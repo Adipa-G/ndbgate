@@ -1,42 +1,20 @@
 #summary Example to do basic loading and saving using the library
 
 = Simple Example =
-Example is created using derby as the database engine. This demonstrates 
+Example is created using SQLLite as the database engine. This demonstrates
 basic features like persisting, retrieval, change tracking
 
 = Details =
 ===Create the entity===
 {{{
-@DBTableInfo(tableName = "simple_entity")
-public class SimpleEntity  extends DefaultServerDBClass
+[DbTableInfo("sub_entity")]
+public class SubEntity : MiddleEntity
 {
-    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
-    private int id;
-    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
-    private String name;
+    [DbColumnInfo(DbColumnType.Varchar)]
+    public string SubName { get; set; }
 
-    public SimpleEntity()
+    public SubEntity()
     {
-    }
-
-    public int getId()
-    {
-        return id;
-    }
-
-    public void setId(int id)
-    {
-        this.id = id;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
     }
 }
 }}}
@@ -45,143 +23,116 @@ public class SimpleEntity  extends DefaultServerDBClass
 {{{
 public class ExampleBase
 {
-    protected DBConnector connector;
-
-    public void initializeConnector()
+    public static IDbConnection SetupDb()
     {
         try
         {
-            Logger.getLogger(getClass().getName()).info("Starting in-memory database for unit tests");
-            Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
-            Connection con = DriverManager.getConnection("jdbc:derby:memory:testdb;create=true");
-            connector = new DBConnector("jdbc:derby:memory:testdb;","org.apache.derby.jdbc.EmbeddedDriver",DBConnector.DB_DERBY);
+            log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
+
+            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(),typeof(ExampleBase)).Log(typeof(ExampleBase),Level.Info,"Starting in-memory database for unit tests",null);
+            var dbConnector = new DbConnector("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DbConnector.DbSqllite);
+            return dbConnector.Connection;
         }
         catch (Exception ex)
         {
-            ex.printStackTrace();
-            Logger.getLogger(getClass().getName()).severe("Exception during database startup.");
+            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(ExampleBase)).Log(typeof(ExampleBase), Level.Fatal, "Exception during database startup.", ex);
+            return null;
         }
     }
 
-    public void destroyConnector()
+
+    public static void CloseDb()
     {
         try
         {
-            DriverManager.getConnection("jdbc:derby:memory:testdb;shutdown=true").close();
+            IDbConnection connection = DbConnector.GetSharedInstance().Connection;
+            connection.Close();
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
-            if (ex.getErrorCode() != 45000)
-            {
-                ex.printStackTrace();
-            }
+            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(ExampleBase)).Log(typeof(ExampleBase), Level.Fatal, "Exception during database cleanup.", ex);
         }
-        try
-        {
-            VFMemoryStorageFactory.purgeDatabase(new File("testdb").getCanonicalPath());
-        }
-        catch (IOException iox)
-        {
-            iox.printStackTrace();
-        }
-        connector.finalize();
-        connector = null;
     }
 }
 }}}
 
 ===Class to do the operation===
 {{{
-public class SimpleExample extends ExampleBase
+public class SimpleExample
 {
-    private int id = 43;
+    private const int Id = 43;
 
-    public SimpleEntity createEntity()
+    public SimpleEntity CreateEntity()
     {
         SimpleEntity entity = new SimpleEntity();
-        entity.setId(id);
-        entity.setName("Entity");
+        entity.Id = Id;
+        entity.Name = "Entity";
         return entity;
     }
 
-    public void patch() throws DBPatchingException, SQLException
+    public void Patch(IDbConnection con)
     {
-        Connection con = connector.getConnection();
-        Collection<ServerDBClass> entities = new ArrayList<ServerDBClass>();
-        entities.add(createEntity());
-        ERLayer.getSharedInstance().patchDataBase(con,entities,false);
-        con.commit();
-        DBMgmtUtility.close(con);
+        ICollection<IServerDbClass> entities = new List<IServerDbClass>();
+        entities.Add(CreateEntity());
+        IDbTransaction transaction = con.BeginTransaction();
+        ErLayer.GetSharedInstance().PatchDataBase(con,entities,false);
+        transaction.Commit();
     }
 
-    public void persist(SimpleEntity entity) throws PersistException, SQLException
+    public void Persist(IDbConnection con,SimpleEntity entity)
     {
-        Connection con = connector.getConnection();
-        entity.persist(con);
-        con.commit();
-        DBMgmtUtility.close(con);
+        IDbTransaction transaction = con.BeginTransaction();
+        entity.Persist(con);
+        transaction.Commit();
     }
 
-    public SimpleEntity retrieve() throws SQLException,RetrievalException
+    public SimpleEntity Retrieve(IDbConnection con)
     {
-        Connection con = connector.getConnection();
-        PreparedStatement ps = con.prepareStatement("select * from simple_entity where id = ?");
-        ps.setInt(1,id);
-        ResultSet rs = ps.executeQuery();
+        IDbCommand cmd = con.CreateCommand();
+        cmd.CommandText = "select * from simple_entity where id = ?";
+
+        IDbDataParameter parameter = cmd.CreateParameter();
+        cmd.Parameters.Add(parameter);
+        parameter.DbType = DbType.Int32;
+        parameter.Value = Id;
+
         SimpleEntity entity = null;
-        if (rs.next())
+        IDataReader reader = cmd.ExecuteReader();
+        if (reader.Read())
         {
             entity = new SimpleEntity();
-            entity.retrieve(rs,con);
+            entity.Retrieve(reader, con);
         }
-        DBMgmtUtility.close(rs);
-        DBMgmtUtility.close(ps);
-        DBMgmtUtility.close(con);
+        DbMgmtUtility.Close(reader);
+        DbMgmtUtility.Close(cmd);
         return entity;
     }
 
-    public static void main(String[] args)
+    public static void DoTest()
     {
-        SimpleExample simpleExample = new SimpleExample();
-        simpleExample.initializeConnector();
-        try
-        {
-            simpleExample.patch();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        try
-        {
-            SimpleEntity entity = simpleExample.createEntity();
-            simpleExample.persist(entity);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        try
-        {
-            SimpleEntity entity = simpleExample.retrieve();
-            System.out.println("entity.Name = " + entity.getName());
+        SimpleExample example = new SimpleExample();
+        IDbConnection con = ExampleBase.SetupDb();
+        example.Patch(con);
 
-            entity.setName("Updated");
-            simpleExample.persist(entity);
-            entity = simpleExample.retrieve();
-            System.out.println("entity.Name = " + entity.getName());
+        SimpleEntity entity = example.CreateEntity();
+        example.Persist(con, entity);
 
-            entity.setStatus(DBClassStatus.DELETED);
-            simpleExample.persist(entity);
-            entity = simpleExample.retrieve();
-            System.out.println("entity = " + entity);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        simpleExample.destroyConnector();
+        entity = example.Retrieve(con);
+        Console.WriteLine("Entity Name = " + entity.Name);
+
+        entity.Name = "Updated";
+        example.Persist(con, entity);
+
+        entity = example.Retrieve(con);
+        Console.WriteLine("Entity Name = " + entity.Name);
+
+        entity.Status = DbClassStatus.Deleted;
+        example.Persist(con, entity);
+
+        entity = example.Retrieve(con);
+        Console.WriteLine("Entity = " + entity);
+
+        ExampleBase.CloseDb();
     }
 }
-}}}
 }}}
