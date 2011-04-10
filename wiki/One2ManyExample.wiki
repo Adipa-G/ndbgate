@@ -7,263 +7,172 @@ This demonstrates one to many relationship capability of the library using 2 typ
 = Details =
 ===Parent class===
 {{{
-@DBTableInfo(tableName = "parent_entity")
-public class One2ManyParentEntity extends DefaultServerDBClass
+[DbTableInfo("parent_entity")]
+public class One2ManyParentEntity : DefaultServerDbClass
 {
-    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
-    private int id;
-    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
-    private String name;
-    @ForeignKeyInfoList(infoList = {
-        @ForeignKeyInfo(name = "parent2childA"
-                    ,relatedObjectType = One2ManyChildEntityA.class
-                    ,updateRule = ReferentialRuleType.RESTRICT
-                    ,deleteRule = ReferentialRuleType.CASCADE
-                    ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "id",toField = "parentId")})
-        ,
-        @ForeignKeyInfo(name = "parent2childB"
-                    ,relatedObjectType = One2ManyChildEntityB.class
-                    ,updateRule = ReferentialRuleType.RESTRICT
-                    ,deleteRule = ReferentialRuleType.CASCADE
-                    ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "id",toField = "parentId")})
-    })
-    private Collection<One2ManyChildEntity> childEntities;
+    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    public int Id { get; set; }
+
+    [DbColumnInfo(DbColumnType.Varchar)]
+    public string Name { get; set; }
+
+    [ForeignKeyInfo("parent2childA", typeof(One2ManyChildEntityA), new string[] { "id" }
+        , new string[] { "parentId" }, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+    [ForeignKeyInfo("parent2childB", typeof(One2ManyChildEntityB), new string[] { "id" }
+        , new string[] { "parentId" }, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+    public ICollection<One2ManyChildEntity> ChildEntities { get; set; }
 
     public One2ManyParentEntity()
     {
-        childEntities = new ArrayList<One2ManyChildEntity>();
-    }
-
-    public int getId()
-    {
-        return id;
-    }
-
-    public void setId(int id)
-    {
-        this.id = id;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public Collection<One2ManyChildEntity> getChildEntities()
-    {
-        return childEntities;
-    }
-
-    public void setChildEntities(Collection<One2ManyChildEntity> childEntities)
-    {
-        this.childEntities = childEntities;
+        ChildEntities = new List<One2ManyChildEntity>();
     }
 }
 }}}
 
 ===Child Base Class===
 {{{
-public abstract class One2ManyChildEntity extends DefaultServerDBClass
+public abstract class One2ManyChildEntity : DefaultServerDbClass
 {
-    public abstract String getName();
-
-    public abstract void setName(String name);
+    public abstract string Name { get; set; }
 }
 }}}
 
 ===Child Sub Class 1===
 {{{
-@DBTableInfo(tableName = "child_entity_a")
-public class One2ManyChildEntityA extends One2ManyChildEntity
+[DbTableInfo("child_entity_a")]
+public class One2ManyChildEntityA : One2ManyChildEntity
 {
-    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
-    private int parentId;
-    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
-    private int indexNo;
-    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
-    private String name;
+    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    public int ParentId { get; set; }
 
+    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    public int IndexNo { get; set; }
 
-    public int getParentId()
-    {
-        return parentId;
-    }
-
-    public void setParentId(int parentId)
-    {
-        this.parentId = parentId;
-    }
-
-    public int getIndexNo()
-    {
-        return indexNo;
-    }
-
-    public void setIndexNo(int indexNo)
-    {
-        this.indexNo = indexNo;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+    [DbColumnInfo(DbColumnType.Varchar)]
+    public override string Name { get; set; }
 }
 }}}
 
 ===Child Sub Class 2===
 {{{
-@DBTableInfo(tableName = "child_entity_b")
-public class One2ManyChildEntityB extends One2ManyChildEntity
+[DbTableInfo("child_entity_b")]
+public class One2ManyChildEntityB : One2ManyChildEntity
 {
-    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
-    private int parentId;
-    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
-    private int indexNo;
-    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
-    private String name;
+    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    public int ParentId { get; set; }
 
+    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    public int IndexNo { get; set; }
 
-    public int getParentId()
-    {
-        return parentId;
-    }
-
-    public void setParentId(int parentId)
-    {
-        this.parentId = parentId;
-    }
-
-    public int getIndexNo()
-    {
-        return indexNo;
-    }
-
-    public void setIndexNo(int indexNo)
-    {
-        this.indexNo = indexNo;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
+    [DbColumnInfo(DbColumnType.Varchar)]
+    public override string Name { get; set; }
 }
 }}}
 
 ===Testing Class===
-get the source for ExampleBase from http://code.google.com/p/dbgate/wiki/SimpleEntityExample
+get the source for ExampleBase from http://code.google.com/p/ndbgate/wiki/SimpleEntityExample
 
 {{{
-public class One2ManyExample extends ExampleBase
+public class One2ManyExample
 {
-    private static int id = 43;
+    public const int Id = 43;
 
-    public One2ManyParentEntity createEntityWithChildern()
+    public One2ManyParentEntity CreateEntity()
     {
         One2ManyParentEntity entity = new One2ManyParentEntity();
-        entity.setId(id);
-        entity.setName("Parent");
+        entity.Id = Id;
+        entity.Name = "Parent";
 
         One2ManyChildEntityA childEntityA = new One2ManyChildEntityA();
-        childEntityA.setName("Child A");
-        entity.getChildEntities().add(childEntityA);
+        childEntityA.IndexNo = 0;
+        childEntityA.Name = "Child A";
+        entity.ChildEntities.Add(childEntityA);
 
         One2ManyChildEntityB childEntityB = new One2ManyChildEntityB();
-        childEntityB.setName("Child B");
-        entity.getChildEntities().add(childEntityB);
+        childEntityB.IndexNo = 1;
+        childEntityB.Name = "Child B";
+        entity.ChildEntities.Add(childEntityB);
 
         return entity;
     }
 
-    public void patch() throws DBPatchingException, SQLException
+    public void Patch(IDbConnection con)
     {
-        Connection con = connector.getConnection();
-        Collection<ServerDBClass> entities = new ArrayList<ServerDBClass>();
-        entities.add(createEntityWithChildern());
-        entities.add(new One2ManyChildEntityA());
-        entities.add(new One2ManyChildEntityB());
-        ERLayer.getSharedInstance().patchDataBase(con,entities,false);
-        con.commit();
-        DBMgmtUtility.close(con);
+        ICollection<IServerDbClass> entities = new List<IServerDbClass>();
+        entities.Add(new One2ManyParentEntity());
+        entities.Add(new One2ManyChildEntityA());
+        entities.Add(new One2ManyChildEntityB());
+        IDbTransaction transaction = con.BeginTransaction();
+        ErLayer.GetSharedInstance().PatchDataBase(con,entities,false);
+        transaction.Commit();
     }
 
-    public void persist() throws PersistException, SQLException
+    public void Persist(IDbConnection con, One2ManyParentEntity entity)
     {
-        Connection con = connector.getConnection();
-        One2ManyParentEntity entity = createEntityWithChildern();
-        entity.persist(con);
-        con.commit();
-        DBMgmtUtility.close(con);
+        IDbTransaction transaction = con.BeginTransaction();
+        entity.Persist(con);
+        transaction.Commit();
     }
 
-    public One2ManyParentEntity retrieve(int id) throws SQLException,RetrievalException
+    public One2ManyParentEntity Retrieve(IDbConnection con)
     {
-        Connection con = connector.getConnection();
-        PreparedStatement ps = con.prepareStatement("select * from parent_entity where id = ?");
-        ps.setInt(1, id);
-        ResultSet rs = ps.executeQuery();
+        IDbCommand cmd = con.CreateCommand();
+        cmd.CommandText = "select * from parent_entity where id = ?";
+
+        IDbDataParameter parameter = cmd.CreateParameter();
+        cmd.Parameters.Add(parameter);
+        parameter.DbType = DbType.Int32;
+        parameter.Value = Id;
+
         One2ManyParentEntity entity = null;
-        if (rs.next())
+        IDataReader reader = cmd.ExecuteReader();
+        if (reader.Read())
         {
             entity = new One2ManyParentEntity();
-            entity.retrieve(rs,con);
+            entity.Retrieve(reader, con);
         }
-        DBMgmtUtility.close(rs);
-        DBMgmtUtility.close(ps);
-        DBMgmtUtility.close(con);
+        DbMgmtUtility.Close(reader);
+        DbMgmtUtility.Close(cmd);
         return entity;
     }
 
-    public static void main(String[] args)
+    public static void DoTest()
     {
-        One2ManyExample one2ManyExample = new One2ManyExample();
-        one2ManyExample.initializeConnector();
-        try
+        One2ManyExample example = new One2ManyExample();
+        IDbConnection con = ExampleBase.SetupDb();
+        example.Patch(con);
+
+        One2ManyParentEntity entity = example.CreateEntity();
+        example.Persist(con, entity);
+
+        entity = example.Retrieve(con);
+        Console.WriteLine("Entity Name = " + entity.Name);
+        foreach (One2ManyChildEntity childEntity in entity.ChildEntities)
         {
-            one2ManyExample.patch();
+            Console.WriteLine("Entity Child Name = " + childEntity.Name);
         }
-        catch (Exception e)
+
+        entity.Name = "Updated Entity A";
+        foreach (One2ManyChildEntity childEntity in entity.ChildEntities)
         {
-            e.printStackTrace();
+            childEntity.Name += " Updated";
         }
-        try
+        example.Persist(con, entity);
+
+        entity = example.Retrieve(con);
+        Console.WriteLine("Entity Name = " + entity.Name);
+        foreach (One2ManyChildEntity childEntity in entity.ChildEntities)
         {
-            one2ManyExample.persist();
+            Console.WriteLine("Entity Child Name = " + childEntity.Name);
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        try
-        {
-            One2ManyParentEntity entity = one2ManyExample.retrieve(id);
-            System.out.println("entity.Name() = " + entity.getName());
-            for (One2ManyChildEntity childEntity : entity.getChildEntities())
-            {
-                System.out.println("entity.ChildName() = " + childEntity.getName());
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        one2ManyExample.destroyConnector();
+
+        entity.Status = DbClassStatus.Deleted;
+        example.Persist(con, entity);
+
+        entity = example.Retrieve(con);
+        Console.WriteLine("Entity = " + entity);
+
+        ExampleBase.CloseDb();
     }
 }
 }}}

@@ -7,480 +7,265 @@ This demonstrates no of features working together, with reverse relationships an
 = Details =
 ===Item class===
 {{{
-@DBTableInfo(tableName = "product_item")
-public abstract class Item extends DefaultServerDBClass
+[DbTableInfo("product_item")]
+public abstract class Item : DefaultServerDbClass
 {
-    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true,subClassCommonColumn = true)
-    private int itemId;
-    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
-    private String name;
+    [DbColumnInfo(DbColumnType.Integer, Key = true, SubClassCommonColumn = true)]
+    public int ItemId { get; set; }
+    [DbColumnInfo(DbColumnType.Varchar)]
+    public string Name { get; set; }
 
-    public Item()
+    protected Item()
     {
-    }
-
-    public int getItemId()
-    {
-        return itemId;
-    }
-
-    public void setItemId(int itemId)
-    {
-        this.itemId = itemId;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
     }
 }
 }}}
 
 ===Product Class===
 {{{
-@DBTableInfo(tableName = "product_product")
-public class Product extends Item
+[DbTableInfo("product_product")]
+public class Product : dbgatetestapp.dbgate.complexexample.entities.product.Item
 {
-    @DBColumnInfo(columnType = DBColumnType.DOUBLE)
-    private double unitPrice;
-    @DBColumnInfo(columnType = DBColumnType.DOUBLE,nullable = true)
-    private Double bulkUnitPrice;
+    [DbColumnInfo(DbColumnType.Double)]
+    public double UnitPrice { get; set; }
 
-    public double getUnitPrice()
-    {
-        return unitPrice;
-    }
-
-    public void setUnitPrice(double unitPrice)
-    {
-        this.unitPrice = unitPrice;
-    }
-
-    public Double getBulkUnitPrice()
-    {
-        return bulkUnitPrice;
-    }
-
-    public void setBulkUnitPrice(Double bulkUnitPrice)
-    {
-        this.bulkUnitPrice = bulkUnitPrice;
-    }
+    [DbColumnInfo(DbColumnType.Double,Nullable = true)]
+    public double? BulkUnitPrice { get; set; }
 }
 }}}
 
 ===Service Class===
 {{{
-@DBTableInfo(tableName = "product_service")
-public class Service extends Item
+[DbTableInfo("product_service")]
+public class Service : Item
 {
-    @DBColumnInfo(columnType = DBColumnType.DOUBLE)
-    private double hourlyRate;
-
-    public double getHourlyRate()
-    {
-        return hourlyRate;
-    }
-
-    public void setHourlyRate(double hourlyRate)
-    {
-        this.hourlyRate = hourlyRate;
-    }
+    [DbColumnInfo(DbColumnType.Double)]
+    public double HourlyRate { get; set; }
 }
 }}}
 
 ===Transaction Class===
 {{{
-@DBTableInfo(tableName = "order_transaction")
-public class Transaction extends DefaultServerDBClass
+[DbTableInfo("order_transaction")]
+public class Transaction : DefaultServerDbClass
 {
-    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
-    private int transactionId;
-    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
-    private String name;
-    @ForeignKeyInfo(name = "tx2item_tx"
-                ,relatedObjectType = ItemTransaction.class
-                ,updateRule = ReferentialRuleType.RESTRICT
-                ,deleteRule = ReferentialRuleType.CASCADE
-                ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "transactionId",toField = "transactionId")})
-    private Collection<ItemTransaction> itemTransactions;
+    [DbColumnInfo(DbColumnType.Integer,Key = true)]
+    public int TransactionId { get; set; }
+    [DbColumnInfo(DbColumnType.Varchar)]
+    public string Name { get; set; }
+
+    [ForeignKeyInfo("tx2item_tx", typeof(dbgatetestapp.dbgate.complexexample.entities.order.ItemTransaction), new string[] { "transactionId" },new string[] { "transactionId"}
+        , UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+    public ICollection<dbgatetestapp.dbgate.complexexample.entities.order.ItemTransaction> ItemTransactions { get; set; }
 
     public Transaction()
     {
-        itemTransactions = new ArrayList<ItemTransaction>();
-    }
-
-    public int getTransactionId()
-    {
-        return transactionId;
-    }
-
-    public void setTransactionId(int transactionId)
-    {
-        this.transactionId = transactionId;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public Collection<ItemTransaction> getItemTransactions()
-    {
-        return itemTransactions;
-    }
-
-    public void setItemTransactions(Collection<ItemTransaction> itemTransactions)
-    {
-        this.itemTransactions = itemTransactions;
+        ItemTransactions = new List<dbgatetestapp.dbgate.complexexample.entities.order.ItemTransaction>();
     }
 }
 }}}
 
 ===ItemTransaction Class===
 {{{
-@DBTableInfo(tableName = "order_item_transaction")
-public class ItemTransaction  extends DefaultServerDBClass
+[DbTableInfo("order_item_transaction")]
+public class ItemTransaction  : DefaultServerDbClass
 {
-    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
-    private int transactionId;
-    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
-    private int indexNo;
-    @DBColumnInfo(columnType = DBColumnType.INTEGER)
-    private int itemId;
-    @ForeignKeyInfoList(infoList = {
-    @ForeignKeyInfo(name = "item_tx2product"
-                ,relatedObjectType = Product.class
-                ,updateRule = ReferentialRuleType.RESTRICT
-                ,deleteRule = ReferentialRuleType.CASCADE
-                ,nonIdentifyingRelation = true
-                ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "itemId",toField = "itemId")})
-     ,
-    @ForeignKeyInfo(name = "item_tx2service"
-                ,relatedObjectType = Service.class
-                ,updateRule = ReferentialRuleType.RESTRICT
-                ,deleteRule = ReferentialRuleType.CASCADE
-                ,nonIdentifyingRelation = true
-                ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "itemId",toField = "itemId")})
-    })
-    private Item item;
-    @ForeignKeyInfo(name = "item_tx2tx_rev"
-                ,relatedObjectType = Transaction.class
-                ,reverseRelation = true
-                ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "transactionId",toField = "transactionId")})
-    private Transaction transaction;
-    @ForeignKeyInfo(name = "tx2item_tx_charge"
-                ,relatedObjectType = ItemTransactionCharge.class
-                ,updateRule = ReferentialRuleType.RESTRICT
-                ,deleteRule = ReferentialRuleType.CASCADE
-                ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "transactionId",toField = "transactionId")
-                                    ,@ForeignKeyColumnMapping(fromField = "indexNo",toField = "indexNo")})
-    private Collection<ItemTransactionCharge> itemTransactionCharges;
+    [DbColumnInfo(DbColumnType.Integer,Key = true)]
+    public int TransactionId { get; set; }
+    [DbColumnInfo(DbColumnType.Integer,Key = true)]
+    public int IndexNo { get; set; }
+    [DbColumnInfo(DbColumnType.Integer)]
+    public int ItemId { get; set; }
 
-    public ItemTransaction()
-    {
-    }
+    [ForeignKeyInfo("item_tx2product", typeof (Product), new string[] {"itemId"}, new string[] {"itemId"}
+        , NonIdentifyingRelation = true, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+    [ForeignKeyInfo("item_tx2service", typeof (Service), new string[] {"itemId"}, new string[] {"itemId"}
+        , NonIdentifyingRelation = true, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+    public Item Item { get; set; }
+
+    [ForeignKeyInfo("item_tx2tx_rev", typeof (Transaction), new string[] {"transactionId"},new string[] {"transactionId"}
+        , ReverseRelation = true, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+    public Transaction Transaction { get; set; }
+
+    [ForeignKeyInfo("item_tx2tx_chg", typeof(ItemTransactionCharge), new string[] { "transactionId", "indexNo" },
+        new string[] { "transactionId", "indexNo" }, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+    public ICollection<ItemTransactionCharge> ItemTransactionCharges { get; set; }
 
     public ItemTransaction(Transaction transaction)
     {
-        this.transaction = transaction;
-        itemTransactionCharges = new ArrayList<ItemTransactionCharge>();
+        this.Transaction = transaction;
+        ItemTransactionCharges = new List<ItemTransactionCharge>();
     }
 
-    public int getTransactionId()
+    public ItemTransaction()
     {
-        return transactionId;
-    }
-
-    public void setTransactionId(int transactionId)
-    {
-        this.transactionId = transactionId;
-    }
-
-    public int getIndexNo()
-    {
-        return indexNo;
-    }
-
-    public void setIndexNo(int indexNo)
-    {
-        this.indexNo = indexNo;
-    }
-
-    public int getItemId()
-    {
-        return itemId;
-    }
-
-    public void setItemId(int itemId)
-    {
-        this.itemId = itemId;
-    }
-
-    public Item getItem()
-    {
-        return item;
-    }
-
-    public void setItem(Item item)
-    {
-        this.item = item;
-    }
-
-    public Transaction getTransaction()
-    {
-        return transaction;
-    }
-
-    public void setTransaction(Transaction transaction)
-    {
-        this.transaction = transaction;
-    }
-
-    public Collection<ItemTransactionCharge> getItemTransactionCharges()
-    {
-        return itemTransactionCharges;
-    }
-
-    public void setItemTransactionCharges(Collection<ItemTransactionCharge> itemTransactionCharges)
-    {
-        this.itemTransactionCharges = itemTransactionCharges;
+        ItemTransactionCharges = new List<ItemTransactionCharge>();
     }
 }
 }}}
 
 ===ItemTransactionCharge Class===
 {{{
-@DBTableInfo(tableName = "order_item_transaction_charge")
-public class ItemTransactionCharge  extends DefaultServerDBClass
+[DbTableInfo("order_item_transaction_charge")]
+public class ItemTransactionCharge  : DefaultServerDbClass
 {
-    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
-    private int transactionId;
-    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
-    private int indexNo;
-    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
-    private int chargeIndex;
-    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
-    private String chargeCode;
-    @ForeignKeyInfo(name = "item_tx_charge2tx_rev"
-                ,relatedObjectType = Transaction.class
-                ,reverseRelation = true
-                ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "transactionId",toField = "transactionId")})
-    private Transaction transaction;
-    @ForeignKeyInfo(name = "item_tx_charge2tx_item_rev"
-                ,relatedObjectType = ItemTransaction.class
-                ,reverseRelation = true
-                ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "transactionId",toField = "transactionId")
-                    ,@ForeignKeyColumnMapping(fromField = "indexNo",toField = "indexNo")})
-    private ItemTransaction itemTransaction;
+    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    public int TransactionId { get; set; }
+    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    public int IndexNo { get; set; }
+    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    public int ChargeIndex { get; set; }
+    [DbColumnInfo(DbColumnType.Varchar)]
+    public string ChargeCode { get; set; }
+
+    [ForeignKeyInfo("item_tx_charge2tx_rev", typeof (Transaction), new string[] {"transactionId"},new string[] {"transactionId"}
+        , ReverseRelation = true, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+    public Transaction Transaction { get; set; }
+
+    [ForeignKeyInfo("item_tx_charge2tx_item_rev", typeof (dbgatetestapp.dbgate.complexexample.entities.order.ItemTransaction), new string[] {"transactionId","indexNo"},new string[] {"transactionId","indexNo"}
+        , ReverseRelation = true, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+    public dbgatetestapp.dbgate.complexexample.entities.order.ItemTransaction ItemTransaction { get; set; }
 
     public ItemTransactionCharge()
     {
     }
 
-    public ItemTransactionCharge(ItemTransaction itemTransaction)
+    public ItemTransactionCharge(dbgatetestapp.dbgate.complexexample.entities.order.ItemTransaction itemTransaction)
     {
-        this.itemTransaction = itemTransaction;
-        this.transaction = itemTransaction.getTransaction();
-    }
-
-    public int getTransactionId()
-    {
-        return transactionId;
-    }
-
-    public void setTransactionId(int transactionId)
-    {
-        this.transactionId = transactionId;
-    }
-
-    public int getIndexNo()
-    {
-        return indexNo;
-    }
-
-    public void setIndexNo(int indexNo)
-    {
-        this.indexNo = indexNo;
-    }
-
-    public int getChargeIndex()
-    {
-        return chargeIndex;
-    }
-
-    public void setChargeIndex(int chargeIndex)
-    {
-        this.chargeIndex = chargeIndex;
-    }
-
-    public String getChargeCode()
-    {
-        return chargeCode;
-    }
-
-    public void setChargeCode(String chargeCode)
-    {
-        this.chargeCode = chargeCode;
-    }
-
-    public Transaction getTransaction()
-    {
-        return transaction;
-    }
-
-    public void setTransaction(Transaction transaction)
-    {
-        this.transaction = transaction;
-    }
-
-    public ItemTransaction getItemTransaction()
-    {
-        return itemTransaction;
-    }
-
-    public void setItemTransaction(ItemTransaction itemTransaction)
-    {
-        this.itemTransaction = itemTransaction;
+        this.ItemTransaction = itemTransaction;
+        this.Transaction = itemTransaction.Transaction;
     }
 }
 }}}
 
 ===Testing Class===
-get the source for ExampleBase from http://code.google.com/p/dbgate/wiki/SimpleEntityExample
+get the source for ExampleBase from http://code.google.com/p/ndbgate/wiki/SimpleEntityExample
 
 {{{
-public class ComplexExample extends ExampleBase
+public class ComplexExample
 {
-    private static int productId = 321;
-    private static int serviceId = 322;
-    private static int transactionId = 43;
+    public const int ProductId = 43;
+    public const int ServiceId = 63;
+    public const int TransactionId = 1243;
 
-    public Product createDefaultProduct() throws PersistException
+    public Product CreateDefaultProduct(IDbConnection con)
     {
         Product product = new Product();
-        product.setItemId(productId);
-        product.setName("Product");
-        product.setUnitPrice(54D);
-        Connection con = connector.getConnection();
-        product.persist(con);
-        DBMgmtUtility.close(con);
+        product.ItemId = ProductId;
+        product.Name = "Product";
+        product.UnitPrice = 54;
+        IDbTransaction transaction = con.BeginTransaction();
+        product.Persist(con);
+        transaction.Commit();
         return product;
     }
 
-    public Service createDefaultService() throws PersistException
+    public Service CreateDefaultService(IDbConnection con)
     {
         Service service = new Service();
-        service.setItemId(serviceId);
-        service.setName("Service");
-        service.setHourlyRate(65D);
-        Connection con = connector.getConnection();
-        service.persist(con);
-        DBMgmtUtility.close(con);
+        service.ItemId = ServiceId;
+        service.Name = "Service";
+        service.HourlyRate = 65;
+        IDbTransaction transaction = con.BeginTransaction();
+        service.Persist(con);
+        transaction.Commit();
         return service;
     }
 
-    public Transaction createDefaultTransaction() throws PersistException
+    public Transaction CreateDefaultTransaction(IDbConnection con, Product product, Service service)
     {
         Transaction transaction = new Transaction();
-        transaction.setTransactionId(transactionId);
-        transaction.setName("TRS-0001");
+        transaction.TransactionId = TransactionId;
+        transaction.Name = "TRS-0001";
 
         ItemTransaction productTransaction = new ItemTransaction(transaction);
-        productTransaction.setIndexNo(0);
-        productTransaction.setItem(createDefaultProduct());
-        transaction.getItemTransactions().add(productTransaction);
+        productTransaction.IndexNo = 0;
+        productTransaction.Item = product;
+        transaction.ItemTransactions.Add(productTransaction);
 
         ItemTransactionCharge productTransactionCharge = new ItemTransactionCharge(productTransaction);
-        productTransactionCharge.setChargeCode("Product-Sell-Code");
-        productTransaction.getItemTransactionCharges().add(productTransactionCharge);
+        productTransactionCharge.ChargeCode = "Product-Sell-Code";
+        productTransaction.ItemTransactionCharges.Add(productTransactionCharge);
 
         ItemTransaction serviceTransaction = new ItemTransaction(transaction);
-        serviceTransaction.setIndexNo(0);
-        serviceTransaction.setItem(createDefaultService());
-        transaction.getItemTransactions().add(serviceTransaction);
+        serviceTransaction.IndexNo = 1;
+        serviceTransaction.Item = service;
+        transaction.ItemTransactions.Add(serviceTransaction);
 
         ItemTransactionCharge serviceTransactionCharge = new ItemTransactionCharge(serviceTransaction);
-        serviceTransactionCharge.setChargeCode("Service-Sell-Code");
-        serviceTransaction.getItemTransactionCharges().add(serviceTransactionCharge);
+        serviceTransactionCharge.ChargeCode = "Service-Sell-Code";
+        serviceTransaction.ItemTransactionCharges.Add(serviceTransactionCharge);
 
-        Connection con = connector.getConnection();
-        transaction.persist(con);
-        DBMgmtUtility.close(con);
+        IDbTransaction dbTransaction = con.BeginTransaction();
+        transaction.Persist(con);
+        dbTransaction.Commit();
         return transaction;
     }
 
-    public void patch() throws DBPatchingException, SQLException
+    public void Patch(IDbConnection con)
     {
-        Connection con = connector.getConnection();
-        Collection<ServerDBClass> entities = new ArrayList<ServerDBClass>();
-        entities.add(new Transaction());
-        entities.add(new ItemTransaction(new Transaction()));
-        entities.add(new ItemTransactionCharge(new ItemTransaction(new Transaction())));
-        entities.add(new Product());
-        entities.add(new Service());
-        ERLayer.getSharedInstance().patchDataBase(con,entities,false);
-        con.commit();
-        DBMgmtUtility.close(con);
+        ICollection<IServerDbClass> entities = new List<IServerDbClass>();
+        entities.Add(new Product());
+        entities.Add(new Service());
+        entities.Add(new Transaction());
+        entities.Add(new ItemTransaction());
+        entities.Add(new ItemTransactionCharge());
+        IDbTransaction transaction = con.BeginTransaction();
+        ErLayer.GetSharedInstance().PatchDataBase(con,entities,false);
+        transaction.Commit();
     }
 
-    public Transaction retrieve(int id) throws SQLException,RetrievalException
+    public void Persist(IDbConnection con, IServerDbClass entity)
     {
-        Connection con = connector.getConnection();
-        PreparedStatement ps = con.prepareStatement("select * from order_transaction where transaction_Id = ?");
-        ps.setInt(1, id);
-        ResultSet rs = ps.executeQuery();
+        IDbTransaction transaction = con.BeginTransaction();
+        entity.Persist(con);
+        transaction.Commit();
+    }
+
+    public Transaction Retrieve(IDbConnection con)
+    {
+        IDbCommand cmd = con.CreateCommand();
+        cmd.CommandText = "select * from order_transaction where transaction_id = ?";
+
+        IDbDataParameter parameter = cmd.CreateParameter();
+        cmd.Parameters.Add(parameter);
+        parameter.DbType = DbType.Int32;
+        parameter.Value = TransactionId;
+
         Transaction entity = null;
-        if (rs.next())
+        IDataReader reader = cmd.ExecuteReader();
+        if (reader.Read())
         {
             entity = new Transaction();
-            entity.retrieve(rs,con);
+            entity.Retrieve(reader, con);
         }
-        DBMgmtUtility.close(rs);
-        DBMgmtUtility.close(ps);
-        DBMgmtUtility.close(con);
+        DbMgmtUtility.Close(reader);
+        DbMgmtUtility.Close(cmd);
         return entity;
     }
 
-    public static void main(String[] args)
+    public static void DoTest()
     {
-        ComplexExample complexExample = new ComplexExample();
-        complexExample.initializeConnector();
-        try
+        ComplexExample example = new ComplexExample();
+        IDbConnection con = ExampleBase.SetupDb();
+        example.Patch(con);
+
+        Product product = example.CreateDefaultProduct(con);
+        example.Persist(con,product);
+
+        Service service = example.CreateDefaultService(con);
+        example.Persist(con, service);
+
+        Transaction transaction = example.CreateDefaultTransaction(con,product,service);
+        example.Persist(con, transaction);
+
+        transaction = example.Retrieve(con);
+        Console.WriteLine("Transaction Name = " + transaction.Name);
+        foreach (ItemTransaction itemTransaction in transaction.ItemTransactions)
         {
-            complexExample.patch();
+            Console.WriteLine("Item Name = " + itemTransaction.Item.Name);
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        try
-        {
-            complexExample.createDefaultTransaction();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        try
-        {
-            Transaction entity = complexExample.retrieve(transactionId);
-            System.out.println("entityA.Name() = " + entity.getName());
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        complexExample.destroyConnector();
+        ExampleBase.CloseDb();
     }
 }
 }}}
