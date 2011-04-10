@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3B458BCC-EC93-4F3D-AB40-B33F14323728}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>dbgatetestapp</RootNamespace>
+    <AssemblyName>dbgatetestapp</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\lib\log4net\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\lib\sqllite\System.Data.SQLite.DLL</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Compile Include="src\dbgate\complexexample\entities\order\ItemTransaction.cs" />
+    <Compile Include="src\dbgate\complexexample\entities\order\ItemTransactionCharge.cs" />
+    <Compile Include="src\dbgate\complexexample\entities\order\Transaction.cs" />
+    <Compile Include="src\dbgate\complexexample\entities\product\Item.cs" />
+    <Compile Include="src\dbgate\complexexample\entities\product\Product.cs" />
+    <Compile Include="src\dbgate\complexexample\entities\product\Service.cs" />
+    <Compile Include="src\dbgate\ExampleBase.cs" />
+    <Compile Include="src\dbgate\MainProgram.cs" />
+    <Compile Include="src\dbgate\simpleexample\entities\SimpleEntity.cs" />
+    <Compile Include="src\dbgate\simpleexample\SimpleExample.cs" />
+    <Compile Include="src\dbgate\inheritanceexample\entities\MiddleEntity.cs" />
+    <Compile Include="src\dbgate\inheritanceexample\entities\SubEntity.cs" />
+    <Compile Include="src\dbgate\inheritanceexample\entities\SuperEntity.cs" />
+    <Compile Include="src\dbgate\inheritanceexample\InheritanceExample.cs" />
+    <Compile Include="src\dbgate\one2oneexample\entities\One2OneChildEntity.cs" />
+    <Compile Include="src\dbgate\one2oneexample\entities\One2OneChildEntityA.cs" />
+    <Compile Include="src\dbgate\one2oneexample\entities\One2OneChildEntityB.cs" />
+    <Compile Include="src\dbgate\one2oneexample\entities\One2OneParentEntity.cs" />
+    <Compile Include="src\dbgate\one2oneexample\One2OneExample.cs" />
+    <Compile Include="src\dbgate\one2manyexample\entities\One2ManyChildEntity.cs" />
+    <Compile Include="src\dbgate\one2manyexample\entities\One2ManyChildEntityA.cs" />
+    <Compile Include="src\dbgate\one2manyexample\entities\One2ManyChildEntityB.cs" />
+    <Compile Include="src\dbgate\one2manyexample\entities\One2ManyParentEntity.cs" />
+    <Compile Include="src\dbgate\one2manyexample\One2ManyExample.cs" />
+    <Compile Include="src\dbgate\complexexample\ComplexExample.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\dbgate\dbgate.csproj">
+      <Project>{13EB1070-FC28-4EF6-AB4A-E5333EAAE331}</Project>
+      <Name>dbgate</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

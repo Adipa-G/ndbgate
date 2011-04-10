@@ -1,0 +1,316 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{13EB1070-FC28-4EF6-AB4A-E5333EAAE331}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>dbgate</RootNamespace>
+    <AssemblyName>dbgate</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net, Version=1.2.9.0, Culture=neutral, PublicKeyToken=b32731d11ce58905">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\log4net\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.5.9.10348, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\nunit\framework\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.mocks, Version=2.5.9.10348, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\nunit\framework\nunit.mocks.dll</HintPath>
+    </Reference>
+    <Reference Include="pnunit.framework, Version=1.0.4000.25744, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\nunit\framework\pnunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.SQLite, Version=1.0.66.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\sqllite\System.Data.SQLite.DLL</HintPath>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src-tests\dbgate\dbutility\DbUtilsTests.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\ErManagementColumnPersistTests.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\ErManagementInheritancePersistTests.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\ErManagementMetaDataTests.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\ErManagementTreePersistTests.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\metadata\LeafEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\metadata\LeafEntitySubA.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\metadata\LeafEntitySubB.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\metadata\RootEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\columntest\ColumnTestEntityAnnotations.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\columntest\ColumnTestEntityExts.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\columntest\ColumnTestEntityFields.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\columntest\ColumnTestExtFactory.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\columntest\IColumnTestEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\columntest\PrimaryKeyGenerator.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\IInheritanceTestSubEntityA.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\IInheritanceTestSubEntityB.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\IInheritanceTestSuperEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\InheritanceTestExtFactory.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\InheritanceTestSubEntityAAnnotations.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\InheritanceTestSubEntityAExt.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\InheritanceTestSubEntityAFields.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\InheritanceTestSubEntityBAnnotations.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\InheritanceTestSubEntityBExt.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\InheritanceTestSubEntityBFields.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\InheritanceTestSuperEntityAnnotations.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\InheritanceTestSuperEntityExt.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\InheritanceTestSuperEntityFields.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\ITreeTestOne2ManyEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\ITreeTestOne2OneEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\ITreeTestRootEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestExtFactory.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestOne2ManyEntityAnnotations.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestOne2ManyEntityExt.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestOne2ManyEntityFields.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestOne2OneEntityAnnotations.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestOne2OneEntityExt.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestOne2OneEntityFields.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestRootEntityAnnotations.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestRootEntityExt.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestRootEntityFields.cs" />
+    <Compile Include="src-tests\dbgate\utility\StatusManagerTests.cs" />
+    <Compile Include="src-tests\dbgate\utility\support\LeafEntity.cs" />
+    <Compile Include="src-tests\dbgate\utility\support\RootEntity.cs" />
+    <Compile Include="src\dbgate\DbClassStatus.cs" />
+    <Compile Include="src\dbgate\DbColumnType.cs" />
+    <Compile Include="src\dbgate\dbutility\DbConnector.cs" />
+    <Compile Include="src\dbgate\dbutility\DbMgmtUtility.cs" />
+    <Compile Include="src\dbgate\ermanagement\AbstractDbColumn.cs" />
+    <Compile Include="src\dbgate\ermanagement\AbstractDbRelation.cs" />
+    <Compile Include="src\dbgate\ermanagement\AbstractManagedDbClass.cs" />
+    <Compile Include="src\dbgate\ermanagement\AbstractManagedRoDbClass.cs" />
+    <Compile Include="src\dbgate\ermanagement\caches\IFieldCache.cs" />
+    <Compile Include="src\dbgate\ermanagement\caches\IMethodCache.cs" />
+    <Compile Include="src\dbgate\ermanagement\caches\impl\FieldCache.cs" />
+    <Compile Include="src\dbgate\ermanagement\caches\impl\MethodCache.cs" />
+    <Compile Include="src\dbgate\ermanagement\caches\impl\QueryCache.cs" />
+    <Compile Include="src\dbgate\ermanagement\caches\impl\QueryHolder.cs" />
+    <Compile Include="src\dbgate\ermanagement\caches\impl\TableCache.cs" />
+    <Compile Include="src\dbgate\ermanagement\caches\IQueryCache.cs" />
+    <Compile Include="src\dbgate\ermanagement\caches\ITableCache.cs" />
+    <Compile Include="src\dbgate\ermanagement\context\IErSession.cs" />
+    <Compile Include="src\dbgate\ermanagement\context\impl\ErSession.cs" />
+    <Compile Include="src\dbgate\ermanagement\DbColumnInfo.cs" />
+    <Compile Include="src\dbgate\ermanagement\DbRelationColumnMapping.cs" />
+    <Compile Include="src\dbgate\ermanagement\DbTableInfo.cs" />
+    <Compile Include="src\dbgate\ermanagement\DefaultDbColumn.cs" />
+    <Compile Include="src\dbgate\ermanagement\DefaultDbRelation.cs" />
+    <Compile Include="src\dbgate\ermanagement\DefaultServerDbClass.cs" />
+    <Compile Include="src\dbgate\ermanagement\DefaultServerRoDbClass.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\IncorrectFieldDefinitionException.cs" />
+    <Compile Include="src\dbgate\ermanagement\ForeignKeyColumnMapping.cs" />
+    <Compile Include="src\dbgate\ermanagement\ForeignKeyInfo.cs" />
+    <Compile Include="src\dbgate\ermanagement\IDbColumn.cs" />
+    <Compile Include="src\dbgate\ermanagement\IDbRelation.cs" />
+    <Compile Include="src\dbgate\ermanagement\IErDataManager.cs" />
+    <Compile Include="src\dbgate\ermanagement\IErLayer.cs" />
+    <Compile Include="src\dbgate\ermanagement\IErLayerConfig.cs" />
+    <Compile Include="src\dbgate\ermanagement\IField.cs" />
+    <Compile Include="src\dbgate\ermanagement\IManagedDbClass.cs" />
+    <Compile Include="src\dbgate\ermanagement\IManagedRoDbClass.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\AbstractDbLayer.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\AccessDbLayer.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\AbstractDataManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\AccessDataManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\DefaultDataManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\IDataManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\DefaultDbLayer.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\IDbLayer.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\LayerFactory.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\AbstractMetaManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\compare\AbstractMetaComparisonGroup.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\compare\CompareUtility.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\compare\IMetaComparisonGroup.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\compare\MetaComparisonColumnGroup.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\compare\MetaComparisonForeignKeyGroup.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\compare\MetaComparisonPrimaryKeyGroup.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\compare\MetaComparisonTableGroup.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\datastructures\AbstractMetaItem.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\datastructures\IMetaItem.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\datastructures\MetaColumn.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\datastructures\MetaForeignKey.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\datastructures\MetaForeignKeyColumnMapping.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\datastructures\MetaItemType.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\datastructures\MetaPrimaryKey.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\datastructures\MetaTable.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\DefaultMetaManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\IMetaManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\mappings\ColumnTypeMapItem.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\mappings\ReferentialRuleTypeMapItem.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\MySqlMetaManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\SqlLiteMetaManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\support\MetaQueryHolder.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\MySqlDbLayer.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\SqlLiteDbLayer.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\ErDataCommonManager.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\utils\ReflectionUtils.cs" />
+    <Compile Include="src\dbgate\ermanagement\ISequenceGenerator.cs" />
+    <Compile Include="src\dbgate\ermanagement\ISession.cs" />
+    <Compile Include="src\dbgate\ermanagement\ReferentialRuleType.cs" />
+    <Compile Include="src\dbgate\ermanagement\session\Session.cs" />
+    <Compile Include="src\dbgate\ermanagement\session\SessionConfig.cs" />
+    <Compile Include="src\dbgate\GsInfo.cs" />
+    <Compile Include="src\dbgate\IDbClass.cs" />
+    <Compile Include="src\dbgate\IRoDbClass.cs" />
+    <Compile Include="src\dbgate\IServerDbClass.cs" />
+    <Compile Include="src\dbgate\IServerRoDbClass.cs" />
+    <Compile Include="src\dbgate\utility\StatusManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Compile Include="src\dbgate\BaseException.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\FieldCacheMissException.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\NoFieldsFoundException.cs" />
+    <Compile Include="src\dbgate\ermanagement\caches\CacheManager.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\QueryBuildingException.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\TableCacheMissException.cs" />
+    <Compile Include="src\dbgate\ermanagement\context\EntityFieldValue.cs" />
+    <Compile Include="src\dbgate\ermanagement\context\IChangeTracker.cs" />
+    <Compile Include="src\dbgate\ermanagement\context\IEntityContext.cs" />
+    <Compile Include="src\dbgate\ermanagement\context\IEntityFieldValueList.cs" />
+    <Compile Include="src\dbgate\ermanagement\context\IFieldValueList.cs" />
+    <Compile Include="src\dbgate\ermanagement\context\impl\ChangeTracker.cs" />
+    <Compile Include="src\dbgate\ermanagement\context\impl\EntityContext.cs" />
+    <Compile Include="src\dbgate\ermanagement\context\impl\EntityFieldValueList.cs" />
+    <Compile Include="src\dbgate\ermanagement\context\impl\EntityRelationFieldValueList.cs" />
+    <Compile Include="src\dbgate\ermanagement\context\impl\EntityTypeFieldValueList.cs" />
+    <Compile Include="src\dbgate\ermanagement\context\ITypeFieldValueList.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\utils\DBClassAttributeExtractionUtils.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\utils\ERDataManagerUtils.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\utils\ERSessionUtils.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\utils\MiscUtils.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\ErDataManager.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\ErMetaDataManager.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\MetaDataException.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\ErLayerConfig.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\ErLayer.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\DBConnectorNotInitializedException.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\ErDataPersistManager.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\PersistException.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\DataUpdatedFromAnotherSourceException.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\IncorrectStatusException.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\NoMatchingColumnFoundException.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\IntegrityConstraintViolationException.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\ErDataRetrievalManager.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\RetrievalException.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\NoMatchingRecordFoundForSuperClassException.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\NoSetterFoundToSetChildObjectListException.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\SequenceGeneratorInitializationException.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\DBPatchingException.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\changetracker\ChangeTrackerTestOne2ManyEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\changetracker\ChangeTrackerTestOne2OneEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\changetracker\ChangeTrackerTestRootEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\ErManagementChangeTrackerTest.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\constraint\ConstraintTestDeleteCascadeRootEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\constraint\ConstraintTestDeleteRestrictRootEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\constraint\ConstraintTestOne2ManyEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\constraint\ConstraintTestOne2OneEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\constraint\ConstraintTestReverseRootEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\ErManagementConstraintValidationTest.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\version\VersionColumnTestOne2ManyEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\version\VersionColumnTestOne2OneEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\version\VersionColumnTestRootEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\version\VersionGeneralTestOne2ManyEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\version\VersionGeneralTestOne2OneEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\version\VersionGeneralTestRootEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\ErManagementVersionTest.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\crossreference\CrossReferenceTestOne2ManyEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\crossreference\CrossReferenceTestOne2OneEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\crossreference\CrossReferenceTestRootEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\ErManagementCrossReferenceTest.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\featureintegration\product\Item.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\featureintegration\product\Product.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\featureintegration\product\Service.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\featureintegration\order\ItemTransaction.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\featureintegration\order\ItemTransactionCharge.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\featureintegration\order\Transaction.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\ErManagementFeatureIntegrationTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\dbgate\ermanagement\utils\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

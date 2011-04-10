@@ -1,0 +1,187 @@
+#summary Example to do basic loading and saving using the library
+
+= Simple Example =
+Example is created using derby as the database engine. This demonstrates 
+basic features like persisting, retrieval, change tracking
+
+= Details =
+===Create the entity===
+{{{
+@DBTableInfo(tableName = "simple_entity")
+public class SimpleEntity  extends DefaultServerDBClass
+{
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
+    private int id;
+    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
+    private String name;
+
+    public SimpleEntity()
+    {
+    }
+
+    public int getId()
+    {
+        return id;
+    }
+
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+}
+}}}
+
+===Base class for examples===
+{{{
+public class ExampleBase
+{
+    protected DBConnector connector;
+
+    public void initializeConnector()
+    {
+        try
+        {
+            Logger.getLogger(getClass().getName()).info("Starting in-memory database for unit tests");
+            Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+            Connection con = DriverManager.getConnection("jdbc:derby:memory:testdb;create=true");
+            connector = new DBConnector("jdbc:derby:memory:testdb;","org.apache.derby.jdbc.EmbeddedDriver",DBConnector.DB_DERBY);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+            Logger.getLogger(getClass().getName()).severe("Exception during database startup.");
+        }
+    }
+
+    public void destroyConnector()
+    {
+        try
+        {
+            DriverManager.getConnection("jdbc:derby:memory:testdb;shutdown=true").close();
+        }
+        catch (SQLException ex)
+        {
+            if (ex.getErrorCode() != 45000)
+            {
+                ex.printStackTrace();
+            }
+        }
+        try
+        {
+            VFMemoryStorageFactory.purgeDatabase(new File("testdb").getCanonicalPath());
+        }
+        catch (IOException iox)
+        {
+            iox.printStackTrace();
+        }
+        connector.finalize();
+        connector = null;
+    }
+}
+}}}
+
+===Class to do the operation===
+{{{
+public class SimpleExample extends ExampleBase
+{
+    private int id = 43;
+
+    public SimpleEntity createEntity()
+    {
+        SimpleEntity entity = new SimpleEntity();
+        entity.setId(id);
+        entity.setName("Entity");
+        return entity;
+    }
+
+    public void patch() throws DBPatchingException, SQLException
+    {
+        Connection con = connector.getConnection();
+        Collection<ServerDBClass> entities = new ArrayList<ServerDBClass>();
+        entities.add(createEntity());
+        ERLayer.getSharedInstance().patchDataBase(con,entities,false);
+        con.commit();
+        DBMgmtUtility.close(con);
+    }
+
+    public void persist(SimpleEntity entity) throws PersistException, SQLException
+    {
+        Connection con = connector.getConnection();
+        entity.persist(con);
+        con.commit();
+        DBMgmtUtility.close(con);
+    }
+
+    public SimpleEntity retrieve() throws SQLException,RetrievalException
+    {
+        Connection con = connector.getConnection();
+        PreparedStatement ps = con.prepareStatement("select * from simple_entity where id = ?");
+        ps.setInt(1,id);
+        ResultSet rs = ps.executeQuery();
+        SimpleEntity entity = null;
+        if (rs.next())
+        {
+            entity = new SimpleEntity();
+            entity.retrieve(rs,con);
+        }
+        DBMgmtUtility.close(rs);
+        DBMgmtUtility.close(ps);
+        DBMgmtUtility.close(con);
+        return entity;
+    }
+
+    public static void main(String[] args)
+    {
+        SimpleExample simpleExample = new SimpleExample();
+        simpleExample.initializeConnector();
+        try
+        {
+            simpleExample.patch();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            SimpleEntity entity = simpleExample.createEntity();
+            simpleExample.persist(entity);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            SimpleEntity entity = simpleExample.retrieve();
+            System.out.println("entity.Name = " + entity.getName());
+
+            entity.setName("Updated");
+            simpleExample.persist(entity);
+            entity = simpleExample.retrieve();
+            System.out.println("entity.Name = " + entity.getName());
+
+            entity.setStatus(DBClassStatus.DELETED);
+            simpleExample.persist(entity);
+            entity = simpleExample.retrieve();
+            System.out.println("entity = " + entity);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        simpleExample.destroyConnector();
+    }
+}
+}}}
+}}}

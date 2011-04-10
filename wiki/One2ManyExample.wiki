@@ -1,0 +1,269 @@
+#summary One to Many relationship example
+
+= Introduction =
+
+This demonstrates one to many relationship capability of the library using 2 types of different child objects.
+
+= Details =
+===Parent class===
+{{{
+@DBTableInfo(tableName = "parent_entity")
+public class One2ManyParentEntity extends DefaultServerDBClass
+{
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
+    private int id;
+    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
+    private String name;
+    @ForeignKeyInfoList(infoList = {
+        @ForeignKeyInfo(name = "parent2childA"
+                    ,relatedObjectType = One2ManyChildEntityA.class
+                    ,updateRule = ReferentialRuleType.RESTRICT
+                    ,deleteRule = ReferentialRuleType.CASCADE
+                    ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "id",toField = "parentId")})
+        ,
+        @ForeignKeyInfo(name = "parent2childB"
+                    ,relatedObjectType = One2ManyChildEntityB.class
+                    ,updateRule = ReferentialRuleType.RESTRICT
+                    ,deleteRule = ReferentialRuleType.CASCADE
+                    ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "id",toField = "parentId")})
+    })
+    private Collection<One2ManyChildEntity> childEntities;
+
+    public One2ManyParentEntity()
+    {
+        childEntities = new ArrayList<One2ManyChildEntity>();
+    }
+
+    public int getId()
+    {
+        return id;
+    }
+
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public Collection<One2ManyChildEntity> getChildEntities()
+    {
+        return childEntities;
+    }
+
+    public void setChildEntities(Collection<One2ManyChildEntity> childEntities)
+    {
+        this.childEntities = childEntities;
+    }
+}
+}}}
+
+===Child Base Class===
+{{{
+public abstract class One2ManyChildEntity extends DefaultServerDBClass
+{
+    public abstract String getName();
+
+    public abstract void setName(String name);
+}
+}}}
+
+===Child Sub Class 1===
+{{{
+@DBTableInfo(tableName = "child_entity_a")
+public class One2ManyChildEntityA extends One2ManyChildEntity
+{
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
+    private int parentId;
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
+    private int indexNo;
+    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
+    private String name;
+
+
+    public int getParentId()
+    {
+        return parentId;
+    }
+
+    public void setParentId(int parentId)
+    {
+        this.parentId = parentId;
+    }
+
+    public int getIndexNo()
+    {
+        return indexNo;
+    }
+
+    public void setIndexNo(int indexNo)
+    {
+        this.indexNo = indexNo;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+}
+}}}
+
+===Child Sub Class 2===
+{{{
+@DBTableInfo(tableName = "child_entity_b")
+public class One2ManyChildEntityB extends One2ManyChildEntity
+{
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
+    private int parentId;
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
+    private int indexNo;
+    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
+    private String name;
+
+
+    public int getParentId()
+    {
+        return parentId;
+    }
+
+    public void setParentId(int parentId)
+    {
+        this.parentId = parentId;
+    }
+
+    public int getIndexNo()
+    {
+        return indexNo;
+    }
+
+    public void setIndexNo(int indexNo)
+    {
+        this.indexNo = indexNo;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+}
+}}}
+
+===Testing Class===
+get the source for ExampleBase from http://code.google.com/p/dbgate/wiki/SimpleEntityExample
+
+{{{
+public class One2ManyExample extends ExampleBase
+{
+    private static int id = 43;
+
+    public One2ManyParentEntity createEntityWithChildern()
+    {
+        One2ManyParentEntity entity = new One2ManyParentEntity();
+        entity.setId(id);
+        entity.setName("Parent");
+
+        One2ManyChildEntityA childEntityA = new One2ManyChildEntityA();
+        childEntityA.setName("Child A");
+        entity.getChildEntities().add(childEntityA);
+
+        One2ManyChildEntityB childEntityB = new One2ManyChildEntityB();
+        childEntityB.setName("Child B");
+        entity.getChildEntities().add(childEntityB);
+
+        return entity;
+    }
+
+    public void patch() throws DBPatchingException, SQLException
+    {
+        Connection con = connector.getConnection();
+        Collection<ServerDBClass> entities = new ArrayList<ServerDBClass>();
+        entities.add(createEntityWithChildern());
+        entities.add(new One2ManyChildEntityA());
+        entities.add(new One2ManyChildEntityB());
+        ERLayer.getSharedInstance().patchDataBase(con,entities,false);
+        con.commit();
+        DBMgmtUtility.close(con);
+    }
+
+    public void persist() throws PersistException, SQLException
+    {
+        Connection con = connector.getConnection();
+        One2ManyParentEntity entity = createEntityWithChildern();
+        entity.persist(con);
+        con.commit();
+        DBMgmtUtility.close(con);
+    }
+
+    public One2ManyParentEntity retrieve(int id) throws SQLException,RetrievalException
+    {
+        Connection con = connector.getConnection();
+        PreparedStatement ps = con.prepareStatement("select * from parent_entity where id = ?");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        One2ManyParentEntity entity = null;
+        if (rs.next())
+        {
+            entity = new One2ManyParentEntity();
+            entity.retrieve(rs,con);
+        }
+        DBMgmtUtility.close(rs);
+        DBMgmtUtility.close(ps);
+        DBMgmtUtility.close(con);
+        return entity;
+    }
+
+    public static void main(String[] args)
+    {
+        One2ManyExample one2ManyExample = new One2ManyExample();
+        one2ManyExample.initializeConnector();
+        try
+        {
+            one2ManyExample.patch();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            one2ManyExample.persist();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            One2ManyParentEntity entity = one2ManyExample.retrieve(id);
+            System.out.println("entity.Name() = " + entity.getName());
+            for (One2ManyChildEntity childEntity : entity.getChildEntities())
+            {
+                System.out.println("entity.ChildName() = " + childEntity.getName());
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        one2ManyExample.destroyConnector();
+    }
+}
+}}}

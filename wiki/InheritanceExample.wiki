@@ -1,0 +1,227 @@
+#summary Inheritance example
+
+= Introduction =
+
+This demonstrates inheritance capability of the library using 3 level inheritance structure.
+
+= Details =
+===Super class===
+{{{
+@DBTableInfo(tableName = "super_entity")
+public class SuperEntity extends DefaultServerDBClass
+{
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true,subClassCommonColumn = true)
+    private int id;
+    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
+    private String superName;
+
+    public SuperEntity()
+    {
+    }
+
+    public int getId()
+    {
+        return id;
+    }
+
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+
+    public String getSuperName()
+    {
+        return superName;
+    }
+
+    public void setSuperName(String superName)
+    {
+        this.superName = superName;
+    }
+}
+}}}
+
+===Middle Class===
+{{{
+@DBTableInfo(tableName = "middle_entity")
+public class MiddleEntity extends SuperEntity
+{
+    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
+    private String middleName;
+
+    public MiddleEntity()
+    {
+    }
+
+    public String getMiddleName()
+    {
+        return middleName;
+    }
+
+    public void setMiddleName(String middleName)
+    {
+        this.middleName = middleName;
+    }
+}
+
+}}}
+
+===Base Class===
+{{{
+@DBTableInfo(tableName = "sub_entity")
+public class SubEntity extends MiddleEntity
+{
+    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
+    private String subName;
+
+    public SubEntity()
+    {
+    }
+
+    public String getSubName()
+    {
+        return subName;
+    }
+
+    public void setSubName(String subName)
+    {
+        this.subName = subName;
+    }
+}
+}}}
+
+===Child Sub Class 2===
+{{{
+@DBTableInfo(tableName = "child_entity_b")
+public class One2ManyChildEntityB extends One2ManyChildEntity
+{
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
+    private int parentId;
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
+    private int indexNo;
+    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
+    private String name;
+
+
+    public int getParentId()
+    {
+        return parentId;
+    }
+
+    public void setParentId(int parentId)
+    {
+        this.parentId = parentId;
+    }
+
+    public int getIndexNo()
+    {
+        return indexNo;
+    }
+
+    public void setIndexNo(int indexNo)
+    {
+        this.indexNo = indexNo;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+}
+}}}
+
+===Testing Class===
+get the source for ExampleBase from http://code.google.com/p/dbgate/wiki/SimpleEntityExample
+
+{{{
+public class InheritanceExample extends ExampleBase
+{
+    private int id = 43;
+
+    public SubEntity createEntity()
+    {
+        SubEntity entity = new SubEntity();
+        entity.setId(id);
+        entity.setSuperName("Super");
+        entity.setMiddleName("Middle");
+        entity.setSubName("Sub");
+        return entity;
+    }
+
+    public void patch() throws DBPatchingException, SQLException
+    {
+        Connection con = connector.getConnection();
+        Collection<ServerDBClass> entities = new ArrayList<ServerDBClass>();
+        entities.add(createEntity());
+        ERLayer.getSharedInstance().patchDataBase(con,entities,false);
+        con.commit();
+        DBMgmtUtility.close(con);
+    }
+
+    public void persist() throws PersistException, SQLException
+    {
+        Connection con = connector.getConnection();
+        SubEntity entity = createEntity();
+        entity.persist(con);
+        con.commit();
+        DBMgmtUtility.close(con);
+    }
+
+    public SubEntity retrieve() throws SQLException,RetrievalException
+    {
+        Connection con = connector.getConnection();
+        PreparedStatement ps = con.prepareStatement("select * from sub_entity where id = ?");
+        ps.setInt(1,id);
+        ResultSet rs = ps.executeQuery();
+        SubEntity entity = null;
+        if (rs.next())
+        {
+            entity = new SubEntity();
+            entity.retrieve(rs,con);
+        }
+        DBMgmtUtility.close(rs);
+        DBMgmtUtility.close(ps);
+        DBMgmtUtility.close(con);
+        return entity;
+    }
+
+    public static void main(String[] args)
+    {
+        InheritanceExample inheritanceExample = new InheritanceExample();
+        inheritanceExample.initializeConnector();
+        try
+        {
+            inheritanceExample.patch();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            inheritanceExample.persist();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            SubEntity entity = inheritanceExample.retrieve();
+            System.out.println("entity.SuperName = " + entity.getSuperName());
+            System.out.println("entity.MiddleName = " + entity.getMiddleName());
+            System.out.println("entity.SubName = " + entity.getSubName());
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        inheritanceExample.destroyConnector();
+    }
+}
+}}}

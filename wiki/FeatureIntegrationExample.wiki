@@ -1,0 +1,486 @@
+#summary Feature Integration example
+
+= Introduction =
+
+This demonstrates no of features working together, with reverse relationships and non-identifying relationships.
+
+= Details =
+===Item class===
+{{{
+@DBTableInfo(tableName = "product_item")
+public abstract class Item extends DefaultServerDBClass
+{
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true,subClassCommonColumn = true)
+    private int itemId;
+    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
+    private String name;
+
+    public Item()
+    {
+    }
+
+    public int getItemId()
+    {
+        return itemId;
+    }
+
+    public void setItemId(int itemId)
+    {
+        this.itemId = itemId;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+}
+}}}
+
+===Product Class===
+{{{
+@DBTableInfo(tableName = "product_product")
+public class Product extends Item
+{
+    @DBColumnInfo(columnType = DBColumnType.DOUBLE)
+    private double unitPrice;
+    @DBColumnInfo(columnType = DBColumnType.DOUBLE,nullable = true)
+    private Double bulkUnitPrice;
+
+    public double getUnitPrice()
+    {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(double unitPrice)
+    {
+        this.unitPrice = unitPrice;
+    }
+
+    public Double getBulkUnitPrice()
+    {
+        return bulkUnitPrice;
+    }
+
+    public void setBulkUnitPrice(Double bulkUnitPrice)
+    {
+        this.bulkUnitPrice = bulkUnitPrice;
+    }
+}
+}}}
+
+===Service Class===
+{{{
+@DBTableInfo(tableName = "product_service")
+public class Service extends Item
+{
+    @DBColumnInfo(columnType = DBColumnType.DOUBLE)
+    private double hourlyRate;
+
+    public double getHourlyRate()
+    {
+        return hourlyRate;
+    }
+
+    public void setHourlyRate(double hourlyRate)
+    {
+        this.hourlyRate = hourlyRate;
+    }
+}
+}}}
+
+===Transaction Class===
+{{{
+@DBTableInfo(tableName = "order_transaction")
+public class Transaction extends DefaultServerDBClass
+{
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
+    private int transactionId;
+    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
+    private String name;
+    @ForeignKeyInfo(name = "tx2item_tx"
+                ,relatedObjectType = ItemTransaction.class
+                ,updateRule = ReferentialRuleType.RESTRICT
+                ,deleteRule = ReferentialRuleType.CASCADE
+                ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "transactionId",toField = "transactionId")})
+    private Collection<ItemTransaction> itemTransactions;
+
+    public Transaction()
+    {
+        itemTransactions = new ArrayList<ItemTransaction>();
+    }
+
+    public int getTransactionId()
+    {
+        return transactionId;
+    }
+
+    public void setTransactionId(int transactionId)
+    {
+        this.transactionId = transactionId;
+    }
+
+    public String getName()
+    {
+        return name;
+    }
+
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    public Collection<ItemTransaction> getItemTransactions()
+    {
+        return itemTransactions;
+    }
+
+    public void setItemTransactions(Collection<ItemTransaction> itemTransactions)
+    {
+        this.itemTransactions = itemTransactions;
+    }
+}
+}}}
+
+===ItemTransaction Class===
+{{{
+@DBTableInfo(tableName = "order_item_transaction")
+public class ItemTransaction  extends DefaultServerDBClass
+{
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
+    private int transactionId;
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
+    private int indexNo;
+    @DBColumnInfo(columnType = DBColumnType.INTEGER)
+    private int itemId;
+    @ForeignKeyInfoList(infoList = {
+    @ForeignKeyInfo(name = "item_tx2product"
+                ,relatedObjectType = Product.class
+                ,updateRule = ReferentialRuleType.RESTRICT
+                ,deleteRule = ReferentialRuleType.CASCADE
+                ,nonIdentifyingRelation = true
+                ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "itemId",toField = "itemId")})
+     ,
+    @ForeignKeyInfo(name = "item_tx2service"
+                ,relatedObjectType = Service.class
+                ,updateRule = ReferentialRuleType.RESTRICT
+                ,deleteRule = ReferentialRuleType.CASCADE
+                ,nonIdentifyingRelation = true
+                ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "itemId",toField = "itemId")})
+    })
+    private Item item;
+    @ForeignKeyInfo(name = "item_tx2tx_rev"
+                ,relatedObjectType = Transaction.class
+                ,reverseRelation = true
+                ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "transactionId",toField = "transactionId")})
+    private Transaction transaction;
+    @ForeignKeyInfo(name = "tx2item_tx_charge"
+                ,relatedObjectType = ItemTransactionCharge.class
+                ,updateRule = ReferentialRuleType.RESTRICT
+                ,deleteRule = ReferentialRuleType.CASCADE
+                ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "transactionId",toField = "transactionId")
+                                    ,@ForeignKeyColumnMapping(fromField = "indexNo",toField = "indexNo")})
+    private Collection<ItemTransactionCharge> itemTransactionCharges;
+
+    public ItemTransaction()
+    {
+    }
+
+    public ItemTransaction(Transaction transaction)
+    {
+        this.transaction = transaction;
+        itemTransactionCharges = new ArrayList<ItemTransactionCharge>();
+    }
+
+    public int getTransactionId()
+    {
+        return transactionId;
+    }
+
+    public void setTransactionId(int transactionId)
+    {
+        this.transactionId = transactionId;
+    }
+
+    public int getIndexNo()
+    {
+        return indexNo;
+    }
+
+    public void setIndexNo(int indexNo)
+    {
+        this.indexNo = indexNo;
+    }
+
+    public int getItemId()
+    {
+        return itemId;
+    }
+
+    public void setItemId(int itemId)
+    {
+        this.itemId = itemId;
+    }
+
+    public Item getItem()
+    {
+        return item;
+    }
+
+    public void setItem(Item item)
+    {
+        this.item = item;
+    }
+
+    public Transaction getTransaction()
+    {
+        return transaction;
+    }
+
+    public void setTransaction(Transaction transaction)
+    {
+        this.transaction = transaction;
+    }
+
+    public Collection<ItemTransactionCharge> getItemTransactionCharges()
+    {
+        return itemTransactionCharges;
+    }
+
+    public void setItemTransactionCharges(Collection<ItemTransactionCharge> itemTransactionCharges)
+    {
+        this.itemTransactionCharges = itemTransactionCharges;
+    }
+}
+}}}
+
+===ItemTransactionCharge Class===
+{{{
+@DBTableInfo(tableName = "order_item_transaction_charge")
+public class ItemTransactionCharge  extends DefaultServerDBClass
+{
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
+    private int transactionId;
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
+    private int indexNo;
+    @DBColumnInfo(columnType = DBColumnType.INTEGER,key = true)
+    private int chargeIndex;
+    @DBColumnInfo(columnType = DBColumnType.VARCHAR)
+    private String chargeCode;
+    @ForeignKeyInfo(name = "item_tx_charge2tx_rev"
+                ,relatedObjectType = Transaction.class
+                ,reverseRelation = true
+                ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "transactionId",toField = "transactionId")})
+    private Transaction transaction;
+    @ForeignKeyInfo(name = "item_tx_charge2tx_item_rev"
+                ,relatedObjectType = ItemTransaction.class
+                ,reverseRelation = true
+                ,columnMappings =  {@ForeignKeyColumnMapping(fromField = "transactionId",toField = "transactionId")
+                    ,@ForeignKeyColumnMapping(fromField = "indexNo",toField = "indexNo")})
+    private ItemTransaction itemTransaction;
+
+    public ItemTransactionCharge()
+    {
+    }
+
+    public ItemTransactionCharge(ItemTransaction itemTransaction)
+    {
+        this.itemTransaction = itemTransaction;
+        this.transaction = itemTransaction.getTransaction();
+    }
+
+    public int getTransactionId()
+    {
+        return transactionId;
+    }
+
+    public void setTransactionId(int transactionId)
+    {
+        this.transactionId = transactionId;
+    }
+
+    public int getIndexNo()
+    {
+        return indexNo;
+    }
+
+    public void setIndexNo(int indexNo)
+    {
+        this.indexNo = indexNo;
+    }
+
+    public int getChargeIndex()
+    {
+        return chargeIndex;
+    }
+
+    public void setChargeIndex(int chargeIndex)
+    {
+        this.chargeIndex = chargeIndex;
+    }
+
+    public String getChargeCode()
+    {
+        return chargeCode;
+    }
+
+    public void setChargeCode(String chargeCode)
+    {
+        this.chargeCode = chargeCode;
+    }
+
+    public Transaction getTransaction()
+    {
+        return transaction;
+    }
+
+    public void setTransaction(Transaction transaction)
+    {
+        this.transaction = transaction;
+    }
+
+    public ItemTransaction getItemTransaction()
+    {
+        return itemTransaction;
+    }
+
+    public void setItemTransaction(ItemTransaction itemTransaction)
+    {
+        this.itemTransaction = itemTransaction;
+    }
+}
+}}}
+
+===Testing Class===
+get the source for ExampleBase from http://code.google.com/p/dbgate/wiki/SimpleEntityExample
+
+{{{
+public class ComplexExample extends ExampleBase
+{
+    private static int productId = 321;
+    private static int serviceId = 322;
+    private static int transactionId = 43;
+
+    public Product createDefaultProduct() throws PersistException
+    {
+        Product product = new Product();
+        product.setItemId(productId);
+        product.setName("Product");
+        product.setUnitPrice(54D);
+        Connection con = connector.getConnection();
+        product.persist(con);
+        DBMgmtUtility.close(con);
+        return product;
+    }
+
+    public Service createDefaultService() throws PersistException
+    {
+        Service service = new Service();
+        service.setItemId(serviceId);
+        service.setName("Service");
+        service.setHourlyRate(65D);
+        Connection con = connector.getConnection();
+        service.persist(con);
+        DBMgmtUtility.close(con);
+        return service;
+    }
+
+    public Transaction createDefaultTransaction() throws PersistException
+    {
+        Transaction transaction = new Transaction();
+        transaction.setTransactionId(transactionId);
+        transaction.setName("TRS-0001");
+
+        ItemTransaction productTransaction = new ItemTransaction(transaction);
+        productTransaction.setIndexNo(0);
+        productTransaction.setItem(createDefaultProduct());
+        transaction.getItemTransactions().add(productTransaction);
+
+        ItemTransactionCharge productTransactionCharge = new ItemTransactionCharge(productTransaction);
+        productTransactionCharge.setChargeCode("Product-Sell-Code");
+        productTransaction.getItemTransactionCharges().add(productTransactionCharge);
+
+        ItemTransaction serviceTransaction = new ItemTransaction(transaction);
+        serviceTransaction.setIndexNo(0);
+        serviceTransaction.setItem(createDefaultService());
+        transaction.getItemTransactions().add(serviceTransaction);
+
+        ItemTransactionCharge serviceTransactionCharge = new ItemTransactionCharge(serviceTransaction);
+        serviceTransactionCharge.setChargeCode("Service-Sell-Code");
+        serviceTransaction.getItemTransactionCharges().add(serviceTransactionCharge);
+
+        Connection con = connector.getConnection();
+        transaction.persist(con);
+        DBMgmtUtility.close(con);
+        return transaction;
+    }
+
+    public void patch() throws DBPatchingException, SQLException
+    {
+        Connection con = connector.getConnection();
+        Collection<ServerDBClass> entities = new ArrayList<ServerDBClass>();
+        entities.add(new Transaction());
+        entities.add(new ItemTransaction(new Transaction()));
+        entities.add(new ItemTransactionCharge(new ItemTransaction(new Transaction())));
+        entities.add(new Product());
+        entities.add(new Service());
+        ERLayer.getSharedInstance().patchDataBase(con,entities,false);
+        con.commit();
+        DBMgmtUtility.close(con);
+    }
+
+    public Transaction retrieve(int id) throws SQLException,RetrievalException
+    {
+        Connection con = connector.getConnection();
+        PreparedStatement ps = con.prepareStatement("select * from order_transaction where transaction_Id = ?");
+        ps.setInt(1, id);
+        ResultSet rs = ps.executeQuery();
+        Transaction entity = null;
+        if (rs.next())
+        {
+            entity = new Transaction();
+            entity.retrieve(rs,con);
+        }
+        DBMgmtUtility.close(rs);
+        DBMgmtUtility.close(ps);
+        DBMgmtUtility.close(con);
+        return entity;
+    }
+
+    public static void main(String[] args)
+    {
+        ComplexExample complexExample = new ComplexExample();
+        complexExample.initializeConnector();
+        try
+        {
+            complexExample.patch();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            complexExample.createDefaultTransaction();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            Transaction entity = complexExample.retrieve(transactionId);
+            System.out.println("entityA.Name() = " + entity.getName());
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        complexExample.destroyConnector();
+    }
+}
+}}}
