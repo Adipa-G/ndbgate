@@ -121,7 +121,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity entity = new ColumnTestEntityFields();
-                entity.IdCol = id;
                 CreateEntityWithNonNullValues(entity);
 
                 entity.Persist(connection);
@@ -154,7 +153,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity entity = new ColumnTestEntityExts();
-                entity.IdCol = id;
                 CreateEntityWithNonNullValues(entity);
 
                 entity.Persist(connection);
@@ -183,9 +181,8 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity entity = new ColumnTestEntityAnnotations();
-                entity.IdCol =id;
+                
                 CreateEntityWithNonNullValues(entity);
-
                 entity.Persist(connection);
                 transaction.Commit();
                 
@@ -212,7 +209,7 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity entity = new ColumnTestEntityFields();
-                entity.IdCol = id;
+                
                 CreateEntityWithNullValues(entity);
 
                 entity.Persist(connection);
@@ -245,7 +242,7 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity entity = new ColumnTestEntityExts();
-                entity.IdCol = id;
+                
                 CreateEntityWithNullValues(entity);
 
                 entity.Persist(connection);
@@ -274,7 +271,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity entity = new ColumnTestEntityAnnotations();
-                entity.IdCol = id;
                 CreateEntityWithNullValues(entity);
 
                 entity.Persist(connection);
@@ -303,7 +299,6 @@ namespace dbgate.ermanagement
 
                 int id =(int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
-                newEntity.IdCol = id;
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();
@@ -345,7 +340,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
-                newEntity.IdCol = id;
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();
@@ -383,7 +377,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
-                newEntity.IdCol = id;
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();
@@ -421,7 +414,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
-                newEntity.IdCol = id;
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();
@@ -463,7 +455,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
-                newEntity.IdCol = id;
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();
@@ -501,7 +492,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
-                newEntity.IdCol = id;
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();
@@ -539,7 +529,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
-                newEntity.IdCol = id;
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();
@@ -581,7 +570,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
-                newEntity.IdCol = id;
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();
@@ -619,7 +607,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
-                newEntity.IdCol = id;
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();
@@ -657,7 +644,6 @@ namespace dbgate.ermanagement
 
                 int id =(int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
-                newEntity.IdCol = id;
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();
@@ -699,7 +685,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
-                newEntity.IdCol = id;
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();
@@ -737,7 +722,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
-                newEntity.IdCol = id;
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();
@@ -775,7 +759,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
-                newEntity.IdCol = id;
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();
@@ -815,7 +798,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
-                newEntity.IdCol = id;
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();
@@ -851,7 +833,6 @@ namespace dbgate.ermanagement
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
-                newEntity.IdCol = id;
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(connection);
                 transaction.Commit();

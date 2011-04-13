@@ -107,7 +107,7 @@ namespace dbgate.ermanagement.impl
             }
             else if (entity.Status == DbClassStatus.New)
             {
-                Insert(fieldValues, type, con);
+                Insert(entity,fieldValues, type, con);
             }
             else if (entity.Status == DbClassStatus.Modified)
             {
@@ -181,7 +181,7 @@ namespace dbgate.ermanagement.impl
             }
         }
 
-        private void Insert(ITypeFieldValueList valueTypeList, Type type, IDbConnection con)
+        private void Insert(IServerDbClass entity,ITypeFieldValueList valueTypeList, Type type, IDbConnection con)
         {
             StringBuilder logSb = new StringBuilder();
             String query = CacheManager.QueryCache.GetInsertQuery(type);
@@ -203,6 +203,8 @@ namespace dbgate.ermanagement.impl
                         && dbColumn.SequenceGenerator != null)
                 {
                     columnValue = dbColumn.SequenceGenerator.GetNextSequenceValue(con);
+                    PropertyInfo setter = CacheManager.MethodCache.GetProperty(entity, dbColumn.AttributeName);
+                    setter.SetValue(entity,columnValue,null);
                 }
                 else
                 {
