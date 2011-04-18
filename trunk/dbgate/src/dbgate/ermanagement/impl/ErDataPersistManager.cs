@@ -488,6 +488,15 @@ namespace dbgate.ermanagement.impl
                 {
                     continue;
                 }
+                if (relationKeyValueList is EntityRelationFieldValueList)
+                {
+                    EntityRelationFieldValueList entityRelationFieldValueList = (EntityRelationFieldValueList) relationKeyValueList;
+                    if (entityRelationFieldValueList.Relation.ReverseRelationship 
+                        || entityRelationFieldValueList.Relation.NonIdentifyingRelation)
+                    {
+                        continue;
+                    }
+                }
 
                 bool recordExists = false;
                 IDbCommand cmd = CreateRetrievalPreparedStatement(relationKeyValueList,con);
