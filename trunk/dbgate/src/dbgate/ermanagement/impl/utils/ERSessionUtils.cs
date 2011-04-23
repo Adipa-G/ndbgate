@@ -36,7 +36,8 @@ namespace dbgate.ermanagement.impl.utils
         public static bool ExistsInSession(IServerRoDbClass roEntity, ITypeFieldValueList typeList)
         {
             if (roEntity.Context != null
-                && roEntity.Context.ErSession != null)
+                && roEntity.Context.ErSession != null
+                && typeList != null)
             {
                 return roEntity.Context.ErSession.IsProcessed(typeList);
             }
@@ -46,7 +47,8 @@ namespace dbgate.ermanagement.impl.utils
         public static void AddToSession(IServerRoDbClass roEntity, IEntityFieldValueList typeList)
         {
             if (roEntity.Context != null
-                && roEntity.Context.ErSession != null)
+                && roEntity.Context.ErSession != null
+                && typeList != null)
             {
                 roEntity.Context.ErSession.CheckAndAddEntityList(typeList);
             }
@@ -55,7 +57,8 @@ namespace dbgate.ermanagement.impl.utils
         public static IServerRoDbClass GetFromSession(IServerRoDbClass roEntity, ITypeFieldValueList typeList)
         {
             if (roEntity.Context != null
-                && roEntity.Context.ErSession != null)
+                && roEntity.Context.ErSession != null
+                && typeList != null)
             {
                 return roEntity.Context.ErSession.GetProcessed(typeList);
             }
