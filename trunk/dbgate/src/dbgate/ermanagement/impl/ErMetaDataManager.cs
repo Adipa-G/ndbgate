@@ -79,6 +79,9 @@ namespace dbgate.ermanagement.impl
 
                 foreach (MetaQueryHolder holder in queryHolders)
                 {
+                    if (holder.QueryString == null)
+                        continue;
+
                     LogManager.GetLogger(_config.LoggerName).Debug(holder.QueryString);
 
                     IDbCommand cmd = con.CreateCommand();

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.compare;
 using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.datastructures;
@@ -13,6 +14,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
         DbColumnType MapColumnTypeNameToType(string columnTypeName);
 
         string MapColumnTypeToTypeName(DbColumnType columnTypeId);
+
+        String GetDefaultValueForType(DbColumnType columnTypeId);
 
         ReferentialRuleType MapReferentialRuleNameToType(string ruleTypeName);
 

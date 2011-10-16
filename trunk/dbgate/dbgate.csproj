@@ -85,14 +85,18 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src-tests\dbgate\dbutility\DbUtilsTests.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\ErManagementPatchTableDifferenceDBTests.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\ErManagementColumnPersistTests.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\ErManagementInheritancePersistTests.cs" />
-    <Compile Include="src-tests\dbgate\ermanagement\ErManagementMetaDataTests.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\ErManagementPatchEmptyDBTests.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\ErManagementTreePersistTests.cs" />
-    <Compile Include="src-tests\dbgate\ermanagement\support\metadata\LeafEntity.cs" />
-    <Compile Include="src-tests\dbgate\ermanagement\support\metadata\LeafEntitySubA.cs" />
-    <Compile Include="src-tests\dbgate\ermanagement\support\metadata\LeafEntitySubB.cs" />
-    <Compile Include="src-tests\dbgate\ermanagement\support\metadata\RootEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\patch\patchempty\LeafEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\patch\patchempty\LeafEntitySubA.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\patch\patchempty\LeafEntitySubB.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\patch\patchempty\RootEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\patch\patchtabledifferences\ThreeColumnTypeDifferentEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\patch\patchtabledifferences\ThreeColumnEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\patch\patchtabledifferences\FourColumnEntity.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\columntest\ColumnTestEntityAnnotations.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\columntest\ColumnTestEntityExts.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\columntest\ColumnTestEntityFields.cs" />

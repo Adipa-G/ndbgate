@@ -23,7 +23,8 @@
 
             if (Null != that.Null) return false;
             if (ColumnType != that.ColumnType) return false;
-            if (Size != that.Size) return false;
+            if ((ColumnType == DbColumnType.Varchar || ColumnType == DbColumnType.Char)
+                && !Size.Equals(that.Size)) return false;
 
             return true;
         }

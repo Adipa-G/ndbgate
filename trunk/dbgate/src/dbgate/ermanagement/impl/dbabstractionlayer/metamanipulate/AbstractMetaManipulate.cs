@@ -122,6 +122,19 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
             return null;
         }
 
+       
+        public String GetDefaultValueForType(DbColumnType columnTypeId)
+        {
+            foreach (ColumnTypeMapItem typeMapItem in ColumnTypeMapItems)
+            {
+                if (typeMapItem.ColumnType == columnTypeId)
+                {
+                    return typeMapItem.DefaultNonNullValue;
+                }
+            }
+            return null;
+        }
+
         public ReferentialRuleType MapReferentialRuleNameToType(String ruleTypeName)
         {
             foreach (ReferentialRuleTypeMapItem ruleTypeMapItem in ReferentialRuleTypeMapItems)

@@ -15,15 +15,15 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
 
         protected override void FillDataMappings(IDbConnection con)
         {
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("INTEGER",DbColumnType.Integer));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("BOOL",DbColumnType.Boolean));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("FLOAT",DbColumnType.Float));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("CHAR", DbColumnType.Char));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("DATE",DbColumnType.Date));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("DOUBLE",DbColumnType.Double));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("BIGINT",DbColumnType.Long));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("TIMESTAMP",DbColumnType.Timestamp));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("VARCHAR",DbColumnType.Varchar));   
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("INTEGER",DbColumnType.Integer,"0"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("BOOL",DbColumnType.Boolean,"true"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("FLOAT",DbColumnType.Float,"0"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("CHAR", DbColumnType.Char,"' '"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("DATE",DbColumnType.Date,"1981/10/12"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("DOUBLE",DbColumnType.Double,"0"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("BIGINT",DbColumnType.Long,"0"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("TIMESTAMP",DbColumnType.Timestamp,"1981/10/12"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("VARCHAR",DbColumnType.Varchar,"''"));   
         }
 
         protected override void ExtractPrimaryKeyData(IDbConnection con, MetaTable table)
@@ -146,6 +146,18 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
 
         protected override string CreateDropPrimaryKeyQuery(MetaComparisonTableGroup tableGroup, MetaComparisonPrimaryKeyGroup primaryKeyGroup)
         {
+            return null;
+        }
+
+        protected override string CreateAlterColumnQuery(MetaComparisonTableGroup tableGroup, MetaComparisonColumnGroup columnGroup)
+        {
+            //sql lite does not support this
+            return null;
+        }
+
+        protected override string CreateDropColumnQuery(MetaComparisonTableGroup tableGroup, MetaComparisonColumnGroup columnGroup)
+        {
+            //sql lite does not support this
             return null;
         }
     }

@@ -234,7 +234,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
 
         protected override String CreateAlterTableQuery(MetaComparisonTableGroup tableGroup)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         protected override String CreateCreateColumnQuery(MetaComparisonTableGroup tableGroup, MetaComparisonColumnGroup columnGroup)
@@ -245,7 +245,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
             StringBuilder sb = new StringBuilder();
             sb.Append("ALTER TABLE ");
             sb.Append(metaTable.Name);
-            sb.Append("ADD ");
+            sb.Append(" ADD ");
             sb.Append(metaColumn.Name);
             sb.Append(" ");
             if (metaColumn.ColumnType == DbColumnType.Char
@@ -260,6 +260,21 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
             {
                 sb.Append(MapColumnTypeToTypeName(metaColumn.ColumnType));
             }
+
+            sb.Append(" DEFAULT ");
+            if (!metaColumn.Null)
+            {
+                String defaultValue = GetDefaultValueForType(metaColumn.ColumnType);
+                if (defaultValue != null)
+                {
+                    sb.Append(defaultValue);
+                }
+            }
+            else
+            {
+                sb.Append("NULL");
+            }
+
             sb.Append(" ");
             sb.Append(metaColumn.Null ? "" : "NOT NULL");
             sb.Append(" ");
@@ -275,7 +290,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
             StringBuilder sb = new StringBuilder();
             sb.Append("ALTER TABLE ");
             sb.Append(metaTable.Name);
-            sb.Append("DROP COLUMN ");
+            sb.Append(" DROP COLUMN ");
             sb.Append(metaColumn.Name);
             sb.Append(" ");
 
@@ -290,9 +305,10 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
             StringBuilder sb = new StringBuilder();
             sb.Append("ALTER TABLE ");
             sb.Append(metaTable.Name);
-            sb.Append("MODIFY ");
+            sb.Append(" ALTER ");
             sb.Append(metaColumn.Name);
             sb.Append(" ");
+            sb.Append(" SET DATA TYPE ");
             if (metaColumn.ColumnType == DbColumnType.Char
                     || metaColumn.ColumnType == DbColumnType.Varchar)
             {
@@ -305,6 +321,21 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
             {
                 sb.Append(MapColumnTypeToTypeName(metaColumn.ColumnType));
             }
+
+            sb.Append(" DEFAULT ");
+            if (!metaColumn.Null)
+            {
+                String defaultValue = GetDefaultValueForType(metaColumn.ColumnType);
+                if (defaultValue != null)
+                {
+                    sb.Append(defaultValue);
+                }
+            }
+            else
+            {
+                sb.Append("NULL");
+            }
+
             sb.Append(" ");
             sb.Append(metaColumn.Null ? "" : "NOT NULL");
             sb.Append(" ");

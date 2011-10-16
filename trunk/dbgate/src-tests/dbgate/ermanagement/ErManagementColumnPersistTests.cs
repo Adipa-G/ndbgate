@@ -37,7 +37,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception ex)
             {
-                LogManager.GetLogger(typeof (ErManagementMetaDataTests)).Fatal("Exception during test cleanup.", ex);
+                LogManager.GetLogger(typeof (ErManagementPatchEmptyDbTests)).Fatal("Exception during test cleanup.", ex);
             }
         }
 
@@ -71,7 +71,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception ex)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test cleanup.", ex);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test cleanup.", ex);
             }
         }
         
@@ -134,7 +134,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -166,7 +166,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -194,7 +194,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -223,7 +223,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -256,7 +256,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -284,7 +284,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -321,7 +321,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -362,7 +362,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -399,7 +399,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -436,7 +436,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -477,7 +477,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -514,7 +514,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -551,7 +551,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -592,7 +592,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -629,7 +629,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -666,7 +666,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -707,7 +707,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -744,7 +744,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -779,7 +779,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -818,7 +818,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -853,7 +853,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementMetaDataTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(ErManagementPatchEmptyDbTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
