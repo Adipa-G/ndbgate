@@ -9,5 +9,7 @@ namespace dbgate.ermanagement.context
         ICollection<ITypeFieldValueList> ChildEntityKeys { get; }
 
         EntityFieldValue GetFieldValue(string attributeName);
+
+        bool Valid { get; }
     }
 }

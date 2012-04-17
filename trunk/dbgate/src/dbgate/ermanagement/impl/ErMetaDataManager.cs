@@ -17,11 +17,13 @@ namespace dbgate.ermanagement.impl
     public class ErMetaDataManager
     {
         private readonly IDbLayer _dbLayer;
+        private readonly IErLayerStatistics _statistics;
         private readonly IErLayerConfig _config;
 
-        public ErMetaDataManager(IDbLayer dbLayer,IErLayerConfig config)
+        public ErMetaDataManager(IDbLayer dbLayer,IErLayerStatistics statistics,IErLayerConfig config)
         {
             _dbLayer = dbLayer;
+            _statistics = statistics;
             _config = config;
         }
 
@@ -88,6 +90,8 @@ namespace dbgate.ermanagement.impl
                     cmd.CommandText = holder.QueryString;
                     cmd.ExecuteNonQuery();
                     DbMgmtUtility.Close(cmd);
+
+                    if (_config.EnableStatistics) _statistics.RegisterPatch();
                 }
             }
             catch (Exception e)

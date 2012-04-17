@@ -8,14 +8,14 @@ namespace dbgate.ermanagement
         protected AbstractDbRelation(String attributeName, String relationshipName,Type relatedObjectType
                     , DbRelationColumnMapping[] tableColumnMappings)
             : this(attributeName, relationshipName, relatedObjectType, tableColumnMappings,ReferentialRuleType.Restrict
-                    , ReferentialRuleType.Cascade,false,false)
+                    , ReferentialRuleType.Cascade,false,false,false)
         {
         }
 
         protected AbstractDbRelation(String attributeName, String relationshipName, Type relatedObjectType
                                     , DbRelationColumnMapping[] tableColumnMappings,ReferentialRuleType updateRule
                                     , ReferentialRuleType deleteRule,bool reverseRelationship
-                                    ,bool nonIdentifyingRelation)
+                                    ,bool nonIdentifyingRelation,bool lazy)
         {
             AttributeName = attributeName;
             RelationShipName = relationshipName;
@@ -25,6 +25,7 @@ namespace dbgate.ermanagement
             DeleteRule = deleteRule;
             ReverseRelationship = reverseRelationship;
             NonIdentifyingRelation = nonIdentifyingRelation;
+            Lazy = lazy;
         }
 
         #region IDbRelation Members
@@ -44,6 +45,8 @@ namespace dbgate.ermanagement
         public bool ReverseRelationship { get; set; }
 
         public bool NonIdentifyingRelation { get; set; }
+
+        public bool Lazy { get; set; }
 
         #endregion
     }

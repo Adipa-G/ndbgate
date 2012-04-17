@@ -17,6 +17,7 @@ namespace dbgate.ermanagement.impl
         private readonly IErDataManager _erDataManager;
         private readonly ErMetaDataManager _erMetaDataManager;
         private readonly IErLayerConfig _config;
+        private readonly IErLayerStatistics _statistics;
 
         private ErLayer()
         {
@@ -26,12 +27,13 @@ namespace dbgate.ermanagement.impl
             }
             int dbType = DbConnector.GetSharedInstance().DbType;
             _config = new ErLayerConfig();
+            _statistics = new ErLayerStatistics();
             InitializeDefaults();
 
             IDbLayer dbLayer = LayerFactory.CreateLayer(dbType,_config);
             CacheManager.Init(dbLayer);
-            _erDataManager = new ErDataManager(dbLayer,_config);
-            _erMetaDataManager = new ErMetaDataManager(dbLayer,_config);
+            _erDataManager = new ErDataManager(dbLayer,_statistics,_config);
+            _erMetaDataManager = new ErMetaDataManager(dbLayer,_statistics,_config);
         }
 
         private void InitializeDefaults()
@@ -73,6 +75,11 @@ namespace dbgate.ermanagement.impl
         public IErLayerConfig Config 
         {
             get { return _config; }
+        }
+
+        public IErLayerStatistics Statistics
+        {
+            get { return _statistics; }
         }
 
         public static IErLayer GetSharedInstance()

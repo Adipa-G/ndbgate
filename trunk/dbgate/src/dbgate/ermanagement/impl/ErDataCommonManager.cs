@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
+using Castle.DynamicProxy;
+using dbgate.dbutility;
 using dbgate.ermanagement.caches;
 using dbgate.ermanagement.context;
 using dbgate.ermanagement.context.impl;
+using dbgate.ermanagement.exceptions;
 using dbgate.ermanagement.impl.dbabstractionlayer;
 using dbgate.ermanagement.impl.utils;
 using log4net;
@@ -15,11 +18,13 @@ namespace dbgate.ermanagement.impl
     public abstract class ErDataCommonManager
     {
         protected IDbLayer DbLayer;
+        protected IErLayerStatistics Statistics;
         protected IErLayerConfig Config;
 
-        protected ErDataCommonManager(IDbLayer dbLayer, IErLayerConfig config)
+        protected ErDataCommonManager(IDbLayer dbLayer,IErLayerStatistics statistics, IErLayerConfig config)
         {
             DbLayer = dbLayer;
+            Statistics = statistics;
             Config = config;
         }
 
@@ -51,6 +56,10 @@ namespace dbgate.ermanagement.impl
             if (showQuery)
             {
                 LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
+            }
+            if (Config.EnableStatistics)
+            {
+                Statistics.RegisterSelect(targetType);
             }
             return cmd;
         }
@@ -100,6 +109,10 @@ namespace dbgate.ermanagement.impl
                     {
                         continue;
                     }
+                    if (IsProxyObject(parentEntity,typeRelation))
+                    {
+                        continue;
+                    }
 
                     ICollection<IServerDbClass> childEntities = ErDataManagerUtils.GetRelationEntities(parentEntity, typeRelation);
                     foreach (IServerDbClass childEntity in childEntities)
@@ -124,6 +137,120 @@ namespace dbgate.ermanagement.impl
                 }
             }
             return existingEntityChildRelations;
+        }
+
+        protected ICollection<IServerRoDbClass> ReadRelationChildrenFromDb(IServerRoDbClass entity, Type type
+                , IDbConnection con, IDbRelation relation)
+        {
+            Type childType = relation.RelatedObjectType;
+            IServerRoDbClass childTypeInstance = (IServerRoDbClass)Activator.CreateInstance(childType);
+            ErDataManagerUtils.RegisterTypes(childTypeInstance);
+
+            StringBuilder logSb = new StringBuilder();
+            String query = CacheManager.QueryCache.GetRelationObjectLoad(entity.GetType(), relation);
+
+            IList<string> fields = new List<string>();
+            foreach (DbRelationColumnMapping mapping in relation.TableColumnMappings)
+            {
+                fields.Add(mapping.FromField);
+            }
+
+            IDbCommand cmd = con.CreateCommand();
+            cmd.CommandText = query;
+            bool showQuery = Config.ShowQueries;
+            if (showQuery)
+            {
+                logSb.Append(query);
+            }
+            ICollection<IDbColumn> dbColumns = CacheManager.FieldCache.GetDbColumns(type);
+            for (int i = 0; i < fields.Count; i++)
+            {
+                String field = fields[i];
+                IDbColumn matchColumn = ErDataManagerUtils.FindColumnByAttribute(dbColumns, field);
+
+                if (matchColumn != null)
+                {
+                    PropertyInfo getter = CacheManager.MethodCache.GetProperty(entity, matchColumn.AttributeName);
+                    Object fieldValue = getter.GetValue(entity, null);
+
+                    if (showQuery)
+                    {
+                        logSb.Append(" ,").Append(matchColumn.ColumnName).Append("=").Append(fieldValue);
+                    }
+                    DbLayer.GetDataManipulate().SetToPreparedStatement(cmd, fieldValue, i + 1, matchColumn);
+                }
+                else
+                {
+                    String message = String.Format("The field {0} does not have a matching field in the object {1}", field, entity.GetType().FullName);
+                    throw new NoMatchingColumnFoundException(message);
+                }
+            }
+            if (showQuery)
+            {
+                LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
+            }
+            if (Config.EnableStatistics)
+            {
+                Statistics.RegisterSelect(type);
+            }
+            return ReadFromPreparedStatement(entity, con, cmd, childType);
+        }
+
+        private ICollection<IServerRoDbClass> ReadFromPreparedStatement(IServerRoDbClass entity, IDbConnection con, IDbCommand cmd
+            , Type childType)
+        {
+            ICollection<IDbColumn> childKeys = null;
+            ICollection<IServerRoDbClass> data = new List<IServerRoDbClass>();
+            IDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                if (childKeys == null)
+                {
+                    childKeys = CacheManager.FieldCache.GetKeys(childType);
+                }
+                ITypeFieldValueList childTypeKeyList = new EntityTypeFieldValueList(childType);
+                foreach (IDbColumn childKey in childKeys)
+                {
+                    Object value = DbLayer.GetDataManipulate().ReadFromResultSet(reader, childKey);
+                    childTypeKeyList.FieldValues.Add(new EntityFieldValue(value, childKey));
+                }
+                if (ErSessionUtils.ExistsInSession(entity, childTypeKeyList))
+                {
+                    data.Add(ErSessionUtils.GetFromSession(entity, childTypeKeyList));
+                    continue;
+                }
+
+                IServerRoDbClass rodbClass = (IServerRoDbClass)Activator.CreateInstance(childType);
+                ErSessionUtils.TransferSession(entity, rodbClass);
+                rodbClass.Retrieve(reader, con);
+                data.Add(rodbClass);
+
+                IEntityFieldValueList childEntityKeyList = ErDataManagerUtils.ExtractEntityKeyValues(rodbClass);
+                ErSessionUtils.AddToSession(entity, childEntityKeyList);
+            }
+            DbMgmtUtility.Close(reader);
+            DbMgmtUtility.Close(cmd);
+            return data;
+        }
+
+        protected static bool IsProxyObject(IServerDbClass entity, IDbRelation relation)
+        {
+            if (relation.Lazy)
+            {
+                PropertyInfo property = CacheManager.MethodCache.GetProperty(entity,relation.AttributeName);
+                Object value = property.GetValue(entity,new object[]{});
+
+                if (value == null)
+                {
+                    return false;
+                }
+
+                if (ProxyUtil.IsProxyType(value.GetType()))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

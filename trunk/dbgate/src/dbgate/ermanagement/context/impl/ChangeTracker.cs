@@ -34,5 +34,10 @@ namespace dbgate.ermanagement.context.impl
             }
             return null;
         }
+
+        public bool Valid
+        {
+            get { return Fields.Count > 0 || ChildEntityKeys.Count > 0; }
+        }
     }
 }

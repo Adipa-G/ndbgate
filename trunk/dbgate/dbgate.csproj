@@ -31,6 +31,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -52,6 +53,9 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Castle.Core">
+      <HintPath>..\lib\castle.core.3.0.0\net35\Castle.Core.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.9.0, Culture=neutral, PublicKeyToken=b32731d11ce58905">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\log4net\log4net.dll</HintPath>
@@ -85,6 +89,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src-tests\dbgate\dbutility\DbUtilsTests.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\ErManagementLazyTest.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\ErManagementPatchTableDifferenceDBTests.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\ErManagementColumnPersistTests.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\ErManagementInheritancePersistTests.cs" />
@@ -103,6 +108,9 @@
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\columntest\ColumnTestExtFactory.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\columntest\IColumnTestEntity.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\columntest\PrimaryKeyGenerator.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\lazy\LazyTestOne2ManyEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\lazy\LazyTestOne2OneEntity.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\persistant\lazy\LazyTestRootEntity.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\IInheritanceTestSubEntityA.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\IInheritanceTestSubEntityB.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\inheritancetest\IInheritanceTestSuperEntity.cs" />
@@ -166,6 +174,7 @@
     <Compile Include="src\dbgate\ermanagement\IErDataManager.cs" />
     <Compile Include="src\dbgate\ermanagement\IErLayer.cs" />
     <Compile Include="src\dbgate\ermanagement\IErLayerConfig.cs" />
+    <Compile Include="src\dbgate\ermanagement\IErLayerStatistics.cs" />
     <Compile Include="src\dbgate\ermanagement\IField.cs" />
     <Compile Include="src\dbgate\ermanagement\IManagedDbClass.cs" />
     <Compile Include="src\dbgate\ermanagement\IManagedRoDbClass.cs" />
@@ -204,9 +213,11 @@
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\MySqlDbLayer.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\SqlLiteDbLayer.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\ErDataCommonManager.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\ErLayerStatistics.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\utils\ReflectionUtils.cs" />
     <Compile Include="src\dbgate\ermanagement\ISequenceGenerator.cs" />
     <Compile Include="src\dbgate\ermanagement\ISession.cs" />
+    <Compile Include="src\dbgate\ermanagement\lazy\ChildLoadInterceptor.cs" />
     <Compile Include="src\dbgate\ermanagement\ReferentialRuleType.cs" />
     <Compile Include="src\dbgate\ermanagement\session\Session.cs" />
     <Compile Include="src\dbgate\ermanagement\session\SessionConfig.cs" />

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Reflection;
 using System.Text;
@@ -16,8 +17,8 @@ namespace dbgate.ermanagement.impl
 {
     public class ErDataPersistManager : ErDataCommonManager
     {
-        public ErDataPersistManager(IDbLayer dbLayer, IErLayerConfig config)
-            : base(dbLayer, config)
+        public ErDataPersistManager(IDbLayer dbLayer,IErLayerStatistics statistics, IErLayerConfig config)
+            : base(dbLayer,statistics, config)
         {
         }
 
@@ -54,7 +55,7 @@ namespace dbgate.ermanagement.impl
             {
                 if (Config.AutoTrackChanges)
                 {
-                    if (CheckForModification(serverDBClass, entityContext))
+                    if (CheckForModification(serverDBClass,con, entityContext))
                     {
                         MiscUtils.Modify(serverDBClass);
                     }
@@ -84,6 +85,10 @@ namespace dbgate.ermanagement.impl
             foreach (IDbRelation relation in dbRelations)
             {
                 if (relation.ReverseRelationship)
+                {
+                    continue;
+                }
+                if (IsProxyObject(entity, relation))
                 {
                     continue;
                 }
@@ -158,6 +163,11 @@ namespace dbgate.ermanagement.impl
                 {
                     continue;
                 }
+                if (IsProxyObject(entity, relation))
+                {
+                    continue;
+                }
+
                 ICollection<IServerDbClass> childObjects = ErDataManagerUtils.GetRelationEntities(entity, relation);
                 if (childObjects != null)
                 {
@@ -221,6 +231,10 @@ namespace dbgate.ermanagement.impl
             {
                 LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
             }
+            if (Config.EnableStatistics)
+            {
+                Statistics.RegisterInsert(type);
+            }
             cmd.ExecuteNonQuery();
             DbMgmtUtility.Close(cmd);
         }
@@ -274,6 +288,10 @@ namespace dbgate.ermanagement.impl
             {
                 LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
             }
+            if (Config.EnableStatistics)
+            {
+                Statistics.RegisterUpdate(type);
+            }
             cmd.ExecuteNonQuery();
             DbMgmtUtility.Close(cmd);
         }
@@ -312,6 +330,10 @@ namespace dbgate.ermanagement.impl
             if (showQuery)
             {
                 LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
+            }
+            if (Config.EnableStatistics)
+            {
+                Statistics.RegisterDelete(type);
             }
             ps.ExecuteNonQuery();
             DbMgmtUtility.Close(ps);
@@ -451,8 +473,13 @@ namespace dbgate.ermanagement.impl
             }
         }
 
-        private static bool CheckForModification(IServerDbClass serverDBClass, IEntityContext entityContext)
+        private bool CheckForModification(IServerDbClass serverDBClass,IDbConnection con, IEntityContext entityContext)
         {
+            if (!entityContext.ChangeTracker.Valid)
+            {
+                FillChangeTrackerValues(serverDBClass, con, entityContext);
+            }
+
             Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(serverDBClass.GetType(), new[] { typeof(IServerDbClass) });
             foreach (Type type in typeList)
             {
@@ -477,6 +504,45 @@ namespace dbgate.ermanagement.impl
                 }
             }
             return false;
+        }
+
+        private void FillChangeTrackerValues(IServerDbClass serverDBClass, IDbConnection con, IEntityContext entityContext)
+        {
+            if (serverDBClass.Status == DbClassStatus.New
+                    || serverDBClass.Status == DbClassStatus.Deleted)
+            {
+                return;
+            }
+
+            Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(serverDBClass.GetType(), new Type[]{typeof(IServerDbClass)});
+            foreach (Type type in typeList)
+            {
+                String tableName = CacheManager.TableCache.GetTableName(type);
+                if (tableName == null)
+                {
+                    continue;
+                }
+
+                ITypeFieldValueList values = ExtractCurrentRowValues(serverDBClass,type,con);
+                foreach (EntityFieldValue fieldValue in values.FieldValues)
+                {
+                    entityContext.ChangeTracker.Fields.Add(fieldValue);
+                }
+
+                ICollection<IDbRelation> dbRelations = CacheManager.FieldCache.GetDbRelations(type);
+                foreach (IDbRelation relation in dbRelations)
+                {
+                    ICollection<IServerRoDbClass> children = ReadRelationChildrenFromDb(serverDBClass,type,con,relation);
+                    foreach (IServerRoDbClass childEntity in children)
+                    {
+                        ITypeFieldValueList valueTypeList = ErDataManagerUtils.ExtractRelationKeyValues(childEntity,relation);
+                        if (valueTypeList != null)
+                        {
+                            entityContext.ChangeTracker.ChildEntityKeys.Add(valueTypeList);
+                        }
+                    }
+                }
+            }
         }
 
         private void DeleteOrphanChildren(IDbConnection con, IEnumerable<ITypeFieldValueList> childrenToDelete)

@@ -19,5 +19,7 @@ namespace dbgate.ermanagement
         void RegisterFields(Type type, ICollection<IField> fields);
 
         IErLayerConfig Config { get; }
+
+        IErLayerStatistics Statistics { get; }
     }
 }

@@ -18,5 +18,7 @@ namespace dbgate.ermanagement
         bool ReverseRelationship { get; set; }
 
         bool NonIdentifyingRelation { get; set; }
+
+        bool Lazy { get; set; }
     }
 }

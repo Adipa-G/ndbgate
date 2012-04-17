@@ -7,6 +7,7 @@ namespace dbgate.ermanagement.impl
             AutoTrackChanges = true;
             ShowQueries = true;
             CheckVersion = true;
+            EnableStatistics = false;
         }
 
         public bool AutoTrackChanges { get; set; }
@@ -16,5 +17,7 @@ namespace dbgate.ermanagement.impl
         public bool ShowQueries { get; set; }
 
         public bool CheckVersion { get; set; }
+         
+        public bool EnableStatistics { get; set; }
     }
 }

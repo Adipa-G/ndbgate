@@ -11,10 +11,10 @@ namespace dbgate.ermanagement.impl
         private readonly ErDataRetrievalManager _erDataRetrievalManager;
         private readonly ErDataPersistManager _erDataPersistManager;
 
-        public ErDataManager(IDbLayer dbLayer,IErLayerConfig config)
+        public ErDataManager(IDbLayer dbLayer,IErLayerStatistics statistics,IErLayerConfig config)
         {
-            _erDataRetrievalManager = new ErDataRetrievalManager(dbLayer,config);
-            _erDataPersistManager = new ErDataPersistManager(dbLayer,config);
+            _erDataRetrievalManager = new ErDataRetrievalManager(dbLayer,statistics,config);
+            _erDataPersistManager = new ErDataPersistManager(dbLayer,statistics,config);
         }
 
         public void Load(IServerRoDbClass roEntity, IDataReader reader, IDbConnection con) 

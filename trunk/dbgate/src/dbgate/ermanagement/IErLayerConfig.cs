@@ -9,5 +9,7 @@
         bool ShowQueries { get; set; }
 
         bool CheckVersion { get; set; }
+
+        bool EnableStatistics { get; set; }
     }
 }

@@ -171,7 +171,7 @@ namespace dbgate.ermanagement.impl.utils
                                                          , foreignKeyInfo.RelatedOjectType, objectMappings
                                                          , foreignKeyInfo.UpdateRule, foreignKeyInfo.DeleteRule
                                                          ,foreignKeyInfo.ReverseRelation
-                                                         ,foreignKeyInfo.NonIdentifyingRelation);
+                                                         ,foreignKeyInfo.NonIdentifyingRelation,foreignKeyInfo.Lazy);
 
             return relation;
         }

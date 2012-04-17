@@ -164,6 +164,45 @@ namespace dbgate.ermanagement
         }
 
         [Test]
+        public void ERLayer_changeField_WithAutoTrackChangesOnAndClearTracker_shouldUpdateTheEntityInDb()
+        {
+            try
+            {
+                ErLayer.GetSharedInstance().Config.AutoTrackChanges = true;
+                IDbConnection connection = SetupTables();
+
+                IDbTransaction transaction = connection.BeginTransaction();
+                int id = 45;
+                ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
+                entity.IdCol = id;
+                entity.Name = "Org-Name";
+                entity.Persist(connection);
+                transaction.Commit();
+
+                ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
+                LoadEntityWithId(connection, loadedEntity, id);
+                loadedEntity.Context.ChangeTracker.Fields.Clear();
+                loadedEntity.Context.ChangeTracker.ChildEntityKeys.Clear();
+
+                transaction = connection.BeginTransaction();
+                loadedEntity.Name = "Changed-Name";
+                loadedEntity.Persist(connection);
+                transaction.Commit();
+
+                ChangeTrackerTestRootEntity reloadedEntity = new ChangeTrackerTestRootEntity();
+                LoadEntityWithId(connection, reloadedEntity, id);
+                connection.Close();
+
+                Assert.AreEqual(loadedEntity.Name, reloadedEntity.Name);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementChangeTrackerTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
         public void ERLayer_changeField_WithAutoTrackChangesOff_shouldNotUpdateTheEntityInDb()
         {
             try

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
+using Castle.DynamicProxy;
 using dbgate.dbutility;
 using dbgate.ermanagement.caches;
 using dbgate.ermanagement.context;
@@ -11,15 +12,19 @@ using dbgate.ermanagement.context.impl;
 using dbgate.ermanagement.exceptions;
 using dbgate.ermanagement.impl.dbabstractionlayer;
 using dbgate.ermanagement.impl.utils;
+using dbgate.ermanagement.lazy;
 using log4net;
 
 namespace dbgate.ermanagement.impl
 {
     public class ErDataRetrievalManager : ErDataCommonManager
     {
-        public ErDataRetrievalManager(IDbLayer dbLayer, IErLayerConfig config)
-            : base(dbLayer, config)
+        private ProxyGenerator _proxyGenerator;
+
+        public ErDataRetrievalManager(IDbLayer dbLayer,IErLayerStatistics statistics, IErLayerConfig config)
+            : base(dbLayer,statistics, config)
         {
+            _proxyGenerator = new ProxyGenerator();
         }
 
         public void Load(IServerRoDbClass roEntity, IDataReader reader, IDbConnection con)
@@ -101,17 +106,23 @@ namespace dbgate.ermanagement.impl
             ICollection<IDbRelation> dbRelations = CacheManager.FieldCache.GetDbRelations(type);
             foreach (IDbRelation relation in dbRelations)
             {
-                LoadChildrenFromRelation(entity, type, con, relation);
+                LoadChildrenFromRelation(entity, type, con, relation,false);
             }
         }
 
-        private void LoadChildrenFromRelation(IServerRoDbClass parentRoEntity, Type type, IDbConnection con
-            , IDbRelation relation)
+        public void LoadChildrenFromRelation(IServerRoDbClass parentRoEntity, Type type, IDbConnection con
+            , IDbRelation relation,bool lazy)
         {
             IEntityContext entityContext = parentRoEntity.Context;
 
-            PropertyInfo getter = CacheManager.MethodCache.GetProperty(parentRoEntity, relation.AttributeName);
-            Object value = getter.GetValue(parentRoEntity, null);
+            PropertyInfo property = CacheManager.MethodCache.GetProperty(parentRoEntity, relation.AttributeName);
+            Object value = property.GetValue(parentRoEntity, null);
+            
+            if (!lazy && relation.Lazy)
+            {
+                CreateProxy(parentRoEntity, type, con, relation, value, property);
+                return;
+            }
 
             ICollection<IServerRoDbClass> children = ReadRelationChildrenFromDb(parentRoEntity, type, con, relation);
             if (entityContext != null
@@ -127,21 +138,26 @@ namespace dbgate.ermanagement.impl
                 }
             }
 
-            if (value == null
-                    && ReflectionUtils.IsImplementInterface(getter.PropertyType, typeof(ICollection<>)))
+            if ((value == null || ProxyUtil.IsProxyType(value.GetType()))
+                    && ReflectionUtils.IsImplementInterface(property.PropertyType, typeof(ICollection<>)))
             {
-                PropertyInfo setter = CacheManager.MethodCache.GetProperty(parentRoEntity, relation.AttributeName);
-                value = Activator.CreateInstance(setter.PropertyType);
+                Type propertyType = property.PropertyType;
+                if (propertyType.IsInterface)
+                {
+                    Type generic = propertyType.GetGenericArguments()[0];
+                    propertyType = typeof(List<>).MakeGenericType(new Type[] { generic });
+                }
+                value = Activator.CreateInstance(propertyType);
 
                 IList genCollection = (IList)value;
                 foreach (IServerRoDbClass serverRoDbClass in children)
                 {
                     genCollection.Add(serverRoDbClass);
                 }
-                setter.SetValue(parentRoEntity, genCollection, null);
+                property.SetValue(parentRoEntity, genCollection, null);
             }
             else if (value != null
-                    && ReflectionUtils.IsImplementInterface(getter.PropertyType, typeof(ICollection<>)))
+                    && ReflectionUtils.IsImplementInterface(property.PropertyType, typeof(ICollection<>)))
             {
                 IList genCollection = (IList)value;
                 foreach (IServerRoDbClass serverRoDbClass in children)
@@ -155,14 +171,13 @@ namespace dbgate.ermanagement.impl
                 if (childEnumarator.MoveNext())
                 {
                     IServerRoDbClass singleRoDbClass = childEnumarator.Current;
-                    if (getter.PropertyType.IsAssignableFrom(singleRoDbClass.GetType()))
+                    if (property.PropertyType.IsAssignableFrom(singleRoDbClass.GetType()))
                     {
-                        PropertyInfo setter = CacheManager.MethodCache.GetProperty(parentRoEntity, relation.AttributeName);
-                        setter.SetValue(parentRoEntity, singleRoDbClass, null);
+                        property.SetValue(parentRoEntity, singleRoDbClass, null);
                     }
                     else
                     {
-                        string message = singleRoDbClass.GetType().FullName + " is not matching the getter " + getter.Name;
+                        string message = singleRoDbClass.GetType().FullName + " is not matching the getter " + property.Name;
                         LogManager.GetLogger(Config.LoggerName).Fatal(message);
                         throw new NoSetterFoundToSetChildObjectListException(message);
                     }
@@ -170,94 +185,38 @@ namespace dbgate.ermanagement.impl
             }
         }
 
-        private ICollection<IServerRoDbClass> ReadRelationChildrenFromDb(IServerRoDbClass entity, Type type
-                , IDbConnection con, IDbRelation relation)
+        private void CreateProxy(IServerRoDbClass parentRoEntity, Type type, IDbConnection con, IDbRelation relation,
+                                 object value, PropertyInfo property)
         {
-            Type childType = relation.RelatedObjectType;
-            IServerRoDbClass childTypeInstance = (IServerRoDbClass)Activator.CreateInstance(childType);
-            ErDataManagerUtils.RegisterTypes(childTypeInstance);
-
-            StringBuilder logSb = new StringBuilder();
-            String query = CacheManager.QueryCache.GetRelationObjectLoad(entity.GetType(), relation);
-
-            IList<string> fields = new List<string>();
-            foreach (DbRelationColumnMapping mapping in relation.TableColumnMappings)
+            Type proxyType = value == null ? property.PropertyType : value.GetType();
+            if (proxyType.IsGenericType)
             {
-                fields.Add(mapping.FromField);
-            }
-
-            IDbCommand cmd = con.CreateCommand();
-            cmd.CommandText = query;
-            bool showQuery = Config.ShowQueries;
-            if (showQuery)
-            {
-                logSb.Append(query);
-            }
-            ICollection<IDbColumn> dbColumns = CacheManager.FieldCache.GetDbColumns(type);
-            for (int i = 0; i < fields.Count; i++)
-            {
-                String field = fields[i];
-                IDbColumn matchColumn = ErDataManagerUtils.FindColumnByAttribute(dbColumns, field);
-
-                if (matchColumn != null)
+                Type generic = proxyType.GetGenericArguments()[0];
+                if (proxyType.IsInterface)
                 {
-                    PropertyInfo getter = CacheManager.MethodCache.GetProperty(entity, matchColumn.AttributeName);
-                    Object fieldValue = getter.GetValue(entity, null);
-
-                    if (showQuery)
-                    {
-                        logSb.Append(" ,").Append(matchColumn.ColumnName).Append("=").Append(fieldValue);
-                    }
-                    DbLayer.GetDataManipulate().SetToPreparedStatement(cmd, fieldValue, i + 1, matchColumn);
-                }
-                else
-                {
-                    String message = String.Format("The field {0} does not have a matching field in the object {1}", field, entity.GetType().FullName);
-                    throw new NoMatchingColumnFoundException(message);
+                    proxyType = typeof(List<>).MakeGenericType(new Type[] { generic });
                 }
             }
-            if (showQuery)
+            if (value == null)
             {
-                LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
+                value = Activator.CreateInstance(proxyType);
             }
-            return ReadFromPreparedStatement(entity, con, cmd, childType);
-        }
 
-        private ICollection<IServerRoDbClass> ReadFromPreparedStatement(IServerRoDbClass entity, IDbConnection con, IDbCommand cmd
-            , Type childType)
-        {
-            ICollection<IDbColumn> childKeys = null;
-            ICollection<IServerRoDbClass> data = new List<IServerRoDbClass>();
-            IDataReader reader = cmd.ExecuteReader();
-            while (reader.Read())
+            Object proxy = null;
+            if (ReflectionUtils.IsImplementInterface(property.PropertyType, typeof (ICollection<>)))
             {
-                if (childKeys == null)
-                {
-                    childKeys = CacheManager.FieldCache.GetKeys(childType);
-                }
-                ITypeFieldValueList childTypeKeyList = new EntityTypeFieldValueList(childType);
-                foreach (IDbColumn childKey in childKeys)
-                {
-                    Object value = DbLayer.GetDataManipulate().ReadFromResultSet(reader, childKey);
-                    childTypeKeyList.FieldValues.Add(new EntityFieldValue(value, childKey));
-                }
-                if (ErSessionUtils.ExistsInSession(entity, childTypeKeyList))
-                {
-                    data.Add(ErSessionUtils.GetFromSession(entity, childTypeKeyList));
-                    continue;
-                }
-
-                IServerRoDbClass rodbClass = (IServerRoDbClass)Activator.CreateInstance(childType);
-                ErSessionUtils.TransferSession(entity, rodbClass);
-                rodbClass.Retrieve(reader, con);
-                data.Add(rodbClass);
-
-                IEntityFieldValueList childEntityKeyList = ErDataManagerUtils.ExtractEntityKeyValues(rodbClass);
-                ErSessionUtils.AddToSession(entity, childEntityKeyList);
+                Type generic = proxyType.GetGenericArguments()[0];
+                Type genericType = typeof (ICollection<>).MakeGenericType(new Type[] {generic});
+                proxy = _proxyGenerator.CreateInterfaceProxyWithTarget(genericType, value,
+                                                                       new ChildLoadInterceptor(this, parentRoEntity, type, con,
+                                                                                                relation));
             }
-            DbMgmtUtility.Close(reader);
-            DbMgmtUtility.Close(cmd);
-            return data;
+            else
+            {
+                proxy = _proxyGenerator.CreateClassProxy(proxyType, new object[] {},
+                                                         new ChildLoadInterceptor(this, parentRoEntity, type, con, relation));
+            }
+            property.SetValue(parentRoEntity, proxy, new object[] {});
         }
     }
 }
