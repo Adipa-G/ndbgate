@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <VisualState xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ShowCheckBoxes="false">
-  <TopNode>[0-1000]Y:\dev\dotnet\community\ndbgate\trunk\lib\nunit\dbgate.nunit</TopNode>
-  <SelectedNode>[0-1000]Y:\dev\dotnet\community\ndbgate\trunk\lib\nunit\dbgate.nunit</SelectedNode>
+  <TopNode>[0-1000]Z:\dev\dotnet\community\ndbgate\trunk\lib\nunit\dbgate.nunit</TopNode>
+  <SelectedNode>[0-1000]Z:\dev\dotnet\community\ndbgate\trunk\lib\nunit\dbgate.nunit</SelectedNode>
   <ExcludeCategories>false</ExcludeCategories>
   <Nodes>
-    <Node UniqueName="[0-1000]Y:\dev\dotnet\community\ndbgate\trunk\lib\nunit\dbgate.nunit" Expanded="true" />
-    <Node UniqueName="[0-1084]Y:\dev\dotnet\community\ndbgate\trunk\lib\nunit\..\..\dbgate\bin\Debug\dbgate.dll" Expanded="true" />
+    <Node UniqueName="[0-1000]Z:\dev\dotnet\community\ndbgate\trunk\lib\nunit\dbgate.nunit" Expanded="true" />
+    <Node UniqueName="[0-1084]Z:\dev\dotnet\community\ndbgate\trunk\lib\nunit\..\..\dbgate\bin\Debug\dbgate.dll" Expanded="true" />
     <Node UniqueName="[0-1085]dbgate" Expanded="true" />
     <Node UniqueName="[0-1087]dbgate.dbutility" Expanded="true" />
     <Node UniqueName="[0-1086]dbgate.ermanagement" Expanded="true" />

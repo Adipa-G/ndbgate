@@ -50,6 +50,7 @@ namespace dbgate.ermanagement
             {
                 ErLayer.GetSharedInstance().ClearCache();
             }
+            ErLayer.GetSharedInstance().Config.UpdateChangedColumnsOnly = false;
         }
 
         [TearDown]
@@ -186,6 +187,78 @@ namespace dbgate.ermanagement
 
         [Test]
         [ExpectedException(typeof(PersistException))]
+        public void ERLayer_persistWithTwoChanges_WithoutUpdateChangedColumnsOnly_shouldThrowException()
+        {
+            IDbConnection connection = SetupTables();
+
+            IDbTransaction transaction = connection.BeginTransaction();
+            int id = 45;
+            VersionGeneralTestRootEntity entity = new VersionGeneralTestRootEntity();
+            entity.IdCol = id;
+            entity.Name = "Org-Name";
+            entity.Version = 1;
+            entity.Persist(connection);
+            transaction.Commit();
+            
+            transaction = connection.BeginTransaction();
+            VersionGeneralTestRootEntity loadedEntityA = new VersionGeneralTestRootEntity();
+            VersionGeneralTestRootEntity loadedEntityB = new VersionGeneralTestRootEntity();
+            LoadWithoutVersionColumnEntityWithId(connection,loadedEntityA, entity.IdCol);
+            LoadWithoutVersionColumnEntityWithId(connection,loadedEntityB, entity.IdCol);
+            transaction.Commit();
+
+            transaction = connection.BeginTransaction();
+            loadedEntityA.Name ="Mod Name";
+            loadedEntityA.Persist(connection);
+
+            loadedEntityB.Version = loadedEntityB.Version + 1;
+            loadedEntityB.Persist(connection);
+            transaction.Commit();
+            connection.Close();
+        }
+
+        [Test]
+        public void ERLayer_persistWithTwoChanges_WithUpdateChangedColumnsOnly_shouldNotThrowException()
+        {
+            try
+            {
+                ErLayer.GetSharedInstance().Config.UpdateChangedColumnsOnly = true;
+                IDbConnection connection = SetupTables();
+
+                IDbTransaction transaction = connection.BeginTransaction();
+                int id = 45;
+                VersionGeneralTestRootEntity entity = new VersionGeneralTestRootEntity();
+                entity.IdCol = id;
+                entity.Name = "Org-Name";
+                entity.Version = 1;
+                entity.Persist(connection);
+                transaction.Commit();
+
+                transaction = connection.BeginTransaction();
+                VersionGeneralTestRootEntity loadedEntityA = new VersionGeneralTestRootEntity();
+                VersionGeneralTestRootEntity loadedEntityB = new VersionGeneralTestRootEntity();
+                LoadWithoutVersionColumnEntityWithId(connection, loadedEntityA, entity.IdCol);
+                LoadWithoutVersionColumnEntityWithId(connection, loadedEntityB, entity.IdCol);
+                transaction.Commit();
+
+                transaction = connection.BeginTransaction();
+                loadedEntityA.Name = "Mod Name";
+                loadedEntityA.Persist(connection);
+
+                loadedEntityB.Version = loadedEntityB.Version + 1;
+                loadedEntityB.Persist(connection);
+                transaction.Commit();
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementVersionTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        [ExpectedException(typeof(PersistException))]
         public void ERLayer_rootUpdateFromAnotherTransaction_WithVersionColumnEntity_shouldThrowException()
         {
             IDbConnection connection = SetupTables();
@@ -204,7 +277,7 @@ namespace dbgate.ermanagement
 
                 transaction = connection.BeginTransaction();
                 VersionColumnTestRootEntity loadedEntity = new VersionColumnTestRootEntity();
-                LoadWithColumnEntityWithId(connection,loadedEntity,id);
+                LoadWithVersionColumnEntityWithId(connection,loadedEntity,id);
                 loadedEntity.Name ="New Name";
                 loadedEntity.Persist(connection);
                 transaction.Commit();
@@ -242,7 +315,7 @@ namespace dbgate.ermanagement
 
                 transaction = connection.BeginTransaction();
                 VersionGeneralTestRootEntity loadedEntity = new VersionGeneralTestRootEntity();
-                LoadWithoutColumnEntityWithId(connection,loadedEntity,id);
+                LoadWithoutVersionColumnEntityWithId(connection,loadedEntity,id);
                 loadedEntity.Name ="New Name";
                 loadedEntity.Persist(connection);
                 transaction.Commit();
@@ -283,7 +356,7 @@ namespace dbgate.ermanagement
 
                 transaction = connection.BeginTransaction();
                 VersionColumnTestRootEntity loadedEntity = new VersionColumnTestRootEntity();
-                LoadWithColumnEntityWithId(connection,loadedEntity,id);
+                LoadWithVersionColumnEntityWithId(connection,loadedEntity,id);
                 loadedEntity.One2OneEntity.Name ="Modified One2One";
                 loadedEntity.Persist(connection);
                 transaction.Commit();
@@ -324,7 +397,7 @@ namespace dbgate.ermanagement
 
                 transaction = connection.BeginTransaction();
                 VersionGeneralTestRootEntity loadedEntity = new VersionGeneralTestRootEntity();
-                LoadWithoutColumnEntityWithId(connection,loadedEntity,id);
+                LoadWithoutVersionColumnEntityWithId(connection,loadedEntity,id);
                 loadedEntity.One2OneEntity.Name ="Modified One2One";
                 loadedEntity.Persist(connection);
                 transaction.Commit();
@@ -366,7 +439,7 @@ namespace dbgate.ermanagement
 
                 transaction = connection.BeginTransaction();
                 VersionColumnTestRootEntity loadedEntity = new VersionColumnTestRootEntity();
-                LoadWithColumnEntityWithId(connection,loadedEntity,id);
+                LoadWithVersionColumnEntityWithId(connection,loadedEntity,id);
                 IEnumerator<VersionColumnTestOne2ManyEntity> loadedEnumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 loadedEnumerator.MoveNext();
                 VersionColumnTestOne2ManyEntity loadedOne2ManyEntity = loadedEnumerator.Current;
@@ -414,7 +487,7 @@ namespace dbgate.ermanagement
 
                 transaction = connection.BeginTransaction();
                 VersionGeneralTestRootEntity loadedEntity = new VersionGeneralTestRootEntity();
-                LoadWithoutColumnEntityWithId(connection,loadedEntity,id);
+                LoadWithoutVersionColumnEntityWithId(connection,loadedEntity,id);
 
                 IEnumerator<VersionGeneralTestOne2ManyEntity> loadedEnumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 loadedEnumerator.MoveNext();
@@ -439,7 +512,7 @@ namespace dbgate.ermanagement
             connection.Close();
         }
 
-        private bool LoadWithColumnEntityWithId(IDbConnection connection, VersionColumnTestRootEntity loadEntity, int id)
+        private bool LoadWithVersionColumnEntityWithId(IDbConnection connection, VersionColumnTestRootEntity loadEntity, int id)
         {
             bool loaded = false;
 
@@ -462,7 +535,7 @@ namespace dbgate.ermanagement
             return loaded;
         }
 
-        private bool LoadWithoutColumnEntityWithId(IDbConnection connection, VersionGeneralTestRootEntity loadEntity, int id)
+        private bool LoadWithoutVersionColumnEntityWithId(IDbConnection connection, VersionGeneralTestRootEntity loadEntity, int id)
         {
             bool loaded = false;
 

@@ -8,7 +8,7 @@ namespace dbgate.ermanagement.support.persistant.version
         [DbColumnInfo((DbColumnType.Integer), Key = true)]
         public int IdCol { get; set; }
 
-        [DbColumnInfo(DbColumnType.Version)]
+        [DbColumnInfo(DbColumnType.Integer)]
         public int Version { get; set; }
 
         [DbColumnInfo(DbColumnType.Varchar)]

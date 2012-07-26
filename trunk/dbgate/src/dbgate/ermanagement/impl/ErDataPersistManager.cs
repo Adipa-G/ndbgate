@@ -125,7 +125,7 @@ namespace dbgate.ermanagement.impl
                     ErDataManagerUtils.IncrementVersion(fieldValues);
                     SetValues(entity, fieldValues);
                 }
-                Update(fieldValues, type, con);
+                Update(entity, fieldValues, type, con);
             }
             else if (entity.Status == DbClassStatus.Deleted)
             {
@@ -239,22 +239,42 @@ namespace dbgate.ermanagement.impl
             DbMgmtUtility.Close(cmd);
         }
 
-        private void Update(ITypeFieldValueList valueTypeList, Type type, IDbConnection con)
+        private void Update(IServerDbClass entity, ITypeFieldValueList valueTypeList, Type type, IDbConnection con)
         {
+            ICollection<EntityFieldValue> keys = new List<EntityFieldValue>();
+            ICollection<EntityFieldValue> values = new List<EntityFieldValue>();
             StringBuilder logSb = new StringBuilder();
-            String query = CacheManager.QueryCache.GetUpdateQuery(type);
+            String query;
+            
 
-            IList<EntityFieldValue> keys = new List<EntityFieldValue>();
-            IList<EntityFieldValue> values = new List<EntityFieldValue>();
-            foreach (EntityFieldValue fieldValue in valueTypeList.FieldValues)
+            if (Config.UpdateChangedColumnsOnly)
             {
-                if (fieldValue.DbColumn.Key)
+                values = GetModifiedFieldValues(entity, type);
+                keys = ErDataManagerUtils.ExtractEntityKeyValues(entity).FieldValues;
+                ICollection<IDbColumn> keysAndModified = new List<IDbColumn>();
+                foreach (EntityFieldValue fieldValue in values)
                 {
-                    keys.Add(fieldValue);
+                    keysAndModified.Add(fieldValue.DbColumn);
                 }
-                else
+                foreach (EntityFieldValue fieldValue in keys)
                 {
-                    values.Add(fieldValue);
+                    keysAndModified.Add(fieldValue.DbColumn);
+                }
+                query = DbLayer.GetDataManipulate().CreateUpdateQuery(CacheManager.TableCache.GetTableName(type),keysAndModified);
+            }
+            else
+            {
+                query = CacheManager.QueryCache.GetUpdateQuery(type);
+                foreach (EntityFieldValue fieldValue in valueTypeList.FieldValues)
+                {
+                    if (fieldValue.DbColumn.Key)
+                    {
+                        keys.Add(fieldValue);
+                    }
+                    else
+                    {
+                        values.Add(fieldValue);
+                    }
                 }
             }
 
@@ -595,6 +615,16 @@ namespace dbgate.ermanagement.impl
                 }
             }
 
+            if (Config.UpdateChangedColumnsOnly)
+		 	{
+		 	    ICollection<EntityFieldValue> modified = GetModifiedFieldValues(entity, type);
+		 	    typeColumns = new List<IDbColumn>();
+		 	    foreach (EntityFieldValue fieldValue in modified)
+		 	    {
+		 	        typeColumns.Add(fieldValue.DbColumn);
+		 	    }
+		 	}
+
             ITypeFieldValueList fieldValueList = ExtractCurrentRowValues(entity,type,con);
             if (fieldValueList == null)
             {
@@ -605,13 +635,36 @@ namespace dbgate.ermanagement.impl
                 EntityFieldValue classFieldValue = fieldValueList.GetFieldValue(typeColumn.AttributeName);
                 EntityFieldValue originalFieldValue = entity.Context != null ? entity.Context.ChangeTracker.GetFieldValue(typeColumn.AttributeName) : null;
                 bool matches = originalFieldValue != null && classFieldValue != null && classFieldValue.Value == originalFieldValue.Value
-                            || (originalFieldValue != null && classFieldValue != null && classFieldValue.Value.Equals(originalFieldValue.Value));
+                            || (originalFieldValue != null && classFieldValue != null && classFieldValue.Value != null && classFieldValue.Value.Equals(originalFieldValue.Value));
                 if (!matches)
                 {
                     return false;
                 }
             }
             return true;
+        }
+
+        private ICollection<EntityFieldValue> GetModifiedFieldValues(IServerRoDbClass entity, Type type)
+        {
+            ICollection<IDbColumn> typeColumns = CacheManager.FieldCache.GetDbColumns(type);
+            ITypeFieldValueList currentValues = ErDataManagerUtils.ExtractTypeFieldValues(entity,type);
+            ICollection<EntityFieldValue> modifiedColumns = new  List<EntityFieldValue>();
+
+            foreach (IDbColumn typeColumn in typeColumns)
+            {
+                if (typeColumn.Key)
+                    continue;
+
+                EntityFieldValue classFieldValue = currentValues.GetFieldValue(typeColumn.AttributeName);
+                EntityFieldValue originalFieldValue = entity.Context != null ? entity.Context.ChangeTracker.GetFieldValue(typeColumn.AttributeName) : null;
+                bool matches = originalFieldValue != null && classFieldValue != null && classFieldValue.Value == originalFieldValue.Value
+                        || (originalFieldValue != null && classFieldValue != null && classFieldValue.Value != null && classFieldValue.Value.Equals(originalFieldValue.Value));
+                if (!matches)
+                {
+                    modifiedColumns.Add(classFieldValue);
+                }
+            }
+            return modifiedColumns;
         }
 
         private Object ExtractCurrentVersionValue(IServerRoDbClass entity, IDbColumn versionColumn, Type type

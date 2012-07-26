@@ -11,5 +11,7 @@
         bool CheckVersion { get; set; }
 
         bool EnableStatistics { get; set; }
+
+        bool UpdateChangedColumnsOnly { get; set; }
     }
 }
