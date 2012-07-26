@@ -250,6 +250,9 @@ namespace dbgate.ermanagement.impl
             if (Config.UpdateChangedColumnsOnly)
             {
                 values = GetModifiedFieldValues(entity, type);
+                if (values.Count == 0)
+                    return;
+
                 keys = ErDataManagerUtils.ExtractEntityKeyValues(entity).FieldValues;
                 ICollection<IDbColumn> keysAndModified = new List<IDbColumn>();
                 foreach (EntityFieldValue fieldValue in values)
