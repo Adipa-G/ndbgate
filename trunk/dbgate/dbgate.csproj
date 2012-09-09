@@ -89,6 +89,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src-tests\dbgate\dbutility\DbUtilsTests.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\ErManagementQueryBasicTest.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\ErManagementLazyTest.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\ErManagementPatchTableDifferenceDBTests.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\ErManagementColumnPersistTests.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestRootEntityAnnotations.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestRootEntityExt.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestRootEntityFields.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\query\basic\QueryBasicEntity.cs" />
     <Compile Include="src-tests\dbgate\utility\StatusManagerTests.cs" />
     <Compile Include="src-tests\dbgate\utility\support\LeafEntity.cs" />
     <Compile Include="src-tests\dbgate\utility\support\RootEntity.cs" />
@@ -184,6 +186,8 @@
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\AccessDataManipulate.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\DefaultDataManipulate.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\IDataManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\QueryExecInfo.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\QueryParam.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\DefaultDbLayer.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\IDbLayer.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\LayerFactory.cs" />
@@ -218,6 +222,30 @@
     <Compile Include="src\dbgate\ermanagement\ISequenceGenerator.cs" />
     <Compile Include="src\dbgate\ermanagement\ISession.cs" />
     <Compile Include="src\dbgate\ermanagement\lazy\ChildLoadInterceptor.cs" />
+    <Compile Include="src\dbgate\ermanagement\IQuery.cs" />
+    <Compile Include="src\dbgate\ermanagement\IQueryCondition.cs" />
+    <Compile Include="src\dbgate\ermanagement\IQueryFrom.cs" />
+    <Compile Include="src\dbgate\ermanagement\IQueryGroup.cs" />
+    <Compile Include="src\dbgate\ermanagement\IQueryGroupCondition.cs" />
+    <Compile Include="src\dbgate\ermanagement\IQueryJoin.cs" />
+    <Compile Include="src\dbgate\ermanagement\IQueryOrderBy.cs" />
+    <Compile Include="src\dbgate\ermanagement\IQuerySelection.cs" />
+    <Compile Include="src\dbgate\ermanagement\ISelectionQuery.cs" />
+    <Compile Include="src\dbgate\ermanagement\QueryJoinType.cs" />
+    <Compile Include="src\dbgate\ermanagement\QueryOrderType.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QuerySelection.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryJoin.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryGroupCondition.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryGroup.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryFrom.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\Query.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryCondition.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryStructure.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\segments\condition\SqlQueryCondition.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\segments\from\SqlQueryFrom.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\segments\selection\SqlQuerySelection.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\segments\SqlSegment.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\SelectionQuery.cs" />
     <Compile Include="src\dbgate\ermanagement\ReferentialRuleType.cs" />
     <Compile Include="src\dbgate\ermanagement\session\Session.cs" />
     <Compile Include="src\dbgate\ermanagement\session\SessionConfig.cs" />

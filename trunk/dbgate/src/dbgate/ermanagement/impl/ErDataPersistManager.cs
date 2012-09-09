@@ -263,7 +263,7 @@ namespace dbgate.ermanagement.impl
                 {
                     keysAndModified.Add(fieldValue.DbColumn);
                 }
-                query = DbLayer.GetDataManipulate().CreateUpdateQuery(CacheManager.TableCache.GetTableName(type),keysAndModified);
+                query = DbLayer.GetDataManipulate().CreateUpdateQuery(CacheManager.TableCache.GetTableName(type), keysAndModified);
             }
             else
             {

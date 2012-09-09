@@ -1,10 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Data.OleDb;
 using System.Text;
+using Castle.Core.Internal;
 using dbgate.ermanagement.caches;
 using dbgate.ermanagement.impl.utils;
+using System.Linq;
+using dbgate.ermanagement.query;
+using dbgate.ermanagement.query.segments.@from;
+using dbgate.ermanagement.query.segments.selection;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 {
@@ -272,29 +279,105 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             }
         }
 
-        public IDataReader CreateResultSet(IDbConnection con, string sql, DbType[] types, object[] values)
+        public IDataReader CreateResultSet(IDbConnection con, QueryExecInfo execInfo)
         {
             IDbCommand cmd;
 
             cmd = con.CreateCommand();
-            cmd.CommandText = sql;
+            cmd.CommandText = execInfo.Sql;
 
-            for (int i = 0; i < types.Length; i++)
+            var cmdParams = execInfo.Params;
+            var sortedParams = cmdParams.OrderBy(p => p.Index);
+
+            foreach (QueryParam param in sortedParams)
             {
-                DbType type = types[i];
-                object value = values[i];
-
                 DbParameter parameter = (OleDbParameter)cmd.CreateParameter();
-                parameter.DbType = type;
+                parameter.DbType = param.Type;
                 parameter.Direction = ParameterDirection.Input;
-                parameter.IsNullable = value == null;
-                parameter.Value = value;
-                cmd.Parameters.Add(parameter);
+                parameter.IsNullable = param.Value == null;
+                parameter.Value = param.Value;
+                cmd.Parameters.Add(parameter);  
             }
 
             return cmd.ExecuteReader();
         }
 
+        public QueryExecInfo CreateExecInfo(IDbConnection con, ISelectionQuery query)
+        {
+            QueryStructure structure = query.Structure;
+            return ProcessQuery(null, structure);
+        }
+
+        protected QueryExecInfo ProcessQuery(QueryExecInfo execInfo, QueryStructure structure)
+        {
+            if (execInfo == null)
+            {
+                execInfo = new QueryExecInfo();
+            }
+
+            StringBuilder sb = new StringBuilder();
+            ProcessSelection(sb, execInfo, structure);
+            ProcessFrom(sb, execInfo, structure);
+            //sb.append("WHERE ");
+            //sb.append("GROUP BY ");
+            //sb.append("HAVING ");
+            //sb.append("ORDER BY ");
+
+            execInfo.Sql = sb.ToString();
+            return execInfo;
+        }
+
+        private void ProcessSelection(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
+        {
+            sb.Append("SELECT ");
+
+            ICollection<IQuerySelection> selections = structure.SelectList;
+            bool initial = true;
+            foreach (IQuerySelection selection in selections)
+            {
+                if (!initial)
+                {
+                    sb.Append(",");
+                }
+                sb.Append(CreateSelectionSql(selection));
+                initial = false;
+            }
+        }
+
+        protected String CreateSelectionSql(IQuerySelection selection)
+        {
+            if (selection is SqlQuerySelection)
+            {
+                return ((SqlQuerySelection) selection).Sql;
+            }
+            return "/*Incorrect Selection*/";
+        }
+
+        private void ProcessFrom(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
+        {
+            sb.Append(" FROM ");
+
+            ICollection<IQueryFrom> fromList = structure.FromList;
+            bool initial = true;
+            foreach (IQueryFrom from in fromList)
+            {
+                if (!initial)
+                {
+                    sb.Append(",");
+                }
+                sb.Append(CreateFromSql(from));
+                initial = false;
+            }
+        }
+
+        protected String CreateFromSql(IQueryFrom from)
+        {
+            if (from is SqlQueryFrom)
+            {
+                return ((SqlQueryFrom) from).Sql;
+            }
+            return "/*Incorrect From*/";
+        }
         #endregion
     }
 }

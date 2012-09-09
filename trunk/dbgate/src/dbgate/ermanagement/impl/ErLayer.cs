@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using dbgate.dbutility;
 using dbgate.ermanagement.caches;
 using dbgate.ermanagement.exceptions;
 using dbgate.ermanagement.impl.dbabstractionlayer;
+using dbgate.ermanagement.query;
 using log4net;
 
 namespace dbgate.ermanagement.impl
@@ -51,6 +53,11 @@ namespace dbgate.ermanagement.impl
         {
             _erDataManager.Save(serverDbClass, con);
         }
+
+        public ICollection<Object> Select(ISelectionQuery query,IDbConnection con)
+		{
+		 	return _erDataManager.Select(query,con);
+		}
 
         public void PatchDataBase(IDbConnection con, ICollection<IServerDbClass> dbClasses, bool dropAll)
         {
