@@ -7,13 +7,13 @@
             Structure = new QueryStructure();
         }
         
-        public IQuery From(IQueryFrom queryFrom)
+        public virtual IQuery From(IQueryFrom queryFrom)
         {
             Structure.FromList.Add(queryFrom);
             return this;
         }
 
-        public IQuery Join(IQueryJoin queryJoin)
+        public virtual IQuery Join(IQueryJoin queryJoin)
         {
             Structure.JoinList.Add(queryJoin);
             return this;

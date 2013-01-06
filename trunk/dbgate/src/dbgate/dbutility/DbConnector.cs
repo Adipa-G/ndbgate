@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Data.SQLite;
+//for windows
+//using System.Data.SQLite;
+//for linux
+using Mono.Data.Sqlite;
 using log4net;
 
 namespace dbgate.dbutility
@@ -34,7 +37,10 @@ namespace dbgate.dbutility
                 {
                     if (DbType == DbSqllite)
                     {
-                        conn = new SQLiteConnection(_connectionString);
+                        //for windows
+						//conn = new SQLiteConnection(_connectionString);
+						//for linux
+						conn = new SqliteConnection(_connectionString);
                     }
                     else
                     {

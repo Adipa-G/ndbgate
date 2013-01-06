@@ -12,6 +12,8 @@ using System.Linq;
 using dbgate.ermanagement.query;
 using dbgate.ermanagement.query.segments.@from;
 using dbgate.ermanagement.query.segments.selection;
+using dbgate.ermanagement.query.segments.group;
+using dbgate.ermanagement.query.segments.condition;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 {
@@ -318,8 +320,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             StringBuilder sb = new StringBuilder();
             ProcessSelection(sb, execInfo, structure);
             ProcessFrom(sb, execInfo, structure);
-            //sb.append("WHERE ");
-            //sb.append("GROUP BY ");
+            ProcessWhere(sb, execInfo, structure);
+		 	ProcessGroup(sb, execInfo, structure);
             //sb.append("HAVING ");
             //sb.append("ORDER BY ");
 
@@ -378,6 +380,64 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             }
             return "/*Incorrect From*/";
         }
+
+		private void ProcessWhere(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
+	 	{
+		 	ICollection<IQueryCondition> conditionList = structure.ConditionList;
+		 	if (conditionList.Count == 0)
+		 	return;
+		 	
+		 	sb.Append(" WHERE ");
+		 	
+		 	bool initial = true;
+			foreach (IQueryCondition condition in conditionList)
+		 	{
+			 	if (!initial)
+			 	{
+			 		sb.Append(" AND ");
+			 	}
+			 	sb.Append(CreateWhereSql(condition));
+			 	initial = false;
+		 	}
+	 	}
+		 	
+	 	protected String CreateWhereSql(IQueryCondition condition)
+	 	{
+			if (condition is SqlQueryCondition)
+		 	{
+		 		return ((SqlQueryCondition) condition).Sql;
+		 	}
+		 	return "/*Incorrect Where*/";
+	 	}
+		 	
+	 	private void ProcessGroup(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
+	 	{
+		 	ICollection<IQueryGroup> groupList = structure.GroupList;
+		 	if (groupList.Count == 0)
+		 	return;
+		 	
+		 	sb.Append(" GROUP BY ");
+		 	
+		 	bool initial = true;
+		 	foreach (IQueryGroup group in groupList)
+			 	{
+			 	if (!initial)
+			 	{
+			 		sb.Append(",");
+			 	}
+			 	sb.Append(CreateGroupSql(group));
+			 	initial = false;
+		 	}
+	 	}
+	 	
+	 	protected String CreateGroupSql(IQueryGroup group)
+	 	{
+			if (group is SqlQueryGroup)
+		 	{
+		 		return ((SqlQueryGroup) group).Sql;
+		 	}
+		 	return "/*Incorrect Group*/";
+	 	}
         #endregion
     }
 }

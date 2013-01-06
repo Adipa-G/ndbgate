@@ -95,6 +95,33 @@ namespace dbgate.ermanagement
             transaction.Commit();
             return connection;
         }
+
+		private void createTestData(IDbConnection connection)
+	 	{
+		 	int id = 35;
+		 	QueryBasicEntity entity = new QueryBasicEntity();
+		 	entity.IdCol =id;
+		 	entity.Name = "Org-NameA";
+		 	entity.Persist(connection);
+		 	
+		 	id = 45;
+		 	entity = new QueryBasicEntity();
+		 	entity.IdCol = id;
+		 	entity.Name = "Org-NameA";
+		 	entity.Persist(connection);
+		 	
+		 	id = 55;
+		 	entity = new QueryBasicEntity();
+		 	entity.IdCol = id;
+		 	entity.Name = "Org-NameA";
+		 	entity.Persist(connection);
+		 	
+		 	id = 65;
+		 	entity = new QueryBasicEntity();
+		 	entity.IdCol = id;
+			entity.Name = "Org-NameB";
+		 	entity.Persist(connection);
+	 	}
     
         [Test]
         public void ERQuery_loadAll_WithBasicSqlQuery_shouldLoadAll()
@@ -102,24 +129,66 @@ namespace dbgate.ermanagement
             try
             {
                 IDbConnection connection = SetupTables();
-                
-                IDbTransaction transaction = connection.BeginTransaction();
-                int id = 35;
-                QueryBasicEntity entity = new QueryBasicEntity();
-                entity.IdCol = id;
-                entity.Name = "Org-Name-A";
-                entity.Persist(connection);
-                
-                id = 65;
-                entity = new QueryBasicEntity();
-                entity.IdCol = id;
-                entity.Name = "Org-Name-B";
-                entity.Persist(connection);
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
                 transaction.Commit();
                 
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .Select(QuerySelection.RawSql("id_col,name"));
+
+                ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 4);
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+		[Test]
+		public void ERQuery_loadWithCondition_WithBasicSqlQuery_shouldLoadTarget()
+		{
+			try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.RawSql("query_basic qb1"))
+		 			.Where(QueryCondition.RawSql("id_col = 35"))
+		 			.Where(QueryCondition.RawSql("name like 'Org-NameA'"))
+		 			.Select(QuerySelection.RawSql("id_col,name"));
+
+                ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 1);
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+		}
+
+		[Test]
+		public void ERQuery_loadWithGroup_WithBasicSqlQuery_shouldLoadTarget ()
+		{
+			try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.RawSql("query_basic qb1"))
+		 			.GroupBy(QueryGroup.RawSql("name"))
+				 	.Select(QuerySelection.RawSql("name"));
 
                 ICollection<object> results = selectionQuery.ToList(connection);
                 Assert.IsTrue(results.Count == 2);
@@ -130,6 +199,6 @@ namespace dbgate.ermanagement
                 LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
-        }
+		}
     }
 }

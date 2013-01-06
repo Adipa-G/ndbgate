@@ -1,13 +1,14 @@
 ﻿using dbgate.ermanagement.query.segments.condition;
 using dbgate.ermanagement.query.segments.@from;
+using dbgate.ermanagement.query.segments.group;
 
 namespace dbgate.ermanagement.query
 {
     public class QueryGroup
     {
-        public static IQueryGroup RawSql(string sql)
+		public static SqlQueryGroup RawSql(string sql)
         {
-            return null;
+            return new SqlQueryGroup(sql);
         }
     }
 }

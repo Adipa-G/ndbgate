@@ -12,17 +12,17 @@ namespace dbgate.ermanagement.query
             return ErLayer.GetSharedInstance().Select(this, con);
         }
 
-        public ISelectionQuery From(IQueryFrom queryFrom)
+        public new ISelectionQuery From(IQueryFrom queryFrom)
         {
             return (ISelectionQuery)base.From(queryFrom);
         }
 
-        public ISelectionQuery Join(IQueryJoin queryJoin)
+        public new ISelectionQuery Join(IQueryJoin queryJoin)
         {
             return (ISelectionQuery)base.Join(queryJoin);
         }
 
-        public ISelectionQuery Where(IQueryCondition queryCondition)
+        public new ISelectionQuery Where(IQueryCondition queryCondition)
         {
             return (ISelectionQuery)base.Where(queryCondition);
         }
