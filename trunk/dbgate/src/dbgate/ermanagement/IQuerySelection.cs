@@ -5,6 +5,6 @@ namespace dbgate.ermanagement
 {
     public interface IQuerySelection
     {
-        Object Retrieve(IDataReader reader);
+		QuerySelectionType SelectionType { get; }
     }
 }

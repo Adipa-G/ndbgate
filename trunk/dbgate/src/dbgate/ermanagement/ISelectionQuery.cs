@@ -6,11 +6,11 @@ namespace dbgate.ermanagement
 {
     public interface ISelectionQuery : IQuery
     {
-		ISelectionQuery From(IQueryFrom queryFrom);
+		new ISelectionQuery From(IQueryFrom queryFrom);
 		 	
-		ISelectionQuery Join(IQueryJoin queryJoin);
+		new ISelectionQuery Join(IQueryJoin queryJoin);
 		 	
-		ISelectionQuery Where(IQueryCondition queryCondition);
+		new ISelectionQuery Where(IQueryCondition queryCondition);
 
         ICollection<object> ToList(IDbConnection con);
    

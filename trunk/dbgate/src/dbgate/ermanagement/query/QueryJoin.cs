@@ -1,7 +1,4 @@
-﻿using dbgate.ermanagement.query.segments.condition;
-using dbgate.ermanagement.query.segments.@from;
-
-namespace dbgate.ermanagement.query
+﻿namespace dbgate.ermanagement.query
 {
     public class QueryJoin
     {

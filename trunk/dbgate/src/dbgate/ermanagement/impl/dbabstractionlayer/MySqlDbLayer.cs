@@ -1,4 +1,5 @@
 ﻿using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate;
+using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.mysqlmm;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer
 {
@@ -10,7 +11,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer
 
         protected override IMetaManipulate CreateMetaManipulate()
         {
-            return new MySqlMetaManipulate(this,Config);
+			return new MySqlMetaManipulate(this,Config);
         }
     }
 }

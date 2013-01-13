@@ -14,6 +14,8 @@ using dbgate.ermanagement.impl.dbabstractionlayer;
 using dbgate.ermanagement.impl.utils;
 using dbgate.ermanagement.lazy;
 using log4net;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection;
 
 namespace dbgate.ermanagement.impl
 {
@@ -26,6 +28,54 @@ namespace dbgate.ermanagement.impl
         {
             _proxyGenerator = new ProxyGenerator();
         }
+
+		public ICollection<Object> Select (ISelectionQuery query, IDbConnection con)
+		{
+			IDataReader rs = null;
+			try 
+			{
+				var logSb = new StringBuilder ();
+				var showQuery = Config.ShowQueries;
+				var execInfo = DbLayer.GetDataManipulate ().CreateExecInfo (con, query);
+				if (showQuery) 
+				{
+					logSb.Append (execInfo.Sql);
+					foreach (var param in execInfo.Params) 
+					{
+						logSb.Append (" ,").Append ("Param").Append (param.Index).Append ("=").Append (param.Value);
+					}
+					LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
+				}
+		
+				rs = DbLayer.GetDataManipulate().CreateResultSet(con, execInfo);
+		
+				IList<Object> retList = new List<Object> ();
+				ICollection<IQuerySelection> selections = query.Structure.SelectList;
+		
+				while (rs.Read()) 
+				{
+					int count = 0;
+					Object[] rowObjects = new Object[selections.Count];
+					foreach (IQuerySelection selection in selections) 
+					{
+						Object loaded = ((IAbstractQuerySelection)selection).Retrieve (rs);
+						rowObjects [count++] = loaded;
+					}
+					retList.Add (rowObjects);
+				}
+		
+				return retList;
+			} 
+			catch (Exception e) 
+			{
+				LogManager.GetLogger(Config.LoggerName).Error(e.Message, e);
+				throw new RetrievalException (e.Message, e);
+			} 
+			finally 
+			{
+				DbMgmtUtility.Close (rs);
+			}
+		}
 
         public void Load(IServerRoDbClass roEntity, IDataReader reader, IDbConnection con)
         {

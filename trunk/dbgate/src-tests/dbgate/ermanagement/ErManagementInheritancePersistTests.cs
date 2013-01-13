@@ -24,6 +24,7 @@ namespace dbgate.ermanagement
 
                 LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("Starting in-memory database for unit tests");
                 var dbConnector = new DbConnector("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DbConnector.DbSqllite);
+				Assert.IsNotNull(dbConnector.Connection);
             }
             catch (Exception ex)
             {

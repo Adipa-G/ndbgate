@@ -5,16 +5,16 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 {
     public class QueryExecInfo
     {
-        private ICollection<QueryParam> _params; 
+        private ICollection<QueryExecParam> _params; 
 
         public QueryExecInfo()
         {
-            _params = new Collection<QueryParam>();
+            _params = new Collection<QueryExecParam>();
         }
 
         public string Sql { get; set; }
 
-        public ICollection<QueryParam> Params
+        public ICollection<QueryExecParam> Params
         {
             get { return _params; }
         }

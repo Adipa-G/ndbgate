@@ -1,8 +1,8 @@
-﻿using System.Data;
+using System.Data;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 {
-    public class QueryParam
+    public class QueryExecParam
     {
         public int Index { get; set; }
 

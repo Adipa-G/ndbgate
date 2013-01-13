@@ -177,11 +177,8 @@
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\AbstractDbLayer.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\AccessDbLayer.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\AbstractDataManipulate.cs" />
-    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\AccessDataManipulate.cs" />
-    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\DefaultDataManipulate.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\IDataManipulate.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\QueryExecInfo.cs" />
-    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\QueryParam.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\DefaultDbLayer.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\IDbLayer.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\LayerFactory.cs" />
@@ -201,12 +198,9 @@
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\datastructures\MetaItemType.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\datastructures\MetaPrimaryKey.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\datastructures\MetaTable.cs" />
-    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\DefaultMetaManipulate.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\IMetaManipulate.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\mappings\ColumnTypeMapItem.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\mappings\ReferentialRuleTypeMapItem.cs" />
-    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\MySqlMetaManipulate.cs" />
-    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\SqlLiteMetaManipulate.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\support\MetaQueryHolder.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\MySqlDbLayer.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\SqlLiteDbLayer.cs" />
@@ -235,10 +229,6 @@
     <Compile Include="src\dbgate\ermanagement\query\Query.cs" />
     <Compile Include="src\dbgate\ermanagement\query\QueryCondition.cs" />
     <Compile Include="src\dbgate\ermanagement\query\QueryStructure.cs" />
-    <Compile Include="src\dbgate\ermanagement\query\segments\condition\SqlQueryCondition.cs" />
-    <Compile Include="src\dbgate\ermanagement\query\segments\from\SqlQueryFrom.cs" />
-    <Compile Include="src\dbgate\ermanagement\query\segments\selection\SqlQuerySelection.cs" />
-    <Compile Include="src\dbgate\ermanagement\query\segments\SqlSegment.cs" />
     <Compile Include="src\dbgate\ermanagement\query\SelectionQuery.cs" />
     <Compile Include="src\dbgate\ermanagement\ReferentialRuleType.cs" />
     <Compile Include="src\dbgate\ermanagement\session\Session.cs" />
@@ -249,7 +239,28 @@
     <Compile Include="src\dbgate\IServerDbClass.cs" />
     <Compile Include="src\dbgate\IServerRoDbClass.cs" />
     <Compile Include="src\dbgate\utility\StatusManager.cs" />
-    <Compile Include="src\dbgate\ermanagement\query\segments\group\SqlQueryGroup.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\dbdm\accessdm\AccessDataManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\dbmm\defaultmm\DefaultMetaManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\dbdm\defaultdm\DefaultDataManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\dbmm\sqllitemm\SqlLiteMetaManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\dbmm\myqlmm\MySqlMetaManipulate.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\QueryExecParam.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\condition\AbstractQueryConditionFactory.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\condition\AbstractSqlQueryCondition.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\condition\IAbstractQueryCondition.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryConditionType.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryFromType.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryGroupType.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QuerySelectionType.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\AbstractQueryFromFactory.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\AbstractSqlQueryFrom.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\IAbstractQueryFrom.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\group\AbstractQueryGroupFactory.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\group\AbstractSqlQueryGroup.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\group\IAbstractQueryGroup.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\AbstractQuerySelectionFactory.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\AbstractSqlQuerySelection.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\IAbstractQuerySelection.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="log4net.config">
@@ -342,7 +353,18 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\dbgate\ermanagement\utils\" />
-    <Folder Include="src\dbgate\ermanagement\query\segments\group\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\dbdm\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\dbdm\accessdm\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\dbmm\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\dbmm\defaultmm\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\dbdm\defaultdm\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\dbmm\sqllitemm\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\dbmm\myqlmm\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\condition\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\group\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

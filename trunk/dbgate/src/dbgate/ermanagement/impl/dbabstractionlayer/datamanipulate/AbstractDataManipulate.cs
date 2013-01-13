@@ -10,21 +10,27 @@ using dbgate.ermanagement.caches;
 using dbgate.ermanagement.impl.utils;
 using System.Linq;
 using dbgate.ermanagement.query;
-using dbgate.ermanagement.query.segments.@from;
-using dbgate.ermanagement.query.segments.selection;
-using dbgate.ermanagement.query.segments.group;
-using dbgate.ermanagement.query.segments.condition;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.condition;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.group;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 {
     public class AbstractDataManipulate : IDataManipulate
     {
-        private IDbLayer _dbLayer;
-
         public AbstractDataManipulate(IDbLayer dbLayer)
         {
-            _dbLayer = dbLayer;
-        }
+        	initialize();
+		}
+	
+		protected void initialize()
+		{
+			QuerySelection.Factory = new AbstractQuerySelectionFactory();
+			QueryFrom.Factory = new AbstractQueryFromFactory();
+			QueryCondition.Factory = new AbstractQueryConditionFactory();
+			QueryGroup.Factory = new AbstractQueryGroupFactory();
+	 	}
 
         #region IDataManipulate Members
 
@@ -291,7 +297,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             var cmdParams = execInfo.Params;
             var sortedParams = cmdParams.OrderBy(p => p.Index);
 
-            foreach (QueryParam param in sortedParams)
+            foreach (QueryExecParam param in sortedParams)
             {
                 DbParameter parameter = (OleDbParameter)cmd.CreateParameter();
                 parameter.DbType = param.Type;
@@ -348,9 +354,9 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 
         protected String CreateSelectionSql(IQuerySelection selection)
         {
-            if (selection is SqlQuerySelection)
+            if (selection != null)
             {
-                return ((SqlQuerySelection) selection).Sql;
+                return ((IAbstractQuerySelection) selection).CreateSql();
             }
             return "/*Incorrect Selection*/";
         }
@@ -374,9 +380,9 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 
         protected String CreateFromSql(IQueryFrom from)
         {
-            if (from is SqlQueryFrom)
+            if (from != null)
             {
-                return ((SqlQueryFrom) from).Sql;
+                return ((IAbstractQueryFrom) from).CreateSql();
             }
             return "/*Incorrect From*/";
         }
@@ -403,9 +409,9 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 		 	
 	 	protected String CreateWhereSql(IQueryCondition condition)
 	 	{
-			if (condition is SqlQueryCondition)
+			if (condition != null)
 		 	{
-		 		return ((SqlQueryCondition) condition).Sql;
+		 		return ((IAbstractQueryCondition) condition).CreateSql();
 		 	}
 		 	return "/*Incorrect Where*/";
 	 	}
@@ -432,9 +438,9 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 	 	
 	 	protected String CreateGroupSql(IQueryGroup group)
 	 	{
-			if (group is SqlQueryGroup)
+			if (group != null)
 		 	{
-		 		return ((SqlQueryGroup) group).Sql;
+		 		return ((IAbstractQueryGroup) group).CreateSql();
 		 	}
 		 	return "/*Incorrect Group*/";
 	 	}

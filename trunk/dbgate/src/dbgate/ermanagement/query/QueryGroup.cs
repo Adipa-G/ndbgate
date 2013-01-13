@@ -1,14 +1,21 @@
-﻿using dbgate.ermanagement.query.segments.condition;
-using dbgate.ermanagement.query.segments.@from;
-using dbgate.ermanagement.query.segments.group;
+﻿using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.group;
 
 namespace dbgate.ermanagement.query
 {
     public class QueryGroup
     {
-		public static SqlQueryGroup RawSql(string sql)
+		private static AbstractQueryGroupFactory _factory;
+
+		public static AbstractQueryGroupFactory Factory
+		{
+			set { _factory = value;}
+		}
+
+        public static IQueryGroup RawSql(string sql)
         {
-            return new SqlQueryGroup(sql);
+			AbstractSqlQueryGroup queryGroup = (AbstractSqlQueryGroup) _factory.CreateGroup(QueryGroupType.RAW_SQL);
+			queryGroup.Sql = sql;
+			return queryGroup;
         }
     }
 }

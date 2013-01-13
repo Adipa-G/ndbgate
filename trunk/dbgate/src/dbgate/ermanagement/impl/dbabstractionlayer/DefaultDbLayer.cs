@@ -1,5 +1,7 @@
 ﻿using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate;
 using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate;
+using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaultmm;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.dbdm.defaultdm;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer
 {
@@ -11,12 +13,12 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer
 
         protected override IDataManipulate CreateDataManipulate()
         {
-            return new DefaultDataManipulate(this);
+			return new DefaultDataManipulate(this);
         }
 
         protected override IMetaManipulate CreateMetaManipulate()
         {
-            return new DefaultMetaManipulate(this, Config);
+			return new DefaultMetaManipulate(this, Config);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.dbdm.accessdm;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer
 {
@@ -10,7 +11,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer
 
         protected override IDataManipulate CreateDataManipulate()
         {
-            return new AccessDataManipulate(this);
+			return new AccessDataManipulate(this);
         }
     }
 }

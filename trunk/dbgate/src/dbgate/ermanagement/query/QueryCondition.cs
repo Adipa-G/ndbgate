@@ -1,12 +1,21 @@
-﻿using dbgate.ermanagement.query.segments.condition;
+﻿using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.condition;
 
 namespace dbgate.ermanagement.query
 {
     public class QueryCondition
     {
-        public static SqlQueryCondition RawSql(string sql)
+		private static AbstractQueryConditionFactory _factory;
+
+		public static AbstractQueryConditionFactory Factory
+		{
+			set { _factory = value;}
+		}
+
+        public static IQueryCondition RawSql(string sql)
         {
-            return new SqlQueryCondition(sql);
+			AbstractSqlQueryCondition queryCondition = (AbstractSqlQueryCondition) _factory.CreateCondition(QueryConditionType.RAW_SQL);
+			queryCondition.Sql = sql;
+			return queryCondition;
         }
     }
 }
