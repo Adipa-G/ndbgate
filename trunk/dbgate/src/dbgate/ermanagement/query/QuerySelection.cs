@@ -1,4 +1,4 @@
-﻿using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection;
 
 namespace dbgate.ermanagement.query
 {
@@ -13,7 +13,7 @@ namespace dbgate.ermanagement.query
 
         public static IQuerySelection RawSql(string sql)
         {
-			AbstractSqlQuerySelection querySelection = (AbstractSqlQuerySelection) _factory.CreateSelection(QuerySelectionType.RAW_SQL);
+			AbstractSqlQuerySelection querySelection = (AbstractSqlQuerySelection) _factory.CreateSelection(QuerySelectionExpressionType.RAW_SQL);
 			querySelection.Sql = sql;
 			return querySelection;
         }

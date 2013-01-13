@@ -1,10 +1,11 @@
 using System;
 using System.Data;
+using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement
 {
     public interface IQuerySelection
     {
-		QuerySelectionType SelectionType { get; }
+		QuerySelectionExpressionType SelectionExpressionType { get; }
     }
 }

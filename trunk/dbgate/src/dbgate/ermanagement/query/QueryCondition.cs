@@ -13,7 +13,7 @@ namespace dbgate.ermanagement.query
 
         public static IQueryCondition RawSql(string sql)
         {
-			AbstractSqlQueryCondition queryCondition = (AbstractSqlQueryCondition) _factory.CreateCondition(QueryConditionType.RAW_SQL);
+			AbstractSqlQueryCondition queryCondition = (AbstractSqlQueryCondition) _factory.CreateCondition(QueryConditionExpressionType.RAW_SQL);
 			queryCondition.Sql = sql;
 			return queryCondition;
         }

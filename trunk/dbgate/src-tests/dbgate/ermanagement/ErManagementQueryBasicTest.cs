@@ -69,6 +69,14 @@ namespace dbgate.ermanagement
                 command = connection.CreateCommand();
                 command.CommandText = "drop table query_basic";
                 command.ExecuteNonQuery();
+
+				command = connection.CreateCommand();
+                command.CommandText = "DELETE FROM query_basic_details";
+                command.ExecuteNonQuery();
+                
+                command = connection.CreateCommand();
+                command.CommandText = "drop table query_basic_details";
+                command.ExecuteNonQuery();
                 
                 transaction.Commit();
                 connection.Close();
@@ -88,8 +96,15 @@ namespace dbgate.ermanagement
                              "\tid_col Int NOT NULL,\n" +
                              "\tname Varchar(20) NOT NULL,\n" +
                              " Primary Key (id_col))";
-
             IDbCommand cmd = connection.CreateCommand();
+            cmd.CommandText = sql;
+            cmd.ExecuteNonQuery();
+
+
+			sql = "Create table query_basic_details (\n" +
+						 	"\tname Varchar(20) NOT NULL,\n" +
+						 	"\tdescription Varchar(50) NOT NULL )";
+			cmd = connection.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -104,14 +119,19 @@ namespace dbgate.ermanagement
 		 	entity.IdCol =id;
 		 	entity.Name = "Org-NameA";
 		 	entity.Persist(connection);
+
+			QueryBasicDetailsEntity detailsEntity = new QueryBasicDetailsEntity();
+			detailsEntity.Name = entity.Name;
+			detailsEntity.Description = entity.Name + "Details";
+			detailsEntity.Persist(connection);
 		 	
 		 	id = 45;
 		 	entity = new QueryBasicEntity();
 		 	entity.IdCol = id;
 		 	entity.Name = "Org-NameA";
 		 	entity.Persist(connection);
-		 	
-		 	id = 55;
+
+			id = 55;
 		 	entity = new QueryBasicEntity();
 		 	entity.IdCol = id;
 		 	entity.Name = "Org-NameA";
@@ -122,10 +142,15 @@ namespace dbgate.ermanagement
 		 	entity.IdCol = id;
 			entity.Name = "Org-NameB";
 		 	entity.Persist(connection);
+
+			detailsEntity = new QueryBasicDetailsEntity();
+			detailsEntity.Name = entity.Name;
+			detailsEntity.Description = entity.Name + "Details";
+			detailsEntity.Persist(connection);
 	 	}
     
         [Test]
-        public void ERQuery_loadAll_WithBasicSqlQuery_shouldLoadAll()
+        public void ERQuery_ExecuteToRetrieveAll_WithBasicSqlQuery_shouldLoadAll()
         {
             try
             {
@@ -136,7 +161,8 @@ namespace dbgate.ermanagement
                 
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
-                    .Select(QuerySelection.RawSql("id_col,name"));
+                    .Select(QuerySelection.RawSql("id_col"))
+					.Select(QuerySelection.RawSql("name as name_col"));
 
                 ICollection<object> results = selectionQuery.ToList(connection);
                 Assert.IsTrue(results.Count == 4);
@@ -150,7 +176,7 @@ namespace dbgate.ermanagement
         }
 
 		[Test]
-		public void ERQuery_loadWithCondition_WithBasicSqlQuery_shouldLoadTarget()
+		public void ERQuery_ExecuteWithCondition_WithBasicSqlQuery_shouldLoadTarget()
 		{
 			try
             {
@@ -177,7 +203,7 @@ namespace dbgate.ermanagement
 		}
 
 		[Test]
-		public void ERQuery_loadWithGroup_WithBasicSqlQuery_shouldLoadTarget ()
+		public void ERQuery_ExecuteWithGroup_WithBasicSqlQuery_shouldLoadTarget ()
 		{
 			try
             {
@@ -193,6 +219,87 @@ namespace dbgate.ermanagement
 
                 ICollection<object> results = selectionQuery.ToList(connection);
                 Assert.IsTrue(results.Count == 2);
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+		}
+
+		[Test]
+		public void ExecuteWithGroupCondition_WithBasicSqlQuery_shouldLoadTarget()
+		{
+			try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.RawSql("query_basic qb1"))
+		 			.GroupBy(QueryGroup.RawSql("name"))
+					.Having(QueryGroupCondition.RawSql("count(id_col)>1"))
+				 	.Select(QuerySelection.RawSql("name"));
+
+                ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 1);
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+		}
+
+		[Test]
+		public void ExecuteWithOrderBy_WithBasicSqlQuery_shouldLoadTarget()
+		{
+			try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.RawSql("query_basic qb1"))
+		 			.OrderBy(QueryOrderBy.RawSql("name"))
+				 	.Select(QuerySelection.RawSql("name"));
+
+                ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 4);
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+		}
+
+	 	[Test]
+		public void ExecuteWithJoin_WithBasicSqlQuery_shouldLoadTarget()
+		{
+			try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.RawSql("query_basic qb1"))
+				 	.Join(QueryJoin.RawSql("inner join query_basic_details qbd1 on qb1.name = qbd1.name"))
+				 	.OrderBy(QueryOrderBy.RawSql("qb1.name"))
+				 	.Select(QuerySelection.RawSql("qb1.name as name"))
+				 	.Select(QuerySelection.RawSql("description"));
+
+                ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 4);
                 connection.Close();
             }
             catch (Exception e)

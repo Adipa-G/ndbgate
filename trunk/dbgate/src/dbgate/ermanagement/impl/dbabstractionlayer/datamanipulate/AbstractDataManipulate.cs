@@ -14,6 +14,9 @@ using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection
 using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from;
 using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.condition;
 using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.group;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.groupcondition;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.join;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.orderby;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 {
@@ -30,6 +33,9 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 			QueryFrom.Factory = new AbstractQueryFromFactory();
 			QueryCondition.Factory = new AbstractQueryConditionFactory();
 			QueryGroup.Factory = new AbstractQueryGroupFactory();
+			QueryGroupCondition.Factory = new AbstractQueryGroupConditionFactory();
+			QueryJoin.Factory = new AbstractQueryJoinFactory();
+			QueryOrderBy.Factory = new AbstractQueryOrderByFactory();
 	 	}
 
         #region IDataManipulate Members
@@ -326,10 +332,11 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             StringBuilder sb = new StringBuilder();
             ProcessSelection(sb, execInfo, structure);
             ProcessFrom(sb, execInfo, structure);
+			ProcessJoin(sb, execInfo, structure);
             ProcessWhere(sb, execInfo, structure);
 		 	ProcessGroup(sb, execInfo, structure);
-            //sb.append("HAVING ");
-            //sb.append("ORDER BY ");
+			ProcessGroupCondition(sb, execInfo, structure);
+			ProcessOrderBy(sb, execInfo, structure);
 
             execInfo.Sql = sb.ToString();
             return execInfo;
@@ -385,6 +392,28 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
                 return ((IAbstractQueryFrom) from).CreateSql();
             }
             return "/*Incorrect From*/";
+        }
+
+		private void ProcessJoin(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
+        {
+			var joinList = structure.JoinList;
+			if (joinList.Count == 0)
+				return;
+
+			foreach (var join in joinList) 
+			{
+				sb.Append(" ");
+				sb.Append(CreateJoinSql(join));
+			}
+        }
+
+        protected String CreateJoinSql(IQueryJoin join)
+        {
+            if (join != null)
+            {
+                return ((IAbstractQueryJoin) join).CreateSql();
+            }
+            return "/*Incorrect Join*/";
         }
 
 		private void ProcessWhere(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
@@ -443,6 +472,64 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 		 		return ((IAbstractQueryGroup) group).CreateSql();
 		 	}
 		 	return "/*Incorrect Group*/";
+	 	}
+
+		private void ProcessGroupCondition(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
+	 	{
+		 	ICollection<IQueryGroupCondition> groupConditionList = structure.GroupConditionList;
+		 	if (groupConditionList.Count == 0)
+		 	return;
+		 	
+		 	sb.Append(" HAVING ");
+		 	
+		 	bool initial = true;
+			foreach (IQueryGroupCondition groupCondition in groupConditionList)
+		 	{
+			 	if (!initial)
+			 	{
+			 		sb.Append(" AND ");
+			 	}
+			 	sb.Append(CreateGroupConditionSql(groupCondition));
+			 	initial = false;
+		 	}
+	 	}
+		 	
+	 	protected String CreateGroupConditionSql(IQueryGroupCondition groupCondition)
+	 	{
+			if (groupCondition != null)
+		 	{
+		 		return ((IAbstractQueryGroupCondition) groupCondition).CreateSql();
+		 	}
+		 	return "/*Incorrect Group condition*/";
+	 	}
+
+		private void ProcessOrderBy(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
+	 	{
+		 	ICollection<IQueryOrderBy> orderList = structure.OrderList;
+		 	if (orderList.Count == 0)
+		 	return;
+		 	
+		 	sb.Append(" ORDER BY ");
+		 	
+		 	bool initial = true;
+			foreach (IQueryOrderBy orderBy in orderList)
+		 	{
+			 	if (!initial)
+			 	{
+			 		sb.Append(",");
+			 	}
+			 	sb.Append(CreateOrderBySql(orderBy));
+			 	initial = false;
+		 	}
+	 	}
+		 	
+	 	protected String CreateOrderBySql(IQueryOrderBy orderBy)
+	 	{
+			if (orderBy != null)
+		 	{
+		 		return ((IAbstractQueryOrderBy) orderBy).CreateSql();
+		 	}
+		 	return "/*Incorrect Order by*/";
 	 	}
         #endregion
     }

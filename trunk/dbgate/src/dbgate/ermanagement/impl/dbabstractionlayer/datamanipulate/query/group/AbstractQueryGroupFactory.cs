@@ -1,14 +1,15 @@
 using System;
+using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.group
 {
 	public class AbstractQueryGroupFactory
 	{
-		public IAbstractQueryGroup CreateGroup (QueryGroupType groupType)
+		public IAbstractQueryGroup CreateGroup (QueryGroupExpressionType expressionType)
 		{
-			switch (groupType) 
+			switch (expressionType) 
 			{
-				case QueryGroupType.RAW_SQL:
+				case QueryGroupExpressionType.RAW_SQL:
 					return new AbstractSqlQueryGroup ();
 				default:
 					return null;

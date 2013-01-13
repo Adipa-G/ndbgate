@@ -1,14 +1,15 @@
 using System;
+using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.condition
 {
 	public class AbstractQueryConditionFactory
 	{
-		public IAbstractQueryCondition CreateCondition (QueryConditionType conditionType)
+		public IAbstractQueryCondition CreateCondition (QueryConditionExpressionType expressionType)
 		{
-			switch (conditionType) 
+			switch (expressionType) 
 			{
-				case QueryConditionType.RAW_SQL:
+				case QueryConditionExpressionType.RAW_SQL:
 					return new AbstractSqlQueryCondition ();
 				default:
 					return null;

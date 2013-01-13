@@ -1,14 +1,15 @@
 using System;
+using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection
 {
 	public class AbstractQuerySelectionFactory
 	{
-		public IAbstractQuerySelection CreateSelection (QuerySelectionType selectionType)
+		public IAbstractQuerySelection CreateSelection (QuerySelectionExpressionType expressionType)
 		{
-			switch (selectionType) 
+			switch (expressionType) 
 			{
-				case QuerySelectionType.RAW_SQL:
+				case QuerySelectionExpressionType.RAW_SQL:
 					return new AbstractSqlQuerySelection ();
 				default:
 					return null;

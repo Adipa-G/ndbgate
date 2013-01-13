@@ -1,7 +1,9 @@
+using dbgate.ermanagement.query;
+
 namespace dbgate.ermanagement
 {
     public interface IQueryGroup
     {
-		QueryGroupType GroupType { get; }    
+		QueryGroupExpressionType GroupExpressionType { get; }    
     }
 }

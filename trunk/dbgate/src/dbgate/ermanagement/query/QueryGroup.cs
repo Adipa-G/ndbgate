@@ -1,4 +1,4 @@
-﻿using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.group;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.group;
 
 namespace dbgate.ermanagement.query
 {
@@ -13,7 +13,7 @@ namespace dbgate.ermanagement.query
 
         public static IQueryGroup RawSql(string sql)
         {
-			AbstractSqlQueryGroup queryGroup = (AbstractSqlQueryGroup) _factory.CreateGroup(QueryGroupType.RAW_SQL);
+			AbstractSqlQueryGroup queryGroup = (AbstractSqlQueryGroup) _factory.CreateGroup(QueryGroupExpressionType.RAW_SQL);
 			queryGroup.Sql = sql;
 			return queryGroup;
         }

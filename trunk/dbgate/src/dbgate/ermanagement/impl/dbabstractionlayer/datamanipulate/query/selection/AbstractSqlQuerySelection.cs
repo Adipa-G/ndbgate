@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection
 {
@@ -9,9 +10,9 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 	{
 		public String Sql { get; set; }
 
-		public QuerySelectionType SelectionType
+		public QuerySelectionExpressionType SelectionExpressionType
 		{
-			get {return QuerySelectionType.RAW_SQL;}
+			get {return QuerySelectionExpressionType.RAW_SQL;}
 		}
 		
 		public String CreateSql()

@@ -1,7 +1,9 @@
+using dbgate.ermanagement.query;
+
 namespace dbgate.ermanagement
 {
     public interface IQueryCondition
     {
-		QueryConditionType ConditionType { get; }
+		QueryConditionExpressionType ConditionExpressionType { get; }
     }
 }

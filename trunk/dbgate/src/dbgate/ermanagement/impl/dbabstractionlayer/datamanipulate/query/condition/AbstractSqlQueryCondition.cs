@@ -1,4 +1,5 @@
 using System;
+using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.condition
 {
@@ -6,9 +7,9 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.condi
 	{
 		public String Sql { get; set; }
 	 	
-	 	public QueryConditionType ConditionType 
+		public QueryConditionExpressionType ConditionExpressionType 
 		{
-			get {return QueryConditionType.RAW_SQL;}
+			get {return QueryConditionExpressionType.RAW_SQL;}
 		}
 	 	
 	 	public String CreateSql()

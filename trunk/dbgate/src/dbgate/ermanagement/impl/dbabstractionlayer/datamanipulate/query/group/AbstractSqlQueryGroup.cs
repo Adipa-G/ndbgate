@@ -1,4 +1,5 @@
 using System;
+using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.group
 {
@@ -6,9 +7,9 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.group
 	{
 		public String Sql { get; set; }
 
-		public QueryGroupType GroupType
+		public QueryGroupExpressionType GroupExpressionType
 		{
-			get {return QueryGroupType.RAW_SQL;}
+			get {return QueryGroupExpressionType.RAW_SQL;}
 		}
 		
 		public String CreateSql()

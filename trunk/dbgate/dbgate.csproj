@@ -248,10 +248,6 @@
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\condition\AbstractQueryConditionFactory.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\condition\AbstractSqlQueryCondition.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\condition\IAbstractQueryCondition.cs" />
-    <Compile Include="src\dbgate\ermanagement\query\QueryConditionType.cs" />
-    <Compile Include="src\dbgate\ermanagement\query\QueryFromType.cs" />
-    <Compile Include="src\dbgate\ermanagement\query\QueryGroupType.cs" />
-    <Compile Include="src\dbgate\ermanagement\query\QuerySelectionType.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\AbstractQueryFromFactory.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\AbstractSqlQueryFrom.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\IAbstractQueryFrom.cs" />
@@ -261,6 +257,24 @@
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\AbstractQuerySelectionFactory.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\AbstractSqlQuerySelection.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\IAbstractQuerySelection.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\query\basic\QueryBasicDetailsEntity.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryConditionExpressionType.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryFromExpressionType.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QuerySelectionExpressionType.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryGroupConditionExpressionType.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\groupcondition\AbstractQueryGroupConditionFactory.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\groupcondition\IAbstractQueryGroupCondition.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\groupcondition\AbstractSqlQueryGroupCondition.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\join\AbstractQueryJoinFactory.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\join\IAbstractQueryJoin.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\join\AbstractSqlQueryJoin.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\orderby\AbstractQueryOrderByFactory.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\orderby\IAbstractQueryOrderBy.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\orderby\AbstractSqlQueryOrderBy.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryJoinExpressionType.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryOrderByExpressionType.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryGroupExpressionType.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\QueryOrderBy.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="log4net.config">
@@ -365,6 +379,9 @@
     <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\group\" />
     <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\" />
     <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\groupcondition\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\join\" />
+    <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\orderby\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

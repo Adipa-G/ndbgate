@@ -1,4 +1,4 @@
-﻿using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from;
 
 namespace dbgate.ermanagement.query
 {
@@ -13,7 +13,7 @@ namespace dbgate.ermanagement.query
 
         public static IQueryFrom RawSql(string sql)
         {
-			AbstractSqlQueryFrom queryFrom = (AbstractSqlQueryFrom) _factory.CreateFrom(QueryFromType.RAW_SQL);
+			AbstractSqlQueryFrom queryFrom = (AbstractSqlQueryFrom) _factory.CreateFrom(QueryFromExpressionType.RAW_SQL);
 			queryFrom.Sql = sql;
 			return queryFrom;
         }

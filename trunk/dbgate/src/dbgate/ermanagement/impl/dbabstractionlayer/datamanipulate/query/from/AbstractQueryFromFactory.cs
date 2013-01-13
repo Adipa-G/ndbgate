@@ -1,14 +1,15 @@
 using System;
+using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from
 {
 	public class AbstractQueryFromFactory
 	{
-		public IAbstractQueryFrom CreateFrom (QueryFromType fromType)
+		public IAbstractQueryFrom CreateFrom (QueryFromExpressionType expressionType)
 		{
-			switch (fromType) 
+			switch (expressionType) 
 			{
-				case QueryFromType.RAW_SQL:
+				case QueryFromExpressionType.RAW_SQL:
 					return new AbstractSqlQueryFrom ();
 				default:
 					return null;
