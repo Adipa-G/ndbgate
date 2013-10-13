@@ -176,6 +176,160 @@ namespace dbgate.ermanagement
         }
 
 		[Test]
+        public void ERQuery_ExecuteToRetrieveAll_WithDistinctSqlQuery_shouldLoadAll()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.RawSql("query_basic qb1"))
+                    .Select(QuerySelection.RawSql("name as name_col"))
+					.Distinct();
+
+                ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 2);
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+		[Test]
+        public void ERQuery_ExecuteToRetrieveAll_WithRowSkipSqlQuery_shouldLoadAll()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.RawSql("query_basic qb1"))
+                    .Select(QuerySelection.RawSql("name as name_col"))
+					.Skip(1);
+
+                ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 3);
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+		[Test]
+        public void ERQuery_ExecuteToRetrieveAll_WithFetchSqlQuery_shouldLoadAll()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.RawSql("query_basic qb1"))
+                    .Select(QuerySelection.RawSql("name as name_col"))
+					.Fetch(2);
+
+                ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 2);
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+		[Test]
+        public void ERQuery_ExecuteToRetrieveAll_WithSkipAndFetchSqlQuery_shouldLoadAll()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.RawSql("query_basic qb1"))
+                    .Select(QuerySelection.RawSql("name as name_col"))
+					.Skip(1).Fetch(2);
+
+                ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 2);
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+		[Test]
+        public void ERQuery_ExecuteToRetrieveAll_WithTypeSelection_shouldLoadAll()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.RawSql("query_basic qb1"))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 4);
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+		[Test]
+        public void ERQuery_ExecuteToRetrieveAll_WithTypeFrom_shouldLoadAll()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 4);
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+		[Test]
 		public void ERQuery_ExecuteWithCondition_WithBasicSqlQuery_shouldLoadTarget()
 		{
 			try

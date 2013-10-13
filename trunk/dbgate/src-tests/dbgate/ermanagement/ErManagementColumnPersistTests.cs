@@ -526,7 +526,7 @@ namespace dbgate.ermanagement
             try
             {
                 IDbConnection connection = SetupTables();
-                 IDbTransaction transaction = connection.BeginTransaction();
+                IDbTransaction transaction = connection.BeginTransaction();
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();

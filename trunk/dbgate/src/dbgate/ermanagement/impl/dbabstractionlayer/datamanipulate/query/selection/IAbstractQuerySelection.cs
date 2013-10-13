@@ -5,9 +5,9 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 {
 	public interface IAbstractQuerySelection : IQuerySelection
 	{
-		String CreateSql();
+		String CreateSql(QueryExecInfo execInfo);
 
-		Object Retrieve(IDataReader rs);
+		Object Retrieve(IDataReader rs,IDbConnection con);
 	}
 }
 

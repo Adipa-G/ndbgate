@@ -6,6 +6,12 @@ namespace dbgate.ermanagement
 {
     public interface ISelectionQuery : IQuery
     {
+		ISelectionQuery Distinct();
+
+		ISelectionQuery Skip(long records);
+
+		ISelectionQuery Fetch(long records);
+
 		new ISelectionQuery From(IQueryFrom queryFrom);
 		 	
 		new ISelectionQuery Join(IQueryJoin queryJoin);

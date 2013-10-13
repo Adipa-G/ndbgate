@@ -12,7 +12,25 @@ namespace dbgate.ermanagement.query
             return ErLayer.GetSharedInstance().Select(this, con);
         }
 
-        public new ISelectionQuery From(IQueryFrom queryFrom)
+		public new ISelectionQuery Distinct()
+        {
+			Structure.Distinct = true;
+			return this;
+        }
+
+		public new ISelectionQuery Fetch(long records)
+        {
+			Structure.Fetch = records;
+			return this;
+        }
+
+		public new ISelectionQuery Skip(long records)
+        {
+			Structure.Skip = records;
+			return this;
+        }
+
+		public new ISelectionQuery From(IQueryFrom queryFrom)
         {
             return (ISelectionQuery)base.From(queryFrom);
         }

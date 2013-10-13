@@ -24,6 +24,12 @@ namespace dbgate.ermanagement.query
             _groupConditionList = new Collection<IQueryGroupCondition>();
 	  	}
 
+		public bool Distinct { get; set; }
+
+		public long Fetch { get; set; }
+
+		public long Skip { get; set; }
+
         public ICollection<IQueryFrom> FromList
         {
             get { return _fromList; }

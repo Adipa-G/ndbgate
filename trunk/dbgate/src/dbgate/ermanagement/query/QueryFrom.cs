@@ -1,4 +1,5 @@
 using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from;
+using System;
 
 namespace dbgate.ermanagement.query
 {
@@ -15,6 +16,13 @@ namespace dbgate.ermanagement.query
         {
 			AbstractSqlQueryFrom queryFrom = (AbstractSqlQueryFrom) _factory.CreateFrom(QueryFromExpressionType.RAW_SQL);
 			queryFrom.Sql = sql;
+			return queryFrom;
+        }
+
+		public static IQueryFrom EntityType(Type entityType)
+        {
+			AbstractTypeQueryFrom queryFrom = (AbstractTypeQueryFrom) _factory.CreateFrom(QueryFromExpressionType.ENTITY_TYPE);
+			queryFrom.EntityType = entityType;
 			return queryFrom;
         }
     }

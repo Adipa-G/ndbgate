@@ -11,6 +11,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from
 			{
 				case QueryFromExpressionType.RAW_SQL:
 					return new AbstractSqlQueryFrom ();
+				case QueryFromExpressionType.ENTITY_TYPE:
+					return new AbstractTypeQueryFrom ();
 				default:
 					return null;
 			}

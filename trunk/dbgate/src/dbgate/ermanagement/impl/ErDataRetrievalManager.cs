@@ -58,7 +58,7 @@ namespace dbgate.ermanagement.impl
 					Object[] rowObjects = new Object[selections.Count];
 					foreach (IQuerySelection selection in selections) 
 					{
-						Object loaded = ((IAbstractQuerySelection)selection).Retrieve (rs);
+						Object loaded = ((IAbstractQuerySelection)selection).Retrieve (rs,con);
 						rowObjects [count++] = loaded;
 					}
 					retList.Add (rowObjects);

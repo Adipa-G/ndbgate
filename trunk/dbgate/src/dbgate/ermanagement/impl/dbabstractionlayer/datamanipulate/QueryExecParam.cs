@@ -6,7 +6,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
     {
         public int Index { get; set; }
 
-        public DbType Type { get; set; }
+        public DbColumnType Type { get; set; }
 
         public object Value { get; set; }
     }

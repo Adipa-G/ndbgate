@@ -275,6 +275,8 @@
     <Compile Include="src\dbgate\ermanagement\query\QueryOrderByExpressionType.cs" />
     <Compile Include="src\dbgate\ermanagement\query\QueryGroupExpressionType.cs" />
     <Compile Include="src\dbgate\ermanagement\query\QueryOrderBy.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\AbstractTypeQuerySelection.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\AbstractTypeQueryFrom.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="log4net.config">

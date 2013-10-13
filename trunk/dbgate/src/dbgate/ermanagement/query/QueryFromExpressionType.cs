@@ -4,7 +4,8 @@ namespace dbgate.ermanagement.query
 {
 	public enum QueryFromExpressionType
 	{
-		RAW_SQL
+		RAW_SQL,
+		ENTITY_TYPE
 	}
 }
 

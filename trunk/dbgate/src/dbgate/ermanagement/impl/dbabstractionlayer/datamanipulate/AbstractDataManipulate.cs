@@ -255,12 +255,21 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 
         public void SetToPreparedStatement(IDbCommand cmd, object obj, int parameterIndex, IDbColumn dbColumn)
         {
-            IDataParameter parameter = cmd.CreateParameter();
-            cmd.Parameters.Add(parameter);
-            parameter.Direction = ParameterDirection.Input;
-            parameter.Value = obj;
+			SetToPreparedStatement(cmd,obj,parameterIndex,dbColumn.Nullable,dbColumn.ColumnType);
+        }
 
-            switch (dbColumn.ColumnType)
+		protected void SetToPreparedStatement (IDbCommand cmd, object obj, int parameterIndex, bool nullable, DbColumnType columnType)
+		{
+			var parameter = cmd.CreateParameter ();
+			parameter.Direction = ParameterDirection.Input;
+			parameter.Value = obj;
+			if (parameter is OleDbParameter) 
+			{
+				((OleDbParameter)parameter).IsNullable = true;
+			}
+			cmd.Parameters.Add(parameter);
+
+            switch (columnType)
             {
                 case DbColumnType.Boolean:
                     parameter.DbType = DbType.Boolean;
@@ -305,14 +314,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 
             foreach (QueryExecParam param in sortedParams)
             {
-                DbParameter parameter = (OleDbParameter)cmd.CreateParameter();
-                parameter.DbType = param.Type;
-                parameter.Direction = ParameterDirection.Input;
-                parameter.IsNullable = param.Value == null;
-                parameter.Value = param.Value;
-                cmd.Parameters.Add(parameter);  
+				SetToPreparedStatement(cmd,param.Value,param.Index,param.Value == null,param.Type);
             }
-
             return cmd.ExecuteReader();
         }
 
@@ -338,13 +341,49 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 			ProcessGroupCondition(sb, execInfo, structure);
 			ProcessOrderBy(sb, execInfo, structure);
 
+			AddPagingClause(sb,execInfo,structure);
+
             execInfo.Sql = sb.ToString();
             return execInfo;
         }
 
+		protected void AddPagingClause(StringBuilder sb,QueryExecInfo execInfo,QueryStructure structure)
+		{
+			long pageSize = structure.Fetch;
+			long currentOffset = structure.Skip;
+
+			if (currentOffset > 0 && pageSize == 0)
+				pageSize = long.MaxValue;
+
+		 	if (pageSize > 0)
+		 	{
+			 	sb.Append(" LIMIT ? ");
+			 	
+			 	QueryExecParam param = new QueryExecParam();
+			 	param.Index = execInfo.Params.Count;
+			 	param.Type = DbColumnType.Long;
+			 	param.Value = pageSize;
+			 	execInfo.Params.Add(param);
+		 	}
+		 	
+		 	if (currentOffset > 0)
+		 	{
+			 	sb.Append(" OFFSET ? ");
+			 	
+				QueryExecParam param = new QueryExecParam();
+				param.Index = execInfo.Params.Count;
+			 	param.Type = DbColumnType.Long;
+			 	param.Value = currentOffset;
+			 	execInfo.Params.Add(param);
+		 	}
+	 	}
+
         private void ProcessSelection(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
         {
             sb.Append("SELECT ");
+
+			if (structure.Distinct)
+				sb.Append(" DISTINCT ");
 
             ICollection<IQuerySelection> selections = structure.SelectList;
             bool initial = true;
@@ -354,16 +393,16 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
                 {
                     sb.Append(",");
                 }
-                sb.Append(CreateSelectionSql(selection));
+                sb.Append(CreateSelectionSql(selection,execInfo));
                 initial = false;
             }
         }
 
-        protected String CreateSelectionSql(IQuerySelection selection)
+        protected String CreateSelectionSql(IQuerySelection selection,QueryExecInfo execInfo)
         {
             if (selection != null)
             {
-                return ((IAbstractQuerySelection) selection).CreateSql();
+                return ((IAbstractQuerySelection) selection).CreateSql(execInfo);
             }
             return "/*Incorrect Selection*/";
         }
