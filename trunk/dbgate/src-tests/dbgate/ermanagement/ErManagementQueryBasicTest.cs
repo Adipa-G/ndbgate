@@ -315,7 +315,7 @@ namespace dbgate.ermanagement
                 transaction.Commit();
                 
                 ISelectionQuery selectionQuery = new SelectionQuery()
-                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity),"qb1"))
                     .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = selectionQuery.ToList(connection);
@@ -328,7 +328,68 @@ namespace dbgate.ermanagement
                 Assert.Fail(e.Message);
             }
         }
+        
+        [Test]
+        public void ERQuery_ExecuteToRetrieveAll_WithQueryFrom_shouldLoadAll()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery fromQuery = new SelectionQuery()
+                	.From(QueryFrom.EntityType(typeof(QueryBasicEntity)));
+                
+                ISelectionQuery selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.Query(fromQuery,"qb1"))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
+                ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 4);
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+        
+        [Test]
+        public void ERQuery_ExecuteToRetrieveAll_WithQueryUnionFrom_shouldLoadUnion()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery fromBasic = new SelectionQuery()
+                	.From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                	.Select(QuerySelection.RawSql("name as name1"));
+                
+                ISelectionQuery fromDetails = new SelectionQuery()
+                	.From(QueryFrom.EntityType(typeof(QueryBasicDetailsEntity)))
+                	.Select(QuerySelection.RawSql("name as name1"));
+                
+                ISelectionQuery selectionQuery = new SelectionQuery()
+                	.From(QueryFrom.QueryUnion(true,new []{fromBasic,fromDetails}))
+                    .Select(QuerySelection.RawSql("name1"));
+
+                ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 6);
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+       
 		[Test]
 		public void ERQuery_ExecuteWithCondition_WithBasicSqlQuery_shouldLoadTarget()
 		{

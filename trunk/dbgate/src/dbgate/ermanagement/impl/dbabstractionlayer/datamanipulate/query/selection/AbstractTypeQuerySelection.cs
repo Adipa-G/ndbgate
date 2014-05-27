@@ -16,7 +16,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 			get {return QuerySelectionExpressionType.ENTITY_TYPE;}
 		}
 		
-		public String CreateSql(QueryExecInfo execInfo)
+		public String CreateSql(QueryBuildInfo buildInfo)
 		{
 			return "*";
 		}

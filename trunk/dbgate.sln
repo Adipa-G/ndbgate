@@ -1,6 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+# SharpDevelop 5.0
+VisualStudioVersion = 12.0.20827.3
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dbgatetestapp", "dbgatetestapp\dbgatetestapp.csproj", "{3B458BCC-EC93-4F3D-AB40-B33F14323728}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dbgate", "dbgate\dbgate.csproj", "{13EB1070-FC28-4EF6-AB4A-E5333EAAE331}"

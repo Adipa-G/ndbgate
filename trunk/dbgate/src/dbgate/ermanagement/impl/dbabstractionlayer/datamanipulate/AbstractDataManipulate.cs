@@ -7,6 +7,7 @@ using System.Data.OleDb;
 using System.Text;
 using Castle.Core.Internal;
 using dbgate.ermanagement.caches;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query;
 using dbgate.ermanagement.impl.utils;
 using System.Linq;
 using dbgate.ermanagement.query;
@@ -22,8 +23,11 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 {
     public class AbstractDataManipulate : IDataManipulate
     {
+    	private IDbLayer _dbLayer;
+    	
         public AbstractDataManipulate(IDbLayer dbLayer)
         {
+        	_dbLayer = dbLayer;
         	initialize();
 		}
 	
@@ -322,32 +326,32 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
         public QueryExecInfo CreateExecInfo(IDbConnection con, ISelectionQuery query)
         {
             QueryStructure structure = query.Structure;
-            return ProcessQuery(null, structure);
+            return ProcessQuery(null, structure).ExecInfo;
         }
 
-        protected QueryExecInfo ProcessQuery(QueryExecInfo execInfo, QueryStructure structure)
+        public QueryBuildInfo ProcessQuery(QueryBuildInfo buildInfo, QueryStructure structure)
         {
-            if (execInfo == null)
+            if (buildInfo == null)
             {
-                execInfo = new QueryExecInfo();
+                buildInfo = new QueryBuildInfo();
             }
 
             StringBuilder sb = new StringBuilder();
-            ProcessSelection(sb, execInfo, structure);
-            ProcessFrom(sb, execInfo, structure);
-			ProcessJoin(sb, execInfo, structure);
-            ProcessWhere(sb, execInfo, structure);
-		 	ProcessGroup(sb, execInfo, structure);
-			ProcessGroupCondition(sb, execInfo, structure);
-			ProcessOrderBy(sb, execInfo, structure);
+            ProcessSelection(sb, buildInfo, structure);
+            ProcessFrom(sb, buildInfo, structure);
+			ProcessJoin(sb, buildInfo, structure);
+            ProcessWhere(sb, buildInfo, structure);
+		 	ProcessGroup(sb, buildInfo, structure);
+			ProcessGroupCondition(sb, buildInfo, structure);
+			ProcessOrderBy(sb, buildInfo, structure);
 
-			AddPagingClause(sb,execInfo,structure);
+			AddPagingClause(sb,buildInfo,structure);
 
-            execInfo.Sql = sb.ToString();
-            return execInfo;
+            buildInfo.ExecInfo.Sql = sb.ToString();
+            return buildInfo;
         }
 
-		protected void AddPagingClause(StringBuilder sb,QueryExecInfo execInfo,QueryStructure structure)
+		protected void AddPagingClause(StringBuilder sb,QueryBuildInfo buildInfo,QueryStructure structure)
 		{
 			long pageSize = structure.Fetch;
 			long currentOffset = structure.Skip;
@@ -360,10 +364,10 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 			 	sb.Append(" LIMIT ? ");
 			 	
 			 	QueryExecParam param = new QueryExecParam();
-			 	param.Index = execInfo.Params.Count;
+			 	param.Index = buildInfo.ExecInfo.Params.Count;
 			 	param.Type = DbColumnType.Long;
 			 	param.Value = pageSize;
-			 	execInfo.Params.Add(param);
+			 	buildInfo.ExecInfo.Params.Add(param);
 		 	}
 		 	
 		 	if (currentOffset > 0)
@@ -371,16 +375,19 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 			 	sb.Append(" OFFSET ? ");
 			 	
 				QueryExecParam param = new QueryExecParam();
-				param.Index = execInfo.Params.Count;
+				param.Index = buildInfo.ExecInfo.Params.Count;
 			 	param.Type = DbColumnType.Long;
 			 	param.Value = currentOffset;
-			 	execInfo.Params.Add(param);
+			 	buildInfo.ExecInfo.Params.Add(param);
 		 	}
 	 	}
 
-        private void ProcessSelection(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
+        private void ProcessSelection(StringBuilder sb,QueryBuildInfo buildInfo, QueryStructure structure)
         {
             sb.Append("SELECT ");
+            
+             if (structure.SelectList.Count == 0)
+			 	sb.Append(" * ");
 
 			if (structure.Distinct)
 				sb.Append(" DISTINCT ");
@@ -393,21 +400,21 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
                 {
                     sb.Append(",");
                 }
-                sb.Append(CreateSelectionSql(selection,execInfo));
+                sb.Append(CreateSelectionSql(selection,buildInfo));
                 initial = false;
             }
         }
 
-        protected String CreateSelectionSql(IQuerySelection selection,QueryExecInfo execInfo)
+        protected String CreateSelectionSql(IQuerySelection selection,QueryBuildInfo buildInfo)
         {
             if (selection != null)
             {
-                return ((IAbstractQuerySelection) selection).CreateSql(execInfo);
+                return ((IAbstractQuerySelection) selection).CreateSql(buildInfo);
             }
             return "/*Incorrect Selection*/";
         }
 
-        private void ProcessFrom(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
+        private void ProcessFrom(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
         {
             sb.Append(" FROM ");
 
@@ -419,21 +426,21 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
                 {
                     sb.Append(",");
                 }
-                sb.Append(CreateFromSql(from));
+                sb.Append(CreateFromSql(from,buildInfo));
                 initial = false;
             }
         }
 
-        protected String CreateFromSql(IQueryFrom from)
+        protected String CreateFromSql(IQueryFrom from,QueryBuildInfo buildInfo)
         {
             if (from != null)
             {
-                return ((IAbstractQueryFrom) from).CreateSql();
+                return ((IAbstractQueryFrom) from).CreateSql(_dbLayer,buildInfo);
             }
             return "/*Incorrect From*/";
         }
 
-		private void ProcessJoin(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
+		private void ProcessJoin(StringBuilder sb,QueryBuildInfo buildInfo, QueryStructure structure)
         {
 			var joinList = structure.JoinList;
 			if (joinList.Count == 0)
@@ -455,7 +462,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             return "/*Incorrect Join*/";
         }
 
-		private void ProcessWhere(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
+		private void ProcessWhere(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
 	 	{
 		 	ICollection<IQueryCondition> conditionList = structure.ConditionList;
 		 	if (conditionList.Count == 0)
@@ -484,7 +491,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 		 	return "/*Incorrect Where*/";
 	 	}
 		 	
-	 	private void ProcessGroup(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
+	 	private void ProcessGroup(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
 	 	{
 		 	ICollection<IQueryGroup> groupList = structure.GroupList;
 		 	if (groupList.Count == 0)
@@ -513,7 +520,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 		 	return "/*Incorrect Group*/";
 	 	}
 
-		private void ProcessGroupCondition(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
+		private void ProcessGroupCondition(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
 	 	{
 		 	ICollection<IQueryGroupCondition> groupConditionList = structure.GroupConditionList;
 		 	if (groupConditionList.Count == 0)
@@ -542,7 +549,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 		 	return "/*Incorrect Group condition*/";
 	 	}
 
-		private void ProcessOrderBy(StringBuilder sb, QueryExecInfo execInfo, QueryStructure structure)
+		private void ProcessOrderBy(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
 	 	{
 		 	ICollection<IQueryOrderBy> orderList = structure.OrderList;
 		 	if (orderList.Count == 0)

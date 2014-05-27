@@ -275,8 +275,8 @@ namespace dbgate.ermanagement
             entity.BooleanNull = true;
             entity.CharNotNull = 'A';
             entity.CharNull ='B';
-            entity.DateNotNull = DateTime.Now;
-            entity.DateNull = DateTime.UtcNow;
+            entity.DateNotNull = DateTime.Now.AddYears(1);
+            entity.DateNull = DateTime.Now.AddMonths(1);
             entity.DoubleNotNull = 5D;
             entity.DoubleNull = 6D;
             entity.FloatNotNull = 20F;
@@ -285,8 +285,8 @@ namespace dbgate.ermanagement
             entity.IntNull = 23;
             entity.LongNotNull = 356L;
             entity.LongNull = 326L;
-            entity.TimestampNotNull = DateTime.Now;
-            entity.TimestampNull = DateTime.Now;
+            entity.TimestampNotNull = DateTime.Now.AddHours(1);
+            entity.TimestampNull = DateTime.Now.AddMinutes(1);
             entity.VarcharNotNull = "notNull";
             entity.VarcharNull = "null";
 

@@ -11,8 +11,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from
 		{
 			get {return QueryFromExpressionType.RAW_SQL;}
 		}
-		
-		public String CreateSql()
+
+		public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
 		{
 			return Sql;
 		}

@@ -30,11 +30,18 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <NoWin32Manifest>False</NoWin32Manifest>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <DebugType>Full</DebugType>
+    <Optimize>False</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -49,6 +56,16 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+    <BaseAddress>4194304</BaseAddress>
+    <PlatformTarget>x86</PlatformTarget>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Castle.Core">
@@ -74,11 +91,10 @@
     <Reference Include="pnunit.framework">
       <HintPath>..\lib\nunit\framework\pnunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="System.Xml" />
-    <Reference Include="Mono.Data.Sqlite" />
     <Reference Include="System.Data.SQLite">
-      <HintPath>..\lib\sqllite\System.Data.SQLite.DLL</HintPath>
+      <HintPath>..\lib\sqllite\x86\System.Data.SQLite.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -179,6 +195,9 @@
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\AbstractDataManipulate.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\IDataManipulate.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\QueryExecInfo.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\AbstractQueryQueryFrom.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\AbstractQueryUnionQueryFrom.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\QueryBuildInfo.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\DefaultDbLayer.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\IDbLayer.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\LayerFactory.cs" />

@@ -4,7 +4,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from
 {
 	public interface IAbstractQueryFrom : IQueryFrom
 	{
-		String CreateSql();
+		String CreateSql(IDbLayer dbLayer,QueryBuildInfo buildInfo);
 	}
 }
 

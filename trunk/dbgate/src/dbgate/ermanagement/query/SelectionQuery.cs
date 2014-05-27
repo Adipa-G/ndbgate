@@ -11,8 +11,8 @@ namespace dbgate.ermanagement.query
         {
             return ErLayer.GetSharedInstance().Select(this, con);
         }
-
-		public new ISelectionQuery Distinct()
+        
+     	public new ISelectionQuery Distinct()
         {
 			Structure.Distinct = true;
 			return this;

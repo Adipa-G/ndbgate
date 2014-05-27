@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query;
 using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
@@ -23,5 +24,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
         IDataReader CreateResultSet(IDbConnection con, QueryExecInfo execInfo);
 
         QueryExecInfo CreateExecInfo(IDbConnection con, ISelectionQuery query);
+        
+        QueryBuildInfo ProcessQuery(QueryBuildInfo buildInfo,QueryStructure structure);
     }
 }
