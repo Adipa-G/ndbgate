@@ -3,7 +3,7 @@ using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.condition
 {
-	public class AbstractSqlQueryCondition : IAbstractQueryCondition
+	public class AbstractSqlQueryCondition : IAbstractCondition
 	{
 		public String Sql { get; set; }
 	 	

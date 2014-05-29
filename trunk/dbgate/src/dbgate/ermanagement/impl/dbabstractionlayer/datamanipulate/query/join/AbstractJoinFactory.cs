@@ -3,9 +3,9 @@ using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.join
 {
-	public class AbstractQueryJoinFactory
+	public class AbstractJoinFactory
 	{
-		public IAbstractQueryJoin CreateJoin (QueryJoinExpressionType expressionType)
+		public IAbstractJoin CreateJoin (QueryJoinExpressionType expressionType)
 		{
 			switch (expressionType) 
 			{

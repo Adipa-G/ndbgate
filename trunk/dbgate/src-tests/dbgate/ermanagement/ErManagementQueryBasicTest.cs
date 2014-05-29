@@ -170,7 +170,7 @@ namespace dbgate.ermanagement
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+            	LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -317,6 +317,37 @@ namespace dbgate.ermanagement
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof(QueryBasicEntity),"qb1"))
                     .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 4);
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+        
+        [Test]
+        public void ERQuery_ExecuteToRetrieveAll_WithSubQuerySelection_shouldLoadAll()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery descriptionQuery = new SelectionQuery()
+                	.From(QueryFrom.EntityType(typeof(QueryBasicDetailsEntity),"qbd1"))
+		 			.Where(QueryCondition.RawSql("qbd1.name = qb1.name"))
+		 			.Select(QuerySelection.RawSql("qbd1.name")).Fetch(1);
+                
+                ISelectionQuery selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity),"qb1"))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)))
+                	.Select(QuerySelection.Query(descriptionQuery));
 
                 ICollection<object> results = selectionQuery.ToList(connection);
                 Assert.IsTrue(results.Count == 4);

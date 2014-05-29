@@ -12,19 +12,19 @@ namespace dbgate.ermanagement.query
             return ErLayer.GetSharedInstance().Select(this, con);
         }
         
-     	public new ISelectionQuery Distinct()
+     	public ISelectionQuery Distinct()
         {
 			Structure.Distinct = true;
 			return this;
         }
 
-		public new ISelectionQuery Fetch(long records)
+		public ISelectionQuery Fetch(long records)
         {
 			Structure.Fetch = records;
 			return this;
         }
 
-		public new ISelectionQuery Skip(long records)
+		public ISelectionQuery Skip(long records)
         {
 			Structure.Skip = records;
 			return this;

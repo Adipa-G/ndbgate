@@ -7,7 +7,7 @@ using dbgate.ermanagement.exceptions;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection
 {
-	public class AbstractSqlQuerySelection : IAbstractQuerySelection
+	public class AbstractSqlQuerySelection : IAbstractSelection
 	{
 		public String Sql { get; set; }
 
@@ -16,7 +16,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 			get {return QuerySelectionExpressionType.RAW_SQL;}
 		}
 		
-		public String CreateSql(QueryBuildInfo buildInfo)
+		public String CreateSql(IDbLayer dbLayer,QueryBuildInfo buildInfo)
 		{
 			return Sql;
 		}

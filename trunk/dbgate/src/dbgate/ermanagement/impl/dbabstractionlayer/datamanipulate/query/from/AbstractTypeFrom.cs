@@ -6,7 +6,7 @@ using dbgate.ermanagement.impl.utils;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from
 {
-	public class AbstractTypeQueryFrom : IAbstractQueryFrom
+	public class AbstractTypeFrom : IAbstractFrom
 	{
 		public Type EntityType { get; set; }
 		public string Alias { get; set; }
@@ -23,7 +23,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from
 	        {
 	            sql = CacheManager.TableCache.GetTableName(EntityType);
 	        }
-	        catch (TableCacheMissException e)
+	        catch (TableCacheMissException)
 	        {
 	            try
 	            {
@@ -38,7 +38,10 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from
 	        }
 	        
 	        if (!string.IsNullOrEmpty(Alias))
+	        {
 	            sql = sql + " as " + Alias;
+	            buildInfo.AddTypeAlias(Alias,EntityType);
+	        }
 	        return sql;
 	    }
 	}

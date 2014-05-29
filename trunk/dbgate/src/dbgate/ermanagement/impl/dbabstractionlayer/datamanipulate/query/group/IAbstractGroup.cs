@@ -2,7 +2,7 @@ using System;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.group
 {
-	public interface IAbstractQueryGroup : IQueryGroup
+	public interface IAbstractGroup : IQueryGroup
 	{
 		String CreateSql();
 	}

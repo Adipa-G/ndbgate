@@ -33,13 +33,13 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 	
 		protected void initialize()
 		{
-			QuerySelection.Factory = new AbstractQuerySelectionFactory();
-			QueryFrom.Factory = new AbstractQueryFromFactory();
-			QueryCondition.Factory = new AbstractQueryConditionFactory();
-			QueryGroup.Factory = new AbstractQueryGroupFactory();
-			QueryGroupCondition.Factory = new AbstractQueryGroupConditionFactory();
-			QueryJoin.Factory = new AbstractQueryJoinFactory();
-			QueryOrderBy.Factory = new AbstractQueryOrderByFactory();
+			QuerySelection.Factory = new AbstractSelectionFactory();
+			QueryFrom.Factory = new AbstractFromFactory();
+			QueryCondition.Factory = new AbstractConditionFactory();
+			QueryGroup.Factory = new AbstractGroupFactory();
+			QueryGroupCondition.Factory = new AbstractGroupConditionFactory();
+			QueryJoin.Factory = new AbstractJoinFactory();
+			QueryOrderBy.Factory = new AbstractOrderByFactory();
 	 	}
 
         #region IDataManipulate Members
@@ -382,15 +382,15 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 		 	}
 	 	}
 
-        private void ProcessSelection(StringBuilder sb,QueryBuildInfo buildInfo, QueryStructure structure)
+        private void ProcessSelection(StringBuilder querySb,QueryBuildInfo buildInfo, QueryStructure structure)
         {
-            sb.Append("SELECT ");
+            querySb.Append("SELECT ");
             
              if (structure.SelectList.Count == 0)
-			 	sb.Append(" * ");
+			 	querySb.Append(" * ");
 
 			if (structure.Distinct)
-				sb.Append(" DISTINCT ");
+				querySb.Append(" DISTINCT ");
 
             ICollection<IQuerySelection> selections = structure.SelectList;
             bool initial = true;
@@ -398,9 +398,9 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             {
                 if (!initial)
                 {
-                    sb.Append(",");
+                    querySb.Append(",");
                 }
-                sb.Append(CreateSelectionSql(selection,buildInfo));
+                querySb.Append(CreateSelectionSql(selection,buildInfo));
                 initial = false;
             }
         }
@@ -409,7 +409,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
         {
             if (selection != null)
             {
-                return ((IAbstractQuerySelection) selection).CreateSql(buildInfo);
+                return ((IAbstractSelection) selection).CreateSql(_dbLayer,buildInfo);
             }
             return "/*Incorrect Selection*/";
         }
@@ -435,7 +435,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
         {
             if (from != null)
             {
-                return ((IAbstractQueryFrom) from).CreateSql(_dbLayer,buildInfo);
+                return ((IAbstractFrom) from).CreateSql(_dbLayer,buildInfo);
             }
             return "/*Incorrect From*/";
         }
@@ -457,7 +457,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
         {
             if (join != null)
             {
-                return ((IAbstractQueryJoin) join).CreateSql();
+                return ((IAbstractJoin) join).CreateSql();
             }
             return "/*Incorrect Join*/";
         }
@@ -486,7 +486,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 	 	{
 			if (condition != null)
 		 	{
-		 		return ((IAbstractQueryCondition) condition).CreateSql();
+		 		return ((IAbstractCondition) condition).CreateSql();
 		 	}
 		 	return "/*Incorrect Where*/";
 	 	}
@@ -515,7 +515,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 	 	{
 			if (group != null)
 		 	{
-		 		return ((IAbstractQueryGroup) group).CreateSql();
+		 		return ((IAbstractGroup) group).CreateSql();
 		 	}
 		 	return "/*Incorrect Group*/";
 	 	}
@@ -544,7 +544,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 	 	{
 			if (groupCondition != null)
 		 	{
-		 		return ((IAbstractQueryGroupCondition) groupCondition).CreateSql();
+		 		return ((IAbstractGroupCondition) groupCondition).CreateSql();
 		 	}
 		 	return "/*Incorrect Group condition*/";
 	 	}
@@ -573,7 +573,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 	 	{
 			if (orderBy != null)
 		 	{
-		 		return ((IAbstractQueryOrderBy) orderBy).CreateSql();
+		 		return ((IAbstractOrderBy) orderBy).CreateSql();
 		 	}
 		 	return "/*Incorrect Order by*/";
 	 	}

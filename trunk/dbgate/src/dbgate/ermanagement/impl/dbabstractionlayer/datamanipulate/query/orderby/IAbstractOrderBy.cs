@@ -2,7 +2,7 @@ using System;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.orderby
 {
-	public interface IAbstractQueryOrderBy : IQueryOrderBy
+	public interface IAbstractOrderBy : IQueryOrderBy
 	{
 		String CreateSql();
 	}

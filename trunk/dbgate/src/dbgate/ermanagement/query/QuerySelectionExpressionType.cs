@@ -5,7 +5,8 @@ namespace dbgate.ermanagement.query
 	public enum QuerySelectionExpressionType
 	{
 		RAW_SQL,
-		ENTITY_TYPE
+		ENTITY_TYPE,
+		QUERY
 	}
 }
 

@@ -4,9 +4,9 @@ namespace dbgate.ermanagement.query
 {
     public class QueryOrderBy
     {
-		private static AbstractQueryOrderByFactory _factory;
+		private static AbstractOrderByFactory _factory;
 
-		public static AbstractQueryOrderByFactory Factory
+		public static AbstractOrderByFactory Factory
 		{
 			set { _factory = value;}
 		}

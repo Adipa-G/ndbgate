@@ -4,9 +4,9 @@ namespace dbgate.ermanagement.query
 {
     public class QueryJoin
     {
-		private static AbstractQueryJoinFactory _factory;
+		private static AbstractJoinFactory _factory;
 
-		public static AbstractQueryJoinFactory Factory
+		public static AbstractJoinFactory Factory
 		{
 			set { _factory = value;}
 		}

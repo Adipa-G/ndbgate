@@ -3,7 +3,7 @@ using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.orderby
 {
-	public class AbstractSqlQueryOrderBy : IAbstractQueryOrderBy
+	public class AbstractSqlQueryOrderBy : IAbstractOrderBy
 	{
 		public String Sql { get; set; }
 

@@ -3,16 +3,18 @@ using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection
 {
-	public class AbstractQuerySelectionFactory
+	public class AbstractSelectionFactory
 	{
-		public IAbstractQuerySelection CreateSelection (QuerySelectionExpressionType expressionType)
+		public IAbstractSelection CreateSelection (QuerySelectionExpressionType expressionType)
 		{
 			switch (expressionType) 
 			{
 				case QuerySelectionExpressionType.RAW_SQL:
 					return new AbstractSqlQuerySelection ();
 				case QuerySelectionExpressionType.ENTITY_TYPE:
-					return new AbstractTypeQuerySelection();
+					return new AbstractTypeSelection();
+				case QuerySelectionExpressionType.QUERY:
+					return new AbstractSubQuerySelection();
 				default:
 					return null;
 			}

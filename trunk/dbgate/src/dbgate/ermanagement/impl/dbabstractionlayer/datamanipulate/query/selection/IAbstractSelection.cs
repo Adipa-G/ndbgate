@@ -3,9 +3,9 @@ using System.Data;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection
 {
-	public interface IAbstractQuerySelection : IQuerySelection
+	public interface IAbstractSelection : IQuerySelection
 	{
-		String CreateSql(QueryBuildInfo buildInfo);
+		String CreateSql(IDbLayer dbLayer,QueryBuildInfo buildInfo);
 
 		Object Retrieve(IDataReader rs,IDbConnection con);
 	}

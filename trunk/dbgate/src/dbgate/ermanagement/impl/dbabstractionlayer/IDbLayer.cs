@@ -6,8 +6,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer
 {
     public interface IDbLayer
     {
-        IDataManipulate GetDataManipulate();
+        IDataManipulate DataManipulate();
 
-        IMetaManipulate GetMetaManipulate(IDbConnection con);
+        IMetaManipulate MetaManipulate(IDbConnection con);
     }
 }

@@ -5,9 +5,9 @@ namespace dbgate.ermanagement.query
 {
     public class QuerySelection
     {
-		private static AbstractQuerySelectionFactory _factory;
+		private static AbstractSelectionFactory _factory;
 
-		public static AbstractQuerySelectionFactory Factory
+		public static AbstractSelectionFactory Factory
 		{
 			set { _factory = value;}
 		}
@@ -21,9 +21,25 @@ namespace dbgate.ermanagement.query
 
 		public static IQuerySelection EntityType(Type type)
         {
-			AbstractTypeQuerySelection querySelection = (AbstractTypeQuerySelection) _factory.CreateSelection(QuerySelectionExpressionType.ENTITY_TYPE);
+			AbstractTypeSelection querySelection = (AbstractTypeSelection) _factory.CreateSelection(QuerySelectionExpressionType.ENTITY_TYPE);
 			querySelection.EntityType = type;
 			return querySelection;
         }
+		
+		public static IQuerySelection Query(ISelectionQuery query)
+		{
+			return Query(query,null);
+		}
+		
+		public static IQuerySelection Query(ISelectionQuery query,String alias)
+		{
+			AbstractSubQuerySelection selection = (AbstractSubQuerySelection) _factory.CreateSelection(QuerySelectionExpressionType.QUERY);
+			selection.Query = query;
+			if (!string.IsNullOrEmpty(alias))
+			{
+				selection.Alias = alias;
+			}
+			return selection;
+	 	}
     }
 }

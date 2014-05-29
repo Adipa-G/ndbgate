@@ -51,7 +51,7 @@ namespace dbgate.ermanagement.impl
                 {
                     logSb.Append(" ,").Append(key.ColumnName).Append("=").Append(fieldValue);
                 }
-                DbLayer.GetDataManipulate().SetToPreparedStatement(cmd, fieldValue, ++i, key);
+                DbLayer.DataManipulate().SetToPreparedStatement(cmd, fieldValue, ++i, key);
             }
             if (showQuery)
             {
@@ -70,7 +70,7 @@ namespace dbgate.ermanagement.impl
             ICollection<IDbColumn> dbColumns = CacheManager.FieldCache.GetDbColumns(type);
             foreach (IDbColumn dbColumn in dbColumns)
             {
-                Object value = DbLayer.GetDataManipulate().ReadFromResultSet(reader, dbColumn);
+                Object value = DbLayer.DataManipulate().ReadFromResultSet(reader, dbColumn);
                 valueTypeList.FieldValues.Add(new EntityFieldValue(value, dbColumn));
             }
             return valueTypeList;
@@ -177,7 +177,7 @@ namespace dbgate.ermanagement.impl
                     {
                         logSb.Append(" ,").Append(matchColumn.ColumnName).Append("=").Append(fieldValue);
                     }
-                    DbLayer.GetDataManipulate().SetToPreparedStatement(cmd, fieldValue, i + 1, matchColumn);
+                    DbLayer.DataManipulate().SetToPreparedStatement(cmd, fieldValue, i + 1, matchColumn);
                 }
                 else
                 {
@@ -211,7 +211,7 @@ namespace dbgate.ermanagement.impl
                 ITypeFieldValueList childTypeKeyList = new EntityTypeFieldValueList(childType);
                 foreach (IDbColumn childKey in childKeys)
                 {
-                    Object value = DbLayer.GetDataManipulate().ReadFromResultSet(reader, childKey);
+                    Object value = DbLayer.DataManipulate().ReadFromResultSet(reader, childKey);
                     childTypeKeyList.FieldValues.Add(new EntityFieldValue(value, childKey));
                 }
                 if (ErSessionUtils.ExistsInSession(entity, childTypeKeyList))

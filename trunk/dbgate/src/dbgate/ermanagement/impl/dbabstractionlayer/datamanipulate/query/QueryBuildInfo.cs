@@ -19,6 +19,11 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
   	 	{
   	 		get {return _execInfo;}
   	 	}
+  	 	
+  	 	public Dictionary<string,object> Aliases
+  	 	{
+  	 		get { return _aliases;}
+  	 	}
 	  	 	
   	 	public void AddTypeAlias(string alias,Type entityType)
   	 	{
@@ -29,5 +34,10 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
   	 	{
   	 		_aliases.Add(alias,query);
   	 	}
+  	 	
+  	 	public void AddUnionAlias(String alias)
+		{
+			_aliases.Add(alias,"UNION_" + alias);
+		}
     }
 }

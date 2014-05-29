@@ -3,9 +3,9 @@ using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.orderby
 {
-	public class AbstractQueryOrderByFactory
+	public class AbstractOrderByFactory
 	{
-		public IAbstractQueryOrderBy CreateOrderBy (QueryOrderByExpressionType expressionType)
+		public IAbstractOrderBy CreateOrderBy (QueryOrderByExpressionType expressionType)
 		{
 			switch (expressionType) 
 			{

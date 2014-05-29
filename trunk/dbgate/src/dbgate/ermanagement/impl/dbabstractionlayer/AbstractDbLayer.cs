@@ -19,7 +19,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer
 
         protected abstract IMetaManipulate CreateMetaManipulate();
 
-        public IDataManipulate GetDataManipulate()
+        public IDataManipulate DataManipulate()
         {
             if (_dataManipulate == null)
             {
@@ -28,7 +28,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer
             return _dataManipulate;
         }
 
-        public IMetaManipulate GetMetaManipulate(IDbConnection con)
+        public IMetaManipulate MetaManipulate(IDbConnection con)
         {
             if (_metaManipulate == null)
             {

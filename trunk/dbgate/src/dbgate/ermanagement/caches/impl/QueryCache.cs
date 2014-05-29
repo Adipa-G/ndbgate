@@ -58,7 +58,7 @@ namespace dbgate.ermanagement.caches.impl
             string query = GetQuery(tableName, entityType, Load);
             if (query == null)
             {
-                query = _dbLayer.GetDataManipulate().CreateLoadQuery(tableName, CacheManager.FieldCache.GetDbColumns(entityType));
+                query = _dbLayer.DataManipulate().CreateLoadQuery(tableName, CacheManager.FieldCache.GetDbColumns(entityType));
                 SetQuery(tableName, entityType, Load, query);
             }
             if (query == null)
@@ -74,7 +74,7 @@ namespace dbgate.ermanagement.caches.impl
             string query = GetQuery(tableName, entityType, Insert);
             if (query == null)
             {
-                query = _dbLayer.GetDataManipulate().CreateInsertQuery(tableName, CacheManager.FieldCache.GetDbColumns(entityType));
+                query = _dbLayer.DataManipulate().CreateInsertQuery(tableName, CacheManager.FieldCache.GetDbColumns(entityType));
                 SetQuery(tableName, entityType, Insert, query);
             }
             if (query == null)
@@ -90,7 +90,7 @@ namespace dbgate.ermanagement.caches.impl
             string query = GetQuery(tableName, entityType, Update);
             if (query == null)
             {
-                query = _dbLayer.GetDataManipulate().CreateUpdateQuery(tableName, CacheManager.FieldCache.GetDbColumns(entityType));
+                query = _dbLayer.DataManipulate().CreateUpdateQuery(tableName, CacheManager.FieldCache.GetDbColumns(entityType));
                 SetQuery(tableName, entityType, Update, query);
             }
             if (query == null)
@@ -106,7 +106,7 @@ namespace dbgate.ermanagement.caches.impl
             string query = GetQuery(tableName, entityType, Delete);
             if (query == null)
             {
-                query = _dbLayer.GetDataManipulate().CreateDeleteQuery(tableName, CacheManager.FieldCache.GetDbColumns(entityType));
+                query = _dbLayer.DataManipulate().CreateDeleteQuery(tableName, CacheManager.FieldCache.GetDbColumns(entityType));
                 SetQuery(tableName, entityType, Delete, query);
             }
             if (query == null)
@@ -122,7 +122,7 @@ namespace dbgate.ermanagement.caches.impl
             string query = GetQuery(tableName, entityType, relation.RelationShipName);
             if (query == null)
             {
-                query = _dbLayer.GetDataManipulate().CreateRelatedObjectsLoadQuery(tableName, relation);
+                query = _dbLayer.DataManipulate().CreateRelatedObjectsLoadQuery(tableName, relation);
                 SetQuery(tableName, entityType, relation.RelationShipName, query);
             }
             if (query == null)

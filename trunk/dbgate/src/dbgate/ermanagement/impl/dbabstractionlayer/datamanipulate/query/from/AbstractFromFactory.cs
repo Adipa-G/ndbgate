@@ -4,20 +4,20 @@ using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from
 {
-	public class AbstractQueryFromFactory
+	public class AbstractFromFactory
 	{
-		public IAbstractQueryFrom CreateFrom (QueryFromExpressionType expressionType)
+		public IAbstractFrom CreateFrom (QueryFromExpressionType expressionType)
 		{
 			switch (expressionType) 
 			{
 				case QueryFromExpressionType.RAW_SQL:
 					return new AbstractSqlQueryFrom ();
 				case QueryFromExpressionType.ENTITY_TYPE:
-					return new AbstractTypeQueryFrom ();
+					return new AbstractTypeFrom ();
 				case QueryFromExpressionType.QUERY:
-					return new AbstractQueryQueryFrom();
+					return new AbstractSubQueryFrom();
 				case QueryFromExpressionType.QUERY_UNION:
-					return new AbstractQueryUnionQueryFrom();
+					return new AbstractUnionFrom();
 				default:
 					return null;
 			}

@@ -224,7 +224,7 @@ namespace dbgate.ermanagement.impl
                 {
                     logSb.Append(" ,").Append(dbColumn.ColumnName).Append("=").Append(columnValue);
                 }
-                DbLayer.GetDataManipulate().SetToPreparedStatement(cmd, columnValue, i + 1, dbColumn);
+                DbLayer.DataManipulate().SetToPreparedStatement(cmd, columnValue, i + 1, dbColumn);
                 i++;
             }
             if (showQuery)
@@ -263,7 +263,7 @@ namespace dbgate.ermanagement.impl
                 {
                     keysAndModified.Add(fieldValue.DbColumn);
                 }
-                query = DbLayer.GetDataManipulate().CreateUpdateQuery(CacheManager.TableCache.GetTableName(type), keysAndModified);
+                query = DbLayer.DataManipulate().CreateUpdateQuery(CacheManager.TableCache.GetTableName(type), keysAndModified);
             }
             else
             {
@@ -296,7 +296,7 @@ namespace dbgate.ermanagement.impl
                 {
                     logSb.Append(" ,").Append(fieldValue.DbColumn.ColumnName).Append("=").Append(fieldValue.Value);
                 }
-                DbLayer.GetDataManipulate().SetToPreparedStatement(cmd, fieldValue.Value, ++count, fieldValue.DbColumn);
+                DbLayer.DataManipulate().SetToPreparedStatement(cmd, fieldValue.Value, ++count, fieldValue.DbColumn);
             }
 
             foreach (EntityFieldValue fieldValue in keys)
@@ -305,7 +305,7 @@ namespace dbgate.ermanagement.impl
                 {
                     logSb.Append(" ,").Append(fieldValue.DbColumn.ColumnName).Append("=").Append(fieldValue.Value);
                 }
-                DbLayer.GetDataManipulate().SetToPreparedStatement(cmd, fieldValue.Value, ++count, fieldValue.DbColumn);
+                DbLayer.DataManipulate().SetToPreparedStatement(cmd, fieldValue.Value, ++count, fieldValue.DbColumn);
             }
             if (showQuery)
             {
@@ -348,7 +348,7 @@ namespace dbgate.ermanagement.impl
                 {
                     logSb.Append(" ,").Append(fieldValue.DbColumn.ColumnName).Append("=").Append(fieldValue.Value);
                 }
-                DbLayer.GetDataManipulate().SetToPreparedStatement(ps, fieldValue.Value, i + 1, fieldValue.DbColumn);
+                DbLayer.DataManipulate().SetToPreparedStatement(ps, fieldValue.Value, i + 1, fieldValue.DbColumn);
             }
             if (showQuery)
             {
@@ -680,7 +680,7 @@ namespace dbgate.ermanagement.impl
             IDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                versionValue = DbLayer.GetDataManipulate().ReadFromResultSet(reader, versionColumn);
+                versionValue = DbLayer.DataManipulate().ReadFromResultSet(reader, versionColumn);
             }
             DbMgmtUtility.Close(reader);
             DbMgmtUtility.Close(cmd);

@@ -7,7 +7,7 @@ using dbgate.ermanagement.exceptions;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection
 {
-	public class AbstractTypeQuerySelection : IAbstractQuerySelection
+	public class AbstractTypeSelection : IAbstractSelection
 	{
 		public Type EntityType { get; set; }
 
@@ -16,8 +16,20 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 			get {return QuerySelectionExpressionType.ENTITY_TYPE;}
 		}
 		
-		public String CreateSql(QueryBuildInfo buildInfo)
+		public String CreateSql(IDbLayer dbLayer,QueryBuildInfo buildInfo)
 		{
+			var aliases = buildInfo.Aliases;
+			if (aliases.ContainsValue(EntityType))
+			{
+				var keys = aliases.Keys;
+				foreach (string key in keys)
+				{
+					if ((aliases[key] as Type) == EntityType)
+					{
+						return key + ".*";
+					}
+				}
+			}
 			return "*";
 		}
 

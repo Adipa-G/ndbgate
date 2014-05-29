@@ -4,9 +4,9 @@ namespace dbgate.ermanagement.query
 {
     public class QueryCondition
     {
-		private static AbstractQueryConditionFactory _factory;
+		private static AbstractConditionFactory _factory;
 
-		public static AbstractQueryConditionFactory Factory
+		public static AbstractConditionFactory Factory
 		{
 			set { _factory = value;}
 		}

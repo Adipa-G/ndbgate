@@ -16,7 +16,7 @@ using dbgate.ermanagement.query;
 
 namespace dbgate.dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from
 {
-	public class AbstractQueryUnionQueryFrom : IAbstractQueryFrom
+	public class AbstractUnionFrom : IAbstractFrom
 	{
 		public ISelectionQuery[] Queries { get; set; }
 		public bool All { get; set; }
@@ -28,12 +28,14 @@ namespace dbgate.dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.quer
   	 	
   	 	public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
   	 	{
+  	 		String alias = "union_src_" + Guid.NewGuid().ToString().Substring(0,5);
+  	 		
   	 		var sqlBuilder = new StringBuilder();
 	  	 	sqlBuilder.Append("(");
 	  	 	for (int i = 0, queriesLength = Queries.Length; i < queriesLength; i++)
 	  	 	{
 		  	 	ISelectionQuery query = Queries[i];
-		  	 	QueryBuildInfo result = dbLayer.GetDataManipulate().ProcessQuery(buildInfo, query.Structure);
+		  	 	QueryBuildInfo result = dbLayer.DataManipulate().ProcessQuery(buildInfo, query.Structure);
 		  	 	if (i > 0)
 		  	 	{
 		  	 		sqlBuilder.Append( " UNION ");
@@ -42,9 +44,12 @@ namespace dbgate.dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.quer
 			  	 		sqlBuilder.Append(" ALL ");
 			  	 	}
 		  	 	}
-		  	 	sqlBuilder.Append( result.ExecInfo.Sql + " u_"+i );
+		  	 	sqlBuilder.Append( result.ExecInfo.Sql + " union_src_"+i );
 	  	 	}
-	  	 	sqlBuilder.Append(") src_tbl");
+	  	 	
+	  	 	sqlBuilder.Append(") ").Append(alias);
+	  	 	buildInfo.AddUnionAlias(alias);
+	  	 	
 	  	 	return sqlBuilder.ToString();
   	 	}
 	}

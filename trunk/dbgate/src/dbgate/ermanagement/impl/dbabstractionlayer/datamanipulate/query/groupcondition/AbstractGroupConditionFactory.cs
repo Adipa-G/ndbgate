@@ -3,9 +3,9 @@ using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.groupcondition
 {
-	public class AbstractQueryGroupConditionFactory
+	public class AbstractGroupConditionFactory
 	{
-		public IAbstractQueryGroupCondition CreateGroupCondition (QueryGroupConditionExpressionType expressionType)
+		public IAbstractGroupCondition CreateGroupCondition (QueryGroupConditionExpressionType expressionType)
 		{
 			switch (expressionType) 
 			{

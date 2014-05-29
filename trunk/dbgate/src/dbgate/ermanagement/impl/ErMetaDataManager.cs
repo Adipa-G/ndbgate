@@ -41,7 +41,7 @@ namespace dbgate.ermanagement.impl
                     }
                 }
 
-                IMetaManipulate metaManipulate =  _dbLayer.GetMetaManipulate(con);
+                IMetaManipulate metaManipulate =  _dbLayer.MetaManipulate(con);
                 ICollection<IMetaItem> existingItems = metaManipulate.GetMetaData(con);
                 ICollection<IMetaItem> requiredItems = CreateMetaItemsFromDbClasses(dbClasses);
 
@@ -55,14 +55,14 @@ namespace dbgate.ermanagement.impl
                     List<MetaQueryHolder> queryHoldersExisting = new List<MetaQueryHolder>();
                     foreach (IMetaComparisonGroup comparisonGroup in groupExisting)
                     {
-                        queryHoldersExisting.AddRange(_dbLayer.GetMetaManipulate(con).CreateDbPathSql(comparisonGroup));
+                        queryHoldersExisting.AddRange(_dbLayer.MetaManipulate(con).CreateDbPathSql(comparisonGroup));
                     }
                     queryHoldersExisting.Sort();
 
                     List<MetaQueryHolder> queryHoldersRequired = new List<MetaQueryHolder>();
                     foreach (IMetaComparisonGroup comparisonGroup in groupRequired)
                     {
-                        queryHoldersRequired.AddRange(_dbLayer.GetMetaManipulate(con).CreateDbPathSql(comparisonGroup));
+                        queryHoldersRequired.AddRange(_dbLayer.MetaManipulate(con).CreateDbPathSql(comparisonGroup));
                     }
                     queryHoldersRequired.Sort();
 
@@ -74,7 +74,7 @@ namespace dbgate.ermanagement.impl
                     ICollection<IMetaComparisonGroup> groups = CompareUtility.Compare(metaManipulate,existingItems,requiredItems);
                     foreach (IMetaComparisonGroup comparisonGroup in groups)
                     {
-                        queryHolders.AddRange(_dbLayer.GetMetaManipulate(con).CreateDbPathSql(comparisonGroup));
+                        queryHolders.AddRange(_dbLayer.MetaManipulate(con).CreateDbPathSql(comparisonGroup));
                     }
                     queryHolders.Sort();
                 }

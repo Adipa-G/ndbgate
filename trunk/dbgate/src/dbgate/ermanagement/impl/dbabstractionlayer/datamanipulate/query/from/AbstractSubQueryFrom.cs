@@ -16,7 +16,7 @@ using dbgate.ermanagement.query;
 
 namespace dbgate.dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from
 {
-	public class AbstractQueryQueryFrom : IAbstractQueryFrom
+	public class AbstractSubQueryFrom : IAbstractFrom
 	{
 		public ISelectionQuery Query { get; set; }
 		public String Alias { get; set; }
@@ -28,7 +28,7 @@ namespace dbgate.dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.quer
 
 	    public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
 	    {
-	        QueryBuildInfo result = dbLayer.GetDataManipulate().ProcessQuery(buildInfo,Query.Structure);
+	        QueryBuildInfo result = dbLayer.DataManipulate().ProcessQuery(buildInfo,Query.Structure);
 	        String sql = "(" + result.ExecInfo.Sql + ")";
 	        if (!string.IsNullOrEmpty(Alias))
 	        {

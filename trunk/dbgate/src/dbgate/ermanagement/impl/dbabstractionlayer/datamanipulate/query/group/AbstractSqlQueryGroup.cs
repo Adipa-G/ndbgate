@@ -3,7 +3,7 @@ using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.group
 {
-	public class AbstractSqlQueryGroup : IAbstractQueryGroup
+	public class AbstractSqlQueryGroup : IAbstractGroup
 	{
 		public String Sql { get; set; }
 
