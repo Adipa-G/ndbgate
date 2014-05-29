@@ -388,7 +388,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\dbgate\ermanagement\utils\" />
     <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\dbdm\" />
     <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\dbdm\accessdm\" />
     <Folder Include="src\dbgate\ermanagement\impl\dbabstractionlayer\metamanipulate\dbmm\" />
