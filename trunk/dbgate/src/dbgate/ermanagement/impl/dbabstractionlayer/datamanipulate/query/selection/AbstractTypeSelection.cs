@@ -18,17 +18,10 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 		
 		public String CreateSql(IDbLayer dbLayer,QueryBuildInfo buildInfo)
 		{
-			var aliases = buildInfo.Aliases;
-			if (aliases.ContainsValue(EntityType))
+			var aliases = buildInfo.GetAlias(EntityType);
+			if (!string.IsNullOrEmpty(aliases))
 			{
-				var keys = aliases.Keys;
-				foreach (string key in keys)
-				{
-					if ((aliases[key] as Type) == EntityType)
-					{
-						return key + ".*";
-					}
-				}
+				return aliases + ".*";
 			}
 			return "*";
 		}

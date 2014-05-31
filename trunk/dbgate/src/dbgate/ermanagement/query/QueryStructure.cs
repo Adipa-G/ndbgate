@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -15,6 +16,7 @@ namespace dbgate.ermanagement.query
 	  	 	
 	  	public QueryStructure()
 	  	{
+	  		QueryId = Guid.NewGuid().ToString();
 	  	    _fromList = new Collection<IQueryFrom>();
             _joinList = new Collection<IQueryJoin>();
             _conditionList = new Collection<IQueryCondition>();
@@ -29,6 +31,8 @@ namespace dbgate.ermanagement.query
 		public long Fetch { get; set; }
 
 		public long Skip { get; set; }
+		
+		public string QueryId { get; private set; }
 
         public ICollection<IQueryFrom> FromList
         {

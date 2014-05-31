@@ -335,6 +335,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             {
                 buildInfo = new QueryBuildInfo();
             }
+            buildInfo.CurrentQueryId = structure.QueryId;
 
             StringBuilder sb = new StringBuilder();
             ProcessSelection(sb, buildInfo, structure);
