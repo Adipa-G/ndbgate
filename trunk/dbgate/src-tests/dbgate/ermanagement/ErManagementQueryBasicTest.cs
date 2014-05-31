@@ -14,6 +14,9 @@ namespace dbgate.ermanagement
 {
     public class ErManagementQueryBasicTest
     {
+    	private ICollection<QueryBasicEntity> _basicEntities;
+    	private ICollection<QueryBasicDetailsEntity> _detailedEntities;
+    	
         [TestFixtureSetUp]
         public static void Before()
         {
@@ -111,42 +114,71 @@ namespace dbgate.ermanagement
             transaction.Commit();
             return connection;
         }
+        
+        private QueryBasicEntity GetById(int id)
+	 	{
+        	foreach (QueryBasicEntity basicEntity in _basicEntities)
+		 	{
+		 		if (basicEntity.IdCol == id)
+		 			return basicEntity;
+		 		}
+		 		return null;
+		 	}
+		 	
+		 	private QueryBasicDetailsEntity GetDescriptionForName(String name)
+		 	{
+			 	foreach (QueryBasicDetailsEntity detailsEntity in _detailedEntities)
+			 	{
+			 		if (detailsEntity.Name.Equals(name))
+			 			return detailsEntity;
+		 		}
+			 	return null;
+			}
 
 		private void createTestData(IDbConnection connection)
 	 	{
+			_basicEntities = new List<QueryBasicEntity>();
+			_detailedEntities = new List<QueryBasicDetailsEntity>();
+			
 		 	int id = 35;
 		 	QueryBasicEntity entity = new QueryBasicEntity();
 		 	entity.IdCol =id;
 		 	entity.Name = "Org-NameA";
 		 	entity.Persist(connection);
+		 	_basicEntities.Add(entity);
 
 			QueryBasicDetailsEntity detailsEntity = new QueryBasicDetailsEntity();
 			detailsEntity.Name = entity.Name;
 			detailsEntity.Description = entity.Name + "Details";
 			detailsEntity.Persist(connection);
+			_detailedEntities.Add(detailsEntity);
 		 	
 		 	id = 45;
 		 	entity = new QueryBasicEntity();
 		 	entity.IdCol = id;
 		 	entity.Name = "Org-NameA";
 		 	entity.Persist(connection);
+		 	_basicEntities.Add(entity);
 
 			id = 55;
 		 	entity = new QueryBasicEntity();
 		 	entity.IdCol = id;
 		 	entity.Name = "Org-NameA";
 		 	entity.Persist(connection);
+		 	_basicEntities.Add(entity);
 		 	
 		 	id = 65;
 		 	entity = new QueryBasicEntity();
 		 	entity.IdCol = id;
 			entity.Name = "Org-NameB";
 		 	entity.Persist(connection);
+		 	_basicEntities.Add(entity);
 
 			detailsEntity = new QueryBasicDetailsEntity();
 			detailsEntity.Name = entity.Name;
 			detailsEntity.Description = entity.Name + "Details";
 			detailsEntity.Persist(connection);
+			_detailedEntities.Add(detailsEntity);
 	 	}
     
         [Test]
@@ -166,7 +198,16 @@ namespace dbgate.ermanagement
 
                 ICollection<object> results = selectionQuery.ToList(connection);
                 Assert.IsTrue(results.Count == 4);
-                connection.Close();
+                foreach (object result in results)
+				{
+					object[] resultArray = (object[]) result;
+					int id = (int) resultArray[0];
+					string name = (string) resultArray[1];
+				
+					QueryBasicEntity entity = GetById(id);
+					Assert.AreEqual(entity.Name,name);
+				}
+              	connection.Close();
             }
             catch (Exception e)
             {
@@ -192,6 +233,18 @@ namespace dbgate.ermanagement
 
                 ICollection<object> results = selectionQuery.ToList(connection);
                 Assert.IsTrue(results.Count == 2);
+                int count = 0;
+				foreach (object result in results)
+				{
+					object[] resultArray = (object[]) result;
+					string name = (string) resultArray[0];
+					foreach (QueryBasicEntity basicEntity in _basicEntities)
+					{
+						if (basicEntity.Name.Equals(name))
+							count++;
+					}
+				}
+				Assert.IsTrue(count == 4);
                 connection.Close();
             }
             catch (Exception e)
@@ -295,6 +348,14 @@ namespace dbgate.ermanagement
 
                 ICollection<object> results = selectionQuery.ToList(connection);
                 Assert.IsTrue(results.Count == 4);
+                foreach (object result in results)
+				{
+					object[] resultArray = (object[]) result;
+					var loadedEntity = (QueryBasicEntity) resultArray[0];
+					
+					QueryBasicEntity orgEntity = GetById(loadedEntity.IdCol);
+					Assert.AreEqual(loadedEntity.Name,orgEntity.Name);
+				}
                 connection.Close();
             }
             catch (Exception e)
@@ -342,7 +403,7 @@ namespace dbgate.ermanagement
                 ISelectionQuery descriptionQuery = new SelectionQuery()
                 	.From(QueryFrom.EntityType(typeof(QueryBasicDetailsEntity),"qbd1"))
 		 			.Where(QueryCondition.RawSql("qbd1.name = qb1.name"))
-		 			.Select(QuerySelection.RawSql("qbd1.name")).Fetch(1);
+		 			.Select(QuerySelection.RawSql("qbd1.description")).Fetch(1);
                 
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof(QueryBasicEntity),"qb1"))
@@ -350,6 +411,40 @@ namespace dbgate.ermanagement
                 	.Select(QuerySelection.Query(descriptionQuery));
 
                 ICollection<object> results = selectionQuery.ToList(connection);
+                Assert.IsTrue(results.Count == 4);
+                foreach (object result in results)
+				{
+					object[] resultArray = (object[]) result;
+					var entity = (QueryBasicEntity) resultArray[0];
+					string description = (string) resultArray[1];
+				
+					QueryBasicDetailsEntity detailsEntity = GetDescriptionForName(entity.Name);
+					Assert.AreEqual(detailsEntity.Description,description);
+				}
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+        
+        [Test]
+        public void ERQuery_ExecuteToRetrieveAll_WithColumnSelection_shouldLoadAll()
+		{
+        	try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery query = new SelectionQuery()
+                	.From(QueryFrom.EntityType(typeof(QueryBasicEntity), "qb1"))
+                	.Select(QuerySelection.Column(typeof(QueryBasicEntity),"Name","name1"));
+                
+                ICollection<object> results = query.ToList(connection);
                 Assert.IsTrue(results.Count == 4);
                 connection.Close();
             }
@@ -360,6 +455,104 @@ namespace dbgate.ermanagement
             }
         }
         
+		[Test]
+        public void ERQuery_ExecuteToRetrieveAll_WithSumSelection_shouldGetSum()
+		{
+        	try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery query = new SelectionQuery()
+                	.From(QueryFrom.EntityType(typeof(QueryBasicEntity), "qb1"))
+                	.Select(QuerySelection.Sum(typeof(QueryBasicEntity),"IdCol","id_sum"));
+                
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 1);
+                int sum = 0;
+				foreach (QueryBasicEntity entity in _basicEntities)
+				{
+					sum += entity.IdCol;
+				}
+				foreach (Object result in results)
+				{
+					Object[] resultArray = (Object[]) result;
+					long resultSum = (long) resultArray[0];
+					Assert.IsTrue(sum == resultSum);
+				}
+				connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+        
+        [Test]
+        public void ERQuery_ExecuteToRetrieveAll_WithCountSelection_shouldGetCount()
+		{
+        	try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery query = new SelectionQuery()
+                	.From(QueryFrom.EntityType(typeof(QueryBasicEntity), "qb1"))
+                	.Select(QuerySelection.Count(typeof(QueryBasicEntity),"IdCol","id_count"));
+                
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 1);
+               	foreach (Object result in results)
+				{
+					Object[] resultArray = (Object[]) result;
+					long resultCount = (long) resultArray[0];
+					Assert.IsTrue(resultCount == 4);
+				}
+				connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+        
+         [Test]
+        public void ERQuery_ExecuteToRetrieveAll_WithCustomFunctionSelectionWithCount_shouldGetCount()
+		{
+        	try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+                
+                ISelectionQuery query = new SelectionQuery()
+                	.From(QueryFrom.EntityType(typeof(QueryBasicEntity), "qb1"))
+                	.Select(QuerySelection.CustFunction("COUNT",typeof(QueryBasicEntity),"IdCol","id_count"));
+                
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 1);
+               	foreach (Object result in results)
+				{
+					Object[] resultArray = (Object[]) result;
+					long resultCount = (long) resultArray[0];
+					Assert.IsTrue(resultCount == 4);
+				}
+				connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+ 
         [Test]
         public void ERQuery_ExecuteToRetrieveAll_WithQueryFrom_shouldLoadAll()
         {
@@ -460,8 +653,8 @@ namespace dbgate.ermanagement
                 
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
-		 			.GroupBy(QueryGroup.RawSql("name"))
-				 	.Select(QuerySelection.RawSql("name"));
+		 			.GroupBy(QueryGroup.RawSql("Name"))
+				 	.Select(QuerySelection.RawSql("Name"));
 
                 ICollection<object> results = selectionQuery.ToList(connection);
                 Assert.IsTrue(results.Count == 2);

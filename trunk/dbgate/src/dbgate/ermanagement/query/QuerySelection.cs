@@ -1,3 +1,4 @@
+using dbgate.dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection;
 using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection;
 using System;
 
@@ -41,5 +42,39 @@ namespace dbgate.ermanagement.query
 			}
 			return selection;
 	 	}
+		
+		private static IQuerySelection ColumnOperation(QuerySelectionExpressionType expressionType, Type entityType,String field,String alias)
+		{
+			BaseColumnOperation selection = (BaseColumnOperation) _factory.CreateSelection(expressionType);
+			selection.EntityType = entityType;
+			selection.Field = field;
+			if (!string.IsNullOrEmpty(alias))
+			{
+				selection.Alias = alias;
+			}
+			return selection;
+		}
+		
+		public static IQuerySelection Column(Type entityType,String field,String alias)
+		{
+			return ColumnOperation(QuerySelectionExpressionType.COLUMN,entityType,field,alias);
+		}
+		
+		public static IQuerySelection Sum(Type entityType,String field,String alias)
+		{
+			return ColumnOperation(QuerySelectionExpressionType.SUM,entityType,field,alias);
+		}
+		
+		public static IQuerySelection Count(Type entityType,String field,String alias)
+		{
+			return ColumnOperation(QuerySelectionExpressionType.COUNT,entityType,field,alias);
+		}
+		
+		public static IQuerySelection CustFunction(String sqlFunction,Type entityType,String field,String alias)
+		{
+			AbstractCustFuncSelection selection = (AbstractCustFuncSelection)ColumnOperation(QuerySelectionExpressionType.CUST_FUNC,entityType,field,alias);
+			selection.Function = sqlFunction;
+			return selection;
+		}
     }
 }

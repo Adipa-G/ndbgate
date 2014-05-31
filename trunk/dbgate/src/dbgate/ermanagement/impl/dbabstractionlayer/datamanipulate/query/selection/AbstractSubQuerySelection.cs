@@ -12,7 +12,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 		public ISelectionQuery Query { get; set; }
 		public string Alias { get; set; }
 
-		public QuerySelectionExpressionType SelectionExpressionType
+		public QuerySelectionExpressionType SelectionType
 		{
 			get {return QuerySelectionExpressionType.QUERY;}
 		}
@@ -30,7 +30,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 			return sql;
 		}
 
-		public Object Retrieve (IDataReader rs,IDbConnection con)
+		public Object Retrieve (IDataReader rs,IDbConnection con,QueryBuildInfo buildInfo)
 		{
 			try
 			{

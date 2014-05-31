@@ -6,7 +6,11 @@ namespace dbgate.ermanagement.query
 	{
 		RAW_SQL,
 		ENTITY_TYPE,
-		QUERY
+		QUERY,
+		COLUMN,
+		COUNT,
+		SUM,
+		CUST_FUNC
 	}
 }
 

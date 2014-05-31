@@ -23,8 +23,6 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 
         IDataReader CreateResultSet(IDbConnection con, QueryExecInfo execInfo);
 
-        QueryExecInfo CreateExecInfo(IDbConnection con, ISelectionQuery query);
-        
         QueryBuildInfo ProcessQuery(QueryBuildInfo buildInfo,QueryStructure structure);
     }
 }

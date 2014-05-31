@@ -11,7 +11,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 	{
 		public String Sql { get; set; }
 
-		public QuerySelectionExpressionType SelectionExpressionType
+		public QuerySelectionExpressionType SelectionType
 		{
 			get {return QuerySelectionExpressionType.RAW_SQL;}
 		}
@@ -21,7 +21,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 			return Sql;
 		}
 
-		public Object Retrieve (IDataReader rs,IDbConnection con)
+		public Object Retrieve (IDataReader rs,IDbConnection con,QueryBuildInfo buildInfo)
 		{
 			try
 			{
@@ -48,7 +48,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 					readObjects [i] = obj;
 				}
 		 	
-				if (readObjects.Length == 0)
+				if (readObjects.Length == 1)
 					return readObjects [0];
 				return readObjects;
 			} 

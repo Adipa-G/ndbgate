@@ -36,7 +36,9 @@ namespace dbgate.ermanagement.impl
 			{
 				var logSb = new StringBuilder ();
 				var showQuery = Config.ShowQueries;
-				var execInfo = DbLayer.DataManipulate ().CreateExecInfo (con, query);
+				var buildInfo = DbLayer.DataManipulate ().ProcessQuery (null,query.Structure);
+				var execInfo = buildInfo.ExecInfo;
+				
 				if (showQuery) 
 				{
 					logSb.Append (execInfo.Sql);
@@ -58,7 +60,7 @@ namespace dbgate.ermanagement.impl
 					Object[] rowObjects = new Object[selections.Count];
 					foreach (IQuerySelection selection in selections) 
 					{
-						Object loaded = ((IAbstractSelection)selection).Retrieve (rs,con);
+						Object loaded = ((IAbstractSelection)selection).Retrieve (rs,con,buildInfo);
 						rowObjects [count++] = loaded;
 					}
 					retList.Add (rowObjects);

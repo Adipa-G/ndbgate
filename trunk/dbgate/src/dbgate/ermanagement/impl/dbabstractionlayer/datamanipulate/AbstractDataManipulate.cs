@@ -323,12 +323,6 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             return cmd.ExecuteReader();
         }
 
-        public QueryExecInfo CreateExecInfo(IDbConnection con, ISelectionQuery query)
-        {
-            QueryStructure structure = query.Structure;
-            return ProcessQuery(null, structure).ExecInfo;
-        }
-
         public QueryBuildInfo ProcessQuery(QueryBuildInfo buildInfo, QueryStructure structure)
         {
             if (buildInfo == null)

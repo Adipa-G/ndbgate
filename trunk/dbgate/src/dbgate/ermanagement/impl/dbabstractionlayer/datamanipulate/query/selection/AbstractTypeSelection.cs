@@ -11,7 +11,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 	{
 		public Type EntityType { get; set; }
 
-		public QuerySelectionExpressionType SelectionExpressionType
+		public QuerySelectionExpressionType SelectionType
 		{
 			get {return QuerySelectionExpressionType.ENTITY_TYPE;}
 		}
@@ -26,7 +26,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 			return "*";
 		}
 
-		public Object Retrieve (IDataReader rs, IDbConnection con)
+		public Object Retrieve (IDataReader rs, IDbConnection con,QueryBuildInfo buildInfo)
 		{
 			try 
 			{

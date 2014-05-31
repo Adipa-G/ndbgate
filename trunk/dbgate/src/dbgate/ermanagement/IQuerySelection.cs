@@ -6,6 +6,6 @@ namespace dbgate.ermanagement
 {
     public interface IQuerySelection
     {
-		QuerySelectionExpressionType SelectionExpressionType { get; }
+		QuerySelectionExpressionType SelectionType { get; }
     }
 }

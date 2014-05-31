@@ -198,7 +198,12 @@
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\AbstractSubQueryFrom.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\AbstractUnionFrom.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\QueryBuildInfo.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\AbstractColumnSelection.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\AbstractCountSelection.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\AbstractCustFuncSelection.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\AbstractSubQuerySelection.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\AbstractSumSelection.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\BaseColumnOperation.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\DefaultDbLayer.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\IDbLayer.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\LayerFactory.cs" />

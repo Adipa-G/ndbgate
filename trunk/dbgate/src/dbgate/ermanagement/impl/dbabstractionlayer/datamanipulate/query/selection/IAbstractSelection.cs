@@ -7,7 +7,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 	{
 		String CreateSql(IDbLayer dbLayer,QueryBuildInfo buildInfo);
 
-		Object Retrieve(IDataReader rs,IDbConnection con);
+		Object Retrieve(IDataReader rs,IDbConnection con,QueryBuildInfo buildInfo);
 	}
 }
 
