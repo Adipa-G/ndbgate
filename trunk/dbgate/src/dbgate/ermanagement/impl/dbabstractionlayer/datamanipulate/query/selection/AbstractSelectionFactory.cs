@@ -1,5 +1,3 @@
-using System;
-using dbgate.dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection;
 using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection
@@ -10,20 +8,14 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 		{
 			switch (expressionType) 
 			{
-				case QuerySelectionExpressionType.RAW_SQL:
+				case QuerySelectionExpressionType.RawSql:
 					return new AbstractSqlQuerySelection ();
-				case QuerySelectionExpressionType.ENTITY_TYPE:
+				case QuerySelectionExpressionType.EntityType:
 					return new AbstractTypeSelection();
-				case QuerySelectionExpressionType.QUERY:
+				case QuerySelectionExpressionType.Query:
 					return new AbstractSubQuerySelection();
-				case QuerySelectionExpressionType.COLUMN:
-					return new AbstractColumnSelection();
-				case QuerySelectionExpressionType.COUNT:
-					return new AbstractCountSelection();
-				case QuerySelectionExpressionType.SUM:
-					return new AbstractSumSelection();
-				case QuerySelectionExpressionType.CUST_FUNC:
-					return new AbstractCustFuncSelection();
+				case QuerySelectionExpressionType.Expression:
+			        return new AbstractExpressionSelection();
 				default:
 					return null;
 			}

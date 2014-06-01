@@ -1,6 +1,6 @@
-using dbgate.dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection;
 using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection;
 using System;
+using dbgate.ermanagement.query.expr;
 
 namespace dbgate.ermanagement.query
 {
@@ -15,14 +15,14 @@ namespace dbgate.ermanagement.query
 
         public static IQuerySelection RawSql(string sql)
         {
-			AbstractSqlQuerySelection querySelection = (AbstractSqlQuerySelection) _factory.CreateSelection(QuerySelectionExpressionType.RAW_SQL);
+			AbstractSqlQuerySelection querySelection = (AbstractSqlQuerySelection) _factory.CreateSelection(QuerySelectionExpressionType.RawSql);
 			querySelection.Sql = sql;
 			return querySelection;
         }
 
 		public static IQuerySelection EntityType(Type type)
         {
-			AbstractTypeSelection querySelection = (AbstractTypeSelection) _factory.CreateSelection(QuerySelectionExpressionType.ENTITY_TYPE);
+			AbstractTypeSelection querySelection = (AbstractTypeSelection) _factory.CreateSelection(QuerySelectionExpressionType.EntityType);
 			querySelection.EntityType = type;
 			return querySelection;
         }
@@ -34,7 +34,7 @@ namespace dbgate.ermanagement.query
 		
 		public static IQuerySelection Query(ISelectionQuery query,String alias)
 		{
-			AbstractSubQuerySelection selection = (AbstractSubQuerySelection) _factory.CreateSelection(QuerySelectionExpressionType.QUERY);
+			AbstractSubQuerySelection selection = (AbstractSubQuerySelection) _factory.CreateSelection(QuerySelectionExpressionType.Query);
 			selection.Query = query;
 			if (!string.IsNullOrEmpty(alias))
 			{
@@ -43,38 +43,31 @@ namespace dbgate.ermanagement.query
 			return selection;
 	 	}
 		
-		private static IQuerySelection ColumnOperation(QuerySelectionExpressionType expressionType, Type entityType,String field,String alias)
+		private static IQuerySelection Expression(SelectExpr expr)
 		{
-			BaseColumnOperation selection = (BaseColumnOperation) _factory.CreateSelection(expressionType);
-			selection.EntityType = entityType;
-			selection.Field = field;
-			if (!string.IsNullOrEmpty(alias))
-			{
-				selection.Alias = alias;
-			}
-			return selection;
+            var expressionSelection = (AbstractExpressionSelection) _factory.CreateSelection(QuerySelectionExpressionType.Expression);
+	        expressionSelection.Expr = expr;
+            return expressionSelection;
 		}
 		
 		public static IQuerySelection Column(Type entityType,String field,String alias)
 		{
-			return ColumnOperation(QuerySelectionExpressionType.COLUMN,entityType,field,alias);
+		    return Expression(SelectExpr.Build().Field(entityType, field, alias));
 		}
 		
 		public static IQuerySelection Sum(Type entityType,String field,String alias)
 		{
-			return ColumnOperation(QuerySelectionExpressionType.SUM,entityType,field,alias);
+		    return Expression(SelectExpr.Build().Field(entityType, field, alias).Sum());
 		}
 		
 		public static IQuerySelection Count(Type entityType,String field,String alias)
 		{
-			return ColumnOperation(QuerySelectionExpressionType.COUNT,entityType,field,alias);
+            return Expression(SelectExpr.Build().Field(entityType, field, alias).Count());
 		}
 		
 		public static IQuerySelection CustFunction(String sqlFunction,Type entityType,String field,String alias)
 		{
-			AbstractCustFuncSelection selection = (AbstractCustFuncSelection)ColumnOperation(QuerySelectionExpressionType.CUST_FUNC,entityType,field,alias);
-			selection.Function = sqlFunction;
-			return selection;
+            return Expression(SelectExpr.Build().Field(entityType, field, alias).CustFunc(sqlFunction));
 		}
     }
 }

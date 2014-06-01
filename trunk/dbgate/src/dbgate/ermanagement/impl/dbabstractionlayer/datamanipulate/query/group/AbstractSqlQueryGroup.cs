@@ -9,7 +9,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.group
 
 		public QueryGroupExpressionType GroupExpressionType
 		{
-			get {return QueryGroupExpressionType.RAW_SQL;}
+			get {return QueryGroupExpressionType.RawSql;}
 		}
 		
 		public String CreateSql()

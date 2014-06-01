@@ -14,7 +14,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 
 		public QuerySelectionExpressionType SelectionType
 		{
-			get {return QuerySelectionExpressionType.QUERY;}
+			get {return QuerySelectionExpressionType.Query;}
 		}
 		
 		public String CreateSql(IDbLayer dbLayer,QueryBuildInfo buildInfo)

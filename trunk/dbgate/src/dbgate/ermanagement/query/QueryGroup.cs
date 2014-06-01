@@ -13,7 +13,7 @@ namespace dbgate.ermanagement.query
 
         public static IQueryGroup RawSql(string sql)
         {
-			AbstractSqlQueryGroup queryGroup = (AbstractSqlQueryGroup) _factory.CreateGroup(QueryGroupExpressionType.RAW_SQL);
+			AbstractSqlQueryGroup queryGroup = (AbstractSqlQueryGroup) _factory.CreateGroup(QueryGroupExpressionType.RawSql);
 			queryGroup.Sql = sql;
 			return queryGroup;
         }
