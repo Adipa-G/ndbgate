@@ -1,43 +1,60 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using dbgate.ermanagement.exceptions;
 
 namespace dbgate.ermanagement.query.expr.segments
 {
-    public class GroupFunctionSegment : ISegment
+    public class GroupFunctionSegment : BaseSegment
     {
-        private readonly GroupFunctionSegmentType _groupFunctionType;
-	  	private readonly string _custFunction;
-	  	
-        public ISegment SegmentToGroup { get; set; }
-	  	
-	  	public GroupFunctionSegment(GroupFunctionSegmentType groupFunctionType)
-	  	{
-	  	    _groupFunctionType = groupFunctionType;
-	  	    _custFunction = null;
-	  	}
-	  	
-	  	public GroupFunctionSegment(String custFunction)
-	  	{
-	  	    _groupFunctionType = GroupFunctionSegmentType.CustFunc;
-	  	    _custFunction = custFunction;
-	  	}
-	  	
-	  	public SegmentType SegmentType
-	  	{
+        private readonly GroupFunctionSegmentMode _groupFunctionMode;
+        private readonly string _custFunction;
+
+        public FieldSegment SegmentToGroup { get; set; }
+
+        public GroupFunctionSegment(GroupFunctionSegmentMode groupFunctionMode)
+        {
+            _groupFunctionMode = groupFunctionMode;
+            _custFunction = null;
+        }
+
+        public GroupFunctionSegment(String custFunction)
+        {
+            _groupFunctionMode = GroupFunctionSegmentMode.CustFunc;
+            _custFunction = custFunction;
+        }
+
+        public override SegmentType SegmentType
+        {
             get { return SegmentType.Group; }
-	  	}
-	  	
-	  	public GroupFunctionSegmentType GroupFunctionType
-	  	{
-            get { return _groupFunctionType; }
-	  	}
-	  	
-	  	public String CustFunction
-	  	{
+        }
+
+        public GroupFunctionSegmentMode GroupFunctionMode
+        {
+            get { return _groupFunctionMode; }
+        }
+
+        public String CustFunction
+        {
             get { return _custFunction; }
-	  	}
+        }
+
+        public override ISegment Add(ISegment segment)
+        {
+            switch (segment.SegmentType)
+            {
+                case SegmentType.Field:
+                    SegmentToGroup = (FieldSegment) segment;
+                    return this;
+                case SegmentType.Value:
+                case SegmentType.Query:
+                case SegmentType.Merge:
+                case SegmentType.Group:
+                    throw new ExpressionParsingError("Cannot add value/query/merge/group segments to field segment");
+                case SegmentType.Compare:
+                    segment.Add(this);
+                    return segment;
+                default:
+                    return this;
+            }
+        }
     }
 }

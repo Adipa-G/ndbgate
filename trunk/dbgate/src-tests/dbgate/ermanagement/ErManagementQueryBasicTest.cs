@@ -1,6 +1,7 @@
 using dbgate.dbutility;
 using dbgate.ermanagement.impl;
 using dbgate.ermanagement.query;
+using dbgate.ermanagement.query.expr;
 using dbgate.ermanagement.support.query.basic;
 using log4net;
 using NUnit.Framework;
@@ -408,7 +409,7 @@ namespace dbgate.ermanagement
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof(QueryBasicEntity),"qb1"))
                     .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)))
-                	.Select(QuerySelection.Query(descriptionQuery));
+                    .Select(QuerySelection.Query(descriptionQuery, "description"));
 
                 ICollection<object> results = selectionQuery.ToList(connection);
                 Assert.IsTrue(results.Count == 4);
@@ -640,6 +641,508 @@ namespace dbgate.ermanagement
                 Assert.Fail(e.Message);
             }
 		}
+
+        [Test]     
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderNEq_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+				IDbTransaction transaction = connection.BeginTransaction();
+				createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                        .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                        .Where(QueryCondition.Expression(ConditionExpr.Build()
+                            .Field(typeof(QueryBasicEntity), "IdCol").Neq().Value(DbColumnType.Integer,35)))
+                        .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 3);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderGt_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                        .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                        .Where(QueryCondition.Expression(ConditionExpr.Build()
+                            .Field(typeof(QueryBasicEntity), "IdCol").Gt().Value(DbColumnType.Integer, 45)))
+                        .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 2);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderGe_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                        .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                        .Where(QueryCondition.Expression(ConditionExpr.Build()
+                            .Field(typeof(QueryBasicEntity), "IdCol").Ge().Value(DbColumnType.Integer, 45)))
+                        .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 3);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderLt_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                        .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                        .Where(QueryCondition.Expression(ConditionExpr.Build()
+                            .Field(typeof(QueryBasicEntity), "IdCol").Lt().Value(DbColumnType.Integer, 45)))
+                        .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 1);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderLe_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                        .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                        .Where(QueryCondition.Expression(ConditionExpr.Build()
+                            .Field(typeof(QueryBasicEntity), "IdCol").Le().Value(DbColumnType.Integer, 45)))
+                        .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 2);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderLike_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                        .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                        .Where(QueryCondition.Expression(ConditionExpr.Build()
+                            .Field(typeof(QueryBasicEntity), "Name").Like().Value(DbColumnType.Varchar, "Org-NameA")))
+                        .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 3);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderNEqWithField_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                        .From(QueryFrom.EntityType(typeof(QueryBasicDetailsEntity)))
+                        .Where(QueryCondition.Expression(ConditionExpr.Build()
+                            .Field(typeof(QueryBasicEntity), "Name").Neq().Field(typeof(QueryBasicDetailsEntity), "Description")))
+                        .Select(QuerySelection.EntityType(typeof(QueryBasicDetailsEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 2);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderGtWithQuery_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery subQuery = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity), "qbd1"))
+                    .OrderBy(QueryOrderBy.RawSql("id_col"))
+                    .Select(QuerySelection.Column(typeof(QueryBasicEntity), "IdCol", "id_col")).Fetch(1);
+
+                ISelectionQuery query = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                    .Where(QueryCondition.Expression(ConditionExpr.Build()
+                        .Field(typeof(QueryBasicEntity), "IdCol").Gt().Query(subQuery)))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 3);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderBetween_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                    .Where(QueryCondition.Expression(ConditionExpr.Build()
+                        .Field(typeof(QueryBasicEntity), "IdCol").Between().Values(DbColumnType.Integer, new object[]{35, 55})))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 3);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderInWithValues_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                    .Where(QueryCondition.Expression(ConditionExpr.Build()
+                        .Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer, new object[] { 35, 55 })))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 2);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderInWithQuery_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery subQuery = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                    .Select(QuerySelection.Column(typeof(QueryBasicEntity), "IdCol", null));
+
+                ISelectionQuery query = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                    .Where(QueryCondition.Expression(ConditionExpr.Build()
+                        .Field(typeof(QueryBasicEntity), "IdCol").In().Query(subQuery)))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 4);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderExists_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery subQuery = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicDetailsEntity),"qbd1"))
+                    .Where(QueryCondition.Expression(ConditionExpr.Build()
+                        .Field(typeof(QueryBasicDetailsEntity),"qbd1","Name").Eq().Field(typeof(QueryBasicEntity),"qb1","Name")))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicDetailsEntity)));
+
+                ISelectionQuery query = new SelectionQuery()
+                        .From(QueryFrom.EntityType(typeof(QueryBasicEntity),"qb1"))
+                        .Where(QueryCondition.Expression(ConditionExpr.Build()
+                            .Query(subQuery).Exists()))
+                        .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 4);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderNotExists_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery subQuery = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicDetailsEntity), "qbd1"))
+                    .Where(QueryCondition.Expression(ConditionExpr.Build()
+                        .Field(typeof(QueryBasicDetailsEntity), "qbd1", "Name").Eq().Field(typeof(QueryBasicEntity), "qb1", "Name")))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicDetailsEntity)));
+
+                ISelectionQuery query = new SelectionQuery()
+                        .From(QueryFrom.EntityType(typeof(QueryBasicEntity), "qb1"))
+                        .Where(QueryCondition.Expression(ConditionExpr.Build()
+                            .Query(subQuery).NotExists()))
+                        .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 0);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderAnd_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                    .Where(QueryCondition.Expression(ConditionExpr.Build()
+                        .Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer,new object[]{35,55})
+                        .And().Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer,new object[]{45,55})))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 1);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderOr_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                    .Where(QueryCondition.Expression(ConditionExpr.Build()
+                       .Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer,new object[]{35,55})
+                        .Or().Field(typeof(QueryBasicEntity), "IdCol").In().Value(DbColumnType.Integer, 55)
+                        .Or().Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer, new object[] { 45, 55 })))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 3);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderOrAnd_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                    .Where(QueryCondition.Expression(ConditionExpr.Build()
+                       .Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer, new object[] { 35, 55 })
+                        .Or().Field(typeof(QueryBasicEntity), "IdCol").In().Value(DbColumnType.Integer, 55)
+                        .And().Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer, new object[] { 45, 55 })))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 2);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderMergeCombinationAnd_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                    .Where(QueryCondition.Expression(ConditionExpr.Build()
+                       .And(new[]{ConditionExpr.Build()
+                            .Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer, new object[]{35, 55})
+                                ,ConditionExpr.Build()
+                                .Field(typeof(QueryBasicEntity), "IdCol").Eq().Value(DbColumnType.Integer, 55)})
+                        .Or().Field(typeof(QueryBasicEntity), "IdCol").Eq().Value(DbColumnType.Integer, 45)))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 2);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void ERQuery_ExecuteWithCondition_WithExpressionBuilderMergeCombinationOr_shouldLoadTarget()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                createTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
+                    .Where(QueryCondition.Expression(ConditionExpr.Build()
+                       .Or(new[]{ConditionExpr.Build()
+                            .Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer, new object[]{35, 55})
+                                ,ConditionExpr.Build()
+                                .Field(typeof(QueryBasicEntity), "IdCol").Eq().Value(DbColumnType.Integer, 55)})
+                        .Or().Field(typeof(QueryBasicEntity), "IdCol").Eq().Value(DbColumnType.Integer, 45)))
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 3);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(ErManagementQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
 
 		[Test]
 		public void ERQuery_ExecuteWithGroup_WithBasicSqlQuery_shouldLoadTarget ()

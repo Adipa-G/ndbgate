@@ -15,136 +15,77 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 {
     public class AbstractExpressionSelection : IAbstractSelection
     {
-        private Type _entityType;
-		private string _field;
-		private string _alias;
-		private string _function;
+        private AbstractExpressionProcessor _processor;
+        
+        public AbstractExpressionSelection()
+        {
+            _processor = new AbstractExpressionProcessor();
+        }
 
         public SelectExpr Expr { get; set; }
-			
+
         public QuerySelectionExpressionType SelectionType
 	 	{
             get { return QuerySelectionExpressionType.Expression; }
 		}
-		
-		private void ProcessExpr()
-		{
-		    if (_entityType != null)
-		        return;
-		
-		    ISegment rootSegment = Expr.RootSegment;
-		    GroupFunctionSegment groupSegment = null;
-		    FieldSegment fieldSegment = null;
-		
-		    if (rootSegment.SegmentType == SegmentType.Group)
-		    {
-		        groupSegment = (GroupFunctionSegment) rootSegment;
-		        fieldSegment = (FieldSegment) groupSegment.SegmentToGroup;
-		    }
-		    if (rootSegment.SegmentType == SegmentType.Field)
-		    {
-		        fieldSegment = (FieldSegment) rootSegment;
-		    }
-		
-		    if (fieldSegment != null)
-		    {
-		        _entityType = fieldSegment.EntityType;
-		        _field = fieldSegment.Field;
-		        _alias = fieldSegment.Alias;
-		    }
-		
-		    if (groupSegment != null)
-		    {
-		        switch (groupSegment.GroupFunctionType)
-		        {
-		            case GroupFunctionSegmentType.Count:
-		                _function = "COUNT";
-		                break;
-		            case GroupFunctionSegmentType.Sum:
-		                _function = "SUM";
-		                break;
-		            case GroupFunctionSegmentType.CustFunc:
-		                _function = groupSegment.CustFunction;
-		                break;
-		         }
-		     }
-		}
-		
-		private IDbColumn GetColumn(QueryBuildInfo buildInfo)
-		{
-		    ICollection<IDbColumn> columns = null;
-		    try
-		    {
-		        columns = CacheManager.FieldCache.GetDbColumns(_entityType);
-		    }
-			catch (FieldCacheMissException)
-			{
-			    try
-			    {
-			        CacheManager.FieldCache.Register(_entityType,(IServerRoDbClass)Activator.CreateInstance(_entityType));
-			        columns = CacheManager.FieldCache.GetDbColumns(_entityType);
-			    }
-			    catch (Exception ex)
-			    {
-                    Console.Write(ex.StackTrace);
-			    }
-			}
-			
-			foreach (IDbColumn column in columns)
-			{
-			    if (column.AttributeName.Equals(_field))
-			    {
-			        return column;
-			    }
-			}
-			return null;
-		}
-			
 			
 		public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
 		{
-		    ProcessExpr();
-		    string tableAlias = buildInfo.GetAlias(_entityType);
-		    tableAlias = (tableAlias == null)?"" : tableAlias + ".";
-		    IDbColumn column = GetColumn(buildInfo);
-			
-		    if (column != null)
-		    {
-		        string sql = "";
-		        if (!string.IsNullOrEmpty(_function))
-		        {
-		            sql = _function + "(" +tableAlias + column.ColumnName + ")";
-		        }
-		        else
-		        {
-		            sql = tableAlias + column.ColumnName;
-		        }
-		        if (!string.IsNullOrEmpty(_alias))
-		        {
-		            sql = sql + " AS " + _alias;
-		        }
-		        return sql;
-		    }
-		    else
-		    {
-		        return "<incorrect column for " + _field + ">";
-		    }
+            ISegment rootSegment = Expr.RootSegment;
+            switch (rootSegment.SegmentType)
+            {
+                case SegmentType.Group:
+                    return _processor.GetGroupFunction((GroupFunctionSegment) rootSegment, true, buildInfo);
+                case SegmentType.Field:
+                    return _processor.GetFieldName((FieldSegment) rootSegment, true, buildInfo);
+                case SegmentType.Query:
+                    QuerySegment querySegment = (QuerySegment) rootSegment;
+                    buildInfo = dbLayer.DataManipulate().ProcessQuery(buildInfo,querySegment.Query.Structure);
+                    return "(" + buildInfo.ExecInfo.Sql + ") as " + querySegment.Alias;
+            }
+            return null;
 		}
 
         public object Retrieve(IDataReader rs, IDbConnection con, QueryBuildInfo buildInfo)
         {
-		    try
-		    {
-		        ProcessExpr();
-		        string columnName = !string.IsNullOrEmpty(_alias)? _alias : GetColumn(buildInfo).ColumnName;
-		        int ordinal = rs.GetOrdinal(columnName);
-		        object obj = rs.GetValue(ordinal);
-		        return obj;
-		    }
-		    catch (Exception ex)
-		    {
-		        throw new RetrievalException(ex.Message,ex);
-		    }
+            try
+            {
+                String column = null;
+                ISegment rootSegment = Expr.RootSegment;
+
+                FieldSegment fieldSegment = null;
+                switch (rootSegment.SegmentType)
+                {
+                    case SegmentType.Group:
+                        fieldSegment = ((GroupFunctionSegment)rootSegment).SegmentToGroup;
+                        column = GetColumnName(fieldSegment);
+                        break;
+                    case SegmentType.Field:
+                        fieldSegment = (FieldSegment)rootSegment;
+                        column = GetColumnName(fieldSegment);
+                        break;
+                    case SegmentType.Query:
+                        QuerySegment querySegment = (QuerySegment)rootSegment;
+                        column = querySegment.Alias;
+                        break;
+                }
+
+                int ordinal = rs.GetOrdinal(column);
+                Object obj = rs.GetValue(ordinal);
+                return obj;
+            }
+            catch (Exception ex)
+            {
+                throw new RetrievalException(ex.Message, ex);
+            }
+
      	}
+
+        private string GetColumnName(FieldSegment fieldSegment)
+        {
+            string alias = fieldSegment.Alias;
+            string column = !string.IsNullOrEmpty(alias) ? alias : _processor.GetColumn(fieldSegment).ColumnName;
+            return column;
+        }
     }
 }

@@ -5,12 +5,18 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.condi
 {
 	public class AbstractConditionFactory
 	{
-		public IAbstractCondition CreateCondition (QueryConditionExpressionType expressionType)
+	    public AbstractConditionFactory()
+	    {
+	    }
+
+	    public IAbstractCondition CreateCondition (QueryConditionExpressionType expressionType)
 		{
 			switch (expressionType) 
 			{
-				case QueryConditionExpressionType.RAW_SQL:
+				case QueryConditionExpressionType.RawSql:
 					return new AbstractSqlQueryCondition ();
+                case QueryConditionExpressionType.Expression:
+                    return new AbstractExpressionCondition();
 				default:
 					return null;
 			}

@@ -12,8 +12,6 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 					return new AbstractSqlQuerySelection ();
 				case QuerySelectionExpressionType.EntityType:
 					return new AbstractTypeSelection();
-				case QuerySelectionExpressionType.Query:
-					return new AbstractSubQuerySelection();
 				case QuerySelectionExpressionType.Expression:
 			        return new AbstractExpressionSelection();
 				default:

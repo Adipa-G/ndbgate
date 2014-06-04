@@ -1,6 +1,6 @@
 ﻿namespace dbgate.ermanagement.query.expr.segments
 {
-    public enum GroupFunctionSegmentType
+    public enum GroupFunctionSegmentMode
     {
         Sum,
 	  	Count,

@@ -10,10 +10,18 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
     	private readonly QueryExecInfo _execInfo;
   	 	private readonly Dictionary<string,object> _aliases;
 	  	 	
-  	 	public QueryBuildInfo()
+  	 	public QueryBuildInfo(QueryBuildInfo queryBuildInfo)
   	 	{
-  	 		_execInfo = new QueryExecInfo();
-  	 		_aliases = new Dictionary<string,object>();
+            if (queryBuildInfo != null)
+            {
+                _execInfo = queryBuildInfo.ExecInfo;
+                _aliases = queryBuildInfo.Aliases;
+            }
+            else
+            {
+                _execInfo = new QueryExecInfo();
+                _aliases = new Dictionary<string, object>();
+            }
   	 	}
   	 	
   	 	public string CurrentQueryId 

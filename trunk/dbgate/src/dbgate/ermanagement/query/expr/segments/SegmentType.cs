@@ -5,6 +5,8 @@
         Field,
 	  	Group,
 	  	Value,
-	  	Compare
+        Compare,
+        Merge,
+        Query
     }
 }

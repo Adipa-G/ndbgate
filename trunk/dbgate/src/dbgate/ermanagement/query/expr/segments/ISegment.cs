@@ -9,5 +9,7 @@ namespace dbgate.ermanagement.query.expr.segments
     public interface ISegment
     {
         SegmentType SegmentType { get; }
+
+        ISegment Add(ISegment segment);
     }
 }

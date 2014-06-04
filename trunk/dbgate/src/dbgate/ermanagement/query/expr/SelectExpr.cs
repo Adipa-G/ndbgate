@@ -4,6 +4,11 @@ namespace dbgate.ermanagement.query.expr
 {
     public class SelectExpr : BaseExpr
     {
+        public new SelectExpr Query(ISelectionQuery query, String alias)
+        {
+            return (SelectExpr)base.Query(query,alias);
+        }
+
         public new SelectExpr Sum()
 	  	{
 	  		return (SelectExpr)base.Sum();

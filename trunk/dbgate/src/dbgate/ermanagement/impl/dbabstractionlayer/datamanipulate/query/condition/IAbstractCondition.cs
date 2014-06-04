@@ -4,7 +4,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.condi
 {
 	public interface IAbstractCondition : IQueryCondition
 	{
-		String CreateSql();
+        string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo);
 	}
 }
 

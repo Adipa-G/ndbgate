@@ -27,20 +27,11 @@ namespace dbgate.ermanagement.query
 			return querySelection;
         }
 		
-		public static IQuerySelection Query(ISelectionQuery query)
-		{
-			return Query(query,null);
-		}
-		
 		public static IQuerySelection Query(ISelectionQuery query,String alias)
 		{
-			AbstractSubQuerySelection selection = (AbstractSubQuerySelection) _factory.CreateSelection(QuerySelectionExpressionType.Query);
-			selection.Query = query;
-			if (!string.IsNullOrEmpty(alias))
-			{
-				selection.Alias = alias;
-			}
-			return selection;
+            var expressionSelection = (AbstractExpressionSelection) _factory.CreateSelection(QuerySelectionExpressionType.Expression);
+            expressionSelection.Expr = SelectExpr.Build().Query(query,alias);
+            return expressionSelection;
 	 	}
 		
 		private static IQuerySelection Expression(SelectExpr expr)

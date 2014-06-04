@@ -9,12 +9,12 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.condi
 	 	
 		public QueryConditionExpressionType ConditionExpressionType 
 		{
-			get {return QueryConditionExpressionType.RAW_SQL;}
+			get {return QueryConditionExpressionType.RawSql;}
 		}
-	 	
-	 	public String CreateSql()
-	 	{
-	 		return Sql;
+
+	    public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
+	    {
+	        return Sql;
 	 	}
 	}
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace dbgate.ermanagement.query.expr.segments
 {
-    public enum CompareSegmentType
+    public enum CompareSegmentMode
     {
         Eq,
 	  	Neq,
@@ -14,6 +14,10 @@ namespace dbgate.ermanagement.query.expr.segments
 	  	Ge,
 	  	Lt,
 	  	Le,
-	  	Like
+	  	Like,
+        Between,
+        In,
+        Exists,
+        NotExists
     }
 }

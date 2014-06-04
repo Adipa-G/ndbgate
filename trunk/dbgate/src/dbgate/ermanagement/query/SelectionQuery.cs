@@ -30,7 +30,7 @@ namespace dbgate.ermanagement.query
 			return this;
         }
 
-		public new ISelectionQuery From(IQueryFrom queryFrom)
+		public ISelectionQuery From(IQueryFrom queryFrom)
         {
             return (ISelectionQuery)base.From(queryFrom);
         }

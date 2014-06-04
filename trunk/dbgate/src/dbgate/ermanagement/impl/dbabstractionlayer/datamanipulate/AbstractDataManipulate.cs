@@ -325,10 +325,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 
         public QueryBuildInfo ProcessQuery(QueryBuildInfo buildInfo, QueryStructure structure)
         {
-            if (buildInfo == null)
-            {
-                buildInfo = new QueryBuildInfo();
-            }
+            buildInfo = new QueryBuildInfo(buildInfo);
             buildInfo.CurrentQueryId = structure.QueryId;
 
             StringBuilder sb = new StringBuilder();
@@ -472,16 +469,16 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 			 	{
 			 		sb.Append(" AND ");
 			 	}
-			 	sb.Append(CreateWhereSql(condition));
+			 	sb.Append(CreateWhereSql(condition,buildInfo));
 			 	initial = false;
 		 	}
 	 	}
 		 	
-	 	protected String CreateWhereSql(IQueryCondition condition)
+	 	protected String CreateWhereSql(IQueryCondition condition,QueryBuildInfo buildInfo)
 	 	{
 			if (condition != null)
 		 	{
-		 		return ((IAbstractCondition) condition).CreateSql();
+		 		return ((IAbstractCondition) condition).CreateSql(_dbLayer,buildInfo);
 		 	}
 		 	return "/*Incorrect Where*/";
 	 	}
