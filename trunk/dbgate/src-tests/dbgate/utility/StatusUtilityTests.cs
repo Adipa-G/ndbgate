@@ -4,10 +4,10 @@ using NUnit.Framework;
 
 namespace dbgate.utility
 {
-    public class StatusManagerTests
+    public class StatusUtilityTests
     {
         [Test]
-        public void StatusManager_setStatus_withMultiLevelHirachy_shouldSetStatus()
+        public void StatusUtility_SetStatus_WithMultiLevelHirachy_ShouldSetStatus()
         {
             RootEntity rootEntity = new RootEntity();
             LeafEntity leafEntityA = new LeafEntity();
@@ -27,7 +27,7 @@ namespace dbgate.utility
         }
 
         [Test]
-        public void StatusManager_isModified_withMultiLevelHirachy_shouldGetStatus()
+        public void StatusUtility_IsModified_WithMultiLevelHirachy_ShouldGetStatus()
         {
             RootEntity rootEntity = new RootEntity();
             LeafEntity leafEntityA = new LeafEntity();
@@ -58,7 +58,7 @@ namespace dbgate.utility
         }
 
         [Test]
-        public void StatusManager_getImmidiateChildrenAndClear_withMultiLevelHirachy_shouldGetChildren()
+        public void StatusUtility_GetImmidiateChildrenAndClear_WithMultiLevelHirachy_ShouldGetChildren()
         {
             RootEntity rootEntity = new RootEntity();
             LeafEntity leafEntityA = new LeafEntity();

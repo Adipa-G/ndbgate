@@ -9,14 +9,14 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 {
 	public class AbstractSqlQuerySelection : IAbstractSelection
 	{
-		public String Sql { get; set; }
+		public string Sql { get; set; }
 
 		public QuerySelectionExpressionType SelectionType
 		{
 			get {return QuerySelectionExpressionType.RawSql;}
 		}
 		
-		public String CreateSql(IDbLayer dbLayer,QueryBuildInfo buildInfo)
+		public string CreateSql(IDbLayer dbLayer,QueryBuildInfo buildInfo)
 		{
 			return Sql;
 		}

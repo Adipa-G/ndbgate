@@ -9,8 +9,10 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.order
 		{
 			switch (expressionType) 
 			{
-				case QueryOrderByExpressionType.RAW_SQL:
+				case QueryOrderByExpressionType.RawSql:
 					return new AbstractSqlQueryOrderBy ();
+                case QueryOrderByExpressionType.Expression:
+                    return new AbstractExpressionOrderBy();
 				default:
 					return null;
 			}

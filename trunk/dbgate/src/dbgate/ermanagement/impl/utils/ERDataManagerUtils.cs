@@ -12,7 +12,7 @@ namespace dbgate.ermanagement.impl.utils
     {
         public static ICollection<IServerDbClass> GetRelationEntities(IServerRoDbClass parent, IDbRelation relation)
         {
-            PropertyInfo property = CacheManager.MethodCache.GetProperty(parent,relation.AttributeName);
+            PropertyInfo property = CacheManager.MethodCache.GetProperty(parent.GetType(),relation.AttributeName);
             object value = property.GetValue(parent,null);
 
             ICollection<IServerDbClass> fieldObjects = new List<IServerDbClass>();
@@ -116,7 +116,7 @@ namespace dbgate.ermanagement.impl.utils
                 {
                     if (!key || (subLevelColumn.Key && key))
                     {
-                        PropertyInfo getter = CacheManager.MethodCache.GetProperty(serverDBClass, subLevelColumn.AttributeName);
+                        PropertyInfo getter = CacheManager.MethodCache.GetProperty(serverDBClass.GetType(), subLevelColumn.AttributeName);
                         Object value = getter.GetValue(serverDBClass,null);
 
                         entityFieldValues.Add(new EntityFieldValue(value,subLevelColumn));
@@ -222,14 +222,10 @@ namespace dbgate.ermanagement.impl.utils
             }
         }
 
-        public static void RegisterTypes(IServerRoDbClass roEntity) 
+        public static void RegisterType(Type entityType) 
         {
-            Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(roEntity.GetType(),new Type[]{typeof(IServerRoDbClass)});
-            foreach (Type type in typeList)
-            {
-                CacheManager.TableCache.Register(type,roEntity);
-                CacheManager.FieldCache.Register(type, roEntity);
-            }
+            CacheManager.TableCache.Register(entityType);
+            CacheManager.FieldCache.Register(entityType);
         }
     }
 }

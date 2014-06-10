@@ -101,7 +101,7 @@ namespace dbgate.ermanagement
             IDbConnection connection = DbConnector.GetSharedInstance().Connection;
             IDbTransaction transaction = connection.BeginTransaction();
 
-            String sql = "Create table lazy_test_root (\n" +
+            string sql = "Create table lazy_test_root (\n" +
                              "\tid_col Int NOT NULL,\n" +
                              "\tname Varchar(20) NOT NULL,\n" +
                              " Primary Key (id_col))";
@@ -131,7 +131,7 @@ namespace dbgate.ermanagement
         }
     
         [Test]
-        public void ERLayer_persistAndLoad_WithEmptyLazyFieldsWithLazyOn_shouldHaveProxiesForLazyFields()
+        public void Lazy_PersistAndLoad_WithEmptyLazyFieldsWithLazyOn_ShouldHaveProxiesForLazyFields()
         {
             try
             {
@@ -166,7 +166,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_persistAndLoad_WithLazyOnWithValuesInLazyFields_shouldRetrieveLazyFieldsInSameConnection()
+        public void Lazy_PersistAndLoad_WithLazyOnWithValuesInLazyFields_ShouldRetrieveLazyFieldsInSameConnection()
         {
             try
             {
@@ -219,7 +219,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_persistAndLoad_WithLazyOnWithValuesInLazyFields_shouldRetrieveLazyFieldsInAnotherConnection()
+        public void Lazy_PersistAndLoad_WithLazyOnWithValuesInLazyFields_ShouldRetrieveLazyFieldsInAnotherConnection()
         {
             try
             {
@@ -272,7 +272,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_loadAndPersist_WithLazyOnWithoutFetchingLazyFields_shouldNotLoadLazyLoadingQueries()
+        public void Lazy_LoadAndPersist_WithLazyOnWithoutFetchingLazyFields_ShouldNotLoadLazyLoadingQueries()
         {
             try
             {

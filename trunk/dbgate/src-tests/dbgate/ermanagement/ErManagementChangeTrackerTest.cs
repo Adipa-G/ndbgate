@@ -98,7 +98,7 @@ namespace dbgate.ermanagement
             IDbConnection connection = DbConnector.GetSharedInstance().Connection;
             IDbTransaction transaction = connection.BeginTransaction();
 
-            String sql = "Create table change_tracker_test_root (\n" +
+            string sql = "Create table change_tracker_test_root (\n" +
                              "\tid_col Int NOT NULL,\n" +
                              "\tname Varchar(20) NOT NULL,\n" +
                              " Primary Key (id_col))";
@@ -128,7 +128,7 @@ namespace dbgate.ermanagement
         }
     
         [Test]
-        public void ERLayer_changeField_WithAutoTrackChangesOn_shouldUpdateTheEntityInDb()
+        public void ChangeTracker_ChangeField_WithAutoTrackChangesOn_ShouldUpdateTheEntityInDb()
         {
             try
             {
@@ -165,7 +165,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_changeField_WithAutoTrackChangesOnAndClearTracker_shouldUpdateTheEntityInDb()
+        public void ChangeTracker_ChangeField_WithAutoTrackChangesOnAndClearTracker_ShouldUpdateTheEntityInDb()
         {
             try
             {
@@ -204,7 +204,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_changeField_WithAutoTrackChangesOff_shouldNotUpdateTheEntityInDb()
+        public void ChangeTracker_ChangeField_WithAutoTrackChangesOff_ShouldNotUpdateTheEntityInDb()
         {
             try
             {
@@ -241,7 +241,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_removeOneToOneChild_WithAutoTrackChangesOn_shouldDeleteChildInDb()
+        public void ChangeTracker_RemoveOneToOneChild_WithAutoTrackChangesOn_ShouldDeleteChildInDb()
         {
             try
             {
@@ -278,7 +278,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_removeOneToOneChild_WithAutoTrackChangesOff_DeleteChildInDb()
+        public void ChangeTracker_RemoveOneToOneChild_WithAutoTrackChangesOff_DeleteChildInDb()
         {
             try
             {
@@ -315,7 +315,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_changeOneToOneChild_WithAutoTrackChangesOn_shouldUpdateChildInDb()
+        public void ChangeTracker_ChangeOneToOneChild_WithAutoTrackChangesOn_ShouldUpdateChildInDb()
         {
             try
             {
@@ -353,7 +353,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_changeOneToOneChild_WithAutoTrackChangesOff_shouldNotUpdateChildInDb()
+        public void ChangeTracker_ChangeOneToOneChild_WithAutoTrackChangesOff_ShouldNotUpdateChildInDb()
         {
             try
             {
@@ -391,7 +391,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_removeOneToManyChild_WithAutoTrackChangesOn_shouldDeleteChildInDb()
+        public void ChangeTracker_RemoveOneToManyChild_WithAutoTrackChangesOn_ShouldDeleteChildInDb()
         {
             try
             {
@@ -432,7 +432,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_removeOneToManyChild_WithAutoTrackChangesOff_shouldDeleteChildInDb()
+        public void ChangeTracker_RemoveOneToManyChild_WithAutoTrackChangesOff_ShouldDeleteChildInDb()
         {
             try
             {
@@ -473,7 +473,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_changeOneToManyChild_WithAutoTrackChangesOn_shouldUpdateChildInDb()
+        public void ChangeTracker_ChangeOneToManyChild_WithAutoTrackChangesOn_ShouldUpdateChildInDb()
         {
             try
             {
@@ -521,7 +521,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_changeOneToManyChild_WithAutoTrackChangesOff_shouldNotUpdateChildInDb()
+        public void ChangeTracker_ChangeOneToManyChild_WithAutoTrackChangesOff_ShouldNotUpdateChildInDb()
         {
             try
             {

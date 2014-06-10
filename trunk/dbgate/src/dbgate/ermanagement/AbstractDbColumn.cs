@@ -25,13 +25,13 @@ namespace dbgate.ermanagement
         {
         }
 
-        protected AbstractDbColumn(String attributeName, String columnName, bool key, DbColumnType type,
+        protected AbstractDbColumn(String attributeName, string columnName, bool key, DbColumnType type,
                                    bool readFromSequence, ISequenceGenerator generator)
             : this(attributeName, columnName, key, false, type, 20, readFromSequence, generator)
         {
         }
 
-        protected AbstractDbColumn(String attributeName, String columnName, bool key
+        protected AbstractDbColumn(String attributeName, string columnName, bool key
                                    , bool nullable, DbColumnType type, int size, bool readFromSequence,
                                    ISequenceGenerator generator)
         {
@@ -67,7 +67,7 @@ namespace dbgate.ermanagement
 
         #endregion
 
-        private static String PredictColumnName(String attributeName)
+        private static string PredictColumnName(String attributeName)
         {
             bool previousCaps = false;
             var stringBuilder = new StringBuilder();

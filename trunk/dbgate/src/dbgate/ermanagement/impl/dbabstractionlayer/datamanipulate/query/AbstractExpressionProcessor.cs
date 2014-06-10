@@ -30,8 +30,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
             {
                 try
                 {
-                    CacheManager.FieldCache.Register(segment.EntityType,
-                                                     (IServerRoDbClass) Activator.CreateInstance(segment.EntityType));
+                    CacheManager.FieldCache.Register(segment.EntityType);
                     columns = CacheManager.FieldCache.GetDbColumns(segment.EntityType);
                 }
                 catch (Exception ex)
@@ -53,9 +52,13 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
             return null;
         }
 
-        public String GetFieldName(FieldSegment fieldSegment, bool withAlias, QueryBuildInfo buildInfo)
+        public string GetFieldName(FieldSegment fieldSegment, bool withAlias, QueryBuildInfo buildInfo)
         {
             string tableAlias = buildInfo.GetAlias(fieldSegment.EntityType);
+            if (!string.IsNullOrEmpty(fieldSegment.TypeAlias))
+            {
+                tableAlias = fieldSegment.TypeAlias;
+            }
             tableAlias = (tableAlias == null) ? "" : tableAlias + ".";
             IDbColumn column = GetColumn(fieldSegment);
 
@@ -74,7 +77,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
             }
         }
 
-        public String GetGroupFunction(GroupFunctionSegment groupSegment, bool withAlias, QueryBuildInfo buildInfo)
+        public string GetGroupFunction(GroupFunctionSegment groupSegment, bool withAlias, QueryBuildInfo buildInfo)
         {
             var fieldSegment = (FieldSegment) groupSegment.SegmentToGroup;
             string sql = GetFieldName(fieldSegment, false, buildInfo);
@@ -143,7 +146,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
             var param = new QueryExecParam();
             param.Index = buildInfo.ExecInfo.Params.Count;
             param.Type = segment.Type;
-            param.Value = ((object[])segment.Value)[0];
+            param.Value =segment.Values[0];
             buildInfo.ExecInfo.Params.Add(param);
         }
 
@@ -213,7 +216,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
         {
             sb.Append(" BETWEEN ? AND ? ");
             ValueSegment valueSegment = (ValueSegment)segment.Right;
-            Object[] values = (Object[])valueSegment.Value;
+            object[] values = valueSegment.Values;
             for (int i = 0, valuesLength = 2; i < valuesLength; i++)
             {
                 Object value = values[i];
@@ -229,7 +232,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
         {
             sb.Append(" IN (");
             ValueSegment valueSegment = (ValueSegment)segment.Right;
-            Object[] values = (Object[])valueSegment.Value;
+            object[] values = valueSegment.Values;
             for (int i = 0, valuesLength = values.Length; i < valuesLength; i++)
             {
                 Object value = values[i];
@@ -285,6 +288,39 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
             {
                 sb.Append(")");
             }
+        }
+
+        public IDbRelation GetRelation(Type typeFrom,Type typeTo)
+        {
+            ICollection<IDbRelation> relations = null;
+            try
+            {
+                relations = CacheManager.FieldCache.GetDbRelations(typeFrom);
+            }
+            catch (FieldCacheMissException e)
+            {
+                try
+                {
+                    CacheManager.FieldCache.Register(typeFrom);
+                    relations = CacheManager.FieldCache.GetDbRelations(typeFrom);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.StackTrace);
+                }
+            }
+
+            if (relations != null)
+            {
+                foreach (IDbRelation relation in relations)
+                {
+                    if (relation.RelatedObjectType == typeTo)
+                    {
+                        return relation;
+                    }
+                }
+            }
+            return null;
         }
     }
 }

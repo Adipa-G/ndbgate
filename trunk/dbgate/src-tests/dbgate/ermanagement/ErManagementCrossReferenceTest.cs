@@ -98,7 +98,7 @@ namespace dbgate.ermanagement
             IDbConnection connection = DbConnector.GetSharedInstance().Connection;
             IDbTransaction transaction = connection.BeginTransaction();
 
-            String sql = "Create table cross_reference_test_root (\n" +
+            string sql = "Create table cross_reference_test_root (\n" +
                          "\tid_col Int NOT NULL,\n" +
                          "\tname Varchar(20) NOT NULL,\n" +
                          " Primary Key (id_col))";
@@ -128,7 +128,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_persistWithOne2OneChild_WithCrossReference_loadedShouldBeSameAsPersisted()
+        public void CrossReference_PersistWithOne2OneChild_WithCrossReference_LoadedShouldBeSameAsPersisted()
         {
             try
             {
@@ -165,7 +165,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_persistWithOne2ManyChild_WithCrossReference_loadedShouldBeSameAsPersisted()
+        public void CrossReference_PersistWithOne2ManyChild_WithCrossReference_LoadedShouldBeSameAsPersisted()
         {
             try
             {

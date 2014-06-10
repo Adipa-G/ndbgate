@@ -9,8 +9,10 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.join
 		{
 			switch (expressionType) 
 			{
-				case QueryJoinExpressionType.RAW_SQL:
+				case QueryJoinExpressionType.RawSql:
 					return new AbstractSqlQueryJoin ();
+                case QueryJoinExpressionType.Type:
+			        return new AbstractTypeJoin();
 				default:
 					return null;
 			}

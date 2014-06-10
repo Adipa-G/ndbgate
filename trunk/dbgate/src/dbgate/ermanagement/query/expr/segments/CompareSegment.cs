@@ -57,13 +57,25 @@ namespace dbgate.ermanagement.query.expr.segments
                             Left = groupFunctionSegment;
                         }
                     }
+                    else
+                    {
+                        if (Left == null 
+                            && !(Mode == CompareSegmentMode.Exists || Mode == CompareSegmentMode.NotExists))
+                        {
+                            Left = segment;
+                        }
+                        else
+                        {
+                            Right = segment;
+                        }
+                    }
                     return this;
                 case SegmentType.Merge:
                     segment.Add(this);
                     Parent = segment;
                     return segment;
                 case SegmentType.Compare:
-                    throw new ExpressionParsingError("Cannot add compare segment to compare segment");
+                    throw new ExpressionParsingException("Cannot add compare segment to compare segment");
                 default:
                     return this;
             }

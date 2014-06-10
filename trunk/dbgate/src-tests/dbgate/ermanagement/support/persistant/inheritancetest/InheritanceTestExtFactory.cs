@@ -33,9 +33,9 @@ namespace dbgate.ermanagement.support.persistant.inheritancetest
             return fields;
         }
 
-        public static String GetTableNames(Type type)
+        public static string GetTableNames(Type type)
         {
-            String tableName = null;
+            string tableName = null;
             if (type == typeof(InheritanceTestSuperEntityExt))
             {
                 tableName =  "inheritance_test_super";

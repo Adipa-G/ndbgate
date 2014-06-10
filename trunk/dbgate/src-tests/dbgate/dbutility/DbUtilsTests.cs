@@ -101,7 +101,7 @@ namespace dbgate.dbutility
         #endregion
 
         [Test]
-        public void DbConnector_getConnection_databaseInitialized_shouldCreateConnection()
+        public void Utils_GetConnection_DatabaseInitialized_ShouldCreateConnection()
         {
             try
             {

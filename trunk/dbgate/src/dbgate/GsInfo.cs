@@ -12,11 +12,11 @@ namespace dbgate
         {
         }
 
-        public GsInfo(int no, String message) : this(no, message, null)
+        public GsInfo(int no, string message) : this(no, message, null)
         {
         }
 
-        public GsInfo(int no, String message, Object returnData)
+        public GsInfo(int no, string message, Object returnData)
         {
             No = no;
             Message = message;

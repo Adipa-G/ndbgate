@@ -27,23 +27,19 @@ namespace dbgate.ermanagement.impl
             _config = config;
         }
 
-        public void PatchDataBase(IDbConnection con, ICollection<IServerDbClass> dbClasses,bool dropAll)
+        public void PatchDataBase(IDbConnection con, ICollection<Type> entityTypes,bool dropAll)
         {
             try
             {
-                foreach (IServerDbClass dbClass in dbClasses)
+                foreach (Type entityType in entityTypes)
                 {
-                    Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(dbClass.GetType(),new []{typeof (IServerDbClass)});
-                    foreach (Type type in typeList)
-                    {
-                        CacheManager.TableCache.Register(type,dbClass);
-                        CacheManager.FieldCache.Register(type,dbClass);
-                    }
+                    CacheManager.TableCache.Register(entityType);
+                    CacheManager.FieldCache.Register(entityType);
                 }
 
                 IMetaManipulate metaManipulate =  _dbLayer.MetaManipulate(con);
                 ICollection<IMetaItem> existingItems = metaManipulate.GetMetaData(con);
-                ICollection<IMetaItem> requiredItems = CreateMetaItemsFromDbClasses(dbClasses);
+                ICollection<IMetaItem> requiredItems = CreateMetaItemsFromEntityTypes(entityTypes);
 
                 List<MetaQueryHolder> queryHolders = new List<MetaQueryHolder>();
 
@@ -101,14 +97,14 @@ namespace dbgate.ermanagement.impl
             }
         }
 
-        private static ICollection<IMetaItem> CreateMetaItemsFromDbClasses(IEnumerable<IServerDbClass> dbClasses)
+        private static ICollection<IMetaItem> CreateMetaItemsFromEntityTypes(IEnumerable<Type> entityTypes)
         {
             ICollection<IMetaItem> metaItems = new List<IMetaItem>();
             ICollection<String> uniqueNames = new List<String>();
 
-            foreach (IServerDbClass serverDBClass in dbClasses)
+            foreach (Type entityType in entityTypes)
             {
-                IEnumerable<IMetaItem> classMetaItems = ExtractMetaItems(serverDBClass);
+                IEnumerable<IMetaItem> classMetaItems = ExtractMetaItems(entityType);
                 foreach (IMetaItem metaItem in classMetaItems)
                 {
                     //this is to remove duplicate tables in case of different sub classes inheriting same superclass
@@ -122,19 +118,19 @@ namespace dbgate.ermanagement.impl
             return metaItems;
         }
 
-        private static IEnumerable<IMetaItem> ExtractMetaItems(IServerDbClass serverDBClass)
+        private static IEnumerable<IMetaItem> ExtractMetaItems(Type subType)
         {
             ICollection<IMetaItem> retItems = new List<IMetaItem>();
 
-            Type[] superTypes = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(serverDBClass.GetType(),new[]{typeof(IServerDbClass)});
-            foreach (Type type in superTypes)
+            Type[] superTypes = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(subType,new[]{typeof(IServerDbClass)});
+            foreach (Type superType in superTypes)
             {
-                String tableName = CacheManager.TableCache.GetTableName(type);
+                string tableName = CacheManager.TableCache.GetTableName(superType);
                 if (tableName == null)
                 {
                     continue;
                 }
-                ICollection<IField> fields = DbClassAttributeExtractionUtils.GetAllFields(serverDBClass, type);
+                ICollection<IField> fields = CacheManager.FieldCache.GetFields(superType);
 
                 ICollection<IDbColumn> dbColumns = new List<IDbColumn>();
                 ICollection<IDbRelation> dbRelations = new List<IDbRelation>();
@@ -156,7 +152,7 @@ namespace dbgate.ermanagement.impl
                     }
                 }
 
-                retItems.Add(CreateTable(type,dbColumns,dbRelations));
+                retItems.Add(CreateTable(superType,dbColumns,dbRelations));
             }
             return retItems;
         }

@@ -36,7 +36,7 @@ namespace dbgate.ermanagement.query.expr.segments
                 case SegmentType.Value:
                 case SegmentType.Query:
                 case SegmentType.Group:
-                    throw new ExpressionParsingError("Cannot add field/value/query/group segments to field segment");
+                    throw new ExpressionParsingException("Cannot add field/value/query/group segments to field segment");
                 case SegmentType.Merge:
                     segment.Add(this);
                     return segment;

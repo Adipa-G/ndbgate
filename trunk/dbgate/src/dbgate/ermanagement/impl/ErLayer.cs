@@ -59,9 +59,9 @@ namespace dbgate.ermanagement.impl
 		 	return _erDataManager.Select(query,con);
 		}
 
-        public void PatchDataBase(IDbConnection con, ICollection<IServerDbClass> dbClasses, bool dropAll)
+        public void PatchDataBase(IDbConnection con, ICollection<Type> entityTypes, bool dropAll)
         {
-            _erMetaDataManager.PatchDataBase(con, dbClasses, dropAll);
+            _erMetaDataManager.PatchDataBase(con, entityTypes, dropAll);
         }
 
         public void ClearCache()

@@ -52,7 +52,7 @@ namespace dbgate.ermanagement.lazy
                     }
                 }
 
-                PropertyInfo property = CacheManager.MethodCache.GetProperty(_parentRoEntity, _relation.AttributeName);
+                PropertyInfo property = CacheManager.MethodCache.GetProperty(_parentRoEntity.GetType(), _relation.AttributeName);
                 Object objectToInvoke = property.GetValue(_parentRoEntity,new object[]{});
 
                 invocation.ReturnValue =  invocation.Method.Invoke(objectToInvoke, new object[] {});

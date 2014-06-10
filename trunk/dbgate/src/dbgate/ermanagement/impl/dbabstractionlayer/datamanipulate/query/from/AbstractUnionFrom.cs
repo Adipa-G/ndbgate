@@ -6,15 +6,12 @@
  * 
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
+
 using System;
 using System.Text;
-using dbgate.ermanagement;
-using dbgate.ermanagement.impl.dbabstractionlayer;
-using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query;
-using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from;
 using dbgate.ermanagement.query;
 
-namespace dbgate.dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from
+namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from
 {
 	public class AbstractUnionFrom : IAbstractFrom
 	{
@@ -23,7 +20,7 @@ namespace dbgate.dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.quer
 	  	 	
   	 	public QueryFromExpressionType FromExpressionType
   	 	{
-  	 		get { return QueryFromExpressionType.QUERY_UNION; }
+  	 		get { return QueryFromExpressionType.QueryUnion; }
   	 	}
   	 	
   	 	public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)

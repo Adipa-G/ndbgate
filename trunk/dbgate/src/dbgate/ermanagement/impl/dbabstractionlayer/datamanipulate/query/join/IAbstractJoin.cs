@@ -4,7 +4,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.join
 {
 	public interface IAbstractJoin : IQueryJoin
 	{
-		String CreateSql();
+        String CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo);
 	}
 }
 

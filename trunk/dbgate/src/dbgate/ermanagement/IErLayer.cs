@@ -14,7 +14,7 @@ namespace dbgate.ermanagement
 
         ICollection<Object> Select(ISelectionQuery query,IDbConnection con );
 
-        void PatchDataBase(IDbConnection con, ICollection<IServerDbClass> dbClasses, bool dropAll);
+        void PatchDataBase(IDbConnection con, ICollection<Type> entityTypes, bool dropAll);
 
         void ClearCache();
 

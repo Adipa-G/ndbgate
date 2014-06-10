@@ -1,4 +1,6 @@
+using System;
 using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.group;
+using dbgate.ermanagement.query.expr;
 
 namespace dbgate.ermanagement.query
 {
@@ -13,9 +15,16 @@ namespace dbgate.ermanagement.query
 
         public static IQueryGroup RawSql(string sql)
         {
-			AbstractSqlQueryGroup queryGroup = (AbstractSqlQueryGroup) _factory.CreateGroup(QueryGroupExpressionType.RawSql);
+			var queryGroup = (AbstractSqlQueryGroup) _factory.CreateGroup(QueryGroupExpressionType.RawSql);
 			queryGroup.Sql = sql;
 			return queryGroup;
+        }
+
+        public static IQueryGroup Field(Type entityType, string field)
+        {
+            var expressionGroup = (AbstractExpressionGroup) _factory.CreateGroup(QueryGroupExpressionType.Expression);
+            expressionGroup.Expr = GroupExpr.Build().Field(entityType,field);
+            return expressionGroup;
         }
     }
 }

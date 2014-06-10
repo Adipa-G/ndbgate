@@ -25,10 +25,10 @@ namespace dbgatetestapp.dbgate.inheritanceexample
 
         public void Patch(IDbConnection con) 
         {
-            ICollection<IServerDbClass> entities = new List<IServerDbClass>();
-            entities.Add(CreateEntity());
+            ICollection<Type> entityTypes = new List<Type>();
+            entityTypes.Add(typeof(SubEntity));
             IDbTransaction transaction = con.BeginTransaction();
-            ErLayer.GetSharedInstance().PatchDataBase(con,entities,false);
+            ErLayer.GetSharedInstance().PatchDataBase(con, entityTypes, false);
             transaction.Commit();
         }
 

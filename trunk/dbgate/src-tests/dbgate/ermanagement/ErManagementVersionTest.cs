@@ -100,7 +100,7 @@ namespace dbgate.ermanagement
             IDbConnection connection = DbConnector.GetSharedInstance().Connection;
             IDbTransaction transaction = connection.BeginTransaction();
 
-            String sql = "Create table version_test_root (\n" +
+            string sql = "Create table version_test_root (\n" +
                          "\tid_col Int NOT NULL,\n" +
                          "\tname Varchar(20) NOT NULL,\n" +
                          "\tversion Int NOT NULL,\n" +
@@ -133,7 +133,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_persistTwice_WithVersionColumnEntity_shouldNotThrowException()
+        public void Version_PersistTwice_WithVersionColumnEntity_ShouldNotThrowException()
         {
             try
             {
@@ -160,7 +160,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_persistTwice_WithoutVersionColumnEntity_shouldNotThrowException()
+        public void Version_PersistTwice_WithoutVersionColumnEntity_ShouldNotThrowException()
         {
             try
             {
@@ -188,7 +188,7 @@ namespace dbgate.ermanagement
 
         [Test]
         [ExpectedException(typeof(PersistException))]
-        public void ERLayer_persistWithTwoChanges_WithoutUpdateChangedColumnsOnly_shouldThrowException()
+        public void Version_PersistWithTwoChanges_WithoutUpdateChangedColumnsOnly_ShouldThrowException()
         {
             IDbConnection connection = SetupTables();
 
@@ -219,7 +219,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_persistWithTwoChanges_WithUpdateChangedColumnsOnly_shouldNotThrowException()
+        public void Version_PersistWithTwoChanges_WithUpdateChangedColumnsOnly_ShouldNotThrowException()
         {
             try
             {
@@ -260,7 +260,7 @@ namespace dbgate.ermanagement
 
         [Test]
         [ExpectedException(typeof(PersistException))]
-        public void ERLayer_rootUpdateFromAnotherTransaction_WithVersionColumnEntity_shouldThrowException()
+        public void Version_RootUpdateFromAnotherTransaction_WithVersionColumnEntity_ShouldThrowException()
         {
             IDbConnection connection = SetupTables();
             IDbTransaction transaction = null;
@@ -298,7 +298,7 @@ namespace dbgate.ermanagement
 
         [Test]
         [ExpectedException(typeof(PersistException))]
-        public void ERLayer_rootUpdateFromAnotherTransaction_WithOutVersionColumnEntity_shouldThrowException()
+        public void Version_RootUpdateFromAnotherTransaction_WithOutVersionColumnEntity_ShouldThrowException()
         {
             IDbConnection connection = SetupTables();
             IDbTransaction transaction = null;
@@ -336,7 +336,7 @@ namespace dbgate.ermanagement
 
         [Test]
         [ExpectedException(typeof(PersistException))]
-        public void ERLayer_one2oneChildUpdateFromAnotherTransaction_WithVersionColumnEntity_shouldThrowException()
+        public void Version_One2oneChildUpdateFromAnotherTransaction_WithVersionColumnEntity_ShouldThrowException()
         {
             IDbConnection connection = SetupTables();
             IDbTransaction transaction = null;
@@ -377,7 +377,7 @@ namespace dbgate.ermanagement
 
         [Test]
         [ExpectedException(typeof(PersistException))]
-        public void ERLayer_one2oneChildUpdateFromAnotherTransaction_WithoutVersionColumnEntity_shouldThrowException()
+        public void Version_One2oneChildUpdateFromAnotherTransaction_WithoutVersionColumnEntity_ShouldThrowException()
         {
             IDbConnection connection = SetupTables();
             IDbTransaction transaction = null;
@@ -418,7 +418,7 @@ namespace dbgate.ermanagement
 
         [Test]
         [ExpectedException(typeof(PersistException))]
-        public void ERLayer_one2manyChildUpdateFromAnotherTransaction_WithVersionColumnEntity_shouldThrowException()
+        public void Version_One2manyChildUpdateFromAnotherTransaction_WithVersionColumnEntity_ShouldThrowException()
         {
             IDbConnection connection = SetupTables();
             IDbTransaction transaction = null;
@@ -466,7 +466,7 @@ namespace dbgate.ermanagement
 
         [Test]
         [ExpectedException(typeof(PersistException))]
-        public void ERLayer_one2manyChildUpdateFromAnotherTransaction_WithoutVersionColumnEntity_shouldThrowException()
+        public void Version_One2manyChildUpdateFromAnotherTransaction_WithoutVersionColumnEntity_ShouldThrowException()
         {
             IDbConnection connection = SetupTables();
             IDbTransaction transaction = null;

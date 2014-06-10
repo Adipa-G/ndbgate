@@ -19,17 +19,17 @@ namespace dbgate.dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.quer
 	public class AbstractSubQueryFrom : IAbstractFrom
 	{
 		public ISelectionQuery Query { get; set; }
-		public String Alias { get; set; }
+		public string Alias { get; set; }
 
 	    public QueryFromExpressionType FromExpressionType
 	    {
-	    	get { return QueryFromExpressionType.QUERY; }
+	    	get { return QueryFromExpressionType.Query; }
 	    }
 
 	    public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
 	    {
 	        QueryBuildInfo result = dbLayer.DataManipulate().ProcessQuery(buildInfo,Query.Structure);
-	        String sql = "(" + result.ExecInfo.Sql + ")";
+	        string sql = "(" + result.ExecInfo.Sql + ")";
 	        if (!string.IsNullOrEmpty(Alias))
 	        {
 	            sql = sql + " as " + Alias;

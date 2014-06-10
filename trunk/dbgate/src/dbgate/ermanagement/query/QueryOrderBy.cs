@@ -1,4 +1,6 @@
+using System;
 using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.orderby;
+using dbgate.ermanagement.query.expr;
 
 namespace dbgate.ermanagement.query
 {
@@ -13,9 +15,22 @@ namespace dbgate.ermanagement.query
 
         public static IQueryOrderBy RawSql(string sql)
         {
-			var queryOrderBy = (AbstractSqlQueryOrderBy) _factory.CreateOrderBy(QueryOrderByExpressionType.RAW_SQL);
+			var queryOrderBy = (AbstractSqlQueryOrderBy) _factory.CreateOrderBy(QueryOrderByExpressionType.RawSql);
 			queryOrderBy.Sql = sql;
 			return queryOrderBy;
+        }
+
+        public static IQueryOrderBy Field(Type type,string field)
+        {
+            return Field(type,field,QueryOrderType.Ascend);
+        }
+
+        public static IQueryOrderBy Field(Type type,string field,QueryOrderType orderType)
+        {
+            var expressionOrderBy = (AbstractExpressionOrderBy) _factory.CreateOrderBy(QueryOrderByExpressionType.Expression);
+            expressionOrderBy.Expr = OrderByExpr.Build().Field(type,field);
+            expressionOrderBy.OrderType = orderType;
+            return expressionOrderBy;
         }
     }
 }

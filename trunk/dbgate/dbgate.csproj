@@ -148,8 +148,9 @@
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestRootEntityAnnotations.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestRootEntityExt.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\support\persistant\treetest\TreeTestRootEntityFields.cs" />
+    <Compile Include="src-tests\dbgate\ermanagement\support\query\basic\QueryBasicJoinEntity.cs" />
     <Compile Include="src-tests\dbgate\ermanagement\support\query\basic\QueryBasicEntity.cs" />
-    <Compile Include="src-tests\dbgate\utility\StatusManagerTests.cs" />
+    <Compile Include="src-tests\dbgate\utility\StatusUtilityTests.cs" />
     <Compile Include="src-tests\dbgate\utility\support\LeafEntity.cs" />
     <Compile Include="src-tests\dbgate\utility\support\RootEntity.cs" />
     <Compile Include="src\dbgate\DbClassStatus.cs" />
@@ -178,7 +179,8 @@
     <Compile Include="src\dbgate\ermanagement\DefaultDbRelation.cs" />
     <Compile Include="src\dbgate\ermanagement\DefaultServerDbClass.cs" />
     <Compile Include="src\dbgate\ermanagement\DefaultServerRoDbClass.cs" />
-    <Compile Include="src\dbgate\ermanagement\exceptions\ExpressionParsingError.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\ExpressionParsingException.cs" />
+    <Compile Include="src\dbgate\ermanagement\exceptions\EntityRegistrationException.cs" />
     <Compile Include="src\dbgate\ermanagement\exceptions\IncorrectFieldDefinitionException.cs" />
     <Compile Include="src\dbgate\ermanagement\ForeignKeyColumnMapping.cs" />
     <Compile Include="src\dbgate\ermanagement\ForeignKeyInfo.cs" />
@@ -200,6 +202,10 @@
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\condition\AbstractExpressionCondition.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\AbstractSubQueryFrom.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\from\AbstractUnionFrom.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\groupcondition\AbstractExpressionGroupCondition.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\group\AbstractExpressionGroup.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\join\AbstractTypeJoin.cs" />
+    <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\orderby\AbstractExpressionOrderBy.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\QueryBuildInfo.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\datamanipulate\query\selection\AbstractExpressionSelection.cs" />
     <Compile Include="src\dbgate\ermanagement\impl\dbabstractionlayer\DefaultDbLayer.cs" />
@@ -246,6 +252,10 @@
     <Compile Include="src\dbgate\ermanagement\QueryOrderType.cs" />
     <Compile Include="src\dbgate\ermanagement\query\expr\BaseExpr.cs" />
     <Compile Include="src\dbgate\ermanagement\query\expr\ConditionExpr.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\expr\GroupConditionExpr.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\expr\OrderByExpr.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\expr\GroupExpr.cs" />
+    <Compile Include="src\dbgate\ermanagement\query\expr\JoinExpr.cs" />
     <Compile Include="src\dbgate\ermanagement\query\expr\segments\BaseSegment.cs" />
     <Compile Include="src\dbgate\ermanagement\query\expr\segments\CompareSegment.cs" />
     <Compile Include="src\dbgate\ermanagement\query\expr\segments\CompareSegmentMode.cs" />
@@ -322,7 +332,6 @@
     </Content>
     <Compile Include="src\dbgate\BaseException.cs" />
     <Compile Include="src\dbgate\ermanagement\exceptions\FieldCacheMissException.cs" />
-    <Compile Include="src\dbgate\ermanagement\exceptions\NoFieldsFoundException.cs" />
     <Compile Include="src\dbgate\ermanagement\caches\CacheManager.cs" />
     <Compile Include="src\dbgate\ermanagement\exceptions\QueryBuildingException.cs" />
     <Compile Include="src\dbgate\ermanagement\exceptions\TableCacheMissException.cs" />

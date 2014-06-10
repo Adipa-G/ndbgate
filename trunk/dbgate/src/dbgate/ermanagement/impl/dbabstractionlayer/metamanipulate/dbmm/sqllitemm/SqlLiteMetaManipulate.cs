@@ -35,7 +35,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.sqllit
         {
         }
 
-        protected override String CreateCreateTableQuery(MetaComparisonTableGroup tableGroup)
+        protected override string CreateCreateTableQuery(MetaComparisonTableGroup tableGroup)
         {
             MetaTable metaTable = (MetaTable)tableGroup.RequiredItem;
 

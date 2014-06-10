@@ -5,7 +5,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.condi
 {
 	public class AbstractSqlQueryCondition : IAbstractCondition
 	{
-		public String Sql { get; set; }
+		public string Sql { get; set; }
 	 	
 		public QueryConditionExpressionType ConditionExpressionType 
 		{

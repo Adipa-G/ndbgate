@@ -2,36 +2,46 @@
 
 namespace dbgate.ermanagement.query.expr
 {
-    public class SelectExpr : BaseExpr
+    public class SelectExpr : BaseExpr<SelectExpr>
     {
-        public new SelectExpr Query(ISelectionQuery query, String alias)
+        public SelectExpr Query(ISelectionQuery query, string alias)
         {
-            return (SelectExpr)base.Query(query,alias);
+            return BaseQuery(query,alias);
         }
 
-        public new SelectExpr Sum()
+        public SelectExpr Sum()
 	  	{
-	  		return (SelectExpr)base.Sum();
+	  		return BaseSum();
 	  	}
 	  		
-	  	public new SelectExpr Count()
+	  	public SelectExpr Count()
 	  	{
-	  		return (SelectExpr)base.Count();
+	  		return BaseCount();
 	  	}
 	  		
-	  	public new SelectExpr CustFunc(string func)
+	  	public SelectExpr CustFunc(string func)
 	  	{
-	  		return (SelectExpr)base.CustFunc(func);
-	  	}
-	  		
-	  	public new SelectExpr Field(Type entityType, string field)
-	  	{
-	  		return (SelectExpr)base.Field(entityType, field);
+	  		return BaseCustFunc(func);
 	  	}
 
-        public new SelectExpr Field(Type entityType, string field, String alias)
+        public SelectExpr Field(string field)
+        {
+            return BaseField(field);
+        }
+
+        public SelectExpr Field(string field, string alias)
+        {
+            return BaseField(field, alias);
+        }
+	  		
+	  	public SelectExpr Field(Type entityType, string field)
 	  	{
-	  		return (SelectExpr)base.Field(entityType, field,alias);
+	  		return BaseField(entityType, field);
+	  	}
+
+        public SelectExpr Field(Type entityType, string field, string alias)
+	  	{
+	  		return BaseField(entityType, field,alias);
 	  	}
 	  		
 	  	public static SelectExpr Build()

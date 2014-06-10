@@ -36,12 +36,12 @@ namespace dbgatetestapp.dbgate.one2oneexample
 
         public void Patch(IDbConnection con) 
         {
-            ICollection<IServerDbClass> entities = new List<IServerDbClass>();
-            entities.Add(new One2OneParentEntity());
-            entities.Add(new One2OneChildEntityA());
-            entities.Add(new One2OneChildEntityB());
+            ICollection<Type> entityTypes = new List<Type>();
+            entityTypes.Add(typeof(One2OneParentEntity));
+            entityTypes.Add(typeof(One2OneChildEntityA));
+            entityTypes.Add(typeof(One2OneChildEntityB));
             IDbTransaction transaction = con.BeginTransaction();
-            ErLayer.GetSharedInstance().PatchDataBase(con,entities,false);
+            ErLayer.GetSharedInstance().PatchDataBase(con,entityTypes,false);
             transaction.Commit();
         }
 

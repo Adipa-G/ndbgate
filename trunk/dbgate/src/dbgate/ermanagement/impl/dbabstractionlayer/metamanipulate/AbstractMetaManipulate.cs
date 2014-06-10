@@ -110,7 +110,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
             return DbColumnType.Unknown;
         }
 
-        public String MapColumnTypeToTypeName(DbColumnType columnTypeId)
+        public string MapColumnTypeToTypeName(DbColumnType columnTypeId)
         {
             foreach (ColumnTypeMapItem typeMapItem in ColumnTypeMapItems)
             {
@@ -123,7 +123,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
         }
 
        
-        public String GetDefaultValueForType(DbColumnType columnTypeId)
+        public string GetDefaultValueForType(DbColumnType columnTypeId)
         {
             foreach (ColumnTypeMapItem typeMapItem in ColumnTypeMapItems)
             {
@@ -173,7 +173,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                 MetaComparisonTableGroup tableGroup = (MetaComparisonTableGroup) metaComparisonGroup;
                 if (metaComparisonGroup.ShouldCreateInDb())
                 {
-                    String query = CreateCreateTableQuery(tableGroup);
+                    string query = CreateCreateTableQuery(tableGroup);
                     if (!string.IsNullOrEmpty(query))
                     {
                         holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_TABLE,MetaQueryHolder.OPERATION_TYPE_ADD, query));
@@ -181,7 +181,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                 }
                 if (metaComparisonGroup.ShouldDeleteFromDb())
                 {
-                    String query = CreateDropTableQuery(tableGroup);
+                    string query = CreateDropTableQuery(tableGroup);
                     if (!string.IsNullOrEmpty(query))
                     {
                         holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_TABLE,MetaQueryHolder.OPERATION_TYPE_DELETE, query));
@@ -189,7 +189,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                 }
                 if (metaComparisonGroup.ShouldAlterInDb())
                 {
-                    String query = CreateAlterTableQuery(tableGroup);
+                    string query = CreateAlterTableQuery(tableGroup);
                     if (!string.IsNullOrEmpty(query))
                     {
                         holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_TABLE,MetaQueryHolder.OPERATION_TYPE_ALTER, query));
@@ -201,7 +201,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                     if (primaryKeyGroup.ShouldCreateInDb()
                             || primaryKeyGroup.ShouldAlterInDb())
                     {
-                        String query = CreateCreatePrimaryKeyQuery(tableGroup,primaryKeyGroup);
+                        string query = CreateCreatePrimaryKeyQuery(tableGroup,primaryKeyGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
                             holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_PRIMARY_KEY,MetaQueryHolder.OPERATION_TYPE_ADD, query));
@@ -210,7 +210,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                     if (tableGroup.ShouldDeleteFromDb()
                             || primaryKeyGroup.ShouldAlterInDb())
                     {
-                        String query = CreateDropPrimaryKeyQuery(tableGroup,primaryKeyGroup);
+                        string query = CreateDropPrimaryKeyQuery(tableGroup,primaryKeyGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
                             holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_PRIMARY_KEY,MetaQueryHolder.OPERATION_TYPE_DELETE, query));
@@ -222,7 +222,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                 {
                     if (comparisonColumnGroup.ShouldCreateInDb())
                     {
-                        String query = CreateCreateColumnQuery(tableGroup,comparisonColumnGroup);
+                        string query = CreateCreateColumnQuery(tableGroup,comparisonColumnGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
                             holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_COLUMN,MetaQueryHolder.OPERATION_TYPE_ADD, query));
@@ -230,7 +230,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                     }
                     if (comparisonColumnGroup.ShouldDeleteFromDb())
                     {
-                        String query = CreateDropColumnQuery(tableGroup,comparisonColumnGroup);
+                        string query = CreateDropColumnQuery(tableGroup,comparisonColumnGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
                             holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_COLUMN,MetaQueryHolder.OPERATION_TYPE_DELETE, query));
@@ -238,7 +238,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                     }
                     if (comparisonColumnGroup.ShouldAlterInDb())
                     {
-                        String query = CreateAlterColumnQuery(tableGroup,comparisonColumnGroup);
+                        string query = CreateAlterColumnQuery(tableGroup,comparisonColumnGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
                             holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_COLUMN,MetaQueryHolder.OPERATION_TYPE_ALTER, query));
@@ -251,7 +251,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                     if (foreignKeyGroup.ShouldCreateInDb()
                             || foreignKeyGroup.ShouldAlterInDb())
                     {
-                        String query = CreateCreateForeginKeyQuery(tableGroup,foreignKeyGroup);
+                        string query = CreateCreateForeginKeyQuery(tableGroup,foreignKeyGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
                             holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_FOREIGN_KEY,MetaQueryHolder.OPERATION_TYPE_ADD, query));
@@ -260,7 +260,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                     if (tableGroup.ShouldDeleteFromDb()
                             || foreignKeyGroup.ShouldAlterInDb())
                     {
-                        String query = CreateDropForeginKeyQuery(tableGroup,foreignKeyGroup);
+                        string query = CreateDropForeginKeyQuery(tableGroup,foreignKeyGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
                             holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_FOREIGN_KEY,MetaQueryHolder.OPERATION_TYPE_DELETE, query));

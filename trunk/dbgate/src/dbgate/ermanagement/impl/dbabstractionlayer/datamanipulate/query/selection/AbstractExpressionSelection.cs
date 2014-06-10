@@ -50,7 +50,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
         {
             try
             {
-                String column = null;
+                string column = null;
                 ISegment rootSegment = Expr.RootSegment;
 
                 FieldSegment fieldSegment = null;

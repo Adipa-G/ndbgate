@@ -15,14 +15,14 @@ namespace dbgate.ermanagement.query
 
         public static IQuerySelection RawSql(string sql)
         {
-			AbstractSqlQuerySelection querySelection = (AbstractSqlQuerySelection) _factory.CreateSelection(QuerySelectionExpressionType.RawSql);
+			var querySelection = (AbstractSqlQuerySelection) _factory.CreateSelection(QuerySelectionExpressionType.RawSql);
 			querySelection.Sql = sql;
 			return querySelection;
         }
 
 		public static IQuerySelection EntityType(Type type)
         {
-			AbstractTypeSelection querySelection = (AbstractTypeSelection) _factory.CreateSelection(QuerySelectionExpressionType.EntityType);
+			var querySelection = (AbstractTypeSelection) _factory.CreateSelection(QuerySelectionExpressionType.EntityType);
 			querySelection.EntityType = type;
 			return querySelection;
         }
@@ -40,8 +40,18 @@ namespace dbgate.ermanagement.query
 	        expressionSelection.Expr = expr;
             return expressionSelection;
 		}
+
+        public static IQuerySelection Field(String field)
+        {
+            return Expression(SelectExpr.Build().Field(field));
+        }
+
+        public static IQuerySelection Field(String field, String alias)
+        {
+            return Expression(SelectExpr.Build().Field(field, alias));
+        }
 		
-		public static IQuerySelection Column(Type entityType,String field,String alias)
+		public static IQuerySelection Field(Type entityType,String field,String alias)
 		{
 		    return Expression(SelectExpr.Build().Field(entityType, field, alias));
 		}

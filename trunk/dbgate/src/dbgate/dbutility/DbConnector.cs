@@ -19,7 +19,7 @@ namespace dbgate.dbutility
         public const int DbMysql = 6;
 
         private static DbConnector _staticInstance;
-        private readonly String _connectionString;
+        private readonly string _connectionString;
 
         public DbConnector(String connectionString, int dbType)
         {

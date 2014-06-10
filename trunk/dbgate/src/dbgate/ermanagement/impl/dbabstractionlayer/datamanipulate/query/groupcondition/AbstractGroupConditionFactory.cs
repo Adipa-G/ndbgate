@@ -9,8 +9,10 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.group
 		{
 			switch (expressionType) 
 			{
-				case QueryGroupConditionExpressionType.RAW_SQL:
+				case QueryGroupConditionExpressionType.RawSql:
 					return new AbstractSqlQueryGroupCondition ();
+                case QueryGroupConditionExpressionType.Expression:
+                    return new AbstractExpressionGroupCondition();
 				default:
 					return null;
 			}

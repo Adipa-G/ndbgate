@@ -31,7 +31,7 @@ namespace dbgate.ermanagement.impl
         protected IDbCommand CreateRetrievalPreparedStatement(ITypeFieldValueList keyValueList, IDbConnection con)
         {
             Type targetType = keyValueList.Type;
-            String query = CacheManager.QueryCache.GetLoadQuery(targetType);
+            string query = CacheManager.QueryCache.GetLoadQuery(targetType);
 
             IDbCommand cmd = con.CreateCommand();
             cmd.CommandText = query;
@@ -80,7 +80,7 @@ namespace dbgate.ermanagement.impl
         {
             foreach (EntityFieldValue fieldValue in values.FieldValues)
             {
-                PropertyInfo setter = CacheManager.MethodCache.GetProperty(roEntity, fieldValue.DbColumn.AttributeName);
+                PropertyInfo setter = CacheManager.MethodCache.GetProperty(roEntity.GetType(), fieldValue.DbColumn.AttributeName);
                 setter.SetValue(roEntity, fieldValue.Value, null);
             }
         }
@@ -114,11 +114,11 @@ namespace dbgate.ermanagement.impl
                         continue;
                     }
 
+                    ErDataManagerUtils.RegisterType(typeRelation.RelatedObjectType);
+                    
                     ICollection<IServerDbClass> childEntities = ErDataManagerUtils.GetRelationEntities(parentEntity, typeRelation);
                     foreach (IServerDbClass childEntity in childEntities)
                     {
-                        ErDataManagerUtils.RegisterTypes(childEntity);
-
                         if (parentEntity.Status == DbClassStatus.Deleted
                             && typeRelation.DeleteRule == ReferentialRuleType.Cascade)
                         {
@@ -139,15 +139,15 @@ namespace dbgate.ermanagement.impl
             return existingEntityChildRelations;
         }
 
-        protected ICollection<IServerRoDbClass> ReadRelationChildrenFromDb(IServerRoDbClass entity, Type type
+        protected ICollection<IServerRoDbClass> ReadRelationChildrenFromDb(IServerRoDbClass entity, Type entityType
                 , IDbConnection con, IDbRelation relation)
         {
-            Type childType = relation.RelatedObjectType;
-            IServerRoDbClass childTypeInstance = (IServerRoDbClass)Activator.CreateInstance(childType);
-            ErDataManagerUtils.RegisterTypes(childTypeInstance);
+            Type childEntityType = relation.RelatedObjectType;
+            IServerRoDbClass childTypeInstance = (IServerRoDbClass)Activator.CreateInstance(childEntityType);
+            ErDataManagerUtils.RegisterType(childEntityType);
 
             StringBuilder logSb = new StringBuilder();
-            String query = CacheManager.QueryCache.GetRelationObjectLoad(entity.GetType(), relation);
+            string query = CacheManager.QueryCache.GetRelationObjectLoad(entity.GetType(), relation);
 
             IList<string> fields = new List<string>();
             foreach (DbRelationColumnMapping mapping in relation.TableColumnMappings)
@@ -162,15 +162,15 @@ namespace dbgate.ermanagement.impl
             {
                 logSb.Append(query);
             }
-            ICollection<IDbColumn> dbColumns = CacheManager.FieldCache.GetDbColumns(type);
+            ICollection<IDbColumn> dbColumns = CacheManager.FieldCache.GetDbColumns(entityType);
             for (int i = 0; i < fields.Count; i++)
             {
-                String field = fields[i];
+                string field = fields[i];
                 IDbColumn matchColumn = ErDataManagerUtils.FindColumnByAttribute(dbColumns, field);
 
                 if (matchColumn != null)
                 {
-                    PropertyInfo getter = CacheManager.MethodCache.GetProperty(entity, matchColumn.AttributeName);
+                    PropertyInfo getter = CacheManager.MethodCache.GetProperty(entityType, matchColumn.AttributeName);
                     Object fieldValue = getter.GetValue(entity, null);
 
                     if (showQuery)
@@ -181,7 +181,7 @@ namespace dbgate.ermanagement.impl
                 }
                 else
                 {
-                    String message = String.Format("The field {0} does not have a matching field in the object {1}", field, entity.GetType().FullName);
+                    string message = String.Format("The field {0} does not have a matching field in the object {1}", field, entity.GetType().FullName);
                     throw new NoMatchingColumnFoundException(message);
                 }
             }
@@ -191,9 +191,9 @@ namespace dbgate.ermanagement.impl
             }
             if (Config.EnableStatistics)
             {
-                Statistics.RegisterSelect(type);
+                Statistics.RegisterSelect(entityType);
             }
-            return ReadFromPreparedStatement(entity, con, cmd, childType);
+            return ReadFromPreparedStatement(entity, con, cmd, childEntityType);
         }
 
         private ICollection<IServerRoDbClass> ReadFromPreparedStatement(IServerRoDbClass entity, IDbConnection con, IDbCommand cmd
@@ -237,7 +237,7 @@ namespace dbgate.ermanagement.impl
         {
             if (relation.Lazy)
             {
-                PropertyInfo property = CacheManager.MethodCache.GetProperty(entity,relation.AttributeName);
+                PropertyInfo property = CacheManager.MethodCache.GetProperty(entity.GetType(),relation.AttributeName);
                 Object value = property.GetValue(entity,new object[]{});
 
                 if (value == null)

@@ -99,7 +99,7 @@ namespace dbgate.ermanagement
             IDbConnection connection = DbConnector.GetSharedInstance().Connection;
             IDbTransaction transaction = connection.BeginTransaction();
 
-            String sql = "Create table constraint_test_root (\n" +
+            string sql = "Create table constraint_test_root (\n" +
                          "\tid_col Int NOT NULL,\n" +
                          "\tname Varchar(20) NOT NULL,\n" +
                          " Primary Key (id_col))";
@@ -129,7 +129,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_deleteOneToOneChild_WithReverseRelationShip_shouldNotDeleteChild()
+        public void ConstraintValidation_DeleteOneToOneChild_WithReverseRelationShip_ShouldNotDeleteChild()
         {
             try
             {
@@ -172,7 +172,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_deleteOneToManyChild_WithReverseRelationShip_shouldNotDeleteChild()
+        public void ConstraintValidation_DeleteOneToManyChild_WithReverseRelationShip_ShouldNotDeleteChild()
         {
             try
             {
@@ -219,7 +219,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_deleteRootWithOneToOneChild_WithReverseRelationShip_shouldThrowException()
+        public void ConstraintValidation_DeleteRootWithOneToOneChild_WithReverseRelationShip_ShouldThrowException()
         {
             try
             {
@@ -262,7 +262,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_deleteRootWithOneToManyChild_WithReverseRelationShip_shouldNotDeleteChild()
+        public void ConstraintValidation_DeleteRootWithOneToManyChild_WithReverseRelationShip_ShouldNotDeleteChild()
         {
             try
             {
@@ -307,7 +307,7 @@ namespace dbgate.ermanagement
 
         [Test]
         [ExpectedException(typeof(PersistException))]
-        public void ERLayer_deleteRootWithOneToOneChild_WithRestrictConstraint_shouldThrowException()
+        public void ConstraintValidation_DeleteRootWithOneToOneChild_WithRestrictConstraint_ShouldThrowException()
         {
             IDbConnection connection = SetupTables();
 
@@ -337,7 +337,7 @@ namespace dbgate.ermanagement
     
         [Test]
         [ExpectedException(typeof(PersistException))]
-        public void ERLayer_deleteRootWithOneToManyChild_WithRestrictConstraint_shouldThrowException()
+        public void ConstraintValidation_DeleteRootWithOneToManyChild_WithRestrictConstraint_ShouldThrowException()
         {
             IDbConnection connection = SetupTables();
 
@@ -366,7 +366,7 @@ namespace dbgate.ermanagement
         }
     
         [Test]
-        public void ERLayer_deleteOneToManyChild_WithCascadeConstraint_shouldDeleteChild()
+        public void ConstraintValidation_DeleteOneToManyChild_WithCascadeConstraint_ShouldDeleteChild()
         {
             try
             {
@@ -413,7 +413,7 @@ namespace dbgate.ermanagement
         }
     
         [Test]
-        public void ERLayer_deleteOneToOneChild_WithCascadeConstraint_shouldDeleteChild()
+        public void ConstraintValidation_DeleteOneToOneChild_WithCascadeConstraint_ShouldDeleteChild()
         {
             try
             {
@@ -456,7 +456,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_deleteOneToManyRoot_WithCascadeConstraint_shouldDeleteBoth()
+        public void ConstraintValidation_DeleteOneToManyRoot_WithCascadeConstraint_ShouldDeleteBoth()
         {
             try
             {
@@ -500,7 +500,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_deleteOneToOneRoot_WithCascadeConstraint_shouldDeleteBoth()
+        public void ConstraintValidation_DeleteOneToOneRoot_WithCascadeConstraint_ShouldDeleteBoth()
         {
             try
             {

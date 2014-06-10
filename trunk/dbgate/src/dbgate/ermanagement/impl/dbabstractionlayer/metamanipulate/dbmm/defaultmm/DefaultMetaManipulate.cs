@@ -128,7 +128,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
                 }
                 foreach (DataRow fkRow in fkTable.Rows)
                 {
-                    String fkName = fkRow["FK_NAME"].ToString();
+                    string fkName = fkRow["FK_NAME"].ToString();
                     if (!foreignKeyMap.ContainsKey(fkName))
                     {
                         MetaForeignKey foreignKey = new MetaForeignKey();
@@ -162,8 +162,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
 
                     foreach (int ordinal in fromList)
                     {
-                        String fromCol = fromTableColMap[key][ordinal];
-                        String toCol = null;
+                        string fromCol = fromTableColMap[key][ordinal];
+                        string toCol = null;
                         if (toListEnumerator.MoveNext())
                         {
                             toCol = toTableColMap[key][toListEnumerator.Current];
@@ -179,7 +179,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
             } 
         }
         
-        protected override String CreateCreateTableQuery(MetaComparisonTableGroup tableGroup)
+        protected override string CreateCreateTableQuery(MetaComparisonTableGroup tableGroup)
         {
             MetaTable metaTable = (MetaTable)tableGroup.RequiredItem;
 
@@ -222,7 +222,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
             return sb.ToString();
         }
 
-        protected override String CreateDropTableQuery(MetaComparisonTableGroup tableGroup)
+        protected override string CreateDropTableQuery(MetaComparisonTableGroup tableGroup)
         {
             MetaTable metaTable = (MetaTable)tableGroup.ExistingItem;
 
@@ -232,12 +232,12 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
             return sb.ToString();
         }
 
-        protected override String CreateAlterTableQuery(MetaComparisonTableGroup tableGroup)
+        protected override string CreateAlterTableQuery(MetaComparisonTableGroup tableGroup)
         {
             return null;
         }
 
-        protected override String CreateCreateColumnQuery(MetaComparisonTableGroup tableGroup, MetaComparisonColumnGroup columnGroup)
+        protected override string CreateCreateColumnQuery(MetaComparisonTableGroup tableGroup, MetaComparisonColumnGroup columnGroup)
         {
             MetaTable metaTable = (MetaTable)tableGroup.RequiredItem;
             MetaColumn metaColumn = (MetaColumn)columnGroup.RequiredItem;
@@ -264,7 +264,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
             sb.Append(" DEFAULT ");
             if (!metaColumn.Null)
             {
-                String defaultValue = GetDefaultValueForType(metaColumn.ColumnType);
+                string defaultValue = GetDefaultValueForType(metaColumn.ColumnType);
                 if (defaultValue != null)
                 {
                     sb.Append(defaultValue);
@@ -282,7 +282,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
             return sb.ToString();   
         }
 
-        protected override String CreateDropColumnQuery(MetaComparisonTableGroup tableGroup, MetaComparisonColumnGroup columnGroup)
+        protected override string CreateDropColumnQuery(MetaComparisonTableGroup tableGroup, MetaComparisonColumnGroup columnGroup)
         {
             MetaTable metaTable = (MetaTable)tableGroup.RequiredItem;
             MetaColumn metaColumn = (MetaColumn)columnGroup.RequiredItem;
@@ -297,7 +297,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
             return sb.ToString();
         }
 
-        protected override String CreateAlterColumnQuery(MetaComparisonTableGroup tableGroup, MetaComparisonColumnGroup columnGroup)
+        protected override string CreateAlterColumnQuery(MetaComparisonTableGroup tableGroup, MetaComparisonColumnGroup columnGroup)
         {
             MetaTable metaTable = (MetaTable)tableGroup.RequiredItem;
             MetaColumn metaColumn = (MetaColumn)columnGroup.RequiredItem;
@@ -325,7 +325,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
             sb.Append(" DEFAULT ");
             if (!metaColumn.Null)
             {
-                String defaultValue = GetDefaultValueForType(metaColumn.ColumnType);
+                string defaultValue = GetDefaultValueForType(metaColumn.ColumnType);
                 if (defaultValue != null)
                 {
                     sb.Append(defaultValue);
@@ -343,7 +343,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
             return sb.ToString();
         }
 
-        protected override String CreateCreatePrimaryKeyQuery(MetaComparisonTableGroup tableGroup, MetaComparisonPrimaryKeyGroup primaryKeyGroup)
+        protected override string CreateCreatePrimaryKeyQuery(MetaComparisonTableGroup tableGroup, MetaComparisonPrimaryKeyGroup primaryKeyGroup)
         {
             MetaTable requiredTable = (MetaTable)tableGroup.RequiredItem;
             MetaPrimaryKey primaryKey = (MetaPrimaryKey)primaryKeyGroup.RequiredItem;
@@ -374,7 +374,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
             return sb.ToString();
         }
 
-        protected override String CreateDropPrimaryKeyQuery(MetaComparisonTableGroup tableGroup, MetaComparisonPrimaryKeyGroup primaryKeyGroup)
+        protected override string CreateDropPrimaryKeyQuery(MetaComparisonTableGroup tableGroup, MetaComparisonPrimaryKeyGroup primaryKeyGroup)
         {
             MetaTable requiredTable = (MetaTable)tableGroup.ExistingItem;
             MetaPrimaryKey primaryKey = (MetaPrimaryKey)primaryKeyGroup.ExistingItem;
@@ -387,7 +387,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
             return sb.ToString();
         }
 
-        protected override String CreateCreateForeginKeyQuery(MetaComparisonTableGroup tableGroup, MetaComparisonForeignKeyGroup foreignKeyGroup)
+        protected override string CreateCreateForeginKeyQuery(MetaComparisonTableGroup tableGroup, MetaComparisonForeignKeyGroup foreignKeyGroup)
         {
             MetaTable requiredTable = (MetaTable)tableGroup.RequiredItem;
             MetaForeignKey metaForeignKey = (MetaForeignKey)foreignKeyGroup.RequiredItem;
@@ -440,7 +440,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
             return sb.ToString();
         }
 
-        protected override String CreateDropForeginKeyQuery(MetaComparisonTableGroup tableGroup, MetaComparisonForeignKeyGroup foreignKeyGroup)
+        protected override string CreateDropForeginKeyQuery(MetaComparisonTableGroup tableGroup, MetaComparisonForeignKeyGroup foreignKeyGroup)
         {
             MetaTable requiredTable = (MetaTable)tableGroup.ExistingItem;
             MetaForeignKey metaForeignKey = (MetaForeignKey)foreignKeyGroup.ExistingItem;

@@ -10,6 +10,17 @@ namespace dbgate.ermanagement.query.expr.segments
         private readonly string _field;
         private readonly string _alias;
 
+        public FieldSegment(string field) 
+            : this ((Type)null,field)
+        {
+            _field = field;
+        }
+
+        public FieldSegment(string field, string alias)
+            : this(null,field,alias)
+        {
+        }
+
         public FieldSegment(Type entitytType, string field)
         {
             _entityType = entitytType;
@@ -38,14 +49,19 @@ namespace dbgate.ermanagement.query.expr.segments
             get { return _entityType; }
         }
 
-        public String Field
+        public string Field
         {
             get { return _field; }
         }
 
-        public String Alias
+        public string Alias
         {
             get { return _alias; }
+        }
+
+        public string TypeAlias
+        {
+            get { return _typeAlias; }
         }
 
         public override ISegment Add(ISegment segment)
@@ -55,7 +71,7 @@ namespace dbgate.ermanagement.query.expr.segments
                 case SegmentType.Field:
                 case SegmentType.Value:
                 case SegmentType.Query:
-                    throw new ExpressionParsingError("Cannot add field/value/query segments to field segment");
+                    throw new ExpressionParsingException("Cannot add field/value/query segments to field segment");
                 case SegmentType.Merge:
                     segment.Add(this);
                     return segment;

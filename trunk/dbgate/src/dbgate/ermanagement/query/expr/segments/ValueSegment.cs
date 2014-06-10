@@ -5,16 +5,12 @@ namespace dbgate.ermanagement.query.expr.segments
     public class ValueSegment : BaseSegment
     {
         private readonly DbColumnType _type;
-        private readonly object _value;
+        private readonly object[] _values;
 
-        public ValueSegment(DbColumnType type, object value)
+        public ValueSegment(DbColumnType type, object[] values)
         {
             this._type = type;
-            if (!(value is object[]))
-            {
-                value = new[]{value};
-            }
-            this._value = value;
+            this._values = values;
         }
 
         public override SegmentType SegmentType
@@ -27,9 +23,9 @@ namespace dbgate.ermanagement.query.expr.segments
             get { return _type; }
         }
 
-        public object Value
+        public object[] Values
         {
-            get { return _value; }
+            get { return _values; }
         }
 
         public override ISegment Add(ISegment segment)
@@ -40,7 +36,7 @@ namespace dbgate.ermanagement.query.expr.segments
                 case SegmentType.Value:
                 case SegmentType.Query:
                 case SegmentType.Group:
-                    throw new ExpressionParsingError("Cannot add field/value/query/merge/group segments to value segment");
+                    throw new ExpressionParsingException("Cannot add field/value/query/merge/group segments to value segment");
                 case SegmentType.Merge:
                     segment.Add(this);
                     return segment;

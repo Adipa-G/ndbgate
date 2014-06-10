@@ -133,32 +133,8 @@ namespace  dbgate.ermanagement
             return connection;
         }
 
-        private void ClearTables(IDbConnection connection)
-        {
-            try
-            {
-                IDbTransaction transaction = connection.BeginTransaction();
-                IDbCommand command = connection.CreateCommand();
-                command.CommandText = "DELETE FROM tree_test_root";
-                command.ExecuteNonQuery();
-
-                command = connection.CreateCommand();
-                command.CommandText = "delete from tree_test_one2many";
-                command.ExecuteNonQuery();
-
-                command = connection.CreateCommand();
-                command.CommandText = "delete from tree_test_one2one";
-                command.ExecuteNonQuery();
-                transaction.Commit();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof(ErManagementTreePersistTests)).Fatal("Exception during test cleanup.", ex);
-            }
-        }
-
         [Test]
-        public void ERLayer_insert_withAnnotationsDifferentTypeOfChildren_shouldEqualWhenLoaded()
+        public void TreePersist_Insert_WithAnnotationsDifferentTypeOfChildren_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -185,7 +161,7 @@ namespace  dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_insert_withFieldsDifferentTypeOfChildren_shouldEqualWhenLoaded()
+        public void TreePersist_Insert_WithFieldsDifferentTypeOfChildren_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -212,7 +188,7 @@ namespace  dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_insert_withExtsDifferentTypeOfChildren_shouldEqualWhenLoaded()
+        public void TreePersist_Insert_WithExtsDifferentTypeOfChildren_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -241,7 +217,7 @@ namespace  dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withAnnotationsDifferentTypeOfChildren_shouldEqualWhenLoaded()
+        public void TreePersist_Update_WithAnnotationsDifferentTypeOfChildren_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -285,7 +261,7 @@ namespace  dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withFieldsDifferentTypeOfChildren_shouldEqualWhenLoaded()
+        public void TreePersist_Update_WithFieldsDifferentTypeOfChildren_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -329,7 +305,7 @@ namespace  dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withExtsDifferentTypeOfChildren_shouldEqualWhenLoaded()
+        public void TreePersist_Update_WithExtsDifferentTypeOfChildren_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -375,7 +351,7 @@ namespace  dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_delete_withAnnotationsDifferentTypeOfChildren_shouldEqualWhenLoaded()
+        public void TreePersist_Delete_WithAnnotationsDifferentTypeOfChildren_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -413,7 +389,7 @@ namespace  dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_delete_withFieldsDifferentTypeOfChildren_shouldEqualWhenLoaded()
+        public void TreePersist_Delete_WithFieldsDifferentTypeOfChildren_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -451,7 +427,7 @@ namespace  dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_delete_withExtsDifferentTypeOfChildren_shouldEqualWhenLoaded()
+        public void TreePersist_Delete_WithExtsDifferentTypeOfChildren_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -510,26 +486,6 @@ namespace  dbgate.ermanagement
             }
 
             return loaded;
-        }
-
-        private bool ExistsOne2OneChild(IDbConnection connection,int id) 
-        {
-            bool exists = false;
-
-            IDbCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "select * from tree_test_one2one where id_col = ?";
-
-            IDbDataParameter parameter = cmd.CreateParameter();
-            cmd.Parameters.Add(parameter);
-            parameter.DbType = DbType.Int32;
-            parameter.Value = id;
-
-            IDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
-            {
-                exists = true;
-            }
-            return exists;
         }
 
         private bool ExistsOne2ManyChild(IDbConnection connection,int id)

@@ -157,7 +157,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_insert_withAllModesWithBothSubClasses_shouldEqualWhenLoaded()
+        public void Inheritance_Insert_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -176,13 +176,13 @@ namespace dbgate.ermanagement
                     switch (type)
                     {
                         case TYPE_ANNOTATION:
-                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("ERLayer_insert_withAllModesWithBothSubClasses_shouldEqualWhenLoaded With annotations");
+                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("Inheritance_Insert_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With annotations");
                             break;
                         case TYPE_EXTERNAL:
-                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("ERLayer_insert_withAllModesWithBothSubClasses_shouldEqualWhenLoaded With externals");
+                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("Inheritance_Insert_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With externals");
                             break;
                         case TYPE_FIELD:
-                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("ERLayer_insert_withAllModesWithBothSubClasses_shouldEqualWhenLoaded With fields");
+                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("Inheritance_Insert_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With fields");
                             break;
                     }
                     ClearTables(connection);
@@ -222,7 +222,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withAllModesWithBothSubClasses_shouldEqualWhenLoaded()
+        public void Inheritance_Update_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -241,13 +241,13 @@ namespace dbgate.ermanagement
                     switch (type)
                     {
                         case TYPE_ANNOTATION:
-                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("ERLayer_update_withAllModesWithBothSubClasses_shouldEqualWhenLoaded With annotations");
+                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("Inheritance_Update_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With annotations");
                             break;
                         case TYPE_EXTERNAL:
-                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("ERLayer_update_withAllModesWithBothSubClasses_shouldEqualWhenLoaded With externals");
+                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("Inheritance_Update_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With externals");
                             break;
                         case TYPE_FIELD:
-                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("ERLayer_update_withAllModesWithBothSubClasses_shouldEqualWhenLoaded With fields");
+                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("Inheritance_Update_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With fields");
                             break;
                     }
 
@@ -304,7 +304,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_delete_withAllModesWithBothSubClasses_shouldDelete()
+        public void Inheritance_Delete_WithAllModesWithBothSubClasses_ShouldDelete()
         {
             try
             {
@@ -323,13 +323,13 @@ namespace dbgate.ermanagement
                     switch (type)
                     {
                         case TYPE_ANNOTATION:
-                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("ERLayer_delete_withAllModesWithBothSubClasses_shouldDelete With annotations");
+                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("Inheritance_Delete_WithAllModesWithBothSubClasses_ShouldDelete With annotations");
                             break;
                         case TYPE_EXTERNAL:
-                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("ERLayer_delete_withAllModesWithBothSubClasses_shouldDelete With externals");
+                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("Inheritance_Delete_WithAllModesWithBothSubClasses_ShouldDelete With externals");
                             break;
                         case TYPE_FIELD:
-                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("ERLayer_delete_withAllModesWithBothSubClasses_shouldDelete With fields");
+                            LogManager.GetLogger(typeof (ErManagementInheritancePersistTests)).Info("Inheritance_Delete_WithAllModesWithBothSubClasses_ShouldDelete With fields");
                             break;
                     }
 

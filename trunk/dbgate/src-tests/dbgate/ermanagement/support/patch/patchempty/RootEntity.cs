@@ -22,8 +22,8 @@ namespace dbgate.ermanagement.support.patch.patchempty
         public float? FloatNull{ get; set; }
         public DateTime? TimestampNotNull{ get; set; }
         public DateTime? TimestampNull{ get; set; }
-        public String VarcharNotNull{ get; set; }
-        public String VarcharNull{ get; set; }
+        public string VarcharNotNull{ get; set; }
+        public string VarcharNull{ get; set; }
 
         [ForeignKeyInfo("fk_root2leafa", typeof(LeafEntitySubA),new[]{"idcol"},new[]{"idcol"})]
         [ForeignKeyInfo("fk_root2leafb",typeof(LeafEntitySubB),new[]{"idcol"},new[]{"idcol"})]

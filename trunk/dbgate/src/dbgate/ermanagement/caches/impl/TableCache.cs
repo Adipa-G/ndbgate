@@ -11,34 +11,67 @@ namespace dbgate.ermanagement.caches.impl
 
         #region ITableCache Members
 
-        public String GetTableName(Type type)
+        public string GetTableName(Type entityType)
         {
-            if (Cache.ContainsKey(type))
+            if (Cache.ContainsKey(entityType))
             {
-                return Cache[type];
+                return Cache[entityType];
             }
-            throw new TableCacheMissException(String.Format("No cache entry found for {0}", type.FullName));
+            throw new TableCacheMissException(String.Format("No cache entry found for {0}", entityType.FullName));
         }
 
-        public void Register(Type type, string tableName)
+        public void Register(Type entityType, string tableName)
         {
-            if (Cache.ContainsKey(type))
+            if (Cache.ContainsKey(entityType))
             {
-                Cache.Remove(type);
-            }
-            Cache.Add(type, tableName);
-        }
-
-        public void Register(Type type, IServerRoDbClass serverRoDbClass)
-        {
-            String tableName = DbClassAttributeExtractionUtils.GetTableName(serverRoDbClass, type);
-            if (Cache.ContainsKey(type))
-            {
-                return;
+                return;    
             }
             lock (Cache)
             {
-                Cache.Add(type, tableName);
+                Cache.Add(entityType, tableName);    
+            }
+        }
+
+        public void Register(Type entityType)
+        {
+            if (Cache.ContainsKey(entityType))
+            {
+                return;
+            }
+
+            IManagedDbClass managedDbClass = null;
+            if (ReflectionUtils.IsImplementInterface(entityType,typeof(IManagedDbClass)))
+            {
+                try
+                {
+                    managedDbClass = (IManagedDbClass)Activator.CreateInstance(entityType);
+                }
+                catch (Exception e)
+                {
+                    throw  new EntityRegistrationException(String.Format("Could not register type {0}",entityType.FullName),e);
+                }
+            }
+
+            var tempStore = new Dictionary<Type, string>();
+            Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(entityType,new[]{typeof(IServerRoDbClass)});
+            foreach (Type regType in typeList)
+            {
+                if (Cache.ContainsKey(regType))
+                {
+                    continue;
+                }
+                String tableName = managedDbClass != null && managedDbClass.TableNames.ContainsKey(regType)
+                        ? managedDbClass.TableNames[regType]
+                        : DbClassAttributeExtractionUtils.GetTableName(regType);
+                tempStore.Add(regType,tableName);
+            }
+
+            lock (Cache)
+            {
+                foreach (Type type in tempStore.Keys)
+                {
+                    Cache.Add(type, tempStore[type]);
+                }
             }
         }
 

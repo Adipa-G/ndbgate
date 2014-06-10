@@ -89,7 +89,7 @@ namespace dbgate.ermanagement.impl
             try
             {
                 ErSessionUtils.InitSession(roEntity);
-                ErDataManagerUtils.RegisterTypes(roEntity);
+                ErDataManagerUtils.RegisterType(roEntity.GetType());
                 LoadFromDb(roEntity, reader, con);
                 ErSessionUtils.DestroySession(roEntity);
             }
@@ -107,7 +107,7 @@ namespace dbgate.ermanagement.impl
             for (int i = 0; i < typeListLength; i++)
             {
                 Type type = typeList[i];
-                String tableName = CacheManager.TableCache.GetTableName(type);
+                string tableName = CacheManager.TableCache.GetTableName(type);
                 if (i == 0 || tableName == null) //if i==0 that means it's base class and can use existing result set
                 {
                     LoadForType(roEntity, type, reader, con);
@@ -127,7 +127,7 @@ namespace dbgate.ermanagement.impl
                         }
                         else
                         {
-                            String message = String.Format("Super class {0} does not contains a matching record for the base class {1}", type.FullName, typeList[0].FullName);
+                            string message = String.Format("Super class {0} does not contains a matching record for the base class {1}", type.FullName, typeList[0].FullName);
                             throw new NoMatchingRecordFoundForSuperClassException(message);
                         }
                     }
@@ -162,21 +162,21 @@ namespace dbgate.ermanagement.impl
             }
         }
 
-        public void LoadChildrenFromRelation(IServerRoDbClass parentRoEntity, Type type, IDbConnection con
+        public void LoadChildrenFromRelation(IServerRoDbClass parentRoEntity, Type entityType, IDbConnection con
             , IDbRelation relation,bool lazy)
         {
             IEntityContext entityContext = parentRoEntity.Context;
 
-            PropertyInfo property = CacheManager.MethodCache.GetProperty(parentRoEntity, relation.AttributeName);
+            PropertyInfo property = CacheManager.MethodCache.GetProperty(entityType, relation.AttributeName);
             Object value = property.GetValue(parentRoEntity, null);
             
             if (!lazy && relation.Lazy)
             {
-                CreateProxy(parentRoEntity, type, con, relation, value, property);
+                CreateProxy(parentRoEntity, entityType, con, relation, value, property);
                 return;
             }
 
-            ICollection<IServerRoDbClass> children = ReadRelationChildrenFromDb(parentRoEntity, type, con, relation);
+            ICollection<IServerRoDbClass> children = ReadRelationChildrenFromDb(parentRoEntity, entityType, con, relation);
             if (entityContext != null
                     && !relation.ReverseRelationship)
             {

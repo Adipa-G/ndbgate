@@ -81,7 +81,7 @@ namespace dbgate.ermanagement
             IDbConnection connection = DbConnector.GetSharedInstance().Connection;
             IDbTransaction transaction = connection.BeginTransaction();
 
-            String sql = "Create table column_test_entity (\n" +
+            string sql = "Create table column_test_entity (\n" +
                         "\tid_col Int NOT NULL,\n" +
                         "\tlong_not_null Bigint NOT NULL,\n" +
                         "\tlong_null Bigint,\n" +
@@ -113,7 +113,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_insert_withFieldsDifferentTypesWithoutNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Insert_WithFieldsDifferentTypesWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -141,7 +141,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_insert_withExtsDifferentTypesWithoutNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Insert_WithExtsDifferentTypesWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -173,7 +173,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_insert_withAnnotationsDifferentTypesWithoutNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Insert_WithAnnotationsDifferentTypesWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -201,7 +201,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_insert_withFieldsDifferentTypesWithNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Insert_WithFieldsDifferentTypesWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -230,7 +230,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_insert_withExtsDifferentTypesWithNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Insert_WithExtsDifferentTypesWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -263,7 +263,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_insert_withAnnotationsDifferentTypesWithNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Insert_WithAnnotationsDifferentTypesWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -291,7 +291,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withFieldsDifferentTypesStartWithoutNullEndWithoutNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithFieldsDifferentTypesStartWithoutNullEndWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -328,7 +328,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withExtsDifferentTypesStartWithoutNullEndWithoutNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithExtsDifferentTypesStartWithoutNullEndWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -369,7 +369,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withAnnotationsDifferentTypesStartWithoutNullEndWithoutNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithAnnotationsDifferentTypesStartWithoutNullEndWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -406,7 +406,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withFieldsDifferentTypesStartWithoutNullEndWithNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithFieldsDifferentTypesStartWithoutNullEndWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -443,7 +443,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withExtsDifferentTypesStartWithoutNullEndWithNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithExtsDifferentTypesStartWithoutNullEndWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -484,7 +484,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withAnnotationsDifferentTypesStartWithoutNullEndWithNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithAnnotationsDifferentTypesStartWithoutNullEndWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -521,7 +521,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withFieldsDifferentTypesStartWithNullEndWithoutNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithFieldsDifferentTypesStartWithNullEndWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -558,7 +558,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withExtsDifferentTypesStartWithNullEndWithoutNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithExtsDifferentTypesStartWithNullEndWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -599,7 +599,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withAnnotationsDifferentTypesStartWithNullEndWithoutNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithAnnotationsDifferentTypesStartWithNullEndWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -636,7 +636,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withFieldsDifferentTypesStartWithNullEndWithNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithFieldsDifferentTypesStartWithNullEndWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -673,7 +673,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withExtsDifferentTypesStartWithNullEndWithNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithExtsDifferentTypesStartWithNullEndWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -714,7 +714,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_update_withAnnotationsDifferentTypesStartWithNullEndWithNull_shouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithAnnotationsDifferentTypesStartWithNullEndWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -751,7 +751,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_delete_withFieldsDifferentTypesStartWithNullEndWithNull_shouldDelete()
+        public void ColumnPersist_Delete_WithFieldsDifferentTypesStartWithNullEndWithNull_ShouldDelete()
         {
             try
             {
@@ -786,7 +786,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_delete_withExtsDifferentTypesStartWithNullEndWithNull_shouldDelete()
+        public void ColumnPersist_Delete_WithExtsDifferentTypesStartWithNullEndWithNull_ShouldDelete()
         {
             try
             {
@@ -825,7 +825,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_delete_withAnnotationsDifferentTypesStartWithNullEndWithNull_shouldDelete()
+        public void ColumnPersist_Delete_WithAnnotationsDifferentTypesStartWithNullEndWithNull_ShouldDelete()
         {
             try
             {

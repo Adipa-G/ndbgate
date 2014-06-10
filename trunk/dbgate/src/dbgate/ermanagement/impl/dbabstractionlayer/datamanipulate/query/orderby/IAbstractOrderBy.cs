@@ -4,7 +4,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.order
 {
 	public interface IAbstractOrderBy : IQueryOrderBy
 	{
-		String CreateSql();
+	    String CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo);
 	}
 }
 

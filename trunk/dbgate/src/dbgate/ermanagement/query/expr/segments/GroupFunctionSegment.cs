@@ -32,7 +32,7 @@ namespace dbgate.ermanagement.query.expr.segments
             get { return _groupFunctionMode; }
         }
 
-        public String CustFunction
+        public string CustFunction
         {
             get { return _custFunction; }
         }
@@ -48,7 +48,7 @@ namespace dbgate.ermanagement.query.expr.segments
                 case SegmentType.Query:
                 case SegmentType.Merge:
                 case SegmentType.Group:
-                    throw new ExpressionParsingError("Cannot add value/query/merge/group segments to field segment");
+                    throw new ExpressionParsingException("Cannot add value/query/merge/group segments to field segment");
                 case SegmentType.Compare:
                     segment.Add(this);
                     return segment;

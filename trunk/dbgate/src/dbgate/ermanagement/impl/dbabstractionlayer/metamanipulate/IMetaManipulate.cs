@@ -15,7 +15,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
 
         string MapColumnTypeToTypeName(DbColumnType columnTypeId);
 
-        String GetDefaultValueForType(DbColumnType columnTypeId);
+        string GetDefaultValueForType(DbColumnType columnTypeId);
 
         ReferentialRuleType MapReferentialRuleNameToType(string ruleTypeName);
 

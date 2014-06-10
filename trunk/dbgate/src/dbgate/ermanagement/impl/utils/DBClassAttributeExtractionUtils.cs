@@ -8,43 +8,27 @@ namespace dbgate.ermanagement.impl.utils
 {
     public class DbClassAttributeExtractionUtils
     {
-        public static string GetTableName(IServerRoDbClass serverRoDbClass, Type type)
+        public static string GetTableName(Type entityType)
         {
             string tableName = null;
-            if (serverRoDbClass is IManagedDbClass)
+            object[] annotations = entityType.GetCustomAttributes(false);
+            foreach (object annotation in annotations)
             {
-                Dictionary<Type, string> tableNames = ((IManagedDbClass) serverRoDbClass).TableNames;
-                if (tableNames != null
-                    && tableNames.ContainsKey(type))
+                if (annotation is DbTableInfo)
                 {
-                    tableName = tableNames[type];
-                }
-            }
-            if (tableName == null)
-            {
-                object[] annotations = type.GetCustomAttributes(false);
-                foreach (object annotation in annotations)
-                {
-                    if (annotation is DbTableInfo)
-                    {
-                        var tableInfo = (DbTableInfo) annotation;
-                        tableName = tableInfo.TableName;
-                        break;
-                    }
+                    var tableInfo = (DbTableInfo) annotation;
+                    tableName = tableInfo.TableName;
+                    break;
                 }
             }
             return tableName;
         }
 
-        public static ICollection<IField> GetAllFields(IServerRoDbClass serverRoDbClass, Type type)
+        public static ICollection<IField> GetAllFields(Type entityType)
         {
             Dictionary<Type, ICollection<IField>> fieldInfoMap = null;
-            if (serverRoDbClass is IManagedRoDbClass)
-            {
-                fieldInfoMap = ((IManagedRoDbClass) serverRoDbClass).FieldInfo;
-            }
             var fields = new List<IField>();
-            Type[] superTypes = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(type,
+            Type[] superTypes = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(entityType,
                                                                                        new[] {typeof (IServerRoDbClass)});
 
             for (int i = 0; i < superTypes.Length; i++)
@@ -56,12 +40,12 @@ namespace dbgate.ermanagement.impl.utils
             return fields;
         }
 
-        private static ICollection<IField> GetAllFields(Dictionary<Type, ICollection<IField>> fieldInfoMap, Type type,
+        private static ICollection<IField> GetAllFields(Dictionary<Type, ICollection<IField>> fieldInfoMap, Type entityType,
                                                         bool superClass)
         {
             var fields = new List<IField>();
 
-            ICollection<IField> infoFields = fieldInfoMap != null && fieldInfoMap.ContainsKey(type)? fieldInfoMap[type] : null;
+            ICollection<IField> infoFields = fieldInfoMap != null && fieldInfoMap.ContainsKey(entityType)? fieldInfoMap[entityType] : null;
             if (infoFields != null)
             {
                 foreach (IField infoField in infoFields)
@@ -79,10 +63,10 @@ namespace dbgate.ermanagement.impl.utils
                 }
             }
 
-            PropertyInfo[] dbClassFields = type.GetProperties();
+            PropertyInfo[] dbClassFields = entityType.GetProperties();
             foreach (PropertyInfo propertyInfo in dbClassFields)
             {
-                if (propertyInfo.DeclaringType != type)
+                if (propertyInfo.DeclaringType != entityType)
                 {
                     continue;
                 }

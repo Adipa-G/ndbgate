@@ -33,9 +33,9 @@ namespace dbgate.ermanagement.support.persistant.treetest
             return fields;
         }
 
-        public static String GetTableNames(Type type)
+        public static string GetTableNames(Type type)
         {
-            String tableName = null;
+            string tableName = null;
             if (type == typeof( TreeTestRootEntityExt))
             {
                 tableName =  "tree_test_root";

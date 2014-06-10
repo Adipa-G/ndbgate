@@ -15,21 +15,21 @@ namespace dbgate.ermanagement.query
 
         public static IQueryFrom RawSql(string sql)
         {
-			AbstractSqlQueryFrom queryFrom = (AbstractSqlQueryFrom) _factory.CreateFrom(QueryFromExpressionType.RAW_SQL);
+			AbstractSqlQueryFrom queryFrom = (AbstractSqlQueryFrom) _factory.CreateFrom(QueryFromExpressionType.RawSql);
 			queryFrom.Sql = sql;
 			return queryFrom;
         }
 
 		public static IQueryFrom EntityType(Type entityType)
         {
-			var typeFrom = (AbstractTypeFrom) _factory.CreateFrom(QueryFromExpressionType.ENTITY_TYPE);
+			var typeFrom = (AbstractTypeFrom) _factory.CreateFrom(QueryFromExpressionType.EntityType);
 			typeFrom.EntityType = entityType;
 			return typeFrom;
         }
 		
 		public static IQueryFrom EntityType(Type entityType,String alias)
 		{
-			var typeFrom = (AbstractTypeFrom) _factory.CreateFrom(QueryFromExpressionType.ENTITY_TYPE);
+			var typeFrom = (AbstractTypeFrom) _factory.CreateFrom(QueryFromExpressionType.EntityType);
 			typeFrom.EntityType = entityType;
 			if (!string.IsNullOrEmpty(alias))
 		 	{
@@ -45,7 +45,7 @@ namespace dbgate.ermanagement.query
 		 	
 	 	public static IQueryFrom Query(ISelectionQuery query,String alias)
 	 	{
-	 		var queryFromSub = (AbstractSubQueryFrom) _factory.CreateFrom(QueryFromExpressionType.QUERY);
+	 		var queryFromSub = (AbstractSubQueryFrom) _factory.CreateFrom(QueryFromExpressionType.Query);
 	 		queryFromSub.Query = query;;
 	 		if (!string.IsNullOrEmpty(alias))
 	 		{
@@ -56,7 +56,7 @@ namespace dbgate.ermanagement.query
 		 	
 	 	public static IQueryFrom QueryUnion(bool all,ISelectionQuery[] queries)
 	 	{
-	 		var queryFrom = (AbstractUnionFrom) _factory.CreateFrom(QueryFromExpressionType.QUERY_UNION);
+	 		var queryFrom = (AbstractUnionFrom) _factory.CreateFrom(QueryFromExpressionType.QueryUnion);
 	 		queryFrom.Queries = queries;
 	 		queryFrom.All = all;
 			return queryFrom;  

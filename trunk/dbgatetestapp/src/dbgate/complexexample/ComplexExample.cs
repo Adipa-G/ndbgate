@@ -71,14 +71,14 @@ namespace dbgatetestapp.dbgate.complexexample
 
         public void Patch(IDbConnection con) 
         {
-            ICollection<IServerDbClass> entities = new List<IServerDbClass>();
-            entities.Add(new Product());
-            entities.Add(new Service());
-            entities.Add(new Transaction());
-            entities.Add(new ItemTransaction());
-            entities.Add(new ItemTransactionCharge());
+            ICollection<Type> entityTypes = new List<Type>();
+            entityTypes.Add(typeof(Product));
+            entityTypes.Add(typeof(Service));
+            entityTypes.Add(typeof(Transaction));
+            entityTypes.Add(typeof(ItemTransaction));
+            entityTypes.Add(typeof(ItemTransactionCharge));
             IDbTransaction transaction = con.BeginTransaction();
-            ErLayer.GetSharedInstance().PatchDataBase(con,entities,false);
+            ErLayer.GetSharedInstance().PatchDataBase(con,entityTypes,false);
             transaction.Commit();
         }
 

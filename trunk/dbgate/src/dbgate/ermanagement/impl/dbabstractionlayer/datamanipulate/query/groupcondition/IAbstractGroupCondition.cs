@@ -4,7 +4,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.group
 {
 	public interface IAbstractGroupCondition : IQueryGroupCondition
 	{
-		String CreateSql();
+		String CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo);
 	}
 }
 

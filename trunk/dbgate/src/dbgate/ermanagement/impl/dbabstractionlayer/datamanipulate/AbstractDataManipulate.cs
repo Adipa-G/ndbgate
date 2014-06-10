@@ -329,7 +329,6 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             buildInfo.CurrentQueryId = structure.QueryId;
 
             StringBuilder sb = new StringBuilder();
-            ProcessSelection(sb, buildInfo, structure);
             ProcessFrom(sb, buildInfo, structure);
 			ProcessJoin(sb, buildInfo, structure);
             ProcessWhere(sb, buildInfo, structure);
@@ -338,6 +337,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 			ProcessOrderBy(sb, buildInfo, structure);
 
 			AddPagingClause(sb,buildInfo,structure);
+            ProcessSelection(sb, buildInfo, structure);
 
             buildInfo.ExecInfo.Sql = sb.ToString();
             return buildInfo;
@@ -376,13 +376,14 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 
         private void ProcessSelection(StringBuilder querySb,QueryBuildInfo buildInfo, QueryStructure structure)
         {
-            querySb.Append("SELECT ");
+            var selectionSb = new StringBuilder();
+            selectionSb.Append("SELECT ");
             
              if (structure.SelectList.Count == 0)
-			 	querySb.Append(" * ");
+                 selectionSb.Append(" * ");
 
 			if (structure.Distinct)
-				querySb.Append(" DISTINCT ");
+                selectionSb.Append(" DISTINCT ");
 
             ICollection<IQuerySelection> selections = structure.SelectList;
             bool initial = true;
@@ -390,14 +391,16 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             {
                 if (!initial)
                 {
-                    querySb.Append(",");
+                    selectionSb.Append(",");
                 }
-                querySb.Append(CreateSelectionSql(selection,buildInfo));
+                selectionSb.Append(CreateSelectionSql(selection, buildInfo));
                 initial = false;
             }
+
+            querySb.Insert(0, selectionSb.ToString());
         }
 
-        protected String CreateSelectionSql(IQuerySelection selection,QueryBuildInfo buildInfo)
+        protected string CreateSelectionSql(IQuerySelection selection,QueryBuildInfo buildInfo)
         {
             if (selection != null)
             {
@@ -423,7 +426,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             }
         }
 
-        protected String CreateFromSql(IQueryFrom from,QueryBuildInfo buildInfo)
+        protected string CreateFromSql(IQueryFrom from,QueryBuildInfo buildInfo)
         {
             if (from != null)
             {
@@ -441,15 +444,15 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 			foreach (var join in joinList) 
 			{
 				sb.Append(" ");
-				sb.Append(CreateJoinSql(join));
+				sb.Append(CreateJoinSql(join,buildInfo));
 			}
         }
 
-        protected String CreateJoinSql(IQueryJoin join)
+        protected string CreateJoinSql(IQueryJoin join,QueryBuildInfo buildInfo)
         {
             if (join != null)
             {
-                return ((IAbstractJoin) join).CreateSql();
+                return ((IAbstractJoin) join).CreateSql(_dbLayer,buildInfo);
             }
             return "/*Incorrect Join*/";
         }
@@ -474,7 +477,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 		 	}
 	 	}
 		 	
-	 	protected String CreateWhereSql(IQueryCondition condition,QueryBuildInfo buildInfo)
+	 	protected string CreateWhereSql(IQueryCondition condition,QueryBuildInfo buildInfo)
 	 	{
 			if (condition != null)
 		 	{
@@ -498,16 +501,16 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 			 	{
 			 		sb.Append(",");
 			 	}
-			 	sb.Append(CreateGroupSql(group));
+			 	sb.Append(CreateGroupSql(group,buildInfo));
 			 	initial = false;
 		 	}
 	 	}
 	 	
-	 	protected String CreateGroupSql(IQueryGroup group)
+	 	protected string CreateGroupSql(IQueryGroup group,QueryBuildInfo buildInfo)
 	 	{
 			if (group != null)
 		 	{
-		 		return ((IAbstractGroup) group).CreateSql();
+		 		return ((IAbstractGroup) group).CreateSql(_dbLayer,buildInfo);
 		 	}
 		 	return "/*Incorrect Group*/";
 	 	}
@@ -527,16 +530,16 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 			 	{
 			 		sb.Append(" AND ");
 			 	}
-			 	sb.Append(CreateGroupConditionSql(groupCondition));
+			 	sb.Append(CreateGroupConditionSql(groupCondition,buildInfo));
 			 	initial = false;
 		 	}
 	 	}
-		 	
-	 	protected String CreateGroupConditionSql(IQueryGroupCondition groupCondition)
+
+        protected string CreateGroupConditionSql(IQueryGroupCondition groupCondition, QueryBuildInfo buildInfo)
 	 	{
 			if (groupCondition != null)
 		 	{
-		 		return ((IAbstractGroupCondition) groupCondition).CreateSql();
+		 		return ((IAbstractGroupCondition) groupCondition).CreateSql(_dbLayer,buildInfo);
 		 	}
 		 	return "/*Incorrect Group condition*/";
 	 	}
@@ -556,16 +559,16 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 			 	{
 			 		sb.Append(",");
 			 	}
-			 	sb.Append(CreateOrderBySql(orderBy));
+			 	sb.Append(CreateOrderBySql(orderBy,buildInfo));
 			 	initial = false;
 		 	}
 	 	}
 		 	
-	 	protected String CreateOrderBySql(IQueryOrderBy orderBy)
+	 	protected string CreateOrderBySql(IQueryOrderBy orderBy, QueryBuildInfo buildInfo)
 	 	{
 			if (orderBy != null)
 		 	{
-		 		return ((IAbstractOrderBy) orderBy).CreateSql();
+		 		return ((IAbstractOrderBy) orderBy).CreateSql(_dbLayer,buildInfo);
 		 	}
 		 	return "/*Incorrect Order by*/";
 	 	}

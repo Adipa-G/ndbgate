@@ -58,20 +58,20 @@ namespace dbgate.ermanagement
             IDbConnection connection = DbConnector.GetSharedInstance().Connection;
             IDbTransaction transaction = connection.BeginTransaction();
 
-            ICollection<IServerDbClass> dbClassList = new List<IServerDbClass>();
-            dbClassList.Add(new ItemTransaction());
-            dbClassList.Add(new ItemTransactionCharge());
-            dbClassList.Add(new Transaction());
-            dbClassList.Add(new Product());
-            dbClassList.Add(new Service());
-            ErLayer.GetSharedInstance().PatchDataBase(connection,dbClassList,true);
+            ICollection<Type> types = new List<Type>();
+            types.Add(typeof(ItemTransaction));
+            types.Add(typeof(ItemTransactionCharge));
+            types.Add(typeof(Transaction));
+            types.Add(typeof(Product));
+            types.Add(typeof(Service));
+            ErLayer.GetSharedInstance().PatchDataBase(connection,types,true);
 
             transaction.Commit();
             return connection;
         }
 
         [Test]
-        public void ERLayer_persistAndRetrieve_WithComplexStructure_retrievedShouldBeSameAsPersisted()
+        public void FeatureIntegration_PersistAndRetrieve_WithComplexStructure_RetrievedShouldBeSameAsPersisted()
         {
             try
             {

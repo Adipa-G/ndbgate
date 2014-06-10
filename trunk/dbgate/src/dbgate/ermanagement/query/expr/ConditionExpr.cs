@@ -2,111 +2,101 @@ using System;
 
 namespace dbgate.ermanagement.query.expr
 {
-    public class ConditionExpr : BaseExpr
+    public class ConditionExpr : BaseExpr<ConditionExpr>
     {
         public static ConditionExpr Build()
         {
             return new ConditionExpr();
         }
 
-        public new ConditionExpr Field(Type entityType, string field)
+        public ConditionExpr Field(Type entityType, string field)
         {
-            return (ConditionExpr) base.Field(entityType, field);
+            return BaseField(entityType, field);
         }
 
-        public new ConditionExpr Field(Type entityType,string typeAlias, string field)
+        public ConditionExpr Field(Type entityType,string typeAlias, string field)
         {
-            return (ConditionExpr) base.Field(entityType,typeAlias, field,null);
+            return BaseField(entityType,typeAlias, field,null);
         }
 
-        public new ConditionExpr Value(DbColumnType type, object value)
+        public ConditionExpr Value(DbColumnType type, object value)
         {
-            return (ConditionExpr) base.Value(type, value);
+            return Values(type, value);
         }
 
-        public new ConditionExpr Values(DbColumnType type, object[] value)
+        public ConditionExpr Values(DbColumnType type, params object[] value)
         {
-            return (ConditionExpr) base.Values(type, value);
+            return BaseValues(type, value);
         }
 
-        public new ConditionExpr Eq()
+        public ConditionExpr Eq()
         {
-            return (ConditionExpr) base.Eq();
+            return BaseEq();
         }
 
-        public new ConditionExpr Query(ISelectionQuery query)
+        public ConditionExpr Query(ISelectionQuery query)
         {
-            return (ConditionExpr)base.Query(query);
+            return BaseQuery(query);
         }
 
-        public new ConditionExpr Ge()
+        public ConditionExpr Ge()
         {
-            return (ConditionExpr)base.Ge();
+            return BaseGe();
         }
 
-        public new ConditionExpr Gt()
+        public ConditionExpr Gt()
         {
-            return (ConditionExpr)base.Gt();
+            return BaseGt();
         }
 
-        public new ConditionExpr Le()
+        public ConditionExpr Le()
         {
-            return (ConditionExpr)base.Le();
+            return BaseLe();
         }
 
-        public new ConditionExpr Lt()
+        public ConditionExpr Lt()
         {
-            return (ConditionExpr)base.Lt();
+            return BaseLt();
         }
 
-        public new ConditionExpr Neq()
+        public ConditionExpr Neq()
         {
-            return (ConditionExpr)base.Neq();
+            return BaseNeq();
         }
 
-        public new ConditionExpr Like()
+        public ConditionExpr Like()
         {
-            return (ConditionExpr)base.Like();
+            return BaseLike();
         }
 
-        public new ConditionExpr Between()
+        public ConditionExpr Between()
         {
-            return (ConditionExpr)base.Between();
+            return BaseBetween();
         }
 
-        public new ConditionExpr In()
+        public ConditionExpr In()
         {
-            return (ConditionExpr)base.In();
+            return BaseIn();
         }
 
-        public new ConditionExpr Exists()
+        public ConditionExpr Exists()
         {
-            return (ConditionExpr)base.Exists();
+            return BaseExists();
         }
 
-        public new ConditionExpr NotExists()
+        public ConditionExpr NotExists()
         {
-            return (ConditionExpr)base.NotExists();
+            return BaseNotExists();
         }
 
-        public new ConditionExpr And()
+        public ConditionExpr And(params ConditionExpr[] expressions)
         {
-            return (ConditionExpr)base.And();
+            return BaseAnd(expressions);
         }
 
-        public new ConditionExpr Or()
+        public ConditionExpr Or(params ConditionExpr[] expressions)
         {
-            return (ConditionExpr)base.Or();
-        }
-
-        public ConditionExpr And(ConditionExpr[] expressions)
-        {
-            return (ConditionExpr)base.And(expressions);
-        }
-
-        public ConditionExpr Or(ConditionExpr[] expressions)
-        {
-            return (ConditionExpr)base.Or(expressions);
+            return BaseOr(expressions);
         }
     }
 }

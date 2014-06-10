@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
-using System.Text;
 using dbgate.dbutility;
-using dbgate.ermanagement.exceptions;
 using dbgate.ermanagement.impl;
-using dbgate.ermanagement.support.patch.patchempty;
 using dbgate.ermanagement.support.patch.patchtabledifferences;
 using log4net;
 using NUnit.Framework;
@@ -50,23 +46,23 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_patchDB_withTableColumnAdded_shouldAddColumn()
+        public void PatchDifference_PatchDB_WithTableColumnAdded_ShouldAddColumn()
         {
             try
             {
                 IDbConnection connection = DbConnector.GetSharedInstance().Connection;
                 IDbTransaction transaction = connection.BeginTransaction();
-                ICollection<IServerDbClass> dbClasses = new List<IServerDbClass>();
-                dbClasses.Add(new ThreeColumnEntity());
-                ErLayer.GetSharedInstance().PatchDataBase(connection, dbClasses,true);
+                ICollection<Type> types = new List<Type>();
+                types.Add(typeof(ThreeColumnEntity));
+                ErLayer.GetSharedInstance().PatchDataBase(connection, types,true);
                 transaction.Commit();
                 connection.Close();
 
                 connection = DbConnector.GetSharedInstance().Connection;
                 transaction = connection.BeginTransaction();
-                dbClasses = new List<IServerDbClass>();
-                dbClasses.Add(new FourColumnEntity());
-                ErLayer.GetSharedInstance().PatchDataBase(connection, dbClasses, false);
+                types = new List<Type>();
+                types.Add(typeof(FourColumnEntity));
+                ErLayer.GetSharedInstance().PatchDataBase(connection, types, false);
                 transaction.Commit();
                 connection.Close();
 
@@ -86,23 +82,23 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_patchDB_withTableColumnDeleted_shouldDeleteColumn()
+        public void PatchDifference_PatchDB_WithTableColumnDeleted_ShouldDeleteColumn()
         {
             try
             {
                 IDbConnection connection = DbConnector.GetSharedInstance().Connection;
                 IDbTransaction transaction = connection.BeginTransaction();
-                ICollection<IServerDbClass> dbClasses = new List<IServerDbClass>();
-                dbClasses.Add(new FourColumnEntity());
-                ErLayer.GetSharedInstance().PatchDataBase(connection, dbClasses, true);
+                ICollection<Type> types = new List<Type>();
+                types.Add(typeof(FourColumnEntity));
+                ErLayer.GetSharedInstance().PatchDataBase(connection, types, true);
                 transaction.Commit();
                 connection.Close();
 
                 connection = DbConnector.GetSharedInstance().Connection;
                 transaction = connection.BeginTransaction();
-                dbClasses = new List<IServerDbClass>();
-                dbClasses.Add(new ThreeColumnEntity());
-                ErLayer.GetSharedInstance().PatchDataBase(connection, dbClasses, false);
+                types = new List<Type>();
+                types.Add(typeof(ThreeColumnEntity));
+                ErLayer.GetSharedInstance().PatchDataBase(connection, types, false);
                 transaction.Commit();
                 connection.Close();
 
@@ -116,17 +112,17 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_patchDB_withTableColumnChanged_shouldUpdateColumn()
+        public void PatchDifference_PatchDB_WithTableColumnChanged_ShouldUpdateColumn()
         {
             try
             {
-                String longStr = new string('A',220);
+                string longStr = new string('A',220);
 
                 IDbConnection connection = DbConnector.GetSharedInstance().Connection;
                 IDbTransaction transaction = connection.BeginTransaction();
-                ICollection<IServerDbClass> dbClasses = new List<IServerDbClass>();
-                dbClasses.Add(new ThreeColumnEntity());
-                ErLayer.GetSharedInstance().PatchDataBase(connection, dbClasses, true);
+                ICollection<Type> types = new List<Type>();
+                types.Add(typeof(ThreeColumnEntity));
+                ErLayer.GetSharedInstance().PatchDataBase(connection, types, true);
                 transaction.Commit();
                 connection.Close();
 
@@ -138,8 +134,6 @@ namespace dbgate.ermanagement
                 try
                 {
                     columnEntity.Persist(connection);
-                    columnEntity = LoadThreeColumnEntityWithId(connection,id);
-                    //db does not care about length :(
                 }
                 catch (AssertionException)
                 {
@@ -152,9 +146,9 @@ namespace dbgate.ermanagement
 
                 connection = DbConnector.GetSharedInstance().Connection;
                 transaction = connection.BeginTransaction();
-                dbClasses = new List<IServerDbClass>();
-                dbClasses.Add(new ThreeColumnTypeDifferentEntity());
-                ErLayer.GetSharedInstance().PatchDataBase(connection, dbClasses, false);
+                types = new List<Type>();
+                types.Add(typeof(ThreeColumnTypeDifferentEntity));
+                ErLayer.GetSharedInstance().PatchDataBase(connection, types, false);
                 transaction.Commit();
                 connection.Close();
 
@@ -189,28 +183,6 @@ namespace dbgate.ermanagement
             if (rs.Read())
             {
                 loadedEntity = new FourColumnEntity();
-                loadedEntity.Retrieve(rs, connection);
-            }
-
-            return loadedEntity;
-        }
-
-        private ThreeColumnEntity LoadThreeColumnEntityWithId(IDbConnection connection, int id)
-        {
-            ThreeColumnEntity loadedEntity = null;
-
-            IDbCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "select * from table_change_test_entity where id_col = ?";
-
-            IDbDataParameter parameter = cmd.CreateParameter();
-            cmd.Parameters.Add(parameter);
-            parameter.DbType = DbType.Int32;
-            parameter.Value = id;
-
-            IDataReader rs = cmd.ExecuteReader();
-            if (rs.Read())
-            {
-                loadedEntity = new ThreeColumnEntity();
                 loadedEntity.Retrieve(rs, connection);
             }
 

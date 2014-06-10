@@ -35,9 +35,9 @@ namespace dbgate.ermanagement.support.persistant.columntest
             return dbColumns;
         }
 
-        public static String GetTableNames(Type type)
+        public static string GetTableNames(Type type)
         {
-            String tableName = null;
+            string tableName = null;
             if (type == typeof(ColumnTestEntityExts))
             {
                 tableName = "column_test_entity";

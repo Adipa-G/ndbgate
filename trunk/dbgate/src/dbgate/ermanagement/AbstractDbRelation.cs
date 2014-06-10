@@ -5,14 +5,14 @@ namespace dbgate.ermanagement
 {
     public abstract class AbstractDbRelation : IDbRelation
     {
-        protected AbstractDbRelation(String attributeName, String relationshipName,Type relatedObjectType
+        protected AbstractDbRelation(String attributeName, string relationshipName,Type relatedObjectType
                     , DbRelationColumnMapping[] tableColumnMappings)
             : this(attributeName, relationshipName, relatedObjectType, tableColumnMappings,ReferentialRuleType.Restrict
                     , ReferentialRuleType.Cascade,false,false,false)
         {
         }
 
-        protected AbstractDbRelation(String attributeName, String relationshipName, Type relatedObjectType
+        protected AbstractDbRelation(String attributeName, string relationshipName, Type relatedObjectType
                                     , DbRelationColumnMapping[] tableColumnMappings,ReferentialRuleType updateRule
                                     , ReferentialRuleType deleteRule,bool reverseRelationship
                                     ,bool nonIdentifyingRelation,bool lazy)

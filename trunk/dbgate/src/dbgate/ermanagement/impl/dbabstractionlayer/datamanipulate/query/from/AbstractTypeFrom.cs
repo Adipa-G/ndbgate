@@ -13,7 +13,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from
 
 		public QueryFromExpressionType FromExpressionType
 		{
-			get {return QueryFromExpressionType.ENTITY_TYPE;}
+			get {return QueryFromExpressionType.EntityType;}
 		}
 		
 		public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
@@ -27,7 +27,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from
 	        {
 	            try
 	            {
-	                ErDataManagerUtils.RegisterTypes((IServerRoDbClass)Activator.CreateInstance(EntityType));
+	                ErDataManagerUtils.RegisterType(EntityType);
 	                sql = CacheManager.TableCache.GetTableName(EntityType);
 	            }
 	            catch (Exception ex)

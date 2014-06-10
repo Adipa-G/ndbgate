@@ -4,11 +4,11 @@ namespace dbgate.ermanagement.caches
 {
     public interface ITableCache
     {
-        string GetTableName(Type type);
+        string GetTableName(Type entityType);
 
-        void Register(Type type, string tableName);
+        void Register(Type entityType, string tableName);
 
-        void Register(Type type, IServerRoDbClass serverRoDbClass);
+        void Register(Type entityType);
 
         void Clear();
     }

@@ -16,7 +16,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 			get {return QuerySelectionExpressionType.EntityType;}
 		}
 		
-		public String CreateSql(IDbLayer dbLayer,QueryBuildInfo buildInfo)
+		public string CreateSql(IDbLayer dbLayer,QueryBuildInfo buildInfo)
 		{
 			var aliases = buildInfo.GetAlias(EntityType);
 			if (!string.IsNullOrEmpty(aliases))

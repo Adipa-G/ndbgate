@@ -39,11 +39,11 @@ namespace dbgate.ermanagement
             {
                 IDbConnection connection = DbConnector.GetSharedInstance().Connection;
 
-                ICollection<IServerDbClass> dbClasses = new List<IServerDbClass>();
-                dbClasses.Add(new LeafEntitySubA());
-                dbClasses.Add(new LeafEntitySubB());
-                dbClasses.Add(new RootEntity());
-                ErLayer.GetSharedInstance().PatchDataBase(connection, dbClasses, true);
+                ICollection<Type> types = new List<Type>();
+                types.Add(typeof(LeafEntitySubA));
+                types.Add(typeof(LeafEntitySubB));
+                types.Add(typeof(RootEntity));
+                ErLayer.GetSharedInstance().PatchDataBase(connection, types, true);
 
                 connection.Close();
             }
@@ -68,7 +68,7 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_patchDataBase_withEmptyDb_shouldCreateTables_shouldBeAbleToInsertData()
+        public void PatchEmpty_PatchDataBase_WithEmptyDb_ShouldCreateTables_ShouldBeAbleToInsertData()
         {
             try
             {
@@ -104,7 +104,7 @@ namespace dbgate.ermanagement
 
         [Test]
         [ExpectedException(typeof(PersistException))]
-        public void ERLayer_patchDataBase_withEmptyDb_shouldCreatePrimaryKeys_shouldNotAbleToPutDuplicateData()
+        public void PatchEmpty_PatchDataBase_WithEmptyDb_ShouldCreatePrimaryKeys_ShouldNotAbleToPutDuplicateData()
         {
             IDbConnection connection = DbConnector.GetSharedInstance().Connection;
             IDbTransaction transaction = connection.BeginTransaction();
@@ -128,7 +128,7 @@ namespace dbgate.ermanagement
 
         [Test]
         [ExpectedException(typeof(PersistException))]
-        public void ERLayer_patchDataBase_withEmptyDb_shouldCreateForeignKeys_shouldNotAbleToInconsistantData()
+        public void PatchEmpty_PatchDataBase_WithEmptyDb_ShouldCreateForeignKeys_ShouldNotAbleToInconsistantData()
         {
             IDbConnection connection = DbConnector.GetSharedInstance().Connection;
             IDbTransaction transaction = connection.BeginTransaction();
@@ -151,16 +151,16 @@ namespace dbgate.ermanagement
         }
 
         [Test]
-        public void ERLayer_patchDataBase_pathTwice_shouldNotThrowException()
+        public void PatchEmpty_PatchDataBase_PatchTwice_ShouldNotThrowException()
         {
             IDbConnection connection = DbConnector.GetSharedInstance().Connection;
 
-            ICollection<IServerDbClass> dbClasses = new List<IServerDbClass>();
-            dbClasses.Add(new LeafEntitySubA());
-            dbClasses.Add(new LeafEntitySubB());
-            dbClasses.Add(new RootEntity());
+            ICollection<Type> types = new List<Type>();
+            types.Add(typeof(LeafEntitySubA));
+            types.Add(typeof(LeafEntitySubB));
+            types.Add(typeof(RootEntity));
 
-            ErLayer.GetSharedInstance().PatchDataBase(connection,dbClasses,true);
+            ErLayer.GetSharedInstance().PatchDataBase(connection,types,true);
         }
 
         private void AssertTwoRootEntitiesEquals(RootEntity entityA, RootEntity entityB)
