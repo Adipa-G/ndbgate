@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace dbgate.ermanagement.exceptions
 {
-    public class SequenceGeneratorInitializationException : BaseException
+    public class SequenceGeneratorInitializationException : DbGateException
     {
         public SequenceGeneratorInitializationException()
         {

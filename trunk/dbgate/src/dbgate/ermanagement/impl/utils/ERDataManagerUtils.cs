@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using dbgate.ermanagement.caches;
+using dbgate.ermanagement.caches.impl;
 using dbgate.ermanagement.context;
 using dbgate.ermanagement.context.impl;
 
@@ -10,12 +11,13 @@ namespace dbgate.ermanagement.impl.utils
 {
     public class ErDataManagerUtils
     {
-        public static ICollection<IServerDbClass> GetRelationEntities(IServerRoDbClass parent, IDbRelation relation)
+        public static ICollection<IServerDbClass> GetRelationEntities(IServerRoDbClass rootEntity, IDbRelation relation)
         {
-            PropertyInfo property = CacheManager.MethodCache.GetProperty(parent.GetType(),relation.AttributeName);
-            object value = property.GetValue(parent,null);
+            EntityInfo entityInfo = CacheManager.GetEntityInfo(rootEntity);
+            PropertyInfo property = entityInfo.GetProperty(relation.AttributeName);
+            object value = ReflectionUtils.GetValue(property, rootEntity);
 
-            ICollection<IServerDbClass> fieldObjects = new List<IServerDbClass>();
+            ICollection<IServerDbClass> treeEntities = new List<IServerDbClass>();
             if (value is ICollection)
             {
                 ICollection collection = (ICollection) value;
@@ -24,16 +26,16 @@ namespace dbgate.ermanagement.impl.utils
                     if (o is IServerDbClass
                         && ReflectionUtils.IsSubClassOf(o.GetType(),relation.RelatedObjectType))
                     {
-                        fieldObjects.Add((IServerDbClass) o);
+                        treeEntities.Add((IServerDbClass) o);
                     }
                 }
             }
             else if (value is IServerDbClass
                      && ReflectionUtils.IsSubClassOf(value.GetType(),relation.RelatedObjectType))
             {
-                fieldObjects.Add((IServerDbClass) value);
+                treeEntities.Add((IServerDbClass) value);
             }
-            return fieldObjects;
+            return treeEntities;
         }
 
         public static IEntityFieldValueList ExtractEntityKeyValues(IServerRoDbClass entity)
@@ -52,7 +54,7 @@ namespace dbgate.ermanagement.impl.utils
             return valueList;
         }
 
-        public static ITypeFieldValueList ExtractTypeFieldValues(IServerRoDbClass entity,Type type) 
+        public static ITypeFieldValueList ExtractEntityTypeFieldValues(IServerRoDbClass entity,Type type) 
         {
             EntityTypeFieldValueList valueList = null;
             if (entity is IServerDbClass)
@@ -68,7 +70,7 @@ namespace dbgate.ermanagement.impl.utils
             return valueList;
         }
 
-        public static ITypeFieldValueList ExtractTypeKeyValues(IServerRoDbClass entity,Type type)
+        public static ITypeFieldValueList ExtractEntityTypeKeyValues(IServerRoDbClass entity,Type type)
         {
             EntityTypeFieldValueList valueList = null;
             if (entity is IServerDbClass)
@@ -100,28 +102,31 @@ namespace dbgate.ermanagement.impl.utils
             return valueList;
         }
 
-        private static ICollection<EntityFieldValue> ExtractValues(IServerDbClass serverDBClass,bool key,Type typeToLoad)
+        private static ICollection<EntityFieldValue> ExtractValues(IServerDbClass entity,bool key,Type typeToLoad)
         {
             ICollection<EntityFieldValue> entityFieldValues = new List<EntityFieldValue>();
+            EntityInfo parentEntityInfo = CacheManager.GetEntityInfo(entity);
+            EntityInfo entityInfo = parentEntityInfo;
 
-            Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(serverDBClass.GetType(),new Type[]{typeof(IServerDbClass)});
-            foreach (Type type in typeList)
+            while (entityInfo != null)
             {
-                if (typeToLoad != null && typeToLoad != type)
+                if (typeToLoad != null && typeToLoad != entityInfo.EntityType)
                 {
+                    entityInfo = entityInfo.SuperEntityInfo;
                     continue;
                 }
-                ICollection<IDbColumn> subLevelColumns = CacheManager.FieldCache.GetDbColumns(type);
+                ICollection<IDbColumn> subLevelColumns = entityInfo.Columns;
                 foreach (IDbColumn subLevelColumn in subLevelColumns)
                 {
                     if (!key || (subLevelColumn.Key && key))
                     {
-                        PropertyInfo getter = CacheManager.MethodCache.GetProperty(serverDBClass.GetType(), subLevelColumn.AttributeName);
-                        Object value = getter.GetValue(serverDBClass,null);
+                        PropertyInfo getter = entityInfo.GetProperty(subLevelColumn.AttributeName);
+                        Object value = ReflectionUtils.GetValue(getter,entity);
 
                         entityFieldValues.Add(new EntityFieldValue(value,subLevelColumn));
                     }
                 }
+                entityInfo = entityInfo.SuperEntityInfo;
             }
             return entityFieldValues;
         }
@@ -198,16 +203,6 @@ namespace dbgate.ermanagement.impl.utils
             return null;
         }
 
-        public static void Reverse(Type[] types)
-        {
-            for (int left = 0, right = types.Length - 1; left < right; left++, right--)
-            {
-                Type temp = types[left];
-                types[left]  = types[right];
-                types[right] = temp;
-            }
-        }
-
         public static void IncrementVersion(ITypeFieldValueList fieldValues)
         {
             foreach (EntityFieldValue fieldValue in fieldValues.FieldValues)
@@ -220,12 +215,6 @@ namespace dbgate.ermanagement.impl.utils
                     break;
                 }
             }
-        }
-
-        public static void RegisterType(Type entityType) 
-        {
-            CacheManager.TableCache.Register(entityType);
-            CacheManager.FieldCache.Register(entityType);
         }
     }
 }

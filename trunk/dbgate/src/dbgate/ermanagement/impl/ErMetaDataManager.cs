@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using dbgate.dbutility;
 using dbgate.ermanagement.caches;
+using dbgate.ermanagement.caches.impl;
 using dbgate.ermanagement.exceptions;
+using dbgate.ermanagement.exceptions.migration;
 using dbgate.ermanagement.impl.dbabstractionlayer;
 using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate;
 using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.compare;
@@ -33,8 +35,7 @@ namespace dbgate.ermanagement.impl
             {
                 foreach (Type entityType in entityTypes)
                 {
-                    CacheManager.TableCache.Register(entityType);
-                    CacheManager.FieldCache.Register(entityType);
+                    CacheManager.Register(entityType);
                 }
 
                 IMetaManipulate metaManipulate =  _dbLayer.MetaManipulate(con);
@@ -121,38 +122,25 @@ namespace dbgate.ermanagement.impl
         private static IEnumerable<IMetaItem> ExtractMetaItems(Type subType)
         {
             ICollection<IMetaItem> retItems = new List<IMetaItem>();
+            EntityInfo entityInfo = CacheManager.GetEntityInfo(subType);
 
-            Type[] superTypes = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(subType,new[]{typeof(IServerDbClass)});
-            foreach (Type superType in superTypes)
+            while (entityInfo != null)
             {
-                string tableName = CacheManager.TableCache.GetTableName(superType);
-                if (tableName == null)
-                {
-                    continue;
-                }
-                ICollection<IField> fields = CacheManager.FieldCache.GetFields(superType);
+                ICollection<IDbColumn> dbColumns = entityInfo.Columns;
+                ICollection<IDbRelation> dbRelations = entityInfo.Relations;
+                var filteredRelations = new List<IDbRelation>();
 
-                ICollection<IDbColumn> dbColumns = new List<IDbColumn>();
-                ICollection<IDbRelation> dbRelations = new List<IDbRelation>();
-
-                foreach (IField field in fields)
+                foreach (IDbRelation relation in dbRelations)
                 {
-                    if (field is IDbColumn)
+                    if (!relation.ReverseRelationship
+                        && !relation.NonIdentifyingRelation)
                     {
-                        dbColumns.Add((IDbColumn) field);
-                    }
-                    else if (field is IDbRelation)
-                    {
-                        IDbRelation relation = (IDbRelation) field;
-                        if (!relation.ReverseRelationship
-                            && !relation.NonIdentifyingRelation)
-                        {
-                            dbRelations.Add((IDbRelation) field);
-                        }
+                        filteredRelations.Add(relation);
                     }
                 }
-
-                retItems.Add(CreateTable(superType,dbColumns,dbRelations));
+                
+                retItems.Add(CreateTable(entityInfo.EntityType,dbColumns,dbRelations));
+                entityInfo = entityInfo.SuperEntityInfo;
             }
             return retItems;
         }
@@ -160,7 +148,8 @@ namespace dbgate.ermanagement.impl
         private static IMetaItem CreateTable(Type type,IEnumerable<IDbColumn> dbColumns,IEnumerable<IDbRelation> dbRelations)
         {
             MetaTable table = new MetaTable();
-            table.Name = CacheManager.TableCache.GetTableName(type);
+            EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
+            table.Name = entityInfo.TableName;
 
             foreach (IDbColumn dbColumn in dbColumns)
             {
@@ -174,13 +163,15 @@ namespace dbgate.ermanagement.impl
 
             foreach (IDbRelation relation in dbRelations)
             {
+                EntityInfo relatedEntityInfo = CacheManager.GetEntityInfo(relation.RelatedObjectType);
+
                 MetaForeignKey foreignKey = new MetaForeignKey();
                 foreignKey.Name = relation.RelationShipName;
-                foreignKey.ToTable = CacheManager.TableCache.GetTableName(relation.RelatedObjectType);
+                foreignKey.ToTable = relatedEntityInfo.TableName;
                 foreach (DbRelationColumnMapping mapping in relation.TableColumnMappings)
                 {
-                    string fromCol = ErDataManagerUtils.FindColumnByAttribute(CacheManager.FieldCache.GetDbColumns(type),mapping.FromField).ColumnName;
-                    string toCol = ErDataManagerUtils.FindColumnByAttribute(CacheManager.FieldCache.GetDbColumns(relation.RelatedObjectType),mapping.ToField).ColumnName;
+                    string fromCol = ErDataManagerUtils.FindColumnByAttribute(relatedEntityInfo.Columns,mapping.FromField).ColumnName;
+                    string toCol = ErDataManagerUtils.FindColumnByAttribute(relatedEntityInfo.Columns,mapping.ToField).ColumnName;
                     foreignKey.ColumnMappings.Add(new MetaForeignKeyColumnMapping(fromCol,toCol));
                 }
                 foreignKey.DeleteRule = relation.DeleteRule;

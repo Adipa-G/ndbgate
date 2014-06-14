@@ -7,9 +7,12 @@ using System.Text;
 using Castle.DynamicProxy;
 using dbgate.dbutility;
 using dbgate.ermanagement.caches;
+using dbgate.ermanagement.caches.impl;
 using dbgate.ermanagement.context;
 using dbgate.ermanagement.context.impl;
 using dbgate.ermanagement.exceptions;
+using dbgate.ermanagement.exceptions.common;
+using dbgate.ermanagement.exceptions.retrival;
 using dbgate.ermanagement.impl.dbabstractionlayer;
 using dbgate.ermanagement.impl.utils;
 using dbgate.ermanagement.lazy;
@@ -89,7 +92,6 @@ namespace dbgate.ermanagement.impl
             try
             {
                 ErSessionUtils.InitSession(roEntity);
-                ErDataManagerUtils.RegisterType(roEntity.GetType());
                 LoadFromDb(roEntity, reader, con);
                 ErSessionUtils.DestroySession(roEntity);
             }
@@ -102,15 +104,13 @@ namespace dbgate.ermanagement.impl
 
         private void LoadFromDb(IServerRoDbClass roEntity, IDataReader reader, IDbConnection con)
         {
-            Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(roEntity.GetType(), new[] { typeof(IServerRoDbClass) });
-            int typeListLength = typeList.Length;
-            for (int i = 0; i < typeListLength; i++)
+            EntityInfo entityInfo = CacheManager.GetEntityInfo(roEntity);
+            while (entityInfo != null)
             {
-                Type type = typeList[i];
-                string tableName = CacheManager.TableCache.GetTableName(type);
-                if (i == 0 || tableName == null) //if i==0 that means it's base class and can use existing result set
+                string tableName = entityInfo.TableName;
+                if (entityInfo.EntityType == roEntity.GetType() || tableName == null) //if i==0 that means it's base class and can use existing result set
                 {
-                    LoadForType(roEntity, type, reader, con);
+                    LoadForType(roEntity, entityInfo.EntityType, reader, con);
                 }
                 else
                 {
@@ -118,18 +118,26 @@ namespace dbgate.ermanagement.impl
                     IDataReader superReader = null;
                     try
                     {
-                        ITypeFieldValueList keyValueList = ErDataManagerUtils.ExtractTypeKeyValues(roEntity, type);
+                        ITypeFieldValueList keyValueList = ErDataManagerUtils.ExtractEntityTypeKeyValues(roEntity, entityInfo.EntityType);
                         superCmd = CreateRetrievalPreparedStatement(keyValueList, con);
                         superReader = superCmd.ExecuteReader();
                         if (superReader.Read())
                         {
-                            LoadForType(roEntity, type, superReader, con);
+                            LoadForType(roEntity, entityInfo.EntityType, superReader, con);
                         }
                         else
                         {
-                            string message = String.Format("Super class {0} does not contains a matching record for the base class {1}", type.FullName, typeList[0].FullName);
+                            string message =
+                                String.Format(
+                                    "Super class {0} does not contains a matching record for the base class {1}",
+                                    entityInfo.EntityType.FullName, roEntity.GetType().FullName);
                             throw new NoMatchingRecordFoundForSuperClassException(message);
                         }
+                    }
+                    catch(Exception ex)
+                    {
+                        String message = String.Format("SQL Exception while trying to read from table {0}",tableName);
+                        throw new ReadFromResultSetException(message,ex);
                     }
                     finally
                     {
@@ -137,11 +145,13 @@ namespace dbgate.ermanagement.impl
                         DbMgmtUtility.Close(superCmd);
                     }
                 }
+                entityInfo = entityInfo.SuperEntityInfo;
             }
         }
 
         private void LoadForType(IServerRoDbClass entity, Type type, IDataReader reader, IDbConnection con)
         {
+            EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
             IEntityContext entityContext = entity.Context;
             ITypeFieldValueList valueTypeList = ReadValues(type, reader);
             SetValues(entity, valueTypeList);
@@ -155,7 +165,7 @@ namespace dbgate.ermanagement.impl
                 }
             }
 
-            ICollection<IDbRelation> dbRelations = CacheManager.FieldCache.GetDbRelations(type);
+            ICollection<IDbRelation> dbRelations = entityInfo.Relations;
             foreach (IDbRelation relation in dbRelations)
             {
                 LoadChildrenFromRelation(entity, type, con, relation,false);
@@ -165,10 +175,11 @@ namespace dbgate.ermanagement.impl
         public void LoadChildrenFromRelation(IServerRoDbClass parentRoEntity, Type entityType, IDbConnection con
             , IDbRelation relation,bool lazy)
         {
+            EntityInfo entityInfo = CacheManager.GetEntityInfo(entityType);
             IEntityContext entityContext = parentRoEntity.Context;
 
-            PropertyInfo property = CacheManager.MethodCache.GetProperty(entityType, relation.AttributeName);
-            Object value = property.GetValue(parentRoEntity, null);
+            PropertyInfo property = entityInfo.GetProperty(relation.AttributeName);
+            Object value = ReflectionUtils.GetValue(property,parentRoEntity);
             
             if (!lazy && relation.Lazy)
             {
@@ -206,7 +217,7 @@ namespace dbgate.ermanagement.impl
                 {
                     genCollection.Add(serverRoDbClass);
                 }
-                property.SetValue(parentRoEntity, genCollection, null);
+                ReflectionUtils.SetValue(property,parentRoEntity,genCollection);
             }
             else if (value != null
                     && ReflectionUtils.IsImplementInterface(property.PropertyType, typeof(ICollection<>)))
@@ -225,7 +236,7 @@ namespace dbgate.ermanagement.impl
                     IServerRoDbClass singleRoDbClass = childEnumarator.Current;
                     if (property.PropertyType.IsAssignableFrom(singleRoDbClass.GetType()))
                     {
-                        property.SetValue(parentRoEntity, singleRoDbClass, null);
+                        ReflectionUtils.SetValue(property,parentRoEntity,singleRoDbClass);
                     }
                     else
                     {
@@ -268,7 +279,7 @@ namespace dbgate.ermanagement.impl
                 proxy = _proxyGenerator.CreateClassProxy(proxyType, new object[] {},
                                                          new ChildLoadInterceptor(this, parentRoEntity, type, con, relation));
             }
-            property.SetValue(parentRoEntity, proxy, new object[] {});
+            ReflectionUtils.SetValue(property,parentRoEntity,proxy);
         }
     }
 }

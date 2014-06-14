@@ -21,24 +21,9 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
 
         public IDbColumn GetColumn(FieldSegment segment)
         {
-            ICollection<IDbColumn> columns = null;
-            try
-            {
-                columns = CacheManager.FieldCache.GetDbColumns(segment.EntityType);
-            }
-            catch (FieldCacheMissException e)
-            {
-                try
-                {
-                    CacheManager.FieldCache.Register(segment.EntityType);
-                    columns = CacheManager.FieldCache.GetDbColumns(segment.EntityType);
-                }
-                catch (Exception ex)
-                {
-                    Console.Write(ex.StackTrace);
-                }
-            }
-
+            var entityInfo = CacheManager.GetEntityInfo(segment.EntityType);
+            ICollection<IDbColumn> columns = entityInfo.Columns;
+            
             if (columns != null)
             {
                 foreach (IDbColumn column in columns)
@@ -292,24 +277,9 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
 
         public IDbRelation GetRelation(Type typeFrom,Type typeTo)
         {
-            ICollection<IDbRelation> relations = null;
-            try
-            {
-                relations = CacheManager.FieldCache.GetDbRelations(typeFrom);
-            }
-            catch (FieldCacheMissException e)
-            {
-                try
-                {
-                    CacheManager.FieldCache.Register(typeFrom);
-                    relations = CacheManager.FieldCache.GetDbRelations(typeFrom);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.StackTrace);
-                }
-            }
-
+            var entityInfo = CacheManager.GetEntityInfo(typeFrom);
+            ICollection<IDbRelation> relations = entityInfo.Relations;
+           
             if (relations != null)
             {
                 foreach (IDbRelation relation in relations)

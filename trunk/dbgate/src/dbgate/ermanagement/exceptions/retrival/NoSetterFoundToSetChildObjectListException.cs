@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace dbgate.ermanagement.exceptions
+namespace dbgate.ermanagement.exceptions.retrival
 {
-    public class NoSetterFoundToSetChildObjectListException : BaseException
+    public class NoSetterFoundToSetChildObjectListException : DbGateException
     {
         public NoSetterFoundToSetChildObjectListException()
         {

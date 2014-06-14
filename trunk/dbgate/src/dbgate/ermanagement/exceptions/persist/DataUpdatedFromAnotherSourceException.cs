@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace dbgate.ermanagement.exceptions
+namespace dbgate.ermanagement.exceptions.persist
 {
-    public class DataUpdatedFromAnotherSourceException : BaseException
+    public class DataUpdatedFromAnotherSourceException : DbGateException
     {
         public DataUpdatedFromAnotherSourceException()
         {

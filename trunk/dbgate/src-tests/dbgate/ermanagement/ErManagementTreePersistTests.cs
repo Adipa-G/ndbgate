@@ -87,16 +87,16 @@ namespace  dbgate.ermanagement
         private void RegisterForExternal()
         {
             Type objType = typeof(TreeTestRootEntityExt);
-            ErLayer.GetSharedInstance().RegisterTable(objType,TreeTestExtFactory.GetTableNames(objType));
-            ErLayer.GetSharedInstance().RegisterFields(objType,TreeTestExtFactory.GetFieldInfo(objType));
-
+            ErLayer.GetSharedInstance().RegisterEntity(objType, TreeTestExtFactory.GetTableNames(objType),
+                                                       TreeTestExtFactory.GetFieldInfo(objType));
+            
             objType = typeof(TreeTestOne2ManyEntityExt);
-            ErLayer.GetSharedInstance().RegisterTable(objType,TreeTestExtFactory.GetTableNames(objType));
-            ErLayer.GetSharedInstance().RegisterFields(objType,TreeTestExtFactory.GetFieldInfo(objType));
+            ErLayer.GetSharedInstance().RegisterEntity(objType, TreeTestExtFactory.GetTableNames(objType),
+                                                       TreeTestExtFactory.GetFieldInfo(objType));
 
             objType = typeof(TreeTestOne2OneEntityExt);
-            ErLayer.GetSharedInstance().RegisterTable(objType, TreeTestExtFactory.GetTableNames(objType));
-            ErLayer.GetSharedInstance().RegisterFields(objType, TreeTestExtFactory.GetFieldInfo(objType));
+            ErLayer.GetSharedInstance().RegisterEntity(objType, TreeTestExtFactory.GetTableNames(objType),
+                                                       TreeTestExtFactory.GetFieldInfo(objType));
         }
 
         private IDbConnection SetupTables()

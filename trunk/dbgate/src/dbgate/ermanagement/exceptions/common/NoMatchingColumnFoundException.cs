@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace dbgate.ermanagement.exceptions
+namespace dbgate.ermanagement.exceptions.common
 {
-    public class NoMatchingColumnFoundException : BaseException
+    public class NoMatchingColumnFoundException : DbGateException
     {
         public NoMatchingColumnFoundException()
         {

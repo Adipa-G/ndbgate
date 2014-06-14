@@ -5,6 +5,7 @@ using System.Data;
 using dbgate.dbutility;
 using dbgate.ermanagement.caches;
 using dbgate.ermanagement.exceptions;
+using dbgate.ermanagement.exceptions.common;
 using dbgate.ermanagement.impl.dbabstractionlayer;
 using dbgate.ermanagement.query;
 using log4net;
@@ -25,7 +26,7 @@ namespace dbgate.ermanagement.impl
         {
             if (DbConnector.GetSharedInstance() == null)
             {
-                throw new DBConnectorNotInitializedException("The DBConnector is not initialized");
+                throw new DbConnectorNotInitializedException("The DBConnector is not initialized");
             }
             int dbType = DbConnector.GetSharedInstance().DbType;
             _config = new ErLayerConfig();
@@ -33,7 +34,7 @@ namespace dbgate.ermanagement.impl
             InitializeDefaults();
 
             IDbLayer dbLayer = LayerFactory.CreateLayer(dbType,_config);
-            CacheManager.Init(dbLayer);
+            CacheManager.Init(_config);
             _erDataManager = new ErDataManager(dbLayer,_statistics,_config);
             _erMetaDataManager = new ErMetaDataManager(dbLayer,_statistics,_config);
         }
@@ -69,14 +70,9 @@ namespace dbgate.ermanagement.impl
             _erDataManager.ClearCache();
         }
 
-        public void RegisterTable(Type type, string tableName)
+        public void RegisterEntity(Type entityType, string tableName, ICollection<IField> fields)
         {
-            _erDataManager.RegisterTable(type,tableName);
-        }
-
-        public void RegisterFields(Type type, ICollection<IField> fields)
-        {
-            _erDataManager.RegisterFields(type,fields);
+            _erDataManager.RegisterEntity(entityType,tableName,fields);
         }
 
         public IErLayerConfig Config 
@@ -97,7 +93,7 @@ namespace dbgate.ermanagement.impl
                 {
                     _erLayer = new ErLayer();
                 }
-                catch (DBConnectorNotInitializedException e)
+                catch (DbConnectorNotInitializedException e)
                 {
                 
                     LogManager.GetLogger(DefaultLoggerName).Fatal(e.Message,e);

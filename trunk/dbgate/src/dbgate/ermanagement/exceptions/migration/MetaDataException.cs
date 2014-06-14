@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace dbgate.ermanagement.exceptions
+namespace dbgate.ermanagement.exceptions.migration
 {
-    public class MetaDataException : BaseException
+    public class MetaDataException : DbGateException
     {
         public MetaDataException()
         {

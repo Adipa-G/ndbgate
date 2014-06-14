@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace dbgate.ermanagement.exceptions
 {
-    public class IncorrectFieldDefinitionException : BaseException
+    public class IncorrectFieldDefinitionException : DbGateException
     {
         public IncorrectFieldDefinitionException()
         {

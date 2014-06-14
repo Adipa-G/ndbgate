@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace dbgate.ermanagement.exceptions
 {
-    public class PersistException : BaseException
+    public class PersistException : DbGateException
     {
         public PersistException()
         {

@@ -18,10 +18,8 @@ namespace dbgate.ermanagement
 
         void ClearCache();
 
-        void RegisterTable(Type type, string tableName);
-
-        void RegisterFields(Type type, ICollection<IField> fields);
-
+        void RegisterEntity(Type entityType, String tableName, ICollection<IField> fields);
+        
         IErLayerConfig Config { get; }
 
         IErLayerStatistics Statistics { get; }

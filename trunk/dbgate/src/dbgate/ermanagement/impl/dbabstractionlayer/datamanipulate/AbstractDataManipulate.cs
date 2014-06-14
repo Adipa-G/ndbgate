@@ -193,11 +193,13 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             return sb.ToString();
         }
 
-        public string CreateRelatedObjectsLoadQuery(string tableName, IDbRelation relation)
+        public string CreateRelatedObjectsLoadQuery(IDbRelation relation)
         {
+            var entityInfo = CacheManager.GetEntityInfo(relation.RelatedObjectType);
+
             var sb = new StringBuilder();
             sb.Append("SELECT * FROM ");
-            sb.Append(CacheManager.TableCache.GetTableName(relation.RelatedObjectType));
+            sb.Append(entityInfo.TableName);
             sb.Append(" WHERE ");
 
             IEnumerator<DbRelationColumnMapping> enumerator = relation.TableColumnMappings.GetEnumerator();
@@ -211,7 +213,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
                 {
                     sb.Append(" AND ");
                 }
-                sb.Append( ErDataManagerUtils.FindColumnByAttribute(CacheManager.FieldCache.GetDbColumns(relation.RelatedObjectType),columnMapping.ToField).ColumnName);
+                sb.Append( ErDataManagerUtils.FindColumnByAttribute(entityInfo.Columns,columnMapping.ToField).ColumnName);
                 sb.Append("= ?");
                 i++;
             }

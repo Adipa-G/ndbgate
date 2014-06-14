@@ -4,6 +4,7 @@ using System.Reflection;
 using Castle.DynamicProxy;
 using dbgate.dbutility;
 using dbgate.ermanagement.caches;
+using dbgate.ermanagement.caches.impl;
 using dbgate.ermanagement.impl;
 
 namespace dbgate.ermanagement.lazy
@@ -52,7 +53,8 @@ namespace dbgate.ermanagement.lazy
                     }
                 }
 
-                PropertyInfo property = CacheManager.MethodCache.GetProperty(_parentRoEntity.GetType(), _relation.AttributeName);
+                EntityInfo entityInfo = CacheManager.GetEntityInfo(_parentRoEntity);
+                PropertyInfo property = entityInfo.GetProperty(_relation.AttributeName);
                 Object objectToInvoke = property.GetValue(_parentRoEntity,new object[]{});
 
                 invocation.ReturnValue =  invocation.Method.Invoke(objectToInvoke, new object[] {});

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using dbgate.ermanagement.exceptions.common;
 
 namespace dbgate.ermanagement.impl.utils
 {
@@ -76,6 +78,48 @@ namespace dbgate.ermanagement.impl.utils
                 }
             }
             return false;
+        }
+
+        public static Object GetValue(PropertyInfo property,Object target)
+        {
+            try
+            {
+                return property.GetValue(target);
+            }
+            catch (Exception ex)
+            {
+                String message = String.Format("Exception while trying get property {0} value of entity {1}"
+                                               , property.Name, target.GetType().FullName);
+                throw new MethodInvocationException(message,ex);
+            }
+        }
+    
+        public static void SetValue(PropertyInfo property,Object target,Object value)
+        {
+            try
+            {
+                property.SetValue(target,value);
+            }
+            catch (Exception ex)
+            {
+                String message = String.Format("Exception while trying to set property {0} of entity {1}"
+                                               , property.Name, target.GetType().FullName);
+                throw new MethodInvocationException(message,ex);
+            }
+        }
+    
+        public static Object CreateInstance(Type type)
+        {
+            try
+            {
+                return Activator.CreateInstance(type);
+            }
+            catch (Exception ex)
+            {
+                String message = String.Format("Exception while trying to create an instance of type {0}"
+                                               , type.FullName);
+                throw new EntityInstantiationException(message,ex);
+            }
         }
     }
 }

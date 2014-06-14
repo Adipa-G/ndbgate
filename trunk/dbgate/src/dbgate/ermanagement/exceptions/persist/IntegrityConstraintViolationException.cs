@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace dbgate.ermanagement.exceptions
+namespace dbgate.ermanagement.exceptions.persist
 {
-    public class IntegrityConstraintViolationException : BaseException
+    public class IntegrityConstraintViolationException : DbGateException
     {
         public IntegrityConstraintViolationException()
         {

@@ -144,16 +144,16 @@ namespace dbgate.ermanagement
         private void RegisterForExternal()
         {
             Type objType = typeof(InheritanceTestSuperEntityExt);
-            ErLayer.GetSharedInstance().RegisterTable(objType,InheritanceTestExtFactory.GetTableNames(objType));
-            ErLayer.GetSharedInstance().RegisterFields(objType,InheritanceTestExtFactory.GetFieldInfo(objType));
-
+            ErLayer.GetSharedInstance().RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
+                                                       InheritanceTestExtFactory.GetFieldInfo(objType));
+            
             objType = typeof(InheritanceTestSubEntityAExt);
-            ErLayer.GetSharedInstance().RegisterTable(objType,InheritanceTestExtFactory.GetTableNames(objType));
-            ErLayer.GetSharedInstance().RegisterFields(objType,InheritanceTestExtFactory.GetFieldInfo(objType));
-
+            ErLayer.GetSharedInstance().RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
+                                                       InheritanceTestExtFactory.GetFieldInfo(objType));
+            
             objType = typeof(InheritanceTestSubEntityBExt);
-            ErLayer.GetSharedInstance().RegisterTable(objType,InheritanceTestExtFactory.GetTableNames(objType));
-            ErLayer.GetSharedInstance().RegisterFields(objType,InheritanceTestExtFactory.GetFieldInfo(objType));
+            ErLayer.GetSharedInstance().RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
+                                                       InheritanceTestExtFactory.GetFieldInfo(objType));
         }
 
         [Test]

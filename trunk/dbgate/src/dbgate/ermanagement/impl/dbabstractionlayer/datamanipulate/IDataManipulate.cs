@@ -15,7 +15,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 
         string CreateDeleteQuery(string tableName, ICollection<IDbColumn> dbColumns);
 
-        string CreateRelatedObjectsLoadQuery(string tableName, IDbRelation relation);
+        string CreateRelatedObjectsLoadQuery(IDbRelation relation);
 
         object ReadFromResultSet(IDataReader reader, IDbColumn dbColumn);
 

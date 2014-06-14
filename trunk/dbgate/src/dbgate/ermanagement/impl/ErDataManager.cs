@@ -43,20 +43,12 @@ namespace dbgate.ermanagement.impl
 
         public void ClearCache()
         {
-            CacheManager.FieldCache.Clear();
-            CacheManager.MethodCache.Clear();
-            CacheManager.TableCache.Clear();
-            CacheManager.QueryCache.Clear();
+            CacheManager.Clear();
         }
 
-        public void RegisterTable(Type type, string tableName)
+        public void RegisterEntity(Type entityType, string tableName, ICollection<IField> fields)
         {
-            CacheManager.TableCache.Register(type,tableName);
-        }
-
-        public void RegisterFields(Type type, ICollection<IField> fields)
-        {
-            CacheManager.FieldCache.Register(type,fields);
+            CacheManager.Register(entityType,tableName,fields);
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 
 namespace dbgate.ermanagement.exceptions
 {
-    public class ExpressionParsingException  : BaseException
+    public class ExpressionParsingException  : DbGateException
     {
         public ExpressionParsingException ()
         {

@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace dbgate.ermanagement.exceptions
+namespace dbgate.ermanagement.exceptions.retrival
 {
-    public class NoMatchingRecordFoundForSuperClassException : BaseException
+    public class NoMatchingRecordFoundForSuperClassException : DbGateException
     {
         public NoMatchingRecordFoundForSuperClassException()
         {

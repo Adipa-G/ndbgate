@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace dbgate.ermanagement.exceptions
 {
-    public class RetrievalException : BaseException
+    public class RetrievalException : DbGateException
     {
         public RetrievalException()
         {

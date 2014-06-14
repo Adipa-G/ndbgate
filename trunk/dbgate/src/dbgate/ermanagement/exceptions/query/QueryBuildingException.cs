@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace dbgate.ermanagement.exceptions
+namespace dbgate.ermanagement.exceptions.query
 {
-    public class QueryBuildingException : BaseException
+    public class QueryBuildingException : DbGateException
     {
         public QueryBuildingException()
         {
