@@ -24,7 +24,7 @@ namespace dbgate.ermanagement.support.persistant.inheritancetest
                 Dictionary<Type, ICollection<IField>> map = base.FieldInfo;
                 ICollection<IField> dbColumns = new List<IField>();
 
-                dbColumns.Add(new DefaultDbColumn("NameA", DbColumnType.Varchar));
+                dbColumns.Add(new DefaultColumn("NameA", ColumnType.Varchar));
                                
                 map.Add(typeof(InheritanceTestSubEntityAFields),dbColumns);
                 return map;

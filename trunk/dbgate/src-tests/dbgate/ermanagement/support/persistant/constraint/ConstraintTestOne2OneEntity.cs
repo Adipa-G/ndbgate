@@ -1,16 +1,16 @@
 namespace dbgate.ermanagement.support.persistant.constraint
 {
-    [DbTableInfo("constraint_test_one2one")]
-    public class ConstraintTestOne2OneEntity : DefaultServerDbClass
+    [TableInfo("constraint_test_one2one")]
+    public class ConstraintTestOne2OneEntity : DefaultEntity
     {
         public ConstraintTestOne2OneEntity()
         {
         }
 
-        [DbColumnInfo((DbColumnType.Integer), Key = true)]
+        [ColumnInfo((ColumnType.Integer), Key = true)]
         public int IdCol { get; set; }
     
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string Name { get; set; }
     }
 }

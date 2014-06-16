@@ -1,19 +1,19 @@
 namespace dbgate.ermanagement.support.query.basic
 {
-    [DbTableInfo("query_basic_join")]
-    public class QueryBasicJoinEntity : DefaultServerDbClass
+    [TableInfo("query_basic_join")]
+    public class QueryBasicJoinEntity : DefaultEntity
     {
         public QueryBasicJoinEntity()
         {
         }
 
-        [DbColumnInfo((DbColumnType.Integer), Key = true)]
+        [ColumnInfo((ColumnType.Integer), Key = true)]
         public int IdCol { get; set; }
     
-        [DbColumnInfo((DbColumnType.Varchar),Key = true)]
+        [ColumnInfo((ColumnType.Varchar),Key = true)]
         public string Name { get; set; }
 
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string OverrideDescription { get; set; }
     }
 }

@@ -3,13 +3,13 @@ using dbgate.ermanagement;
 
 namespace dbgatetestapp.dbgate.inheritanceexample.entities
 {
-    [DbTableInfo("super_entity")]
-    public class SuperEntity : DefaultServerDbClass
+    [TableInfo("super_entity")]
+    public class SuperEntity : DefaultEntity
     {
-        [DbColumnInfo(DbColumnType.Integer, Key = true, SubClassCommonColumn = true)]
+        [ColumnInfo(ColumnType.Integer, Key = true, SubClassCommonColumn = true)]
         public int Id { get; set; }
 
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string SuperName { get; set; }
 
         public SuperEntity()

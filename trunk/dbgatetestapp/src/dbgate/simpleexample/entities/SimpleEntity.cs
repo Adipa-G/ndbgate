@@ -3,13 +3,13 @@ using dbgate.ermanagement;
 
 namespace dbgatetestapp.dbgate.simpleexample.entities
 {
-    [DbTableInfo("simple_entity")]
-    public class SimpleEntity  : DefaultServerDbClass
+    [TableInfo("simple_entity")]
+    public class SimpleEntity  : DefaultEntity
     {
-        [DbColumnInfo(DbColumnType.Integer, Key = true)]
+        [ColumnInfo(ColumnType.Integer, Key = true)]
         public int Id { get; set; }
 
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string Name { get; set; }
 
         public SimpleEntity()

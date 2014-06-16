@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace dbgate.ermanagement.support.persistant.inheritancetest
 {
-    public class InheritanceTestSuperEntityFields : AbstractManagedDbClass ,IInheritanceTestSuperEntity
+    public class InheritanceTestSuperEntityFields : AbstractManagedEntity ,IInheritanceTestSuperEntity
     {
         public int IdCol { get; set; }
         public string Name { get; set; }
@@ -25,10 +25,10 @@ namespace dbgate.ermanagement.support.persistant.inheritancetest
                 Dictionary<Type, ICollection<IField>> map = new Dictionary<Type, ICollection<IField>>();
                 List<IField> dbColumns = new List<IField>();
 
-                DefaultDbColumn idCol = new DefaultDbColumn("IdCol", true, false, DbColumnType.Integer);
+                DefaultColumn idCol = new DefaultColumn("IdCol", true, false, ColumnType.Integer);
                 idCol.SubClassCommonColumn = true;
                 dbColumns.Add(idCol);
-                dbColumns.Add(new DefaultDbColumn("Name", DbColumnType.Varchar));
+                dbColumns.Add(new DefaultColumn("Name", ColumnType.Varchar));
 
                 map.Add(typeof(InheritanceTestSuperEntityFields),dbColumns);
                 return map;

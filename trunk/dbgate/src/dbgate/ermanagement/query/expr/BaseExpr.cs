@@ -37,7 +37,7 @@ namespace dbgate.ermanagement.query.expr
             return AddSegment(segment);
         }
 
-        protected T BaseValues(DbColumnType type, params object[] values)
+        protected T BaseValues(ColumnType type, params object[] values)
         {
             var segment = new ValueSegment(type,values);
             return AddSegment(segment);

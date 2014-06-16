@@ -24,7 +24,7 @@ namespace dbgate.ermanagement.context.impl
         {
             foreach (EntityFieldValue fieldValue in _fieldValues)
             {
-                if (fieldValue.DbColumn.AttributeName.Equals(attributeName))
+                if (fieldValue.Column.AttributeName.Equals(attributeName))
                 {
                     return fieldValue;
                 }

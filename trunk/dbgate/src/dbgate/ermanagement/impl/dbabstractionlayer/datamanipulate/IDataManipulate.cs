@@ -7,19 +7,19 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 {
     public interface IDataManipulate
     {
-        string CreateLoadQuery(string tableName, ICollection<IDbColumn> dbColumns);
+        string CreateLoadQuery(string tableName, ICollection<IColumn> dbColumns);
 
-        string CreateInsertQuery(string tableName, ICollection<IDbColumn> dbColumns);
+        string CreateInsertQuery(string tableName, ICollection<IColumn> dbColumns);
 
-        string CreateUpdateQuery(string tableName, ICollection<IDbColumn> dbColumns);
+        string CreateUpdateQuery(string tableName, ICollection<IColumn> dbColumns);
 
-        string CreateDeleteQuery(string tableName, ICollection<IDbColumn> dbColumns);
+        string CreateDeleteQuery(string tableName, ICollection<IColumn> dbColumns);
 
-        string CreateRelatedObjectsLoadQuery(IDbRelation relation);
+        string CreateRelatedObjectsLoadQuery(IRelation relation);
 
-        object ReadFromResultSet(IDataReader reader, IDbColumn dbColumn);
+        object ReadFromResultSet(IDataReader reader, IColumn column);
 
-        void SetToPreparedStatement(IDbCommand cmd, object obj, int parameterIndex, IDbColumn dbColumn);
+        void SetToPreparedStatement(IDbCommand cmd, object obj, int parameterIndex, IColumn column);
 
         IDataReader CreateResultSet(IDbConnection con, QueryExecInfo execInfo);
 

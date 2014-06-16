@@ -12,15 +12,15 @@ namespace dbgate.ermanagement.lazy
     public class ChildLoadInterceptor : IInterceptor
     {
         private ErDataRetrievalManager _dataRetrievalManager;
-        private IServerRoDbClass _parentRoEntity;
+        private IReadOnlyEntity _parentRoEntity;
         private Type _applicableParentType;
         private IDbConnection _connection;
-        private IDbRelation _relation;
+        private IRelation _relation;
 
         private bool _intercepted;
 
-        public ChildLoadInterceptor(ErDataRetrievalManager dataRetrievalManager, IServerRoDbClass parentRoEntity
-            , Type applicableParentType, IDbConnection connection, IDbRelation relation)
+        public ChildLoadInterceptor(ErDataRetrievalManager dataRetrievalManager, IReadOnlyEntity parentRoEntity
+            , Type applicableParentType, IDbConnection connection, IRelation relation)
         {
             _dataRetrievalManager = dataRetrievalManager;
             _parentRoEntity = parentRoEntity;

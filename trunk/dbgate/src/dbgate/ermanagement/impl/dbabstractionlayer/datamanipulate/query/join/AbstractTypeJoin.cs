@@ -34,7 +34,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.join
         private void CreateJoinExpressionForDefinedRelation(QueryBuildInfo buildInfo)
         {
             string typeFromAlias = buildInfo.GetAlias(TypeFrom);
-            IDbRelation relation = processor.GetRelation(TypeFrom,TypeTo);
+            IRelation relation = processor.GetRelation(TypeFrom,TypeTo);
             if (relation == null)
             {
                 relation = processor.GetRelation(TypeTo,TypeFrom);

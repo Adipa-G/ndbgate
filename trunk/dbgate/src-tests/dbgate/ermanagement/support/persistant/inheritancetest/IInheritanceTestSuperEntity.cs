@@ -1,6 +1,6 @@
 ﻿namespace dbgate.ermanagement.support.persistant.inheritancetest
 {
-    public interface IInheritanceTestSuperEntity : IServerDbClass
+    public interface IInheritanceTestSuperEntity : IEntity
     {
         int IdCol { get; set; }
 

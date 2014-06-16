@@ -8,11 +8,11 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.dbdm.access
         {
         }
 
-        public override object ReadFromResultSet(IDataReader reader, IDbColumn dbColumn)
+        public override object ReadFromResultSet(IDataReader reader, IColumn column)
         {
-            object result = base.ReadFromResultSet(reader, dbColumn);
+            object result = base.ReadFromResultSet(reader, column);
             if (result != null
-                && dbColumn.ColumnType == DbColumnType.Varchar)
+                && column.ColumnType == ColumnType.Varchar)
             {
                 return result.ToString().Replace("\u0000", "");
             }

@@ -1,8 +1,8 @@
 ﻿namespace dbgate.ermanagement
 {
-    public class DbRelationColumnMapping
+    public class RelationColumnMapping
     {
-        public DbRelationColumnMapping(string fromField, string toField)
+        public RelationColumnMapping(string fromField, string toField)
         {
             FromField = fromField;
             ToField = toField;

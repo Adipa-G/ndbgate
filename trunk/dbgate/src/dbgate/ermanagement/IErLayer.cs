@@ -8,9 +8,9 @@ namespace dbgate.ermanagement
 {
     public interface IErLayer
     {
-        void Load(IServerRoDbClass serverRoDbClass, IDataReader reader, IDbConnection con);
+        void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, IDbConnection con);
 
-        void Save(IServerDbClass serverDbClass, IDbConnection con);
+        void Save(IEntity entity, IDbConnection con);
 
         ICollection<Object> Select(ISelectionQuery query,IDbConnection con );
 

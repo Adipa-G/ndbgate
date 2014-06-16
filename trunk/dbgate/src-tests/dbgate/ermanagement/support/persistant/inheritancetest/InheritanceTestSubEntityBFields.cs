@@ -24,7 +24,7 @@ public class InheritanceTestSubEntityBFields : InheritanceTestSuperEntityFields 
             Dictionary<Type, ICollection<IField>> map = base.FieldInfo;
             List<IField> dbColumns = new List<IField>();
 
-            dbColumns.Add(new DefaultDbColumn("NameB", DbColumnType.Varchar));
+            dbColumns.Add(new DefaultColumn("NameB", ColumnType.Varchar));
 
             map.Add(typeof(InheritanceTestSubEntityBFields),dbColumns);
             return map;

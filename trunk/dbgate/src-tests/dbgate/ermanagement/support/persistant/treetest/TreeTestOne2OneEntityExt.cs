@@ -9,13 +9,13 @@ namespace dbgate.ermanagement.support.persistant.treetest
     {
         private IEntityContext _context;
 
-        public DbClassStatus Status { get; set; }
+        public EntityStatus Status { get; set; }
         public int IdCol { get; set; }
         public string Name { get; set; }
 
         public TreeTestOne2OneEntityExt()
         {
-            Status = DbClassStatus.New;
+            Status = EntityStatus.New;
             _context = new EntityContext();
         }
 

@@ -1,18 +1,18 @@
 ﻿namespace dbgate.ermanagement.support.patch.patchtabledifferences
 {
-    [DbTableInfo("table_change_test_entity")]
-    public class FourColumnEntity : DefaultServerDbClass
+    [TableInfo("table_change_test_entity")]
+    public class FourColumnEntity : DefaultEntity
     {
-        [DbColumnInfo((DbColumnType.Integer), Key = true)]
+        [ColumnInfo((ColumnType.Integer), Key = true)]
         public int IdCol { get; set; }
 
-        [DbColumnInfo((DbColumnType.Integer), Key = true)]
+        [ColumnInfo((ColumnType.Integer), Key = true)]
         public int IndexNo { get; set; }
 
-        [DbColumnInfo((DbColumnType.Varchar))]
+        [ColumnInfo((ColumnType.Varchar))]
         public string Code { get; set; }
 
-        [DbColumnInfo((DbColumnType.Varchar))]
+        [ColumnInfo((ColumnType.Varchar))]
         public string Name { get; set; }
     }
 }

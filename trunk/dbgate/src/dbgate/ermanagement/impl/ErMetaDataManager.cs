@@ -126,11 +126,11 @@ namespace dbgate.ermanagement.impl
 
             while (entityInfo != null)
             {
-                ICollection<IDbColumn> dbColumns = entityInfo.Columns;
-                ICollection<IDbRelation> dbRelations = entityInfo.Relations;
-                var filteredRelations = new List<IDbRelation>();
+                ICollection<IColumn> dbColumns = entityInfo.Columns;
+                ICollection<IRelation> dbRelations = entityInfo.Relations;
+                var filteredRelations = new List<IRelation>();
 
-                foreach (IDbRelation relation in dbRelations)
+                foreach (IRelation relation in dbRelations)
                 {
                     if (!relation.ReverseRelationship
                         && !relation.NonIdentifyingRelation)
@@ -145,13 +145,13 @@ namespace dbgate.ermanagement.impl
             return retItems;
         }
 
-        private static IMetaItem CreateTable(Type type,IEnumerable<IDbColumn> dbColumns,IEnumerable<IDbRelation> dbRelations)
+        private static IMetaItem CreateTable(Type type,IEnumerable<IColumn> dbColumns,IEnumerable<IRelation> dbRelations)
         {
             MetaTable table = new MetaTable();
             EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
             table.Name = entityInfo.TableName;
 
-            foreach (IDbColumn dbColumn in dbColumns)
+            foreach (IColumn dbColumn in dbColumns)
             {
                 MetaColumn metaColumn = new MetaColumn();
                 metaColumn.ColumnType = dbColumn.ColumnType;
@@ -161,14 +161,14 @@ namespace dbgate.ermanagement.impl
                 table.Columns.Add(metaColumn);
             }
 
-            foreach (IDbRelation relation in dbRelations)
+            foreach (IRelation relation in dbRelations)
             {
                 EntityInfo relatedEntityInfo = CacheManager.GetEntityInfo(relation.RelatedObjectType);
 
                 MetaForeignKey foreignKey = new MetaForeignKey();
                 foreignKey.Name = relation.RelationShipName;
                 foreignKey.ToTable = relatedEntityInfo.TableName;
-                foreach (DbRelationColumnMapping mapping in relation.TableColumnMappings)
+                foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
                 {
                     string fromCol = ErDataManagerUtils.FindColumnByAttribute(relatedEntityInfo.Columns,mapping.FromField).ColumnName;
                     string toCol = ErDataManagerUtils.FindColumnByAttribute(relatedEntityInfo.Columns,mapping.ToField).ColumnName;
@@ -181,7 +181,7 @@ namespace dbgate.ermanagement.impl
 
             MetaPrimaryKey primaryKey = new MetaPrimaryKey();
             primaryKey.Name = "pk_" + table.Name;
-            foreach (IDbColumn dbColumn in dbColumns)
+            foreach (IColumn dbColumn in dbColumns)
             {
                 if (dbColumn.Key)
                 {

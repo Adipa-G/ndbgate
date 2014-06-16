@@ -2,55 +2,55 @@
 
 namespace dbgate.ermanagement.support.persistant.columntest
 {
-    [DbTableInfo("column_test_entity")]
-    public class ColumnTestEntityAnnotations : DefaultServerDbClass , IColumnTestEntity
+    [TableInfo("column_test_entity")]
+    public class ColumnTestEntityAnnotations : DefaultEntity , IColumnTestEntity
     {
-        [DbColumnInfo((DbColumnType.Integer), Key = true, ReadFromSequence = true, SequenceGeneratorClassName = "dbgate.ermanagement.support.persistant.columntest.PrimaryKeyGenerator")]
+        [ColumnInfo((ColumnType.Integer), Key = true, ReadFromSequence = true, SequenceGeneratorClassName = "dbgate.ermanagement.support.persistant.columntest.PrimaryKeyGenerator")]
         public int IdCol { get; set; }
         
-        [DbColumnInfo(DbColumnType.Long)]
+        [ColumnInfo(ColumnType.Long)]
         public long LongNotNull { get; set; }
-        [DbColumnInfo((DbColumnType.Long),Nullable = true)]
+        [ColumnInfo((ColumnType.Long),Nullable = true)]
         public long? LongNull { get; set; }
         
-        [DbColumnInfo(DbColumnType.Boolean)]
+        [ColumnInfo(ColumnType.Boolean)]
         public bool BooleanNotNull { get; set; }
-        [DbColumnInfo((DbColumnType.Boolean),Nullable = true)]
+        [ColumnInfo((ColumnType.Boolean),Nullable = true)]
         public bool? BooleanNull { get; set; }
         
-        [DbColumnInfo(DbColumnType.Char)]
+        [ColumnInfo(ColumnType.Char)]
         public char CharNotNull { get; set; }
-        [DbColumnInfo((DbColumnType.Char),Nullable = true)]
+        [ColumnInfo((ColumnType.Char),Nullable = true)]
         public char? CharNull { get; set; }
         
-        [DbColumnInfo(DbColumnType.Integer)]
+        [ColumnInfo(ColumnType.Integer)]
         public int IntNotNull { get; set; }
-        [DbColumnInfo((DbColumnType.Integer),Nullable = true)]
+        [ColumnInfo((ColumnType.Integer),Nullable = true)]
         public int? IntNull { get; set; }
         
-        [DbColumnInfo(DbColumnType.Date)]
+        [ColumnInfo(ColumnType.Date)]
         public DateTime DateNotNull { get; set; }
-        [DbColumnInfo((DbColumnType.Date),Nullable = true)]
+        [ColumnInfo((ColumnType.Date),Nullable = true)]
         public DateTime? DateNull { get; set; }
         
-        [DbColumnInfo(DbColumnType.Double)]
+        [ColumnInfo(ColumnType.Double)]
         public double DoubleNotNull { get; set; }
-        [DbColumnInfo((DbColumnType.Double),Nullable = true)]
+        [ColumnInfo((ColumnType.Double),Nullable = true)]
         public double? DoubleNull { get; set; }
         
-        [DbColumnInfo(DbColumnType.Float)]
+        [ColumnInfo(ColumnType.Float)]
         public float FloatNotNull { get; set; }
-        [DbColumnInfo((DbColumnType.Float),Nullable = true)]
+        [ColumnInfo((ColumnType.Float),Nullable = true)]
         public float? FloatNull { get; set; }
        
-        [DbColumnInfo(DbColumnType.Timestamp)]
+        [ColumnInfo(ColumnType.Timestamp)]
         public DateTime TimestampNotNull { get; set; }
-        [DbColumnInfo((DbColumnType.Timestamp),Nullable = true)]
+        [ColumnInfo((ColumnType.Timestamp),Nullable = true)]
         public DateTime? TimestampNull { get; set; }
         
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string VarcharNotNull { get; set; }
-        [DbColumnInfo((DbColumnType.Varchar),Nullable = true)]
+        [ColumnInfo((ColumnType.Varchar),Nullable = true)]
         public string VarcharNull { get; set; }
     }
 }

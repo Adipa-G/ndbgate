@@ -6,11 +6,11 @@ using dbgate.ermanagement.impl;
 
 namespace dbgate.ermanagement
 {
-    public class DefaultServerRoDbClass : IServerRoDbClass
+    public class DefaultReadOnlyEntity : IReadOnlyEntity
     {
         private IEntityContext _context;
 
-        public DefaultServerRoDbClass()
+        public DefaultReadOnlyEntity()
         {
             _context = new EntityContext();
         }

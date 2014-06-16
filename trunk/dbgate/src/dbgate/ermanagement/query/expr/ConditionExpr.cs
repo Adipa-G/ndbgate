@@ -19,12 +19,12 @@ namespace dbgate.ermanagement.query.expr
             return BaseField(entityType,typeAlias, field,null);
         }
 
-        public ConditionExpr Value(DbColumnType type, object value)
+        public ConditionExpr Value(ColumnType type, object value)
         {
             return Values(type, value);
         }
 
-        public ConditionExpr Values(DbColumnType type, params object[] value)
+        public ConditionExpr Values(ColumnType type, params object[] value)
         {
             return BaseValues(type, value);
         }

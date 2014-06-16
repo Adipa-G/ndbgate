@@ -1,6 +1,6 @@
 ﻿namespace dbgate
 {
-    public enum DbClassStatus
+    public enum EntityStatus
     {
         New,
         Modified,

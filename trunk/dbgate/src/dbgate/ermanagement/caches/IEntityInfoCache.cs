@@ -11,7 +11,7 @@ namespace dbgate.ermanagement.caches
     {
         EntityInfo GetEntityInfo(Type entityType);
 
-        EntityInfo GetEntityInfo(IRoDbClass entity);
+        EntityInfo GetEntityInfo(IReadOnlyClientEntity entity);
 
         void Register(Type entityType,String tableName,ICollection<IField> fields);
 

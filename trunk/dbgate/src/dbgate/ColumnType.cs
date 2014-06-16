@@ -1,6 +1,6 @@
 ﻿namespace dbgate
 {
-    public enum DbColumnType
+    public enum ColumnType
     {
         Long,
         Boolean,

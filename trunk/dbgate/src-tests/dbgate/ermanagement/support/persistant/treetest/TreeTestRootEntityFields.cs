@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace dbgate.ermanagement.support.persistant.treetest
 {
-    public class TreeTestRootEntityFields : AbstractManagedDbClass , ITreeTestRootEntity
+    public class TreeTestRootEntityFields : AbstractManagedEntity , ITreeTestRootEntity
     {
         public int IdCol { get; set; }
         public string Name { get; set; }
@@ -27,12 +27,12 @@ namespace dbgate.ermanagement.support.persistant.treetest
                 Dictionary<Type,ICollection<IField>> map = new Dictionary<Type, ICollection<IField>>();
                 List<IField> dbColumns = new List<IField>();
 
-                dbColumns.Add(new DefaultDbColumn("IdCol",true,false,DbColumnType.Integer));
-                dbColumns.Add(new DefaultDbColumn("Name",DbColumnType.Varchar));
-                dbColumns.Add(new DefaultDbRelation("One2ManyEntities","fk_root2one2manyent",typeof(TreeTestOne2ManyEntityFields)
-                    ,new DbRelationColumnMapping[]{new DbRelationColumnMapping("idCol","idCol")}));
-                dbColumns.Add(new DefaultDbRelation("One2OneEntity","fk_root2one2oneent", typeof(TreeTestOne2OneEntityFields)
-                    ,new DbRelationColumnMapping[]{new DbRelationColumnMapping("idCol","idCol")}));
+                dbColumns.Add(new DefaultColumn("IdCol",true,false,ColumnType.Integer));
+                dbColumns.Add(new DefaultColumn("Name",ColumnType.Varchar));
+                dbColumns.Add(new DefaultRelation("One2ManyEntities","fk_root2one2manyent",typeof(TreeTestOne2ManyEntityFields)
+                    ,new RelationColumnMapping[]{new RelationColumnMapping("idCol","idCol")}));
+                dbColumns.Add(new DefaultRelation("One2OneEntity","fk_root2one2oneent", typeof(TreeTestOne2OneEntityFields)
+                    ,new RelationColumnMapping[]{new RelationColumnMapping("idCol","idCol")}));
 
                 map.Add(typeof(TreeTestRootEntityFields),dbColumns);
                 return map;

@@ -8,20 +8,20 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.mappings
         {
         }
 
-        public ColumnTypeMapItem(string name, DbColumnType id)
+        public ColumnTypeMapItem(string name, ColumnType id)
         {
             Name = name;
             ColumnType = id;
         }
 
-        public ColumnTypeMapItem(string name, DbColumnType columnType, string defaultNonNullValue) : this(name,columnType)
+        public ColumnTypeMapItem(string name, ColumnType columnType, string defaultNonNullValue) : this(name,columnType)
         {
             DefaultNonNullValue = defaultNonNullValue;
         }
 
         public string Name { get; set; }
 
-        public DbColumnType ColumnType { get; set; }
+        public ColumnType ColumnType { get; set; }
 
         public string DefaultNonNullValue { get; set; }
 
@@ -30,101 +30,101 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.mappings
             switch (type)
             {
                 case DbType.AnsiString:
-                    ColumnType = DbColumnType.Varchar;
+                    ColumnType = ColumnType.Varchar;
                     DefaultNonNullValue = "''";
                     break;
                 case DbType.AnsiStringFixedLength:
-                    ColumnType = DbColumnType.Varchar;
+                    ColumnType = ColumnType.Varchar;
                     DefaultNonNullValue = "''";
                     break;
 //                case DbType.Binary:
 //                    break;
                 case DbType.Boolean:
-                    ColumnType = DbColumnType.Boolean;
+                    ColumnType = ColumnType.Boolean;
                     DefaultNonNullValue = "true";
                     break;
                 case DbType.Byte:
-                    ColumnType = DbColumnType.Integer;
+                    ColumnType = ColumnType.Integer;
                     DefaultNonNullValue = "0";
                     break;
                 case DbType.Currency:
-                    ColumnType = DbColumnType.Double;
+                    ColumnType = ColumnType.Double;
                     DefaultNonNullValue = "0";
                     break;
                 case DbType.Date:
-                    ColumnType = DbColumnType.Date;
+                    ColumnType = ColumnType.Date;
                     DefaultNonNullValue = "1981/10/12";
                     break;
                 case DbType.DateTime:
-                    ColumnType = DbColumnType.Date;
+                    ColumnType = ColumnType.Date;
                     DefaultNonNullValue = "1981/10/12";
                     break;
                 case DbType.DateTime2:
-                    ColumnType = DbColumnType.Date;
+                    ColumnType = ColumnType.Date;
                     DefaultNonNullValue = "1981/10/12";
                     break;
 //                case DbType.DateTimeOffset:
 //                    break;
                 case DbType.Decimal:
-                    ColumnType = DbColumnType.Float;
+                    ColumnType = ColumnType.Float;
                     DefaultNonNullValue = "0";
                     break;
                 case DbType.Double:
-                    ColumnType = DbColumnType.Double;
+                    ColumnType = ColumnType.Double;
                     DefaultNonNullValue = "0";
                     break;
                 case DbType.Guid:
-                    ColumnType = DbColumnType.Varchar;
+                    ColumnType = ColumnType.Varchar;
                     DefaultNonNullValue = "''";
                     break;
                 case DbType.Int16:
-                    ColumnType = DbColumnType.Integer;
+                    ColumnType = ColumnType.Integer;
                     DefaultNonNullValue = "0";
                     break;
                 case DbType.Int32:
-                    ColumnType = DbColumnType.Long;
+                    ColumnType = ColumnType.Long;
                     DefaultNonNullValue = "0";
                     break;
                 case DbType.Int64:
-                    ColumnType = DbColumnType.Long;
+                    ColumnType = ColumnType.Long;
                     DefaultNonNullValue = "0";
                     break;
 //                case DbType.Object:
 //                    break;
                 case DbType.SByte:
-                    ColumnType = DbColumnType.Integer;
+                    ColumnType = ColumnType.Integer;
                     DefaultNonNullValue = "0";
                     break;
                 case DbType.Single:
-                    ColumnType = DbColumnType.Double;
+                    ColumnType = ColumnType.Double;
                     DefaultNonNullValue = "0";
                     break;
                 case DbType.String:
-                    ColumnType = DbColumnType.Varchar;
+                    ColumnType = ColumnType.Varchar;
                     DefaultNonNullValue = "''";
                     break;
                 case DbType.StringFixedLength:
-                    ColumnType = DbColumnType.Varchar;
+                    ColumnType = ColumnType.Varchar;
                     DefaultNonNullValue = "''";
                     break;
                 case DbType.Time:
-                    ColumnType = DbColumnType.Date;
+                    ColumnType = ColumnType.Date;
                     DefaultNonNullValue = "1981/10/12";
                     break;
                 case DbType.UInt16:
-                    ColumnType = DbColumnType.Integer;
+                    ColumnType = ColumnType.Integer;
                     DefaultNonNullValue = "0";
                     break;
                 case DbType.UInt32:
-                    ColumnType = DbColumnType.Long;
+                    ColumnType = ColumnType.Long;
                     DefaultNonNullValue = "0";
                     break;
                 case DbType.UInt64:
-                    ColumnType = DbColumnType.Long;
+                    ColumnType = ColumnType.Long;
                     DefaultNonNullValue = "0";
                     break;
                 case DbType.VarNumeric:
-                    ColumnType = DbColumnType.Float;
+                    ColumnType = ColumnType.Float;
                     DefaultNonNullValue = "0";
                     break;
 //                case DbType.Xml:

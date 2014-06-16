@@ -11,11 +11,11 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
     {
         void Initialize(IDbConnection con);
 
-        DbColumnType MapColumnTypeNameToType(string columnTypeName);
+        ColumnType MapColumnTypeNameToType(string columnTypeName);
 
-        string MapColumnTypeToTypeName(DbColumnType columnTypeId);
+        string MapColumnTypeToTypeName(ColumnType columnTypeId);
 
-        string GetDefaultValueForType(DbColumnType columnTypeId);
+        string GetDefaultValueForType(ColumnType columnTypeId);
 
         ReferentialRuleType MapReferentialRuleNameToType(string ruleTypeName);
 

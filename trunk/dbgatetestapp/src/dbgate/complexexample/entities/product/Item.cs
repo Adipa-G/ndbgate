@@ -3,12 +3,12 @@ using dbgate.ermanagement;
 
 namespace dbgatetestapp.dbgate.complexexample.entities.product
 {
-    [DbTableInfo("product_item")]
-    public abstract class Item : DefaultServerDbClass
+    [TableInfo("product_item")]
+    public abstract class Item : DefaultEntity
     {
-        [DbColumnInfo(DbColumnType.Integer, Key = true, SubClassCommonColumn = true)]
+        [ColumnInfo(ColumnType.Integer, Key = true, SubClassCommonColumn = true)]
         public int ItemId { get; set; }
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string Name { get; set; }
 
         protected Item()

@@ -40,7 +40,7 @@ namespace dbgate.ermanagement.caches.impl
             return Cache[entityType];
         }
 
-        public EntityInfo GetEntityInfo(IRoDbClass entity)
+        public EntityInfo GetEntityInfo(IReadOnlyClientEntity entity)
         {
             var entityType = entity.GetType();
             try
@@ -61,7 +61,7 @@ namespace dbgate.ermanagement.caches.impl
         {
             Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(subType,
                                                                                      new Type[]
-                                                                                         {typeof (IServerRoDbClass)});
+                                                                                         {typeof (IReadOnlyEntity)});
             Type immediateSuper = typeList.Length > 1 ? typeList[1] : null;
 
             var subEntityInfo = new EntityInfo(subType);
@@ -111,7 +111,7 @@ namespace dbgate.ermanagement.caches.impl
 
             EntityInfo subEntity = null;
             Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(subType,
-                                                                                     new[] {typeof (IServerRoDbClass)});
+                                                                                     new[] {typeof (IReadOnlyEntity)});
             foreach (Type regType in typeList)
             {
                 if (Cache.ContainsKey(regType))
@@ -147,9 +147,9 @@ namespace dbgate.ermanagement.caches.impl
                 object[] annotations = regType.GetCustomAttributes(false);
                 foreach (object annotation in annotations)
                 {
-                    if (annotation is DbTableInfo)
+                    if (annotation is TableInfo)
                     {
-                        var tableInfo = (DbTableInfo) annotation;
+                        var tableInfo = (TableInfo) annotation;
                         tableName = tableInfo.TableName;
                         break;
                     }
@@ -160,11 +160,11 @@ namespace dbgate.ermanagement.caches.impl
 
         private static string GetTableNameIfManagedClass(Type regType, Type subType)
         {
-            if (ReflectionUtils.IsImplementInterface(regType, typeof (IManagedDbClass)))
+            if (ReflectionUtils.IsImplementInterface(regType, typeof (IManagedEntity)))
             {
                 try
                 {
-                    var managedDBClass = (IManagedDbClass) Activator.CreateInstance(subType);
+                    var managedDBClass = (IManagedEntity) Activator.CreateInstance(subType);
                     return managedDBClass.TableNames.ContainsKey(regType) ? managedDBClass.TableNames[regType] : null;
                 }
                 catch (Exception e)
@@ -181,7 +181,7 @@ namespace dbgate.ermanagement.caches.impl
             List<IField> fields = GetFieldsIfManagedClass(regType, subType);
             Type[] superTypes = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(regType,
                                                                                        new Type[]
-                                                                                           {typeof (IServerRoDbClass)});
+                                                                                           {typeof (IReadOnlyEntity)});
 
             for (int i = 0; i < superTypes.Length; i++)
             {
@@ -194,11 +194,11 @@ namespace dbgate.ermanagement.caches.impl
 
         private static List<IField> GetFieldsIfManagedClass(Type regType, Type subType)
         {
-            if (ReflectionUtils.IsImplementInterface(regType, typeof (IManagedDbClass)))
+            if (ReflectionUtils.IsImplementInterface(regType, typeof (IManagedEntity)))
             {
                 try
                 {
-                    var managedDBClass = (IManagedDbClass) Activator.CreateInstance(subType);
+                    var managedDBClass = (IManagedEntity) Activator.CreateInstance(subType);
                     return GetFieldsForManagedClass(managedDBClass, regType);
                 }
                 catch (Exception e)
@@ -210,12 +210,12 @@ namespace dbgate.ermanagement.caches.impl
             return new List<IField>();
         }
 
-        private static List<IField> GetFieldsForManagedClass(IManagedRoDbClass entity, Type type)
+        private static List<IField> GetFieldsForManagedClass(IManagedReadOnlyEntity entity, Type type)
         {
             var fields = new List<IField>();
 
             Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(type,
-                                                                                     new[] {typeof (IServerRoDbClass)});
+                                                                                     new[] {typeof (IReadOnlyEntity)});
             foreach (Type targetType in typeList)
             {
                 ICollection<IField> targetTypeFields = entity.FieldInfo.ContainsKey(targetType)
@@ -229,7 +229,7 @@ namespace dbgate.ermanagement.caches.impl
                 {
                     foreach (IField field in targetTypeFields)
                     {
-                        var dbColumn = field as IDbColumn;
+                        var dbColumn = field as IColumn;
                         if (dbColumn != null && dbColumn.SubClassCommonColumn)
                         {
                             fields.Add(dbColumn);
@@ -256,10 +256,10 @@ namespace dbgate.ermanagement.caches.impl
                 object[] annotations = propertyInfo.GetCustomAttributes(false);
                 foreach (object annotation in annotations)
                 {
-                    if (annotation is DbColumnInfo)
+                    if (annotation is ColumnInfo)
                     {
-                        var dbColumnInfo = (DbColumnInfo) annotation;
-                        IDbColumn column = CreateColumnMapping(propertyInfo, dbColumnInfo);
+                        var dbColumnInfo = (ColumnInfo) annotation;
+                        IColumn column = CreateColumnMapping(propertyInfo, dbColumnInfo);
                         if (superClass)
                         {
                             if (column.SubClassCommonColumn)
@@ -279,7 +279,7 @@ namespace dbgate.ermanagement.caches.impl
                             continue;
                         }
                         var foreignKeyInfo = (ForeignKeyInfo) annotation;
-                        IDbRelation relation = CreateForeignKeyMapping(propertyInfo, foreignKeyInfo);
+                        IRelation relation = CreateForeignKeyMapping(propertyInfo, foreignKeyInfo);
                         fields.Add(relation);
                     }
                 }
@@ -288,23 +288,23 @@ namespace dbgate.ermanagement.caches.impl
             return fields;
         }
 
-        private static IDbColumn CreateColumnMapping(PropertyInfo propertyInfo, DbColumnInfo dbColumnInfo)
+        private static IColumn CreateColumnMapping(PropertyInfo propertyInfo, ColumnInfo columnInfo)
         {
-            IDbColumn column = new DefaultDbColumn(propertyInfo.Name, dbColumnInfo.ColumnType, dbColumnInfo.Nullable);
-            if (dbColumnInfo.ColumnName != null
-                && dbColumnInfo.ColumnName.Trim().Length > 0)
+            IColumn column = new DefaultColumn(propertyInfo.Name, columnInfo.ColumnType, columnInfo.Nullable);
+            if (columnInfo.ColumnName != null
+                && columnInfo.ColumnName.Trim().Length > 0)
             {
-                column.ColumnName = dbColumnInfo.ColumnName;
+                column.ColumnName = columnInfo.ColumnName;
             }
-            column.Key = dbColumnInfo.Key;
-            column.Size = dbColumnInfo.Size;
-            column.SubClassCommonColumn = dbColumnInfo.SubClassCommonColumn;
-            column.ReadFromSequence = dbColumnInfo.ReadFromSequence;
+            column.Key = columnInfo.Key;
+            column.Size = columnInfo.Size;
+            column.SubClassCommonColumn = columnInfo.SubClassCommonColumn;
+            column.ReadFromSequence = columnInfo.ReadFromSequence;
             if (column.ReadFromSequence)
             {
                 try
                 {
-                    Type sequenceType = Type.GetType(dbColumnInfo.SequenceGeneratorClassName);
+                    Type sequenceType = Type.GetType(columnInfo.SequenceGeneratorClassName);
                     column.SequenceGenerator = (ISequenceGenerator) Activator.CreateInstance(sequenceType);
                 }
                 catch (Exception e)
@@ -315,9 +315,9 @@ namespace dbgate.ermanagement.caches.impl
             return column;
         }
 
-        private static IDbRelation CreateForeignKeyMapping(PropertyInfo propertyInfo, ForeignKeyInfo foreignKeyInfo)
+        private static IRelation CreateForeignKeyMapping(PropertyInfo propertyInfo, ForeignKeyInfo foreignKeyInfo)
         {
-            var objectMappings = new DbRelationColumnMapping[foreignKeyInfo.FromColumnMappings.Length];
+            var objectMappings = new RelationColumnMapping[foreignKeyInfo.FromColumnMappings.Length];
             string[] fromColumnMappings = foreignKeyInfo.FromColumnMappings;
             string[] toColumnMappings = foreignKeyInfo.ToColumnMappings;
 
@@ -333,10 +333,10 @@ namespace dbgate.ermanagement.caches.impl
             {
                 string fromMapping = fromColumnMappings[i];
                 string toMapping = toColumnMappings[i];
-                objectMappings[i] = new DbRelationColumnMapping(fromMapping, toMapping);
+                objectMappings[i] = new RelationColumnMapping(fromMapping, toMapping);
             }
 
-            IDbRelation relation = new DefaultDbRelation(propertyInfo.Name, foreignKeyInfo.Name
+            IRelation relation = new DefaultRelation(propertyInfo.Name, foreignKeyInfo.Name
                                                          , foreignKeyInfo.RelatedOjectType, objectMappings
                                                          , foreignKeyInfo.UpdateRule, foreignKeyInfo.DeleteRule
                                                          , foreignKeyInfo.ReverseRelation

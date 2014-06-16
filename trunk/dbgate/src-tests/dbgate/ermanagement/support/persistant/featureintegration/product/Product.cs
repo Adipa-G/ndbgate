@@ -1,12 +1,12 @@
 namespace dbgate.ermanagement.support.persistant.featureintegration.product
 {
-    [DbTableInfo("product_product")]
+    [TableInfo("product_product")]
     public class Product : Item
     {
-        [DbColumnInfo(DbColumnType.Double)]
+        [ColumnInfo(ColumnType.Double)]
         public double UnitPrice { get; set; }
     
-        [DbColumnInfo(DbColumnType.Double,Nullable = true)]
+        [ColumnInfo(ColumnType.Double,Nullable = true)]
         public double? BulkUnitPrice { get; set; }
     }
 }

@@ -274,11 +274,11 @@ namespace dbgate.ermanagement
 
                     loadedEntityA.Name = "typeA-changed-name";
                     loadedEntityA.NameA = "changed-nameA";
-                    loadedEntityA.Status = DbClassStatus.Modified;
+                    loadedEntityA.Status = EntityStatus.Modified;
 
                     loadedEntityB.Name ="typeB-changed-name";
                     loadedEntityB.NameB= "changed-nameB";
-                    loadedEntityB.Status = DbClassStatus.Modified;
+                    loadedEntityB.Status = EntityStatus.Modified;
 
                     loadedEntityA.Persist(connection);
                     loadedEntityB.Persist(connection);
@@ -356,11 +356,11 @@ namespace dbgate.ermanagement
 
                     loadedEntityA.Name = "typeA-changed-name";
                     loadedEntityA.NameA = "changed-nameA";
-                    loadedEntityA.Status = DbClassStatus.Deleted;
+                    loadedEntityA.Status = EntityStatus.Deleted;
 
                     loadedEntityB.Name = "typeB-changed-name";
                     loadedEntityB.NameB ="changed-nameB";
-                    loadedEntityB.Status = DbClassStatus.Deleted;
+                    loadedEntityB.Status = EntityStatus.Deleted;
 
                     loadedEntityA.Persist(connection);
                     loadedEntityB.Persist(connection);

@@ -4,13 +4,13 @@ using dbgate.ermanagement;
 
 namespace dbgatetestapp.dbgate.one2manyexample.entities
 {
-    [DbTableInfo("parent_entity")]
-    public class One2ManyParentEntity : DefaultServerDbClass
+    [TableInfo("parent_entity")]
+    public class One2ManyParentEntity : DefaultEntity
     {
-        [DbColumnInfo(DbColumnType.Integer, Key = true)]
+        [ColumnInfo(ColumnType.Integer, Key = true)]
         public int Id { get; set; }
 
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string Name { get; set; }
 
         [ForeignKeyInfo("parent2childA", typeof(One2ManyChildEntityA), new string[] { "id" }

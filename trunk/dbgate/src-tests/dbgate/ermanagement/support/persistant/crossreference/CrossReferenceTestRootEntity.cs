@@ -2,13 +2,13 @@ using System.Collections.Generic;
 
 namespace dbgate.ermanagement.support.persistant.crossreference
 {
-    [DbTableInfo("cross_reference_test_root")]
-    public class CrossReferenceTestRootEntity : DefaultServerDbClass
+    [TableInfo("cross_reference_test_root")]
+    public class CrossReferenceTestRootEntity : DefaultEntity
     {
-        [DbColumnInfo((DbColumnType.Integer), Key = true)]
+        [ColumnInfo((ColumnType.Integer), Key = true)]
         public int IdCol { get; set; }
 
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string Name { get; set; }
 
         [ForeignKeyInfo("fk_root2one2manyent",typeof(CrossReferenceTestOne2ManyEntity),new string[]{"idCol"}

@@ -82,7 +82,7 @@ namespace dbgatetestapp.dbgate.complexexample
             transaction.Commit();
         }
 
-        public void Persist(IDbConnection con, IServerDbClass entity)
+        public void Persist(IDbConnection con, IEntity entity)
         {
             IDbTransaction transaction = con.BeginTransaction();
             entity.Persist(con);

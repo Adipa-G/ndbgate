@@ -2,12 +2,12 @@
 
 namespace dbgate.ermanagement.support.persistant.treetest
 {
-    [DbTableInfo("tree_test_root")]
-    public class TreeTestRootEntityAnnotations : DefaultServerDbClass , ITreeTestRootEntity
+    [TableInfo("tree_test_root")]
+    public class TreeTestRootEntityAnnotations : DefaultEntity , ITreeTestRootEntity
     {
-        [DbColumnInfo((DbColumnType.Integer),Key = true)]
+        [ColumnInfo((ColumnType.Integer),Key = true)]
         public int IdCol { get; set; }
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string Name { get; set; }
 
         [ForeignKeyInfo("fk_root2one2manyent",typeof(TreeTestOne2ManyEntityAnnotations),new []{"idcol"},new []{"idcol"}

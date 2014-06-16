@@ -6,6 +6,6 @@
 
         void CommitTransaction();
 
-        void Save(IDbClass dbClass);
+        void Save(IClientEntity clientEntity);
     }
 }

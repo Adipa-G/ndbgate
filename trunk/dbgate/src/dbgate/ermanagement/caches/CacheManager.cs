@@ -19,7 +19,7 @@ namespace dbgate.ermanagement.caches
             return _entityInfoCache.GetEntityInfo(entityType);
         }
 
-        public static EntityInfo GetEntityInfo(IRoDbClass entity)
+        public static EntityInfo GetEntityInfo(IReadOnlyClientEntity entity)
         {
             return _entityInfoCache.GetEntityInfo(entity);
         }

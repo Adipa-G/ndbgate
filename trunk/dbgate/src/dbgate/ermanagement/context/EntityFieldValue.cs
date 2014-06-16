@@ -7,14 +7,14 @@ namespace dbgate.ermanagement.context
         {
         }
 
-        public EntityFieldValue(object value, IDbColumn dbColumn)
+        public EntityFieldValue(object value, IColumn column)
         {
             Value = value;
-            DbColumn = dbColumn;
+            Column = column;
         }
 
         public object Value { get; set; }
 
-        public IDbColumn DbColumn { get; set; }
+        public IColumn Column { get; set; }
     }
 }

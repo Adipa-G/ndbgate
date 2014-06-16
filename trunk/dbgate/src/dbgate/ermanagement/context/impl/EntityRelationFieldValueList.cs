@@ -5,16 +5,16 @@ namespace dbgate.ermanagement.context.impl
 {
     public class EntityRelationFieldValueList : ITypeFieldValueList
     {
-        private readonly IDbRelation _relation;
+        private readonly IRelation _relation;
         private readonly ICollection<EntityFieldValue> _fieldValues;
 
-        public EntityRelationFieldValueList(IDbRelation relation)
+        public EntityRelationFieldValueList(IRelation relation)
         {
             _relation = relation;
             _fieldValues = new List<EntityFieldValue>();
         }
 
-        public IDbRelation Relation 
+        public IRelation Relation 
         {
             get { return _relation; }
         }
@@ -33,7 +33,7 @@ namespace dbgate.ermanagement.context.impl
         {
             foreach (EntityFieldValue fieldValue in _fieldValues)
             {
-                if (fieldValue.DbColumn.AttributeName.Equals(attributeName))
+                if (fieldValue.Column.AttributeName.Equals(attributeName))
                 {
                     return fieldValue;
                 }

@@ -109,9 +109,9 @@ namespace dbgatetestapp.dbgate.one2oneexample
             Console.WriteLine("Entity Name = " + entityB.Name);
             Console.WriteLine("Entity Child Name = " + entityB.ChildEntity.Name);
 
-            entityA.Status = DbClassStatus.Deleted;
+            entityA.Status = EntityStatus.Deleted;
             example.Persist(con, entityA);
-            entityB.Status = DbClassStatus.Deleted;
+            entityB.Status = EntityStatus.Deleted;
             example.Persist(con, entityB);
 
             entityA = example.Retrieve(con, One2OneExample.IdA);

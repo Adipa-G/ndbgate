@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace dbgate.ermanagement.support.patch.patchempty
 {
-	public class LeafEntity  : AbstractManagedDbClass
+	public class LeafEntity  : AbstractManagedEntity
 	{
 	    public int IdCol { get; set; }
 		public int IndexNo { get; set; }
@@ -26,15 +26,15 @@ namespace dbgate.ermanagement.support.patch.patchempty
                 Dictionary<Type, ICollection<IField>> map = new Dictionary<Type, ICollection<IField>>();
                 List<IField> dbColumns = new List<IField>();
 
-                IDbColumn idCol = new DefaultDbColumn("IdCol", true, DbColumnType.Integer);
+                IColumn idCol = new DefaultColumn("IdCol", true, ColumnType.Integer);
                 idCol.SubClassCommonColumn = true;
                 dbColumns.Add(idCol);
 
-                IDbColumn indexCol = new DefaultDbColumn("IndexNo", true, DbColumnType.Integer);
+                IColumn indexCol = new DefaultColumn("IndexNo", true, ColumnType.Integer);
                 indexCol.SubClassCommonColumn = true;
                 dbColumns.Add(indexCol);
 
-                dbColumns.Add(new DefaultDbColumn("SomeText", DbColumnType.Varchar));
+                dbColumns.Add(new DefaultColumn("SomeText", ColumnType.Varchar));
 
                 map.Add(typeof(LeafEntity),dbColumns);
                 return map;

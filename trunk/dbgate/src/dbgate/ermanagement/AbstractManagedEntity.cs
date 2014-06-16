@@ -5,11 +5,11 @@ using log4net;
 
 namespace dbgate.ermanagement
 {
-    public abstract class AbstractManagedDbClass : AbstractManagedRoDbClass, IManagedDbClass
+    public abstract class AbstractManagedEntity : AbstractManagedReadOnlyEntity, IManagedEntity
     {
-        protected AbstractManagedDbClass()
+        protected AbstractManagedEntity()
         {
-            Status = DbClassStatus.New;
+            Status = EntityStatus.New;
         }
 
         public abstract Dictionary<Type, string> TableNames { get; }

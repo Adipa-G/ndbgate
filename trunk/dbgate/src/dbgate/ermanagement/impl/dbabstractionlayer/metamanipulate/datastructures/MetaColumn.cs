@@ -7,7 +7,7 @@
             ItemType = MetaItemType.Column;   
         }
 
-        public DbColumnType ColumnType { get; set; }
+        public ColumnType ColumnType { get; set; }
 
         public int Size { get; set; }
 
@@ -23,7 +23,7 @@
 
             if (Null != that.Null) return false;
             if (ColumnType != that.ColumnType) return false;
-            if ((ColumnType == DbColumnType.Varchar || ColumnType == DbColumnType.Char)
+            if ((ColumnType == ColumnType.Varchar || ColumnType == ColumnType.Char)
                 && !Size.Equals(that.Size)) return false;
 
             return true;

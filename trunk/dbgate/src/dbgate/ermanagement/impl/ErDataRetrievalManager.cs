@@ -82,12 +82,12 @@ namespace dbgate.ermanagement.impl
 			}
 		}
 
-        public void Load(IServerRoDbClass roEntity, IDataReader reader, IDbConnection con)
+        public void Load(IReadOnlyEntity roEntity, IDataReader reader, IDbConnection con)
         {
-            if (roEntity is IServerDbClass)
+            if (roEntity is IEntity)
             {
-                IServerDbClass entity = (IServerDbClass)roEntity;
-                entity.Status = DbClassStatus.Unmodified;
+                IEntity entity = (IEntity)roEntity;
+                entity.Status = EntityStatus.Unmodified;
             }
             try
             {
@@ -102,7 +102,7 @@ namespace dbgate.ermanagement.impl
             }
         }
 
-        private void LoadFromDb(IServerRoDbClass roEntity, IDataReader reader, IDbConnection con)
+        private void LoadFromDb(IReadOnlyEntity roEntity, IDataReader reader, IDbConnection con)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(roEntity);
             while (entityInfo != null)
@@ -149,7 +149,7 @@ namespace dbgate.ermanagement.impl
             }
         }
 
-        private void LoadForType(IServerRoDbClass entity, Type type, IDataReader reader, IDbConnection con)
+        private void LoadForType(IReadOnlyEntity entity, Type type, IDataReader reader, IDbConnection con)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
             IEntityContext entityContext = entity.Context;
@@ -165,15 +165,15 @@ namespace dbgate.ermanagement.impl
                 }
             }
 
-            ICollection<IDbRelation> dbRelations = entityInfo.Relations;
-            foreach (IDbRelation relation in dbRelations)
+            ICollection<IRelation> dbRelations = entityInfo.Relations;
+            foreach (IRelation relation in dbRelations)
             {
                 LoadChildrenFromRelation(entity, type, con, relation,false);
             }
         }
 
-        public void LoadChildrenFromRelation(IServerRoDbClass parentRoEntity, Type entityType, IDbConnection con
-            , IDbRelation relation,bool lazy)
+        public void LoadChildrenFromRelation(IReadOnlyEntity parentRoEntity, Type entityType, IDbConnection con
+            , IRelation relation,bool lazy)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(entityType);
             IEntityContext entityContext = parentRoEntity.Context;
@@ -187,11 +187,11 @@ namespace dbgate.ermanagement.impl
                 return;
             }
 
-            ICollection<IServerRoDbClass> children = ReadRelationChildrenFromDb(parentRoEntity, entityType, con, relation);
+            ICollection<IReadOnlyEntity> children = ReadRelationChildrenFromDb(parentRoEntity, entityType, con, relation);
             if (entityContext != null
                     && !relation.ReverseRelationship)
             {
-                foreach (IServerRoDbClass childEntity in children)
+                foreach (IReadOnlyEntity childEntity in children)
                 {
                     ITypeFieldValueList valueTypeList = ErDataManagerUtils.ExtractRelationKeyValues(childEntity, relation);
                     if (valueTypeList != null)
@@ -213,7 +213,7 @@ namespace dbgate.ermanagement.impl
                 value = Activator.CreateInstance(propertyType);
 
                 IList genCollection = (IList)value;
-                foreach (IServerRoDbClass serverRoDbClass in children)
+                foreach (IReadOnlyEntity serverRoDbClass in children)
                 {
                     genCollection.Add(serverRoDbClass);
                 }
@@ -223,17 +223,17 @@ namespace dbgate.ermanagement.impl
                     && ReflectionUtils.IsImplementInterface(property.PropertyType, typeof(ICollection<>)))
             {
                 IList genCollection = (IList)value;
-                foreach (IServerRoDbClass serverRoDbClass in children)
+                foreach (IReadOnlyEntity serverRoDbClass in children)
                 {
                     genCollection.Add(serverRoDbClass);
                 }
             }
             else
             {
-                IEnumerator<IServerRoDbClass> childEnumarator = children.GetEnumerator();
+                IEnumerator<IReadOnlyEntity> childEnumarator = children.GetEnumerator();
                 if (childEnumarator.MoveNext())
                 {
-                    IServerRoDbClass singleRoDbClass = childEnumarator.Current;
+                    IReadOnlyEntity singleRoDbClass = childEnumarator.Current;
                     if (property.PropertyType.IsAssignableFrom(singleRoDbClass.GetType()))
                     {
                         ReflectionUtils.SetValue(property,parentRoEntity,singleRoDbClass);
@@ -248,7 +248,7 @@ namespace dbgate.ermanagement.impl
             }
         }
 
-        private void CreateProxy(IServerRoDbClass parentRoEntity, Type type, IDbConnection con, IDbRelation relation,
+        private void CreateProxy(IReadOnlyEntity parentRoEntity, Type type, IDbConnection con, IRelation relation,
                                  object value, PropertyInfo property)
         {
             Type proxyType = value == null ? property.PropertyType : value.GetType();

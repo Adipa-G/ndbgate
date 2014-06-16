@@ -2,16 +2,16 @@ using System.Collections.Generic;
 
 namespace dbgate.ermanagement.support.persistant.version
 {
-    [DbTableInfo("version_test_root")]
-    public class VersionGeneralTestRootEntity : DefaultServerDbClass
+    [TableInfo("version_test_root")]
+    public class VersionGeneralTestRootEntity : DefaultEntity
     {
-        [DbColumnInfo((DbColumnType.Integer), Key = true)]
+        [ColumnInfo((ColumnType.Integer), Key = true)]
         public int IdCol { get; set; }
 
-        [DbColumnInfo(DbColumnType.Integer)]
+        [ColumnInfo(ColumnType.Integer)]
         public int Version { get; set; }
 
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string Name { get; set; }
 
         [ForeignKeyInfo("fk_root2one2manyent", typeof(VersionGeneralTestOne2ManyEntity), new string[] { "idCol" }

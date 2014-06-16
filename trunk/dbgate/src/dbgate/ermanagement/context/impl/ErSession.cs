@@ -17,7 +17,7 @@ namespace dbgate.ermanagement.context.impl
             get { return _entityFieldValueList; }
         }
 
-        public IServerRoDbClass GetProcessed(ITypeFieldValueList typeKeyFieldList)
+        public IReadOnlyEntity GetProcessed(ITypeFieldValueList typeKeyFieldList)
         {
             foreach (IEntityFieldValueList existingEntity in _entityFieldValueList)
             {

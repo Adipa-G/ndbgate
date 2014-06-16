@@ -741,7 +741,7 @@ namespace dbgate.ermanagement
                 ISelectionQuery query = new SelectionQuery()
                         .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
                         .Where(QueryCondition.Expression(ConditionExpr.Build()
-                            .Field(typeof(QueryBasicEntity), "IdCol").Eq().Value(DbColumnType.Integer, 35)))
+                            .Field(typeof(QueryBasicEntity), "IdCol").Eq().Value(ColumnType.Integer, 35)))
                         .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = query.ToList(connection);
@@ -767,7 +767,7 @@ namespace dbgate.ermanagement
                 ISelectionQuery query = new SelectionQuery()
                         .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
                         .Where(QueryCondition.Expression(ConditionExpr.Build()
-                            .Field(typeof(QueryBasicEntity), "IdCol").Neq().Value(DbColumnType.Integer,35)))
+                            .Field(typeof(QueryBasicEntity), "IdCol").Neq().Value(ColumnType.Integer,35)))
                         .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = query.ToList(connection);
@@ -793,7 +793,7 @@ namespace dbgate.ermanagement
                 ISelectionQuery query = new SelectionQuery()
                         .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
                         .Where(QueryCondition.Expression(ConditionExpr.Build()
-                            .Field(typeof(QueryBasicEntity), "IdCol").Gt().Value(DbColumnType.Integer, 45)))
+                            .Field(typeof(QueryBasicEntity), "IdCol").Gt().Value(ColumnType.Integer, 45)))
                         .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = query.ToList(connection);
@@ -819,7 +819,7 @@ namespace dbgate.ermanagement
                 ISelectionQuery query = new SelectionQuery()
                         .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
                         .Where(QueryCondition.Expression(ConditionExpr.Build()
-                            .Field(typeof(QueryBasicEntity), "IdCol").Ge().Value(DbColumnType.Integer, 45)))
+                            .Field(typeof(QueryBasicEntity), "IdCol").Ge().Value(ColumnType.Integer, 45)))
                         .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = query.ToList(connection);
@@ -845,7 +845,7 @@ namespace dbgate.ermanagement
                 ISelectionQuery query = new SelectionQuery()
                         .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
                         .Where(QueryCondition.Expression(ConditionExpr.Build()
-                            .Field(typeof(QueryBasicEntity), "IdCol").Lt().Value(DbColumnType.Integer, 45)))
+                            .Field(typeof(QueryBasicEntity), "IdCol").Lt().Value(ColumnType.Integer, 45)))
                         .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = query.ToList(connection);
@@ -871,7 +871,7 @@ namespace dbgate.ermanagement
                 ISelectionQuery query = new SelectionQuery()
                         .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
                         .Where(QueryCondition.Expression(ConditionExpr.Build()
-                            .Field(typeof(QueryBasicEntity), "IdCol").Le().Value(DbColumnType.Integer, 45)))
+                            .Field(typeof(QueryBasicEntity), "IdCol").Le().Value(ColumnType.Integer, 45)))
                         .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = query.ToList(connection);
@@ -897,7 +897,7 @@ namespace dbgate.ermanagement
                 ISelectionQuery query = new SelectionQuery()
                         .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
                         .Where(QueryCondition.Expression(ConditionExpr.Build()
-                            .Field(typeof(QueryBasicEntity), "Name").Like().Value(DbColumnType.Varchar, "Org-NameA")))
+                            .Field(typeof(QueryBasicEntity), "Name").Like().Value(ColumnType.Varchar, "Org-NameA")))
                         .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = query.ToList(connection);
@@ -980,7 +980,7 @@ namespace dbgate.ermanagement
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
-                        .Field(typeof(QueryBasicEntity), "IdCol").Between().Values(DbColumnType.Integer, new object[]{35, 55})))
+                        .Field(typeof(QueryBasicEntity), "IdCol").Between().Values(ColumnType.Integer, new object[]{35, 55})))
                     .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = query.ToList(connection);
@@ -1006,7 +1006,7 @@ namespace dbgate.ermanagement
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
-                        .Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer, new object[] { 35, 55 })))
+                        .Field(typeof(QueryBasicEntity), "IdCol").In().Values(ColumnType.Integer, new object[] { 35, 55 })))
                     .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = query.ToList(connection);
@@ -1126,8 +1126,8 @@ namespace dbgate.ermanagement
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
-                        .Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer,new object[]{35,55})
-                        .And().Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer,new object[]{45,55})))
+                        .Field(typeof(QueryBasicEntity), "IdCol").In().Values(ColumnType.Integer,new object[]{35,55})
+                        .And().Field(typeof(QueryBasicEntity), "IdCol").In().Values(ColumnType.Integer,new object[]{45,55})))
                     .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = query.ToList(connection);
@@ -1153,9 +1153,9 @@ namespace dbgate.ermanagement
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
-                       .Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer,new object[]{35,55})
-                        .Or().Field(typeof(QueryBasicEntity), "IdCol").In().Value(DbColumnType.Integer, 55)
-                        .Or().Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer, new object[] { 45, 55 })))
+                       .Field(typeof(QueryBasicEntity), "IdCol").In().Values(ColumnType.Integer,new object[]{35,55})
+                        .Or().Field(typeof(QueryBasicEntity), "IdCol").In().Value(ColumnType.Integer, 55)
+                        .Or().Field(typeof(QueryBasicEntity), "IdCol").In().Values(ColumnType.Integer, new object[] { 45, 55 })))
                     .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = query.ToList(connection);
@@ -1181,9 +1181,9 @@ namespace dbgate.ermanagement
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
-                       .Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer, new object[] { 35, 55 })
-                        .Or().Field(typeof(QueryBasicEntity), "IdCol").In().Value(DbColumnType.Integer, 55)
-                        .And().Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer, new object[] { 45, 55 })))
+                       .Field(typeof(QueryBasicEntity), "IdCol").In().Values(ColumnType.Integer, new object[] { 35, 55 })
+                        .Or().Field(typeof(QueryBasicEntity), "IdCol").In().Value(ColumnType.Integer, 55)
+                        .And().Field(typeof(QueryBasicEntity), "IdCol").In().Values(ColumnType.Integer, new object[] { 45, 55 })))
                     .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = query.ToList(connection);
@@ -1210,10 +1210,10 @@ namespace dbgate.ermanagement
                     .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
                        .And(ConditionExpr.Build()
-                            .Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer, new object[]{35, 55})
+                            .Field(typeof(QueryBasicEntity), "IdCol").In().Values(ColumnType.Integer, new object[]{35, 55})
                                 ,ConditionExpr.Build()
-                                .Field(typeof(QueryBasicEntity), "IdCol").Eq().Value(DbColumnType.Integer, 55))
-                        .Or().Field(typeof(QueryBasicEntity), "IdCol").Eq().Value(DbColumnType.Integer, 45)))
+                                .Field(typeof(QueryBasicEntity), "IdCol").Eq().Value(ColumnType.Integer, 55))
+                        .Or().Field(typeof(QueryBasicEntity), "IdCol").Eq().Value(ColumnType.Integer, 45)))
                     .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = query.ToList(connection);
@@ -1240,10 +1240,10 @@ namespace dbgate.ermanagement
                     .From(QueryFrom.EntityType(typeof(QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
                        .Or(ConditionExpr.Build()
-                            .Field(typeof(QueryBasicEntity), "IdCol").In().Values(DbColumnType.Integer, new object[]{35, 55})
+                            .Field(typeof(QueryBasicEntity), "IdCol").In().Values(ColumnType.Integer, new object[]{35, 55})
                                 ,ConditionExpr.Build()
-                                .Field(typeof(QueryBasicEntity), "IdCol").Eq().Value(DbColumnType.Integer, 55))
-                        .Or().Field(typeof(QueryBasicEntity), "IdCol").Eq().Value(DbColumnType.Integer, 45)))
+                                .Field(typeof(QueryBasicEntity), "IdCol").Eq().Value(ColumnType.Integer, 55))
+                        .Or().Field(typeof(QueryBasicEntity), "IdCol").Eq().Value(ColumnType.Integer, 45)))
                     .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 ICollection<object> results = query.ToList(connection);
@@ -1487,7 +1487,7 @@ namespace dbgate.ermanagement
                     .GroupBy(QueryGroup.Field(typeof(QueryBasicEntity), "Name"))
                     .Having(QueryGroupCondition.Expression(
                             GroupConditionExpr.Build()
-                                .Field(typeof(QueryBasicEntity), "Name").Count().Gt().Value(DbColumnType.Integer,1)
+                                .Field(typeof(QueryBasicEntity), "Name").Count().Gt().Value(ColumnType.Integer,1)
                     ));
 
                 ICollection<object> results = query.ToList(connection);

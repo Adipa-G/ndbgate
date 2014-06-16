@@ -1,11 +1,11 @@
 ﻿namespace dbgate.ermanagement.support.persistant.inheritancetest
 {
-    [DbTableInfo("inheritance_test_super")]
-    public class InheritanceTestSuperEntityAnnotations : DefaultServerDbClass , IInheritanceTestSuperEntity
+    [TableInfo("inheritance_test_super")]
+    public class InheritanceTestSuperEntityAnnotations : DefaultEntity , IInheritanceTestSuperEntity
     {
-        [DbColumnInfo((DbColumnType.Integer), Key = true, SubClassCommonColumn = true)]
+        [ColumnInfo((ColumnType.Integer), Key = true, SubClassCommonColumn = true)]
         public int IdCol { get; set; }
-        [DbColumnInfo((DbColumnType.Varchar))]
+        [ColumnInfo((ColumnType.Varchar))]
         public string Name { get; set; }
 
         public InheritanceTestSuperEntityAnnotations()

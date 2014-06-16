@@ -1,15 +1,15 @@
 namespace dbgate.ermanagement.support.persistant.changetracker
 {
-    [DbTableInfo("change_tracker_test_one2many")]
-    public class ChangeTrackerTestOne2ManyEntity : DefaultServerDbClass
+    [TableInfo("change_tracker_test_one2many")]
+    public class ChangeTrackerTestOne2ManyEntity : DefaultEntity
     {
-        [DbColumnInfo((DbColumnType.Integer), Key = true)]
+        [ColumnInfo((ColumnType.Integer), Key = true)]
         public int IdCol { get; set; }
 
-        [DbColumnInfo((DbColumnType.Integer), Key = true)]
+        [ColumnInfo((ColumnType.Integer), Key = true)]
         public int IndexNo { get; set; }
 
-        [DbColumnInfo((DbColumnType.Varchar))]
+        [ColumnInfo((ColumnType.Varchar))]
         public string Name { get; set; }
     }
 }

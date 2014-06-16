@@ -1,9 +1,9 @@
 ﻿namespace dbgate.ermanagement.support.persistant.inheritancetest
 {
-    [DbTableInfo("inheritance_test_suba")]
+    [TableInfo("inheritance_test_suba")]
     public class InheritanceTestSubEntityAAnnotations : InheritanceTestSuperEntityAnnotations ,IInheritanceTestSubEntityA
     {
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string NameA { get; set; }
     }
 }

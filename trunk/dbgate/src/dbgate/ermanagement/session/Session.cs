@@ -16,7 +16,7 @@ namespace dbgate.ermanagement.session
             throw new NotImplementedException();
         }
 
-        public void Save(IDbClass dbClass)
+        public void Save(IClientEntity clientEntity)
         {
             throw new NotImplementedException();
         }

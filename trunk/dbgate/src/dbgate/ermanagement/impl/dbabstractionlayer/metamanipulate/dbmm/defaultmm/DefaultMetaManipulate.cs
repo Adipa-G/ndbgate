@@ -201,8 +201,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
                 }
                 sb.Append(metaColumn.Name);
                 sb.Append(" ");
-                if (metaColumn.ColumnType == DbColumnType.Char
-                        || metaColumn.ColumnType == DbColumnType.Varchar)
+                if (metaColumn.ColumnType == ColumnType.Char
+                        || metaColumn.ColumnType == ColumnType.Varchar)
                 {
                     sb.Append(MapColumnTypeToTypeName(metaColumn.ColumnType));
                     sb.Append("(");
@@ -248,8 +248,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
             sb.Append(" ADD ");
             sb.Append(metaColumn.Name);
             sb.Append(" ");
-            if (metaColumn.ColumnType == DbColumnType.Char
-                    || metaColumn.ColumnType == DbColumnType.Varchar)
+            if (metaColumn.ColumnType == ColumnType.Char
+                    || metaColumn.ColumnType == ColumnType.Varchar)
             {
                 sb.Append(MapColumnTypeToTypeName(metaColumn.ColumnType));
                 sb.Append("(");
@@ -309,8 +309,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
             sb.Append(metaColumn.Name);
             sb.Append(" ");
             sb.Append(" SET DATA TYPE ");
-            if (metaColumn.ColumnType == DbColumnType.Char
-                    || metaColumn.ColumnType == DbColumnType.Varchar)
+            if (metaColumn.ColumnType == ColumnType.Char
+                    || metaColumn.ColumnType == ColumnType.Varchar)
             {
                 sb.Append(MapColumnTypeToTypeName(metaColumn.ColumnType));
                 sb.Append("(");

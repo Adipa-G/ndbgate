@@ -3,11 +3,11 @@
 namespace dbgate.ermanagement
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class DbTableInfo : Attribute
+    public class TableInfo : Attribute
     {
         public string TableName;
 
-        public DbTableInfo(string tableName)
+        public TableInfo(string tableName)
         {
             TableName = tableName;
         }

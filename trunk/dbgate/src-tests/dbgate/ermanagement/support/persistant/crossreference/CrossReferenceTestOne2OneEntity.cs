@@ -1,16 +1,16 @@
 namespace dbgate.ermanagement.support.persistant.crossreference
 {
-    [DbTableInfo("cross_reference_test_one2one")]
-    public class CrossReferenceTestOne2OneEntity : DefaultServerDbClass
+    [TableInfo("cross_reference_test_one2one")]
+    public class CrossReferenceTestOne2OneEntity : DefaultEntity
     {
         public CrossReferenceTestOne2OneEntity()
         {
         }
 
-        [DbColumnInfo((DbColumnType.Integer), Key = true)]
+        [ColumnInfo((ColumnType.Integer), Key = true)]
         public int IdCol { get; set; }
     
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string Name { get; set; }
 
         [ForeignKeyInfo("fk_one2oneent2root", typeof(CrossReferenceTestRootEntity), new string[] { "idCol" }

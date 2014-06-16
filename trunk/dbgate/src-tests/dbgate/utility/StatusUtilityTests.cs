@@ -18,12 +18,12 @@ namespace dbgate.utility
             rootEntity.LeafEntityNotNull = leafEntityNotNull;
             rootEntity.LeafEntityNull = null;
 
-            StatusManager.SetStatus(rootEntity, DbClassStatus.Modified);
+            StatusManager.SetStatus(rootEntity, EntityStatus.Modified);
 
-            Assert.AreEqual(rootEntity.Status, DbClassStatus.Modified);
-            Assert.AreEqual(leafEntityA.Status, DbClassStatus.Modified);
-            Assert.AreEqual(leafEntityB.Status, DbClassStatus.Modified);
-            Assert.AreEqual(leafEntityNotNull.Status, DbClassStatus.Modified);
+            Assert.AreEqual(rootEntity.Status, EntityStatus.Modified);
+            Assert.AreEqual(leafEntityA.Status, EntityStatus.Modified);
+            Assert.AreEqual(leafEntityB.Status, EntityStatus.Modified);
+            Assert.AreEqual(leafEntityNotNull.Status, EntityStatus.Modified);
         }
 
         [Test]
@@ -40,15 +40,15 @@ namespace dbgate.utility
 
             bool unModifiedRoot = StatusManager.IsModified(rootEntity);
 
-            rootEntity.Status = DbClassStatus.Modified;
+            rootEntity.Status = EntityStatus.Modified;
             bool modifiedRoot = StatusManager.IsModified(rootEntity);
 
-            rootEntity.Status = DbClassStatus.Unmodified;
-            leafEntityA.Status = DbClassStatus.New;
+            rootEntity.Status = EntityStatus.Unmodified;
+            leafEntityA.Status = EntityStatus.New;
             bool modifiedLeafCollection = StatusManager.IsModified(rootEntity);
 
-            leafEntityA.Status = DbClassStatus.Unmodified;
-            leafEntityNotNull.Status = DbClassStatus.Deleted;
+            leafEntityA.Status = EntityStatus.Unmodified;
+            leafEntityNotNull.Status = EntityStatus.Deleted;
             bool modifiedLeafSubEntity = StatusManager.IsModified(rootEntity);
 
             Assert.IsFalse(unModifiedRoot);
@@ -69,7 +69,7 @@ namespace dbgate.utility
             rootEntity.LeafEntityNotNull = leafEntityNotNull;
             rootEntity.LeafEntityNull = null;
 
-            ICollection<IDbClass> childern = StatusManager.GetImmidiateChildrenAndClear(rootEntity);
+            ICollection<IClientEntity> childern = StatusManager.GetImmidiateChildrenAndClear(rootEntity);
 
             Assert.IsTrue(childern.Contains(leafEntityA));
             Assert.IsTrue(childern.Contains(leafEntityB));

@@ -85,7 +85,7 @@ namespace dbgatetestapp.dbgate.inheritanceexample
             Console.WriteLine("Entity Middle Name = " + entity.MiddleName);
             Console.WriteLine("Entity Sub Name = " + entity.SubName);
 
-            entity.Status = DbClassStatus.Deleted;
+            entity.Status = EntityStatus.Deleted;
             example.Persist(con, entity);
 
             entity = example.Retrieve(con);

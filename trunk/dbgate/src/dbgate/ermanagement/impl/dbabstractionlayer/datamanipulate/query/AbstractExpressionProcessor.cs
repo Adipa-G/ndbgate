@@ -19,14 +19,14 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
             return sql;
         }
 
-        public IDbColumn GetColumn(FieldSegment segment)
+        public IColumn GetColumn(FieldSegment segment)
         {
             var entityInfo = CacheManager.GetEntityInfo(segment.EntityType);
-            ICollection<IDbColumn> columns = entityInfo.Columns;
+            ICollection<IColumn> columns = entityInfo.Columns;
             
             if (columns != null)
             {
-                foreach (IDbColumn column in columns)
+                foreach (IColumn column in columns)
                 {
                     if (column.AttributeName.Equals(segment.Field))
                     {
@@ -45,7 +45,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
                 tableAlias = fieldSegment.TypeAlias;
             }
             tableAlias = (tableAlias == null) ? "" : tableAlias + ".";
-            IDbColumn column = GetColumn(fieldSegment);
+            IColumn column = GetColumn(fieldSegment);
 
             if (column != null)
             {
@@ -275,14 +275,14 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query
             }
         }
 
-        public IDbRelation GetRelation(Type typeFrom,Type typeTo)
+        public IRelation GetRelation(Type typeFrom,Type typeTo)
         {
             var entityInfo = CacheManager.GetEntityInfo(typeFrom);
-            ICollection<IDbRelation> relations = entityInfo.Relations;
+            ICollection<IRelation> relations = entityInfo.Relations;
            
             if (relations != null)
             {
-                foreach (IDbRelation relation in relations)
+                foreach (IRelation relation in relations)
                 {
                     if (relation.RelatedObjectType == typeTo)
                     {

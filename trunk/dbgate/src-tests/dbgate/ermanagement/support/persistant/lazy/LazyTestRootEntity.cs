@@ -2,13 +2,13 @@ using System.Collections.Generic;
 
 namespace dbgate.ermanagement.support.persistant.lazy
 {
-    [DbTableInfo("lazy_test_root")]
-    public class LazyTestRootEntity : DefaultServerDbClass
+    [TableInfo("lazy_test_root")]
+    public class LazyTestRootEntity : DefaultEntity
     {
-        [DbColumnInfo((DbColumnType.Integer), Key = true)]
+        [ColumnInfo((ColumnType.Integer), Key = true)]
         public virtual int IdCol { get; set; }
 
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public virtual string Name { get; set; }
 
         [ForeignKeyInfo("fk_root2one2manyent",typeof(LazyTestOne2ManyEntity),new string[]{"idCol"}

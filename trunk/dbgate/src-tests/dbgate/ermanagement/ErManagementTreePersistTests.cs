@@ -233,16 +233,16 @@ namespace  dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
 
                 loadedEntity.Name = "changed-name";
-                loadedEntity.Status = DbClassStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.One2OneEntity.Name = "changed-one2one";
-                loadedEntity.One2OneEntity.Status = DbClassStatus.Modified;
+                loadedEntity.One2OneEntity.Status = EntityStatus.Modified;
 
                 IEnumerator<ITreeTestOne2ManyEntity> enumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
 
                 ITreeTestOne2ManyEntity one2ManyEntity = enumerator.Current;
                 one2ManyEntity.Name = "changed-one2many";
-                one2ManyEntity.Status = DbClassStatus.Modified;
+                one2ManyEntity.Status = EntityStatus.Modified;
 
                 loadedEntity.Persist(connection);
 
@@ -277,16 +277,16 @@ namespace  dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
 
                 loadedEntity.Name = "changed-name";
-                loadedEntity.Status = DbClassStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.One2OneEntity.Name = "changed-one2one";
-                loadedEntity.One2OneEntity.Status = DbClassStatus.Modified;
+                loadedEntity.One2OneEntity.Status = EntityStatus.Modified;
 
                 IEnumerator<ITreeTestOne2ManyEntity> enumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
 
                 ITreeTestOne2ManyEntity one2ManyEntity = enumerator.Current;
                 one2ManyEntity.Name = "changed-one2many";
-                one2ManyEntity.Status = DbClassStatus.Modified;
+                one2ManyEntity.Status = EntityStatus.Modified;
 
                 loadedEntity.Persist(connection);
 
@@ -323,16 +323,16 @@ namespace  dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
 
                 loadedEntity.Name = "changed-name";
-                loadedEntity.Status = DbClassStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.One2OneEntity.Name = "changed-one2one";
-                loadedEntity.One2OneEntity.Status = DbClassStatus.Modified;
+                loadedEntity.One2OneEntity.Status = EntityStatus.Modified;
 
                 IEnumerator<ITreeTestOne2ManyEntity> enumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
 
                 ITreeTestOne2ManyEntity one2ManyEntity = enumerator.Current;
                 one2ManyEntity.Name = "changed-one2many";
-                one2ManyEntity.Status = DbClassStatus.Modified;
+                one2ManyEntity.Status = EntityStatus.Modified;
 
                 loadedEntity.Persist(connection);
 
@@ -367,7 +367,7 @@ namespace  dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
 
                 loadedEntity.Name = "changed-name";
-                loadedEntity.Status = DbClassStatus.Deleted;
+                loadedEntity.Status = EntityStatus.Deleted;
 
                 loadedEntity.Persist(connection);
 
@@ -405,7 +405,7 @@ namespace  dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
 
                 loadedEntity.Name  = "changed-name";
-                loadedEntity.Status = DbClassStatus.Deleted;
+                loadedEntity.Status = EntityStatus.Deleted;
 
                 loadedEntity.Persist(connection);
 
@@ -445,7 +445,7 @@ namespace  dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
 
                 loadedEntity.Name = "changed-name";
-                loadedEntity.Status = DbClassStatus.Deleted;
+                loadedEntity.Status = EntityStatus.Deleted;
 
                 loadedEntity.Persist(connection);
 

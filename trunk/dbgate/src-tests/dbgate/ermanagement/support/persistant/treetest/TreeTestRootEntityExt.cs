@@ -10,7 +10,7 @@ namespace dbgate.ermanagement.support.persistant.treetest
     {
         private IEntityContext _context;
 
-        public DbClassStatus Status { get; set; }
+        public EntityStatus Status { get; set; }
         public int IdCol { get; set; }
         public string Name { get; set; }
         public List<ITreeTestOne2ManyEntity> One2ManyEntities { get; set; }
@@ -18,7 +18,7 @@ namespace dbgate.ermanagement.support.persistant.treetest
         
         public TreeTestRootEntityExt()
         {
-            Status = DbClassStatus.New;
+            Status = EntityStatus.New;
             _context = new EntityContext();
         }
 

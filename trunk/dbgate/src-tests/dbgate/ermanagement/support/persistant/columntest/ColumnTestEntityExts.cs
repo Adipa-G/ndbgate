@@ -15,7 +15,7 @@ namespace dbgate.ermanagement.support.persistant.columntest
             _context = new EntityContext();
         }
 
-        public DbClassStatus Status { get; set; }
+        public EntityStatus Status { get; set; }
         public int IdCol { get; set; }
         public long LongNotNull { get; set; }
         public long? LongNull { get; set; }

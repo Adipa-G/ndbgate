@@ -45,14 +45,14 @@ namespace dbgate.ermanagement.impl
             _config.LoggerName = DefaultLoggerName;
         }
 
-        public void Load(IServerRoDbClass roEntity, IDataReader reader, IDbConnection con)
+        public void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, IDbConnection con)
         {
-            _erDataManager.Load(roEntity, reader, con);
+            _erDataManager.Load(readOnlyEntity, reader, con);
         }
 
-        public void Save(IServerDbClass serverDbClass, IDbConnection con)
+        public void Save(IEntity entity, IDbConnection con)
         {
-            _erDataManager.Save(serverDbClass, con);
+            _erDataManager.Save(entity, con);
         }
 
         public ICollection<Object> Select(ISelectionQuery query,IDbConnection con)

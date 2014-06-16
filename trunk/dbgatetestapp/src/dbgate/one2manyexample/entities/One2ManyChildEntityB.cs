@@ -3,16 +3,16 @@ using dbgate.ermanagement;
 
 namespace dbgatetestapp.dbgate.one2manyexample.entities
 {
-    [DbTableInfo("child_entity_b")]
+    [TableInfo("child_entity_b")]
     public class One2ManyChildEntityB : One2ManyChildEntity
     {
-        [DbColumnInfo(DbColumnType.Integer, Key = true)]
+        [ColumnInfo(ColumnType.Integer, Key = true)]
         public int ParentId { get; set; }
 
-        [DbColumnInfo(DbColumnType.Integer, Key = true)]
+        [ColumnInfo(ColumnType.Integer, Key = true)]
         public int IndexNo { get; set; }
 
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public override string Name { get; set; }
     }
 }

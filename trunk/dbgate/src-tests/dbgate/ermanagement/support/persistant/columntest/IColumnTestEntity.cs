@@ -2,7 +2,7 @@
 
 namespace dbgate.ermanagement.support.persistant.columntest
 {
-    public interface IColumnTestEntity : IServerDbClass
+    public interface IColumnTestEntity : IEntity
     {
         int IdCol { get; set; }
 

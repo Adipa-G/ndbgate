@@ -11,40 +11,40 @@ namespace dbgate.ermanagement.impl.utils
 {
     public class ErDataManagerUtils
     {
-        public static ICollection<IServerDbClass> GetRelationEntities(IServerRoDbClass rootEntity, IDbRelation relation)
+        public static ICollection<IEntity> GetRelationEntities(IReadOnlyEntity rootEntity, IRelation relation)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(rootEntity);
             PropertyInfo property = entityInfo.GetProperty(relation.AttributeName);
             object value = ReflectionUtils.GetValue(property, rootEntity);
 
-            ICollection<IServerDbClass> treeEntities = new List<IServerDbClass>();
+            ICollection<IEntity> treeEntities = new List<IEntity>();
             if (value is ICollection)
             {
                 ICollection collection = (ICollection) value;
                 foreach (object o in collection)
                 {
-                    if (o is IServerDbClass
+                    if (o is IEntity
                         && ReflectionUtils.IsSubClassOf(o.GetType(),relation.RelatedObjectType))
                     {
-                        treeEntities.Add((IServerDbClass) o);
+                        treeEntities.Add((IEntity) o);
                     }
                 }
             }
-            else if (value is IServerDbClass
+            else if (value is IEntity
                      && ReflectionUtils.IsSubClassOf(value.GetType(),relation.RelatedObjectType))
             {
-                treeEntities.Add((IServerDbClass) value);
+                treeEntities.Add((IEntity) value);
             }
             return treeEntities;
         }
 
-        public static IEntityFieldValueList ExtractEntityKeyValues(IServerRoDbClass entity)
+        public static IEntityFieldValueList ExtractEntityKeyValues(IReadOnlyEntity entity)
         {
             EntityFieldValueList valueList = null;
-            if (entity is IServerDbClass)
+            if (entity is IEntity)
             {
                 valueList = new EntityFieldValueList(entity);
-                IServerDbClass entityDbClass = (IServerDbClass) entity;
+                IEntity entityDbClass = (IEntity) entity;
                 ICollection<EntityFieldValue> extractedValues = ExtractValues(entityDbClass, true, entity.GetType());
                 foreach (EntityFieldValue entityFieldValue in extractedValues)
                 {
@@ -54,13 +54,13 @@ namespace dbgate.ermanagement.impl.utils
             return valueList;
         }
 
-        public static ITypeFieldValueList ExtractEntityTypeFieldValues(IServerRoDbClass entity,Type type) 
+        public static ITypeFieldValueList ExtractEntityTypeFieldValues(IReadOnlyEntity entity,Type type) 
         {
             EntityTypeFieldValueList valueList = null;
-            if (entity is IServerDbClass)
+            if (entity is IEntity)
             {
                 valueList = new EntityTypeFieldValueList(type);
-                IServerDbClass entityDbClass = (IServerDbClass) entity;
+                IEntity entityDbClass = (IEntity) entity;
                 ICollection<EntityFieldValue> extractedValues = ExtractValues(entityDbClass,false,type);
                 foreach (EntityFieldValue entityFieldValue in extractedValues)
                 {
@@ -70,13 +70,13 @@ namespace dbgate.ermanagement.impl.utils
             return valueList;
         }
 
-        public static ITypeFieldValueList ExtractEntityTypeKeyValues(IServerRoDbClass entity,Type type)
+        public static ITypeFieldValueList ExtractEntityTypeKeyValues(IReadOnlyEntity entity,Type type)
         {
             EntityTypeFieldValueList valueList = null;
-            if (entity is IServerDbClass)
+            if (entity is IEntity)
             {
                 valueList = new EntityTypeFieldValueList(type);
-                IServerDbClass entityDbClass = (IServerDbClass) entity;
+                IEntity entityDbClass = (IEntity) entity;
                 ICollection<EntityFieldValue> extractedValues = ExtractValues(entityDbClass,true,type);
                 foreach (EntityFieldValue entityFieldValue in extractedValues)
                 {
@@ -86,13 +86,13 @@ namespace dbgate.ermanagement.impl.utils
             return valueList;
         }
 
-        public static ITypeFieldValueList ExtractRelationKeyValues(IServerRoDbClass child,IDbRelation relation)
+        public static ITypeFieldValueList ExtractRelationKeyValues(IReadOnlyEntity child,IRelation relation)
         {
             EntityRelationFieldValueList valueList = null;
-            if (child is IServerDbClass)
+            if (child is IEntity)
             {
                 valueList = new EntityRelationFieldValueList(relation);
-                IServerDbClass childDbClass = (IServerDbClass) child;
+                IEntity childDbClass = (IEntity) child;
                 ICollection<EntityFieldValue> extractedValues = ExtractValues(childDbClass,true,null);
                 foreach (EntityFieldValue entityFieldValue in extractedValues)
                 {
@@ -102,7 +102,7 @@ namespace dbgate.ermanagement.impl.utils
             return valueList;
         }
 
-        private static ICollection<EntityFieldValue> ExtractValues(IServerDbClass entity,bool key,Type typeToLoad)
+        private static ICollection<EntityFieldValue> ExtractValues(IEntity entity,bool key,Type typeToLoad)
         {
             ICollection<EntityFieldValue> entityFieldValues = new List<EntityFieldValue>();
             EntityInfo parentEntityInfo = CacheManager.GetEntityInfo(entity);
@@ -115,8 +115,8 @@ namespace dbgate.ermanagement.impl.utils
                     entityInfo = entityInfo.SuperEntityInfo;
                     continue;
                 }
-                ICollection<IDbColumn> subLevelColumns = entityInfo.Columns;
-                foreach (IDbColumn subLevelColumn in subLevelColumns)
+                ICollection<IColumn> subLevelColumns = entityInfo.Columns;
+                foreach (IColumn subLevelColumn in subLevelColumns)
                 {
                     if (!key || (subLevelColumn.Key && key))
                     {
@@ -173,7 +173,7 @@ namespace dbgate.ermanagement.impl.utils
                 bool found  = false;
                 foreach (EntityFieldValue fieldValue2 in item2.FieldValues)
                 {
-                    if (fieldValue1.DbColumn.AttributeName.Equals(fieldValue2.DbColumn.AttributeName))
+                    if (fieldValue1.Column.AttributeName.Equals(fieldValue2.Column.AttributeName))
                     {
                         found = fieldValue1.Value == fieldValue2.Value
                                 || (fieldValue1.Value != null && fieldValue1.Value.Equals(fieldValue2.Value));
@@ -191,9 +191,9 @@ namespace dbgate.ermanagement.impl.utils
             return true;
         }
 
-        public static IDbColumn FindColumnByAttribute(ICollection<IDbColumn> columns,String attribute)
+        public static IColumn FindColumnByAttribute(ICollection<IColumn> columns,String attribute)
         {
-            foreach (IDbColumn column in columns)
+            foreach (IColumn column in columns)
             {
                 if (column.AttributeName.Equals(attribute,StringComparison.InvariantCultureIgnoreCase))
                 {
@@ -207,7 +207,7 @@ namespace dbgate.ermanagement.impl.utils
         {
             foreach (EntityFieldValue fieldValue in fieldValues.FieldValues)
             {
-                if (fieldValue.DbColumn.ColumnType == DbColumnType.Version)
+                if (fieldValue.Column.ColumnType == ColumnType.Version)
                 {
                     int version = int.Parse(fieldValue.Value.ToString());
                     version++;

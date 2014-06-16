@@ -4,12 +4,12 @@ using dbgate.ermanagement;
 
 namespace dbgatetestapp.dbgate.complexexample.entities.order
 {
-    [DbTableInfo("order_transaction")]
-    public class Transaction : DefaultServerDbClass
+    [TableInfo("order_transaction")]
+    public class Transaction : DefaultEntity
     {
-        [DbColumnInfo(DbColumnType.Integer,Key = true)]
+        [ColumnInfo(ColumnType.Integer,Key = true)]
         public int TransactionId { get; set; }
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string Name { get; set; }
 
         [ForeignKeyInfo("tx2item_tx", typeof(dbgatetestapp.dbgate.complexexample.entities.order.ItemTransaction), new string[] { "transactionId" },new string[] { "transactionId"}

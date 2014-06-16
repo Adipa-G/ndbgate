@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace dbgate.ermanagement.support.persistant.treetest
 {
-    public class TreeTestOne2ManyEntityFields : AbstractManagedDbClass , ITreeTestOne2ManyEntity
+    public class TreeTestOne2ManyEntityFields : AbstractManagedEntity , ITreeTestOne2ManyEntity
     {
         public int IdCol { get; set; }
         public int IndexNo { get; set; }
@@ -26,9 +26,9 @@ namespace dbgate.ermanagement.support.persistant.treetest
                 Dictionary<Type, ICollection<IField>> map = new Dictionary<Type, ICollection<IField>>();
                 List<IField> dbColumns = new List<IField>();
 
-                dbColumns.Add(new DefaultDbColumn("IdCol", true, false, DbColumnType.Integer));
-                dbColumns.Add(new DefaultDbColumn("IndexNo", true, false, DbColumnType.Integer));
-                dbColumns.Add(new DefaultDbColumn("Name", DbColumnType.Varchar));
+                dbColumns.Add(new DefaultColumn("IdCol", true, false, ColumnType.Integer));
+                dbColumns.Add(new DefaultColumn("IndexNo", true, false, ColumnType.Integer));
+                dbColumns.Add(new DefaultColumn("Name", ColumnType.Varchar));
 
                 map.Add(typeof(TreeTestOne2ManyEntityFields), dbColumns);
                 return map;

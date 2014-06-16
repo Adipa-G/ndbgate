@@ -1,16 +1,16 @@
 namespace dbgate.ermanagement.support.query.basic
 {
-    [DbTableInfo("query_basic_details")]
-    public class QueryBasicDetailsEntity : DefaultServerDbClass
+    [TableInfo("query_basic_details")]
+    public class QueryBasicDetailsEntity : DefaultEntity
     {
         public QueryBasicDetailsEntity()
         {
         }
 
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string Name { get; set; }
     
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string Description { get; set; }
     }
 }

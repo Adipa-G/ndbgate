@@ -153,7 +153,7 @@ namespace dbgate.ermanagement
                 transaction = connection.BeginTransaction();
                 ConstraintTestReverseRootEntity loadedEntity = new ConstraintTestReverseRootEntity();
                 LoadEntityWithId(connection,loadedEntity,id);
-                loadedEntity.One2OneEntity.Status =DbClassStatus.Deleted;
+                loadedEntity.One2OneEntity.Status =EntityStatus.Deleted;
                 loadedEntity.Persist(connection);
                 transaction.Commit();
 
@@ -200,7 +200,7 @@ namespace dbgate.ermanagement
                 IEnumerator<ConstraintTestOne2ManyEntity> childEnumarator = loadedEntity.One2ManyEntities.GetEnumerator();
                 childEnumarator.MoveNext();
                 ConstraintTestOne2ManyEntity loadedOne2ManyEntity = childEnumarator.Current;
-                loadedOne2ManyEntity.Status = DbClassStatus.Deleted;
+                loadedOne2ManyEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(connection);
                 transaction.Commit();
 
@@ -243,7 +243,7 @@ namespace dbgate.ermanagement
                 transaction = connection.BeginTransaction();
                 ConstraintTestReverseRootEntity loadedEntity = new ConstraintTestReverseRootEntity();
                 LoadEntityWithId(connection,loadedEntity,id);
-                loadedEntity.Status = DbClassStatus.Deleted;
+                loadedEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(connection);
                 transaction.Commit();
 
@@ -287,7 +287,7 @@ namespace dbgate.ermanagement
                 transaction = connection.BeginTransaction();
                 ConstraintTestReverseRootEntity loadedEntity = new ConstraintTestReverseRootEntity();
                 LoadEntityWithId(connection,loadedEntity,id);
-                loadedEntity.Status = DbClassStatus.Deleted;
+                loadedEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(connection);
                 transaction.Commit();
 
@@ -329,7 +329,7 @@ namespace dbgate.ermanagement
             transaction = connection.BeginTransaction();
             ConstraintTestDeleteRestrictRootEntity loadedEntity = new ConstraintTestDeleteRestrictRootEntity();
             LoadEntityWithId(connection,loadedEntity,id);
-            loadedEntity.Status = DbClassStatus.Deleted;
+            loadedEntity.Status = EntityStatus.Deleted;
             loadedEntity.Persist(connection);
             transaction.Commit();
             connection.Close();
@@ -359,7 +359,7 @@ namespace dbgate.ermanagement
             transaction = connection.BeginTransaction();
             ConstraintTestDeleteRestrictRootEntity loadedEntity = new ConstraintTestDeleteRestrictRootEntity();
             LoadEntityWithId(connection,loadedEntity,id);
-            loadedEntity.Status = DbClassStatus.Deleted;
+            loadedEntity.Status = EntityStatus.Deleted;
             loadedEntity.Persist(connection);
             transaction.Commit();
             connection.Close();
@@ -394,7 +394,7 @@ namespace dbgate.ermanagement
                 IEnumerator<ConstraintTestOne2ManyEntity> childEnumarator = loadedEntity.One2ManyEntities.GetEnumerator();
                 childEnumarator.MoveNext();
                 ConstraintTestOne2ManyEntity loadedOne2ManyEntity = childEnumarator.Current;
-                loadedOne2ManyEntity.Status = DbClassStatus.Deleted;
+                loadedOne2ManyEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(connection);
                 transaction.Commit();
 
@@ -437,7 +437,7 @@ namespace dbgate.ermanagement
                 transaction = connection.BeginTransaction();
                 ConstraintTestDeleteCascadeRootEntity loadedEntity = new ConstraintTestDeleteCascadeRootEntity();
                 LoadEntityWithId(connection,loadedEntity,id);
-                loadedEntity.One2OneEntity.Status = DbClassStatus.Deleted;
+                loadedEntity.One2OneEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(connection);
                 transaction.Commit();
 
@@ -481,7 +481,7 @@ namespace dbgate.ermanagement
                 transaction = connection.BeginTransaction();
                 ConstraintTestDeleteCascadeRootEntity loadedEntity = new ConstraintTestDeleteCascadeRootEntity();
                 LoadEntityWithId(connection,loadedEntity,id);
-                loadedEntity.Status = DbClassStatus.Deleted;
+                loadedEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(connection);
                 transaction.Commit();
 
@@ -524,7 +524,7 @@ namespace dbgate.ermanagement
                 transaction = connection.BeginTransaction();
                 ConstraintTestDeleteCascadeRootEntity loadedEntity = new ConstraintTestDeleteCascadeRootEntity();
                 LoadEntityWithId(connection,loadedEntity,id);
-                loadedEntity.Status = DbClassStatus.Deleted;
+                loadedEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(connection);
                 transaction.Commit();
 

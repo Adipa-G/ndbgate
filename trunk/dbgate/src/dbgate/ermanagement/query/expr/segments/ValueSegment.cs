@@ -4,10 +4,10 @@ namespace dbgate.ermanagement.query.expr.segments
 {
     public class ValueSegment : BaseSegment
     {
-        private readonly DbColumnType _type;
+        private readonly ColumnType _type;
         private readonly object[] _values;
 
-        public ValueSegment(DbColumnType type, object[] values)
+        public ValueSegment(ColumnType type, object[] values)
         {
             this._type = type;
             this._values = values;
@@ -18,7 +18,7 @@ namespace dbgate.ermanagement.query.expr.segments
             get { return SegmentType.Value;}
         }
 
-        public DbColumnType Type
+        public ColumnType Type
         {
             get { return _type; }
         }

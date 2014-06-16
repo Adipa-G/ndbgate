@@ -2,14 +2,14 @@ namespace dbgate.ermanagement.context.impl
 {
     public class EntityFieldValueList : EntityTypeFieldValueList , IEntityFieldValueList
     {
-        private readonly IServerRoDbClass _entity;
+        private readonly IReadOnlyEntity _entity;
 
-        public EntityFieldValueList(IServerRoDbClass entity) : base (entity.GetType())
+        public EntityFieldValueList(IReadOnlyEntity entity) : base (entity.GetType())
         {
             _entity = entity;
         }
 
-        public IServerRoDbClass Entity
+        public IReadOnlyEntity Entity
         {
             get {  return _entity; }
         }

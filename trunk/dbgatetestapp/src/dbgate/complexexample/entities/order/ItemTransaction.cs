@@ -5,14 +5,14 @@ using dbgatetestapp.dbgate.complexexample.entities.product;
 
 namespace dbgatetestapp.dbgate.complexexample.entities.order
 {
-    [DbTableInfo("order_item_transaction")]
-    public class ItemTransaction  : DefaultServerDbClass
+    [TableInfo("order_item_transaction")]
+    public class ItemTransaction  : DefaultEntity
     {
-        [DbColumnInfo(DbColumnType.Integer,Key = true)]
+        [ColumnInfo(ColumnType.Integer,Key = true)]
         public int TransactionId { get; set; }
-        [DbColumnInfo(DbColumnType.Integer,Key = true)]
+        [ColumnInfo(ColumnType.Integer,Key = true)]
         public int IndexNo { get; set; }
-        [DbColumnInfo(DbColumnType.Integer)]
+        [ColumnInfo(ColumnType.Integer)]
         public int ItemId { get; set; }
 
         [ForeignKeyInfo("item_tx2product", typeof (Product), new string[] {"itemId"}, new string[] {"itemId"}

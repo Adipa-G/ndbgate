@@ -16,15 +16,15 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.sqllit
 
         protected override void FillDataMappings(IDbConnection con)
         {
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("INTEGER",DbColumnType.Integer,"0"));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("BOOL",DbColumnType.Boolean,"true"));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("FLOAT",DbColumnType.Float,"0"));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("CHAR", DbColumnType.Char,"' '"));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("DATE",DbColumnType.Date,"1981/10/12"));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("DOUBLE",DbColumnType.Double,"0"));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("BIGINT",DbColumnType.Long,"0"));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("TIMESTAMP",DbColumnType.Timestamp,"1981/10/12"));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("VARCHAR",DbColumnType.Varchar,"''"));   
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("INTEGER",ColumnType.Integer,"0"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("BOOL",ColumnType.Boolean,"true"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("FLOAT",ColumnType.Float,"0"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("CHAR", ColumnType.Char,"' '"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("DATE",ColumnType.Date,"1981/10/12"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("DOUBLE",ColumnType.Double,"0"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("BIGINT",ColumnType.Long,"0"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("TIMESTAMP",ColumnType.Timestamp,"1981/10/12"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("VARCHAR",ColumnType.Varchar,"''"));   
         }
 
         protected override void ExtractPrimaryKeyData(IDbConnection con, MetaTable table)
@@ -57,8 +57,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.sqllit
                 }
                 sb.Append(metaColumn.Name);
                 sb.Append(" ");
-                if (metaColumn.ColumnType == DbColumnType.Char
-                        || metaColumn.ColumnType == DbColumnType.Varchar)
+                if (metaColumn.ColumnType == ColumnType.Char
+                        || metaColumn.ColumnType == ColumnType.Varchar)
                 {
                     sb.Append(MapColumnTypeToTypeName(metaColumn.ColumnType));
                     sb.Append("(");

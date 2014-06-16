@@ -2,13 +2,13 @@ using System.Collections.Generic;
 
 namespace dbgate.ermanagement.support.persistant.constraint
 {
-    [DbTableInfo("constraint_test_root")]
-    public class ConstraintTestDeleteRestrictRootEntity : DefaultServerDbClass
+    [TableInfo("constraint_test_root")]
+    public class ConstraintTestDeleteRestrictRootEntity : DefaultEntity
     {
-        [DbColumnInfo((DbColumnType.Integer), Key = true)]
+        [ColumnInfo((ColumnType.Integer), Key = true)]
         public int IdCol { get; set; }
 
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string Name { get; set; }
 
         [ForeignKeyInfo("fk_root2one2manyent", typeof(ConstraintTestOne2ManyEntity), new string[] { "idCol" }

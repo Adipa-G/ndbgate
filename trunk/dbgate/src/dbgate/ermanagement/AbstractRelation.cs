@@ -3,17 +3,17 @@ using System.Collections.Generic;
 
 namespace dbgate.ermanagement
 {
-    public abstract class AbstractDbRelation : IDbRelation
+    public abstract class AbstractRelation : IRelation
     {
-        protected AbstractDbRelation(String attributeName, string relationshipName,Type relatedObjectType
-                    , DbRelationColumnMapping[] tableColumnMappings)
+        protected AbstractRelation(String attributeName, string relationshipName,Type relatedObjectType
+                    , RelationColumnMapping[] tableColumnMappings)
             : this(attributeName, relationshipName, relatedObjectType, tableColumnMappings,ReferentialRuleType.Restrict
                     , ReferentialRuleType.Cascade,false,false,false)
         {
         }
 
-        protected AbstractDbRelation(String attributeName, string relationshipName, Type relatedObjectType
-                                    , DbRelationColumnMapping[] tableColumnMappings,ReferentialRuleType updateRule
+        protected AbstractRelation(String attributeName, string relationshipName, Type relatedObjectType
+                                    , RelationColumnMapping[] tableColumnMappings,ReferentialRuleType updateRule
                                     , ReferentialRuleType deleteRule,bool reverseRelationship
                                     ,bool nonIdentifyingRelation,bool lazy)
         {
@@ -28,7 +28,7 @@ namespace dbgate.ermanagement
             Lazy = lazy;
         }
 
-        #region IDbRelation Members
+        #region IRelation Members
 
         public string AttributeName { get; set; }
 
@@ -36,7 +36,7 @@ namespace dbgate.ermanagement
 
         public Type RelatedObjectType { get; set; }
 
-        public ICollection<DbRelationColumnMapping> TableColumnMappings { get; set; }
+        public ICollection<RelationColumnMapping> TableColumnMappings { get; set; }
 
         public ReferentialRuleType UpdateRule { get; set; }
 

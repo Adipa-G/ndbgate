@@ -1,12 +1,12 @@
 ﻿namespace dbgate.utility.support
 {
-    public class LeafEntity : IDbClass
+    public class LeafEntity : IClientEntity
     {
-        public DbClassStatus Status { get; set; }
+        public EntityStatus Status { get; set; }
 
         public LeafEntity()
         {
-            Status = DbClassStatus.Unmodified;
+            Status = EntityStatus.Unmodified;
         }
     }
 }

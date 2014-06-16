@@ -26,12 +26,12 @@ namespace dbgate.ermanagement.impl
             _erDataPersistManager = new ErDataPersistManager(dbLayer,statistics,config);
         }
 
-        public void Load(IServerRoDbClass roEntity, IDataReader reader, IDbConnection con) 
+        public void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, IDbConnection con) 
         {
-            _erDataRetrievalManager.Load(roEntity, reader, con);
+            _erDataRetrievalManager.Load(readOnlyEntity, reader, con);
         }
 
-        public void Save(IServerDbClass entity,IDbConnection con )
+        public void Save(IEntity entity,IDbConnection con )
         {
             _erDataPersistManager.Save(entity,con);
         }

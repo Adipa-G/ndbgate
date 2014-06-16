@@ -2,11 +2,11 @@ namespace dbgate.ermanagement.impl.utils
 {
     public class MiscUtils
     {
-        public static void Modify(IServerDbClass serverDbClass)
+        public static void Modify(IEntity entity)
         {
-            if (serverDbClass.Status == DbClassStatus.Unmodified)
+            if (entity.Status == EntityStatus.Unmodified)
             {
-                serverDbClass.Status = DbClassStatus.Modified;
+                entity.Status = EntityStatus.Modified;
             }
         }
     }

@@ -8,7 +8,7 @@ namespace dbgate.ermanagement.context
 
         bool IsProcessed(ITypeFieldValueList typeKeyFieldList);
 
-        IServerRoDbClass GetProcessed(ITypeFieldValueList typeKeyFieldList);
+        IReadOnlyEntity GetProcessed(ITypeFieldValueList typeKeyFieldList);
 
         void CheckAndAddEntityList(IEntityFieldValueList entityKeyFieldList);
     }

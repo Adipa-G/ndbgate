@@ -3,10 +3,10 @@ using dbgate.ermanagement;
 
 namespace dbgatetestapp.dbgate.inheritanceexample.entities
 {
-    [DbTableInfo("sub_entity")]
+    [TableInfo("sub_entity")]
     public class SubEntity : MiddleEntity
     {
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string SubName { get; set; }
 
         public SubEntity()

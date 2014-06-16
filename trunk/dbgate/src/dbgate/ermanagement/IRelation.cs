@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace dbgate.ermanagement
 {
-    public interface IDbRelation : IField
+    public interface IRelation : IField
     {
         string RelationShipName { get; set; }
 
         Type RelatedObjectType { get; set; }
 
-        ICollection<DbRelationColumnMapping> TableColumnMappings { get; set; }
+        ICollection<RelationColumnMapping> TableColumnMappings { get; set; }
 
         ReferentialRuleType UpdateRule { get; set; }
 

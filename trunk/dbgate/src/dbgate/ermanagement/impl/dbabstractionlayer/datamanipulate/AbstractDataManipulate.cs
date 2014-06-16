@@ -44,11 +44,11 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 
         #region IDataManipulate Members
 
-        public string CreateLoadQuery(string tableName, ICollection<IDbColumn> dbColumns)
+        public string CreateLoadQuery(string tableName, ICollection<IColumn> dbColumns)
         {
-            var keys = new List<IDbColumn>();
+            var keys = new List<IColumn>();
 
-            foreach (IDbColumn dbColumn in dbColumns)
+            foreach (IColumn dbColumn in dbColumns)
             {
                 if (dbColumn.Key)
                 {
@@ -63,31 +63,31 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 
             for (int i = 0; i < keys.Count; i++)
             {
-                IDbColumn dbColumn = keys[i];
+                IColumn column = keys[i];
                 if (i != 0)
                 {
                     sb.Append(" AND ");
                 }
-                sb.Append(dbColumn.ColumnName);
+                sb.Append(column.ColumnName);
                 sb.Append("= ?");
             }
 
             return sb.ToString();
         }
 
-        public string CreateInsertQuery(string tableName, ICollection<IDbColumn> dbColumns)
+        public string CreateInsertQuery(string tableName, ICollection<IColumn> dbColumns)
         {
             var sb = new StringBuilder();
             sb.Append("INSERT INTO ");
             sb.Append(tableName);
             sb.Append(" (");
 
-            IEnumerator<IDbColumn> enumerator = dbColumns.GetEnumerator();
+            IEnumerator<IColumn> enumerator = dbColumns.GetEnumerator();
             int i = 0;
 
             while (enumerator.MoveNext())
             {
-                IDbColumn column = enumerator.Current;
+                IColumn column = enumerator.Current;
                 if (i != 0)
                 {
                     sb.Append(",");
@@ -114,12 +114,12 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             return sb.ToString();
         }
 
-        public string CreateUpdateQuery(string tableName, ICollection<IDbColumn> dbColumns)
+        public string CreateUpdateQuery(string tableName, ICollection<IColumn> dbColumns)
         {
-            var keys = new List<IDbColumn>();
-            var values = new List<IDbColumn>();
+            var keys = new List<IColumn>();
+            var values = new List<IColumn>();
 
-            foreach (IDbColumn dbColumn in dbColumns)
+            foreach (IColumn dbColumn in dbColumns)
             {
                 if (dbColumn.Key)
                 {
@@ -138,35 +138,35 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 
             for (int i = 0; i < values.Count; i++)
             {
-                IDbColumn dbColumn = values[i];
+                IColumn column = values[i];
                 if (i != 0)
                 {
                     sb.Append(",");
                 }
-                sb.Append(dbColumn.ColumnName);
+                sb.Append(column.ColumnName);
                 sb.Append(" = ?");
             }
 
             sb.Append(" WHERE ");
             for (int i = 0; i < keys.Count; i++)
             {
-                IDbColumn dbColumn = keys[i];
+                IColumn column = keys[i];
                 if (i != 0)
                 {
                     sb.Append(" AND ");
                 }
-                sb.Append(dbColumn.ColumnName);
+                sb.Append(column.ColumnName);
                 sb.Append("= ?");
             }
 
             return sb.ToString();
         }
 
-        public string CreateDeleteQuery(string tableName, ICollection<IDbColumn> dbColumns)
+        public string CreateDeleteQuery(string tableName, ICollection<IColumn> dbColumns)
         {
-            var keys = new List<IDbColumn>();
+            var keys = new List<IColumn>();
 
-            foreach (IDbColumn dbColumn in dbColumns)
+            foreach (IColumn dbColumn in dbColumns)
             {
                 if (dbColumn.Key)
                 {
@@ -181,19 +181,19 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 
             for (int i = 0; i < keys.Count; i++)
             {
-                IDbColumn dbColumn = keys[i];
+                IColumn column = keys[i];
                 if (i != 0)
                 {
                     sb.Append(" AND ");
                 }
-                sb.Append(dbColumn.ColumnName);
+                sb.Append(column.ColumnName);
                 sb.Append("= ?");
             }
 
             return sb.ToString();
         }
 
-        public string CreateRelatedObjectsLoadQuery(IDbRelation relation)
+        public string CreateRelatedObjectsLoadQuery(IRelation relation)
         {
             var entityInfo = CacheManager.GetEntityInfo(relation.RelatedObjectType);
 
@@ -202,13 +202,13 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             sb.Append(entityInfo.TableName);
             sb.Append(" WHERE ");
 
-            IEnumerator<DbRelationColumnMapping> enumerator = relation.TableColumnMappings.GetEnumerator();
+            IEnumerator<RelationColumnMapping> enumerator = relation.TableColumnMappings.GetEnumerator();
             int i = 0;
 
             enumerator.Reset();
             while (enumerator.MoveNext())
             {
-                DbRelationColumnMapping columnMapping = enumerator.Current;
+                RelationColumnMapping columnMapping = enumerator.Current;
                 if (i != 0)
                 {
                     sb.Append(" AND ");
@@ -221,10 +221,10 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
             return sb.ToString();
         }
 
-        public virtual object ReadFromResultSet(IDataReader reader, IDbColumn dbColumn)
+        public virtual object ReadFromResultSet(IDataReader reader, IColumn column)
         {
-            int ordinal = reader.GetOrdinal(dbColumn.ColumnName);
-            if (dbColumn.Nullable)
+            int ordinal = reader.GetOrdinal(column.ColumnName);
+            if (column.Nullable)
             {
                 object obj = reader.GetValue(ordinal);
                 if (obj is System.DBNull)
@@ -233,38 +233,38 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
                 }
             }
 
-            switch (dbColumn.ColumnType)
+            switch (column.ColumnType)
             {
-                case DbColumnType.Boolean:
+                case ColumnType.Boolean:
                     return reader.GetBoolean(ordinal);
-                case DbColumnType.Char:
+                case ColumnType.Char:
                     return reader.GetString(ordinal)[0];
-                case DbColumnType.Date:
+                case ColumnType.Date:
                     return reader.GetDateTime(ordinal);
-                case DbColumnType.Double:
+                case ColumnType.Double:
                     return reader.GetDouble(ordinal);
-                case DbColumnType.Float:
+                case ColumnType.Float:
                     return reader.GetFloat(ordinal);
-                case DbColumnType.Integer:
-                case DbColumnType.Version:
+                case ColumnType.Integer:
+                case ColumnType.Version:
                     return reader.GetInt32(ordinal);
-                case DbColumnType.Long:
+                case ColumnType.Long:
                     return reader.GetInt64(ordinal);
-                case DbColumnType.Timestamp:
+                case ColumnType.Timestamp:
                     return reader.GetDateTime(ordinal);
-                case DbColumnType.Varchar:
+                case ColumnType.Varchar:
                     return reader.GetString(ordinal);
                 default:
                     return null;
             }
         }
 
-        public void SetToPreparedStatement(IDbCommand cmd, object obj, int parameterIndex, IDbColumn dbColumn)
+        public void SetToPreparedStatement(IDbCommand cmd, object obj, int parameterIndex, IColumn column)
         {
-			SetToPreparedStatement(cmd,obj,parameterIndex,dbColumn.Nullable,dbColumn.ColumnType);
+			SetToPreparedStatement(cmd,obj,parameterIndex,column.Nullable,column.ColumnType);
         }
 
-		protected void SetToPreparedStatement (IDbCommand cmd, object obj, int parameterIndex, bool nullable, DbColumnType columnType)
+		protected void SetToPreparedStatement (IDbCommand cmd, object obj, int parameterIndex, bool nullable, ColumnType columnType)
 		{
 			var parameter = cmd.CreateParameter ();
 			parameter.Direction = ParameterDirection.Input;
@@ -277,32 +277,32 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 
             switch (columnType)
             {
-                case DbColumnType.Boolean:
+                case ColumnType.Boolean:
                     parameter.DbType = DbType.Boolean;
                     break;
-                case DbColumnType.Char:
+                case ColumnType.Char:
                     parameter.DbType = DbType.StringFixedLength;
                     break;
-                case DbColumnType.Date:
+                case ColumnType.Date:
                     parameter.DbType = DbType.Date;
                     break;
-                case DbColumnType.Double:
+                case ColumnType.Double:
                     parameter.DbType = DbType.Double;
                     break;
-                case DbColumnType.Float:
+                case ColumnType.Float:
                     parameter.DbType = DbType.VarNumeric;
                     break;
-                case DbColumnType.Integer:
-                case DbColumnType.Version:
+                case ColumnType.Integer:
+                case ColumnType.Version:
                     parameter.DbType = DbType.Int32;
                     break;
-                case DbColumnType.Long:
+                case ColumnType.Long:
                     parameter.DbType = DbType.Int64;
                     break;
-                case DbColumnType.Timestamp:
+                case ColumnType.Timestamp:
                     parameter.DbType = DbType.DateTime;
                     break;
-                case DbColumnType.Varchar:
+                case ColumnType.Varchar:
                     parameter.DbType = DbType.String;
                     break;
             }
@@ -359,7 +359,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 			 	
 			 	QueryExecParam param = new QueryExecParam();
 			 	param.Index = buildInfo.ExecInfo.Params.Count;
-			 	param.Type = DbColumnType.Long;
+			 	param.Type = ColumnType.Long;
 			 	param.Value = pageSize;
 			 	buildInfo.ExecInfo.Params.Add(param);
 		 	}
@@ -370,7 +370,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
 			 	
 				QueryExecParam param = new QueryExecParam();
 				param.Index = buildInfo.ExecInfo.Params.Count;
-			 	param.Type = DbColumnType.Long;
+			 	param.Type = ColumnType.Long;
 			 	param.Value = currentOffset;
 			 	buildInfo.ExecInfo.Params.Add(param);
 		 	}

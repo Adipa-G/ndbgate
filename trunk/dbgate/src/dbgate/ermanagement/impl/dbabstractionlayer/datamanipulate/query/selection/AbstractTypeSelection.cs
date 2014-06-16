@@ -30,7 +30,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selec
 		{
 			try 
 			{
-				IServerDbClass instance = (IServerDbClass)Activator.CreateInstance(EntityType);
+                var instance = (IReadOnlyEntity)Activator.CreateInstance(EntityType);
 				instance.Retrieve(rs,con);
 				return instance;
 			} 

@@ -6,7 +6,7 @@ namespace dbgate.ermanagement.support.persistant.inheritancetest
 {
     public abstract class InheritanceTestSuperEntityExt : IInheritanceTestSuperEntity
     {
-        public DbClassStatus Status { get; set; }
+        public EntityStatus Status { get; set; }
         public int IdCol { get; set; }
         public string Name { get; set; }
 
@@ -14,7 +14,7 @@ namespace dbgate.ermanagement.support.persistant.inheritancetest
 
         protected InheritanceTestSuperEntityExt()
         {
-            Status = DbClassStatus.New;
+            Status = EntityStatus.New;
             _context = new EntityContext();
         }
 

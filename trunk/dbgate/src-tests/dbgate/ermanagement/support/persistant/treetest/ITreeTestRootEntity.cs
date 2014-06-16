@@ -2,7 +2,7 @@
 
 namespace dbgate.ermanagement.support.persistant.treetest
 {
-    public interface ITreeTestRootEntity  : IServerDbClass
+    public interface ITreeTestRootEntity  : IEntity
     {
         int IdCol { get; set; }
 

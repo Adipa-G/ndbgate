@@ -1,15 +1,15 @@
 namespace dbgate.ermanagement.support.persistant.featureintegration.order
 {
-    [DbTableInfo("order_item_transaction_charge")]
-    public class ItemTransactionCharge  : DefaultServerDbClass
+    [TableInfo("order_item_transaction_charge")]
+    public class ItemTransactionCharge  : DefaultEntity
     {
-        [DbColumnInfo(DbColumnType.Integer, Key = true)]
+        [ColumnInfo(ColumnType.Integer, Key = true)]
         public int TransactionId { get; set; }
-        [DbColumnInfo(DbColumnType.Integer, Key = true)]
+        [ColumnInfo(ColumnType.Integer, Key = true)]
         public int IndexNo { get; set; }
-        [DbColumnInfo(DbColumnType.Integer, Key = true)]
+        [ColumnInfo(ColumnType.Integer, Key = true)]
         public int ChargeIndex { get; set; }
-        [DbColumnInfo(DbColumnType.Varchar)]
+        [ColumnInfo(ColumnType.Varchar)]
         public string ChargeCode { get; set; }
 
         [ForeignKeyInfo("item_tx_charge2tx_rev", typeof (Transaction), new string[] {"transactionId"},new string[] {"transactionId"}

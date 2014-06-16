@@ -3,16 +3,16 @@ using dbgate.ermanagement.impl;
 
 namespace dbgate.ermanagement
 {
-    public class DefaultServerDbClass : DefaultServerRoDbClass, IServerDbClass
+    public class DefaultEntity : DefaultReadOnlyEntity, IEntity
     {
-        public DefaultServerDbClass()
+        public DefaultEntity()
         {
-            Status = DbClassStatus.New;
+            Status = EntityStatus.New;
         }
 
-        #region IServerDbClass Members
+        #region IEntity Members
 
-        public DbClassStatus Status { get; set; }
+        public EntityStatus Status { get; set; }
 
         public void Persist(IDbConnection con)
         {
@@ -23,9 +23,9 @@ namespace dbgate.ermanagement
 
         public void _modify()
         {
-            if (Status == DbClassStatus.Unmodified)
+            if (Status == EntityStatus.Unmodified)
             {
-                Status = DbClassStatus.Modified;
+                Status = EntityStatus.Modified;
             }
         }
     }

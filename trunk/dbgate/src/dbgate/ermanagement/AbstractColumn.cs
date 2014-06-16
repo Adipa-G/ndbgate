@@ -3,36 +3,36 @@ using System.Text;
 
 namespace dbgate.ermanagement
 {
-    public abstract class AbstractDbColumn : IDbColumn
+    public abstract class AbstractColumn : IColumn
     {
-        protected AbstractDbColumn(String attributeName, DbColumnType type)
+        protected AbstractColumn(String attributeName, ColumnType type)
             : this(attributeName, PredictColumnName(attributeName), false, type, false, null)
         {
         }
 
-        protected AbstractDbColumn(String attributeName, DbColumnType type, bool nullable)
+        protected AbstractColumn(String attributeName, ColumnType type, bool nullable)
             : this(attributeName, PredictColumnName(attributeName), false, nullable, type, 20, false, null)
         {
         }
 
-        protected AbstractDbColumn(String attributeName, bool key, DbColumnType type)
+        protected AbstractColumn(String attributeName, bool key, ColumnType type)
             : this(attributeName, PredictColumnName(attributeName), key, type, false, null)
         {
         }
 
-        protected AbstractDbColumn(String attributeName, bool key, bool nullable, DbColumnType type)
+        protected AbstractColumn(String attributeName, bool key, bool nullable, ColumnType type)
             : this(attributeName, PredictColumnName(attributeName), key, nullable, type, 20, false, null)
         {
         }
 
-        protected AbstractDbColumn(String attributeName, string columnName, bool key, DbColumnType type,
+        protected AbstractColumn(String attributeName, string columnName, bool key, ColumnType type,
                                    bool readFromSequence, ISequenceGenerator generator)
             : this(attributeName, columnName, key, false, type, 20, readFromSequence, generator)
         {
         }
 
-        protected AbstractDbColumn(String attributeName, string columnName, bool key
-                                   , bool nullable, DbColumnType type, int size, bool readFromSequence,
+        protected AbstractColumn(String attributeName, string columnName, bool key
+                                   , bool nullable, ColumnType type, int size, bool readFromSequence,
                                    ISequenceGenerator generator)
         {
             AttributeName = attributeName;
@@ -45,11 +45,11 @@ namespace dbgate.ermanagement
             SequenceGenerator = generator;
         }
 
-        #region IDbColumn Members
+        #region IColumn Members
 
         public string AttributeName { get; set; }
 
-        public DbColumnType ColumnType { get; set; }
+        public ColumnType ColumnType { get; set; }
 
         public int Size { get; set; }
 

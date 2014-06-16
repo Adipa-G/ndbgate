@@ -1,8 +1,8 @@
 ﻿namespace dbgate.ermanagement
 {
-    public interface IDbColumn : IField
+    public interface IColumn : IField
     {
-        DbColumnType ColumnType { get; set; }
+        ColumnType ColumnType { get; set; }
 
         int Size { get; set; }
 

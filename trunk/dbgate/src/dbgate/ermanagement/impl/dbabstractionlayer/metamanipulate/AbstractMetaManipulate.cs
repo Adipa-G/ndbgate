@@ -98,7 +98,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
             ReferentialRuleTypeMapItems.Add(new ReferentialRuleTypeMapItem(ReferentialRuleType.Restrict,"1"));
         }
 
-        public DbColumnType MapColumnTypeNameToType(string columnTypeName)
+        public ColumnType MapColumnTypeNameToType(string columnTypeName)
         {
             foreach (ColumnTypeMapItem typeMapItem in ColumnTypeMapItems)
             {
@@ -107,10 +107,10 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                     return typeMapItem.ColumnType;
                 }
             }
-            return DbColumnType.Unknown;
+            return ColumnType.Unknown;
         }
 
-        public string MapColumnTypeToTypeName(DbColumnType columnTypeId)
+        public string MapColumnTypeToTypeName(ColumnType columnTypeId)
         {
             foreach (ColumnTypeMapItem typeMapItem in ColumnTypeMapItems)
             {
@@ -123,7 +123,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
         }
 
        
-        public string GetDefaultValueForType(DbColumnType columnTypeId)
+        public string GetDefaultValueForType(ColumnType columnTypeId)
         {
             foreach (ColumnTypeMapItem typeMapItem in ColumnTypeMapItems)
             {

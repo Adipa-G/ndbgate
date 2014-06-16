@@ -11,24 +11,24 @@ namespace dbgate.ermanagement.support.persistant.inheritancetest
 
             if (type == typeof(InheritanceTestSuperEntityExt))
             {
-                DefaultDbColumn idCol = new DefaultDbColumn("IdCol",true,false,DbColumnType.Integer);
+                DefaultColumn idCol = new DefaultColumn("IdCol",true,false,ColumnType.Integer);
                 idCol.SubClassCommonColumn = true;
                 fields.Add(idCol);
-                fields.Add(new DefaultDbColumn("Name",DbColumnType.Varchar));
+                fields.Add(new DefaultColumn("Name",ColumnType.Varchar));
             }
             else if (type == typeof(InheritanceTestSubEntityAExt))
             {
-                DefaultDbColumn idCol = new DefaultDbColumn("IdCol",true,false,DbColumnType.Integer);
+                DefaultColumn idCol = new DefaultColumn("IdCol",true,false,ColumnType.Integer);
                 idCol.SubClassCommonColumn = true;
                 fields.Add(idCol);
-                fields.Add(new DefaultDbColumn("NameA",DbColumnType.Varchar));
+                fields.Add(new DefaultColumn("NameA",ColumnType.Varchar));
             }
             else if (type == typeof(InheritanceTestSubEntityBExt))
             {
-                DefaultDbColumn idCol = new DefaultDbColumn("IdCol", true, false, DbColumnType.Integer);
+                DefaultColumn idCol = new DefaultColumn("IdCol", true, false, ColumnType.Integer);
                 idCol.SubClassCommonColumn = true;
                 fields.Add(idCol);
-                fields.Add(new DefaultDbColumn("NameB",DbColumnType.Varchar));
+                fields.Add(new DefaultColumn("NameB",ColumnType.Varchar));
             }
             return fields;
         }

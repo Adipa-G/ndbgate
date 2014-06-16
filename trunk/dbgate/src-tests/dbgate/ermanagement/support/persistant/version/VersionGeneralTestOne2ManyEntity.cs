@@ -1,18 +1,18 @@
 namespace dbgate.ermanagement.support.persistant.version
 {
-    [DbTableInfo("version_test_one2many")]
-    public class VersionGeneralTestOne2ManyEntity : DefaultServerDbClass
+    [TableInfo("version_test_one2many")]
+    public class VersionGeneralTestOne2ManyEntity : DefaultEntity
     {
-        [DbColumnInfo((DbColumnType.Integer), Key = true)]
+        [ColumnInfo((ColumnType.Integer), Key = true)]
         public int IdCol { get; set; }
 
-        [DbColumnInfo((DbColumnType.Integer), Key = true)]
+        [ColumnInfo((ColumnType.Integer), Key = true)]
         public int IndexNo { get; set; }
 
-        [DbColumnInfo((DbColumnType.Integer))]
+        [ColumnInfo((ColumnType.Integer))]
         public int Version { get; set; }
 
-        [DbColumnInfo((DbColumnType.Varchar))]
+        [ColumnInfo((ColumnType.Varchar))]
         public string Name { get; set; }
     }
 }

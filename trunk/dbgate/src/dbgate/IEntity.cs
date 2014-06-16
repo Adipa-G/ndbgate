@@ -2,7 +2,7 @@
 
 namespace dbgate
 {
-    public interface IServerDbClass : IServerRoDbClass, IDbClass
+    public interface IEntity : IReadOnlyEntity, IClientEntity
     {
         void Persist(IDbConnection con);
     }

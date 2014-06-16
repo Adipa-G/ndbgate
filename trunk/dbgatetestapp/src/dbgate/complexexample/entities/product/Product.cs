@@ -3,13 +3,13 @@ using dbgate.ermanagement;
 
 namespace dbgatetestapp.dbgate.complexexample.entities.product
 {
-    [DbTableInfo("product_product")]
+    [TableInfo("product_product")]
     public class Product : dbgatetestapp.dbgate.complexexample.entities.product.Item
     {
-        [DbColumnInfo(DbColumnType.Double)]
+        [ColumnInfo(ColumnType.Double)]
         public double UnitPrice { get; set; }
     
-        [DbColumnInfo(DbColumnType.Double,Nullable = true)]
+        [ColumnInfo(ColumnType.Double,Nullable = true)]
         public double? BulkUnitPrice { get; set; }
     }
 }

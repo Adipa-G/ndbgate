@@ -3,11 +3,11 @@
 namespace dbgate.ermanagement
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class DbColumnInfo : Attribute
+    public class ColumnInfo : Attribute
     {
-        public readonly DbColumnType ColumnType;
+        public readonly ColumnType ColumnType;
 
-        public DbColumnInfo(DbColumnType columnType)
+        public ColumnInfo(ColumnType columnType)
         {
             ColumnType = columnType;
         }

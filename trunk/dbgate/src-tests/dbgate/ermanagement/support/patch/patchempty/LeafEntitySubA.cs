@@ -24,7 +24,7 @@ namespace dbgate.ermanagement.support.patch.patchempty
                 Dictionary<Type, ICollection<IField>> map = base.FieldInfo;
                 List<IField> dbColumns = new List<IField>();
 
-                dbColumns.Add(new DefaultDbColumn("SomeTextA", DbColumnType.Varchar));
+                dbColumns.Add(new DefaultColumn("SomeTextA", ColumnType.Varchar));
 
                 map.Add(typeof(LeafEntitySubA),dbColumns);
                 return map;

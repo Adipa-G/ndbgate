@@ -5,7 +5,7 @@ namespace dbgate.ermanagement.impl.utils
 {
     public class ErSessionUtils
     {
-        public static void InitSession(IServerRoDbClass roEntity)
+        public static void InitSession(IReadOnlyEntity roEntity)
         {
             if (roEntity.Context != null
                 && roEntity.Context.ErSession == null)
@@ -14,7 +14,7 @@ namespace dbgate.ermanagement.impl.utils
             }
         }
 
-        public static void TransferSession(IServerRoDbClass parentEntity,IServerRoDbClass childEntity)
+        public static void TransferSession(IReadOnlyEntity parentEntity,IReadOnlyEntity childEntity)
         {
             if (parentEntity.Context != null
                 && childEntity.Context != null
@@ -24,7 +24,7 @@ namespace dbgate.ermanagement.impl.utils
             }
         }
 
-        public static void DestroySession(IServerRoDbClass roEntity)
+        public static void DestroySession(IReadOnlyEntity roEntity)
         {
             if (roEntity.Context != null
                 && roEntity.Context.ErSession != null)
@@ -33,7 +33,7 @@ namespace dbgate.ermanagement.impl.utils
             }
         }
 
-        public static bool ExistsInSession(IServerRoDbClass roEntity, ITypeFieldValueList typeList)
+        public static bool ExistsInSession(IReadOnlyEntity roEntity, ITypeFieldValueList typeList)
         {
             if (roEntity.Context != null
                 && roEntity.Context.ErSession != null
@@ -44,7 +44,7 @@ namespace dbgate.ermanagement.impl.utils
             return false;
         }
 
-        public static void AddToSession(IServerRoDbClass roEntity, IEntityFieldValueList typeList)
+        public static void AddToSession(IReadOnlyEntity roEntity, IEntityFieldValueList typeList)
         {
             if (roEntity.Context != null
                 && roEntity.Context.ErSession != null
@@ -54,7 +54,7 @@ namespace dbgate.ermanagement.impl.utils
             }
         }
 
-        public static IServerRoDbClass GetFromSession(IServerRoDbClass roEntity, ITypeFieldValueList typeList)
+        public static IReadOnlyEntity GetFromSession(IReadOnlyEntity roEntity, ITypeFieldValueList typeList)
         {
             if (roEntity.Context != null
                 && roEntity.Context.ErSession != null

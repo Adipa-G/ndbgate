@@ -10,22 +10,22 @@ namespace dbgate.utility
     {
         private const string fmt = "%24s: %s%n";
 
-        public static void SetStatus(IDbClass dbClass, DbClassStatus status)
+        public static void SetStatus(IClientEntity clientEntity, EntityStatus status)
         {
-            if (dbClass == null)
+            if (clientEntity == null)
             {
                 return;
             }
 
-            dbClass.Status = status;
+            clientEntity.Status = status;
 
-            Type objectType = dbClass.GetType();
+            Type objectType = clientEntity.GetType();
             PropertyInfo[] properties = objectType.GetProperties();
             foreach (PropertyInfo propertyInfo in properties)
             {
                 try
                 {
-                    Object value = propertyInfo.GetValue(dbClass, null);
+                    Object value = propertyInfo.GetValue(clientEntity, null);
                     if (value != null)
                     {
                         if (value is ICollection)
@@ -33,15 +33,15 @@ namespace dbgate.utility
                             var enumerable = (ICollection) value;
                             foreach (Object o in enumerable)
                             {
-                                if (o is IDbClass)
+                                if (o is IClientEntity)
                                 {
-                                    SetStatus((IDbClass) o, status);
+                                    SetStatus((IClientEntity) o, status);
                                 }
                             }
                         }
-                        else if (value is IDbClass)
+                        else if (value is IClientEntity)
                         {
-                            SetStatus((IDbClass) value, status);
+                            SetStatus((IClientEntity) value, status);
                         }
                     }
                 }
@@ -73,18 +73,18 @@ namespace dbgate.utility
                     }
                 }
             }
-            else if (!(obO is IDbClass))
+            else if (!(obO is IClientEntity))
             {
                 return false;
             }
 
-            if ((obO is IDbClass))
+            if ((obO is IClientEntity))
             {
-                var dbClass = (IDbClass) obO;
+                var dbClass = (IClientEntity) obO;
 
-                modified = dbClass.Status == DbClassStatus.Deleted
-                           || dbClass.Status == DbClassStatus.New
-                           || dbClass.Status == DbClassStatus.Modified;
+                modified = dbClass.Status == EntityStatus.Deleted
+                           || dbClass.Status == EntityStatus.New
+                           || dbClass.Status == EntityStatus.Modified;
                 if (modified)
                 {
                     return true;
@@ -111,7 +111,7 @@ namespace dbgate.utility
                                     }
                                 }
                             }
-                            else if (value is IDbClass)
+                            else if (value is IClientEntity)
                             {
                                 modified = IsModified(value);
                                 if (modified)
@@ -131,18 +131,18 @@ namespace dbgate.utility
             return modified;
         }
 
-        public static ICollection<IDbClass> GetImmidiateChildrenAndClear(IDbClass dbClass)
+        public static ICollection<IClientEntity> GetImmidiateChildrenAndClear(IClientEntity clientEntity)
         {
-            var childList = new List<IDbClass>();
+            var childList = new List<IClientEntity>();
 
-            Type objectType = dbClass.GetType();
+            Type objectType = clientEntity.GetType();
             PropertyInfo[] properties = objectType.GetProperties();
 
             foreach (PropertyInfo propertyInfo in properties)
             {
                 try
                 {
-                    Object value = propertyInfo.GetValue(dbClass, null);
+                    Object value = propertyInfo.GetValue(clientEntity, null);
                     if (value != null)
                     {
                         if (value is IList)
@@ -150,17 +150,17 @@ namespace dbgate.utility
                             var enumerable = (IList) value;
                             foreach (Object o in enumerable)
                             {
-                                if (o is IDbClass)
+                                if (o is IClientEntity)
                                 {
-                                    childList.Add((IDbClass) o);
+                                    childList.Add((IClientEntity) o);
                                 }
                             }
                             enumerable.Clear();
                         }
-                        else if (value is IDbClass)
+                        else if (value is IClientEntity)
                         {
-                            childList.Add((IDbClass) value);
-                            propertyInfo.SetValue(dbClass, null, null);
+                            childList.Add((IClientEntity) value);
+                            propertyInfo.SetValue(clientEntity, null, null);
                         }
                     }
                 }

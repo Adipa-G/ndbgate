@@ -15,15 +15,15 @@ namespace dbgate.ermanagement.caches.impl
     {
         private readonly Type _entityType;
         private readonly IDictionary<string,PropertyInfo> _propertyMap;
-        private readonly ICollection<IDbColumn> _columns;
-        private readonly ICollection<IDbRelation> _relations;
+        private readonly ICollection<IColumn> _columns;
+        private readonly ICollection<IRelation> _relations;
         private readonly IDictionary<string,string> _queries;
     
         public EntityInfo(Type entityType)
         {
             _entityType = entityType;
-            _columns = new List<IDbColumn>();
-            _relations = new List<IDbRelation>();
+            _columns = new List<IColumn>();
+            _relations = new List<IRelation>();
             _propertyMap = new Dictionary<string, PropertyInfo>();
             _queries = new Dictionary<string, string>();
         }
@@ -37,12 +37,12 @@ namespace dbgate.ermanagement.caches.impl
 
         public EntityInfo SuperEntityInfo { get; set; }
 
-        public ICollection<IDbColumn> Columns
+        public ICollection<IColumn> Columns
         {
             get { return _columns; }
         }
 
-        public ICollection<IDbRelation> Relations
+        public ICollection<IRelation> Relations
         {
             get { return _relations; }
         }
@@ -52,10 +52,10 @@ namespace dbgate.ermanagement.caches.impl
             get { return _queries; }
         }
 
-        public ICollection<IDbColumn> GetKeys()
+        public ICollection<IColumn> GetKeys()
         {
-            var keys = new List<IDbColumn>();
-            foreach (IDbColumn column in Columns)
+            var keys = new List<IColumn>();
+            foreach (IColumn column in Columns)
             {
                 if (column.Key)
                 {
@@ -69,14 +69,14 @@ namespace dbgate.ermanagement.caches.impl
         {
             foreach (IField field in fields)
             {
-                var dbColumn = field as IDbColumn;
+                var dbColumn = field as IColumn;
                 if (dbColumn != null)
                 {
                     _columns.Add(dbColumn);
                 }
                 else
                 {
-                    var relation = field as IDbRelation;
+                    var relation = field as IRelation;
                     if (relation != null)
                         _relations.Add(relation);
                 }
@@ -150,7 +150,7 @@ namespace dbgate.ermanagement.caches.impl
             return query;
         }
     
-        public string GetRelationObjectLoad(IDbLayer dbLayer, IDbRelation relation)
+        public string GetRelationObjectLoad(IDbLayer dbLayer, IRelation relation)
         {
             string queryId = relation.RelationShipName + "_" + relation.RelatedObjectType.FullName;
             string query = GetQuery(queryId);
@@ -181,9 +181,9 @@ namespace dbgate.ermanagement.caches.impl
             }
         }
 
-        public PropertyInfo GetProperty(IDbColumn dbColumn)
+        public PropertyInfo GetProperty(IColumn column)
         {
-            return GetProperty(dbColumn.AttributeName);
+            return GetProperty(column.AttributeName);
         }
 
         public PropertyInfo GetProperty(string propertyName)

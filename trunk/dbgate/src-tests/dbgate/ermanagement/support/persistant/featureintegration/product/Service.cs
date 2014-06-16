@@ -1,9 +1,9 @@
 namespace dbgate.ermanagement.support.persistant.featureintegration.product
 {
-    [DbTableInfo("product_service")]
+    [TableInfo("product_service")]
     public class Service : Item
     {
-        [DbColumnInfo(DbColumnType.Double)]
+        [ColumnInfo(ColumnType.Double)]
         public double HourlyRate { get; set; }
     }
 }

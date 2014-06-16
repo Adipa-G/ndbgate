@@ -76,7 +76,7 @@ namespace dbgatetestapp.dbgate.simpleexample
             entity = example.Retrieve(con);
             Console.WriteLine("Entity Name = " + entity.Name);
 
-            entity.Status = DbClassStatus.Deleted;
+            entity.Status = EntityStatus.Deleted;
             example.Persist(con, entity);
 
             entity = example.Retrieve(con);

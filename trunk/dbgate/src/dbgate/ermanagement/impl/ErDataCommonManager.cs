@@ -48,7 +48,7 @@ namespace dbgate.ermanagement.impl
                 throw new CommandCreationException(message,ex);
             }
             
-            ICollection<IDbColumn> keys = entityInfo.GetKeys();
+            ICollection<IColumn> keys = entityInfo.GetKeys();
 
             StringBuilder logSb = new StringBuilder();
             bool showQuery = Config.ShowQueries;
@@ -57,7 +57,7 @@ namespace dbgate.ermanagement.impl
                 logSb.Append(query);
             }
             int i = 0;
-            foreach (IDbColumn key in keys)
+            foreach (IColumn key in keys)
             {
                 Object fieldValue = keyValueList.GetFieldValue(key.AttributeName).Value;
                 if (showQuery)
@@ -82,8 +82,8 @@ namespace dbgate.ermanagement.impl
             EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
 
             ITypeFieldValueList valueTypeList = new EntityTypeFieldValueList(type);
-            ICollection<IDbColumn> dbColumns = entityInfo.Columns;
-            foreach (IDbColumn dbColumn in dbColumns)
+            ICollection<IColumn> dbColumns = entityInfo.Columns;
+            foreach (IColumn dbColumn in dbColumns)
             {
                 Object value = DbLayer.DataManipulate().ReadFromResultSet(reader, dbColumn);
                 valueTypeList.FieldValues.Add(new EntityFieldValue(value, dbColumn));
@@ -91,36 +91,36 @@ namespace dbgate.ermanagement.impl
             return valueTypeList;
         }
 
-        protected static void SetValues(IServerRoDbClass roEntity, ITypeFieldValueList values)
+        protected static void SetValues(IReadOnlyEntity roEntity, ITypeFieldValueList values)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(roEntity);
 
             foreach (EntityFieldValue fieldValue in values.FieldValues)
             {
-                PropertyInfo setter = entityInfo.GetProperty(fieldValue.DbColumn.AttributeName);
+                PropertyInfo setter = entityInfo.GetProperty(fieldValue.Column.AttributeName);
                 ReflectionUtils.SetValue(setter, roEntity, fieldValue.Value);
             }
         }
 
-        protected static ICollection<ITypeFieldValueList> GetChildEntityValueListExcludingDeletedStatusItems(IServerDbClass serverDbClass)
+        protected static ICollection<ITypeFieldValueList> GetChildEntityValueListExcludingDeletedStatusItems(IEntity entity)
         {
-            return GetChildEntityValueList(serverDbClass, false);
+            return GetChildEntityValueList(entity, false);
         }
 
-        protected static ICollection<ITypeFieldValueList> GetChildEntityValueListIncludingDeletedStatusItems(IServerDbClass serverDbClass)
+        protected static ICollection<ITypeFieldValueList> GetChildEntityValueListIncludingDeletedStatusItems(IEntity entity)
         {
-            return GetChildEntityValueList(serverDbClass, true);
+            return GetChildEntityValueList(entity, true);
         }
 
-        protected static ICollection<ITypeFieldValueList> GetChildEntityValueList(IServerDbClass parentEntity, bool takeDeleted)
+        protected static ICollection<ITypeFieldValueList> GetChildEntityValueList(IEntity parentEntity, bool takeDeleted)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(parentEntity);
             ICollection<ITypeFieldValueList> existingEntityChildRelations = new List<ITypeFieldValueList>();
 
             while (entityInfo != null)
             {
-                ICollection<IDbRelation> typeRelations = entityInfo.Relations;
-                foreach (IDbRelation typeRelation in typeRelations)
+                ICollection<IRelation> typeRelations = entityInfo.Relations;
+                foreach (IRelation typeRelation in typeRelations)
                 {
                     if (typeRelation.ReverseRelationship)
                     {
@@ -131,15 +131,15 @@ namespace dbgate.ermanagement.impl
                         continue;
                     }
 
-                    ICollection<IServerDbClass> childEntities = ErDataManagerUtils.GetRelationEntities(parentEntity, typeRelation);
-                    foreach (IServerDbClass childEntity in childEntities)
+                    ICollection<IEntity> childEntities = ErDataManagerUtils.GetRelationEntities(parentEntity, typeRelation);
+                    foreach (IEntity childEntity in childEntities)
                     {
-                        if (parentEntity.Status == DbClassStatus.Deleted
+                        if (parentEntity.Status == EntityStatus.Deleted
                             && typeRelation.DeleteRule == ReferentialRuleType.Cascade)
                         {
-                            childEntity.Status = DbClassStatus.Deleted;
+                            childEntity.Status = EntityStatus.Deleted;
                         }
-                        if (childEntity.Status == DbClassStatus.Deleted && !takeDeleted)
+                        if (childEntity.Status == EntityStatus.Deleted && !takeDeleted)
                         {
                             continue;
                         }
@@ -155,18 +155,18 @@ namespace dbgate.ermanagement.impl
             return existingEntityChildRelations;
         }
 
-        protected ICollection<IServerRoDbClass> ReadRelationChildrenFromDb(IServerRoDbClass entity, Type entityType
-                , IDbConnection con, IDbRelation relation)
+        protected ICollection<IReadOnlyEntity> ReadRelationChildrenFromDb(IReadOnlyEntity entity, Type entityType
+                , IDbConnection con, IRelation relation)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(entityType);
             Type childEntityType = relation.RelatedObjectType;
-            IServerRoDbClass childTypeInstance = (IServerRoDbClass)Activator.CreateInstance(childEntityType);
+            IReadOnlyEntity childTypeInstance = (IReadOnlyEntity)Activator.CreateInstance(childEntityType);
 
             StringBuilder logSb = new StringBuilder();
             string query = entityInfo.GetRelationObjectLoad(DbLayer, relation);
 
             IList<string> fields = new List<string>();
-            foreach (DbRelationColumnMapping mapping in relation.TableColumnMappings)
+            foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
             {
                 fields.Add(mapping.FromField);
             }
@@ -188,11 +188,11 @@ namespace dbgate.ermanagement.impl
             {
                 logSb.Append(query);
             }
-            ICollection<IDbColumn> dbColumns = entityInfo.Columns;
+            ICollection<IColumn> dbColumns = entityInfo.Columns;
             for (int i = 0; i < fields.Count; i++)
             {
                 string field = fields[i];
-                IDbColumn matchColumn = ErDataManagerUtils.FindColumnByAttribute(dbColumns, field);
+                IColumn matchColumn = ErDataManagerUtils.FindColumnByAttribute(dbColumns, field);
 
                 if (matchColumn != null)
                 {
@@ -222,12 +222,12 @@ namespace dbgate.ermanagement.impl
             return ExecuteAndReadFromPreparedStatement(entity, con, cmd, childEntityType);
         }
 
-        private ICollection<IServerRoDbClass> ExecuteAndReadFromPreparedStatement(IServerRoDbClass entity, IDbConnection con, IDbCommand cmd
+        private ICollection<IReadOnlyEntity> ExecuteAndReadFromPreparedStatement(IReadOnlyEntity entity, IDbConnection con, IDbCommand cmd
             , Type childType)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(childType);
-            ICollection<IDbColumn> childKeys = null;
-            ICollection<IServerRoDbClass> data = new List<IServerRoDbClass>();
+            ICollection<IColumn> childKeys = null;
+            ICollection<IReadOnlyEntity> data = new List<IReadOnlyEntity>();
 
             IDataReader reader = null;
             try
@@ -240,7 +240,7 @@ namespace dbgate.ermanagement.impl
                         childKeys = entityInfo.GetKeys();
                     }
                     ITypeFieldValueList childTypeKeyList = new EntityTypeFieldValueList(childType);
-                    foreach (IDbColumn childKey in childKeys)
+                    foreach (IColumn childKey in childKeys)
                     {
                         Object value = DbLayer.DataManipulate().ReadFromResultSet(reader, childKey);
                         childTypeKeyList.FieldValues.Add(new EntityFieldValue(value, childKey));
@@ -251,7 +251,7 @@ namespace dbgate.ermanagement.impl
                         continue;
                     }
 
-                    IServerRoDbClass rodbClass = (IServerRoDbClass)Activator.CreateInstance(childType);
+                    IReadOnlyEntity rodbClass = (IReadOnlyEntity)Activator.CreateInstance(childType);
                     ErSessionUtils.TransferSession(entity, rodbClass);
                     rodbClass.Retrieve(reader, con);
                     data.Add(rodbClass);
@@ -274,7 +274,7 @@ namespace dbgate.ermanagement.impl
             return data;
         }
 
-        protected static bool IsProxyObject(IServerDbClass entity, IDbRelation relation)
+        protected static bool IsProxyObject(IEntity entity, IRelation relation)
         {
             if (relation.Lazy)
             {

@@ -308,7 +308,7 @@ namespace dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
                 
                 UpdateEntityWithNonNullValues(loadedEntity);
-                loadedEntity.Status =DbClassStatus.Modified;
+                loadedEntity.Status =EntityStatus.Modified;
 
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
@@ -349,7 +349,7 @@ namespace dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
                
                 UpdateEntityWithNonNullValues(loadedEntity);
-                loadedEntity.Status =DbClassStatus.Modified;
+                loadedEntity.Status =EntityStatus.Modified;
 
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
@@ -386,7 +386,7 @@ namespace dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
                 
                 UpdateEntityWithNonNullValues(loadedEntity);
-                loadedEntity.Status = DbClassStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
 
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
@@ -423,7 +423,7 @@ namespace dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
                 
                 UpdateEntityWithNullValues(loadedEntity);
-                loadedEntity.Status = DbClassStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
 
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
@@ -464,7 +464,7 @@ namespace dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
 
                 UpdateEntityWithNullValues(loadedEntity);
-                loadedEntity.Status = DbClassStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
 
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
@@ -501,7 +501,7 @@ namespace dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
                 
                 UpdateEntityWithNullValues(loadedEntity);
-                loadedEntity.Status = DbClassStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
 
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
@@ -538,7 +538,7 @@ namespace dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
                
                 UpdateEntityWithNonNullValues(loadedEntity);
-                loadedEntity.Status = DbClassStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
 
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
@@ -579,7 +579,7 @@ namespace dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
                 
                 UpdateEntityWithNonNullValues(loadedEntity);
-                loadedEntity.Status = DbClassStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
 
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
@@ -616,7 +616,7 @@ namespace dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
                 
                 UpdateEntityWithNonNullValues(loadedEntity);
-                loadedEntity.Status = DbClassStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
 
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
@@ -653,7 +653,7 @@ namespace dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
 
                 UpdateEntityWithNullValues(loadedEntity);
-                loadedEntity.Status = DbClassStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
 
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
@@ -694,7 +694,7 @@ namespace dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
 
                 UpdateEntityWithNullValues(loadedEntity);
-                loadedEntity.Status = DbClassStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
 
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
@@ -731,7 +731,7 @@ namespace dbgate.ermanagement
                 LoadEntityWithId(connection,loadedEntity,id);
 
                 UpdateEntityWithNullValues(loadedEntity);
-                loadedEntity.Status = DbClassStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
 
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
@@ -767,7 +767,7 @@ namespace dbgate.ermanagement
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
                 LoadEntityWithId(connection,loadedEntity,id);
 
-                loadedEntity.Status = DbClassStatus.Deleted;
+                loadedEntity.Status = EntityStatus.Deleted;
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
                 transaction.Commit();
@@ -806,7 +806,7 @@ namespace dbgate.ermanagement
                 IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
                 LoadEntityWithId(connection,loadedEntity,id);
 
-                loadedEntity.Status = DbClassStatus.Deleted;
+                loadedEntity.Status = EntityStatus.Deleted;
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
                 transaction.Commit();
@@ -841,7 +841,7 @@ namespace dbgate.ermanagement
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
                 LoadEntityWithId(connection,loadedEntity,id);
 
-                loadedEntity.Status = DbClassStatus.Deleted;
+                loadedEntity.Status = EntityStatus.Deleted;
                 transaction = connection.BeginTransaction();
                 loadedEntity.Persist(connection);
                 transaction.Commit();
