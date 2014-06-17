@@ -16,13 +16,13 @@ using log4net;
 
 namespace dbgate.ermanagement.impl
 {
-    public class ErMetaDataManager
+    public class DataMigrationLayer
     {
         private readonly IDbLayer _dbLayer;
-        private readonly IErLayerStatistics _statistics;
-        private readonly IErLayerConfig _config;
+        private readonly IDbGateStatistics _statistics;
+        private readonly IDbGateConfig _config;
 
-        public ErMetaDataManager(IDbLayer dbLayer,IErLayerStatistics statistics,IErLayerConfig config)
+        public DataMigrationLayer(IDbLayer dbLayer,IDbGateStatistics statistics,IDbGateConfig config)
         {
             _dbLayer = dbLayer;
             _statistics = statistics;
@@ -170,8 +170,8 @@ namespace dbgate.ermanagement.impl
                 foreignKey.ToTable = relatedEntityInfo.TableName;
                 foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
                 {
-                    string fromCol = ErDataManagerUtils.FindColumnByAttribute(relatedEntityInfo.Columns,mapping.FromField).ColumnName;
-                    string toCol = ErDataManagerUtils.FindColumnByAttribute(relatedEntityInfo.Columns,mapping.ToField).ColumnName;
+                    string fromCol = OperationUtils.FindColumnByAttribute(relatedEntityInfo.Columns,mapping.FromField).ColumnName;
+                    string toCol = OperationUtils.FindColumnByAttribute(relatedEntityInfo.Columns,mapping.ToField).ColumnName;
                     foreignKey.ColumnMappings.Add(new MetaForeignKeyColumnMapping(fromCol,toCol));
                 }
                 foreignKey.DeleteRule = relation.DeleteRule;

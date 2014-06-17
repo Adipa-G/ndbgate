@@ -51,7 +51,7 @@ namespace dbgate.ermanagement
         {
             if (DbConnector.GetSharedInstance() != null)
             {
-                ErLayer.GetSharedInstance().ClearCache();
+                DbGate.GetSharedInstance().ClearCache();
             }
         }
 
@@ -135,8 +135,8 @@ namespace dbgate.ermanagement
         {
             try
             {
-                ErLayer.GetSharedInstance().Config.EnableStatistics = true;
-                ErLayer.GetSharedInstance().Statistics.Reset();
+                DbGate.GetSharedInstance().Config.EnableStatistics = true;
+                DbGate.GetSharedInstance().Statistics.Reset();
                 IDbConnection connection = SetupTables();
                 
                 IDbTransaction transaction = connection.BeginTransaction();
@@ -156,7 +156,7 @@ namespace dbgate.ermanagement
                 bool isProxyOneToOne = ProxyUtil.IsProxyType(entityReloaded.One2OneEntity.GetType());
                 Assert.IsTrue(isProxyOneToMany);
                 Assert.IsTrue(isProxyOneToOne);
-                Assert.IsTrue(ErLayer.GetSharedInstance().Statistics.SelectQueryCount == 0);
+                Assert.IsTrue(DbGate.GetSharedInstance().Statistics.SelectQueryCount == 0);
             }
             catch (Exception e)
             {
@@ -170,8 +170,8 @@ namespace dbgate.ermanagement
         {
             try
             {
-                ErLayer.GetSharedInstance().Config.EnableStatistics = true;
-                ErLayer.GetSharedInstance().Statistics.Reset();
+                DbGate.GetSharedInstance().Config.EnableStatistics = true;
+                DbGate.GetSharedInstance().Statistics.Reset();
                 IDbConnection connection = SetupTables();
 
                 IDbTransaction transaction = connection.BeginTransaction();
@@ -208,7 +208,7 @@ namespace dbgate.ermanagement
                 Assert.IsTrue(enumerator.Current.Name.Equals(one2Many2.Name));
                 Assert.IsTrue(entityReloaded.One2OneEntity != null);
                 Assert.IsTrue(entityReloaded.One2OneEntity.Name.Equals(one2One.Name));
-                Assert.IsTrue(ErLayer.GetSharedInstance().Statistics.SelectQueryCount == 2);
+                Assert.IsTrue(DbGate.GetSharedInstance().Statistics.SelectQueryCount == 2);
                 connection.Close();
             }
             catch (Exception e)
@@ -223,8 +223,8 @@ namespace dbgate.ermanagement
         {
             try
             {
-                ErLayer.GetSharedInstance().Config.EnableStatistics = true;
-                ErLayer.GetSharedInstance().Statistics.Reset();
+                DbGate.GetSharedInstance().Config.EnableStatistics = true;
+                DbGate.GetSharedInstance().Statistics.Reset();
                 IDbConnection connection = SetupTables();
 
                 IDbTransaction transaction = connection.BeginTransaction();
@@ -262,7 +262,7 @@ namespace dbgate.ermanagement
                 Assert.IsTrue(enumerator.Current.Name.Equals(one2Many2.Name));
                 Assert.IsTrue(entityReloaded.One2OneEntity != null);
                 Assert.IsTrue(entityReloaded.One2OneEntity.Name.Equals(one2One.Name));
-                Assert.IsTrue(ErLayer.GetSharedInstance().Statistics.SelectQueryCount == 2);
+                Assert.IsTrue(DbGate.GetSharedInstance().Statistics.SelectQueryCount == 2);
             }
             catch (Exception e)
             {
@@ -276,8 +276,8 @@ namespace dbgate.ermanagement
         {
             try
             {
-                ErLayer.GetSharedInstance().Config.EnableStatistics = true;
-                ErLayer.GetSharedInstance().Statistics.Reset();
+                DbGate.GetSharedInstance().Config.EnableStatistics = true;
+                DbGate.GetSharedInstance().Statistics.Reset();
                 IDbConnection connection = SetupTables();
 
                 IDbTransaction transaction = connection.BeginTransaction();
@@ -310,7 +310,7 @@ namespace dbgate.ermanagement
                 entity.Persist(connection);
                 transaction.Commit();
 
-                Assert.IsTrue(ErLayer.GetSharedInstance().Statistics.SelectQueryCount == 0);
+                Assert.IsTrue(DbGate.GetSharedInstance().Statistics.SelectQueryCount == 0);
                 connection.Close();
             }
             catch (Exception e)

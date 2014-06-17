@@ -1,6 +1,6 @@
 ﻿namespace dbgate.ermanagement
 {
-    public interface IErLayerConfig
+    public interface IDbGateConfig
     {
         bool AutoTrackChanges { get; set; }
 

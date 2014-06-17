@@ -49,9 +49,9 @@ namespace dbgate.ermanagement
         {
             if (DbConnector.GetSharedInstance() != null)
             {
-                ErLayer.GetSharedInstance().ClearCache();
+                DbGate.GetSharedInstance().ClearCache();
             }
-            ErLayer.GetSharedInstance().Config.UpdateChangedColumnsOnly = false;
+            DbGate.GetSharedInstance().Config.UpdateChangedColumnsOnly = false;
         }
 
         [TearDown]
@@ -223,7 +223,7 @@ namespace dbgate.ermanagement
         {
             try
             {
-                ErLayer.GetSharedInstance().Config.UpdateChangedColumnsOnly = true;
+                DbGate.GetSharedInstance().Config.UpdateChangedColumnsOnly = true;
                 IDbConnection connection = SetupTables();
 
                 IDbTransaction transaction = connection.BeginTransaction();

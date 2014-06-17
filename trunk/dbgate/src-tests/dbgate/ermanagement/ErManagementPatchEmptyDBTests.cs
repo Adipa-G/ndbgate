@@ -43,7 +43,7 @@ namespace dbgate.ermanagement
                 types.Add(typeof(LeafEntitySubA));
                 types.Add(typeof(LeafEntitySubB));
                 types.Add(typeof(RootEntity));
-                ErLayer.GetSharedInstance().PatchDataBase(connection, types, true);
+                DbGate.GetSharedInstance().PatchDataBase(connection, types, true);
 
                 connection.Close();
             }
@@ -160,7 +160,7 @@ namespace dbgate.ermanagement
             types.Add(typeof(LeafEntitySubB));
             types.Add(typeof(RootEntity));
 
-            ErLayer.GetSharedInstance().PatchDataBase(connection,types,true);
+            DbGate.GetSharedInstance().PatchDataBase(connection,types,true);
         }
 
         private void AssertTwoRootEntitiesEquals(RootEntity entityA, RootEntity entityB)

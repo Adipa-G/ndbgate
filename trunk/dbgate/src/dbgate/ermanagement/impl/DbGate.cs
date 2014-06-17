@@ -12,31 +12,31 @@ using log4net;
 
 namespace dbgate.ermanagement.impl
 {
-    public class ErLayer : IErLayer
+    public class DbGate : IDbGate
     {
         private const string DefaultLoggerName = "ER-LAYER";
     
-        private static IErLayer _erLayer;
-        private readonly IErDataManager _erDataManager;
-        private readonly ErMetaDataManager _erMetaDataManager;
-        private readonly IErLayerConfig _config;
-        private readonly IErLayerStatistics _statistics;
+        private static IDbGate _dbGate;
+        private readonly IPersistRetrievalLayer _persistRetrievalLayer;
+        private readonly DataMigrationLayer _dataMigrationLayer;
+        private readonly IDbGateConfig _config;
+        private readonly IDbGateStatistics _statistics;
 
-        private ErLayer()
+        private DbGate()
         {
             if (DbConnector.GetSharedInstance() == null)
             {
                 throw new DbConnectorNotInitializedException("The DBConnector is not initialized");
             }
             int dbType = DbConnector.GetSharedInstance().DbType;
-            _config = new ErLayerConfig();
-            _statistics = new ErLayerStatistics();
+            _config = new DbGateConfig();
+            _statistics = new DbGateStatistics();
             InitializeDefaults();
 
             IDbLayer dbLayer = LayerFactory.CreateLayer(dbType,_config);
             CacheManager.Init(_config);
-            _erDataManager = new ErDataManager(dbLayer,_statistics,_config);
-            _erMetaDataManager = new ErMetaDataManager(dbLayer,_statistics,_config);
+            _persistRetrievalLayer = new PersistRetrievalLayer(dbLayer,_statistics,_config);
+            _dataMigrationLayer = new DataMigrationLayer(dbLayer,_statistics,_config);
         }
 
         private void InitializeDefaults()
@@ -47,51 +47,51 @@ namespace dbgate.ermanagement.impl
 
         public void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, IDbConnection con)
         {
-            _erDataManager.Load(readOnlyEntity, reader, con);
+            _persistRetrievalLayer.Load(readOnlyEntity, reader, con);
         }
 
         public void Save(IEntity entity, IDbConnection con)
         {
-            _erDataManager.Save(entity, con);
+            _persistRetrievalLayer.Save(entity, con);
         }
 
         public ICollection<Object> Select(ISelectionQuery query,IDbConnection con)
 		{
-		 	return _erDataManager.Select(query,con);
+		 	return _persistRetrievalLayer.Select(query,con);
 		}
 
         public void PatchDataBase(IDbConnection con, ICollection<Type> entityTypes, bool dropAll)
         {
-            _erMetaDataManager.PatchDataBase(con, entityTypes, dropAll);
+            _dataMigrationLayer.PatchDataBase(con, entityTypes, dropAll);
         }
 
         public void ClearCache()
         {
-            _erDataManager.ClearCache();
+            _persistRetrievalLayer.ClearCache();
         }
 
         public void RegisterEntity(Type entityType, string tableName, ICollection<IField> fields)
         {
-            _erDataManager.RegisterEntity(entityType,tableName,fields);
+            _persistRetrievalLayer.RegisterEntity(entityType,tableName,fields);
         }
 
-        public IErLayerConfig Config 
+        public IDbGateConfig Config 
         {
             get { return _config; }
         }
 
-        public IErLayerStatistics Statistics
+        public IDbGateStatistics Statistics
         {
             get { return _statistics; }
         }
 
-        public static IErLayer GetSharedInstance()
+        public static IDbGate GetSharedInstance()
         {
-            if (_erLayer == null)
+            if (_dbGate == null)
             {
                 try
                 {
-                    _erLayer = new ErLayer();
+                    _dbGate = new DbGate();
                 }
                 catch (DbConnectorNotInitializedException e)
                 {
@@ -99,7 +99,7 @@ namespace dbgate.ermanagement.impl
                     LogManager.GetLogger(DefaultLoggerName).Fatal(e.Message,e);
                 }
             }
-            return _erLayer;
+            return _dbGate;
         }
     }
 }

@@ -47,7 +47,7 @@ namespace dbgate.ermanagement
         {
             if (DbConnector.GetSharedInstance() != null)
             {
-                ErLayer.GetSharedInstance().ClearCache();
+                DbGate.GetSharedInstance().ClearCache();
             }
         }
 
@@ -149,7 +149,7 @@ namespace dbgate.ermanagement
                 IDbTransaction transaction = connection.BeginTransaction();
 
                 Type type = typeof(ColumnTestEntityExts);
-                ErLayer.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                DbGate.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
@@ -238,7 +238,7 @@ namespace dbgate.ermanagement
                 IDbTransaction transaction = connection.BeginTransaction();
 
                 Type type = typeof(ColumnTestEntityExts);
-                ErLayer.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                DbGate.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
  
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
@@ -336,7 +336,7 @@ namespace dbgate.ermanagement
                  IDbTransaction transaction = connection.BeginTransaction();
 
                 Type type = typeof (ColumnTestEntityExts);
-                ErLayer.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                DbGate.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
@@ -451,7 +451,7 @@ namespace dbgate.ermanagement
                  IDbTransaction transaction = connection.BeginTransaction();
 
                 Type type = typeof(ColumnTestEntityExts);
-                ErLayer.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                DbGate.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
@@ -566,7 +566,7 @@ namespace dbgate.ermanagement
                  IDbTransaction transaction = connection.BeginTransaction();
 
                 Type type = typeof(ColumnTestEntityExts);
-                ErLayer.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                DbGate.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
@@ -681,7 +681,7 @@ namespace dbgate.ermanagement
                  IDbTransaction transaction = connection.BeginTransaction();
 
                 Type type = typeof(ColumnTestEntityExts);
-                ErLayer.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                DbGate.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
@@ -794,7 +794,7 @@ namespace dbgate.ermanagement
                 IDbTransaction transaction = connection.BeginTransaction();
 
                 Type type = typeof(ColumnTestEntityExts);
-                ErLayer.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                DbGate.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);

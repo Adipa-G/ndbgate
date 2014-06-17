@@ -5,7 +5,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer
 {
     public class AccessDbLayer : DefaultDbLayer
     {
-        public AccessDbLayer(IErLayerConfig config) : base(config)
+        public AccessDbLayer(IDbGateConfig config) : base(config)
         {
         }
 

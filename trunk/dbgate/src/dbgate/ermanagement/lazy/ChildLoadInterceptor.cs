@@ -11,7 +11,7 @@ namespace dbgate.ermanagement.lazy
 {
     public class ChildLoadInterceptor : IInterceptor
     {
-        private ErDataRetrievalManager _dataRetrievalManager;
+        private RetrievalOperationLayer _dataRetrievalOperationLayer;
         private IReadOnlyEntity _parentRoEntity;
         private Type _applicableParentType;
         private IDbConnection _connection;
@@ -19,10 +19,10 @@ namespace dbgate.ermanagement.lazy
 
         private bool _intercepted;
 
-        public ChildLoadInterceptor(ErDataRetrievalManager dataRetrievalManager, IReadOnlyEntity parentRoEntity
+        public ChildLoadInterceptor(RetrievalOperationLayer dataRetrievalOperationLayer, IReadOnlyEntity parentRoEntity
             , Type applicableParentType, IDbConnection connection, IRelation relation)
         {
-            _dataRetrievalManager = dataRetrievalManager;
+            _dataRetrievalOperationLayer = dataRetrievalOperationLayer;
             _parentRoEntity = parentRoEntity;
             _applicableParentType = applicableParentType;
             _connection = connection;
@@ -42,7 +42,7 @@ namespace dbgate.ermanagement.lazy
                         _connection = DbConnector.GetSharedInstance().Connection;
                         newConnection = true;
                     }
-                    _dataRetrievalManager.LoadChildrenFromRelation(_parentRoEntity, _applicableParentType, _connection, _relation, true);
+                    _dataRetrievalOperationLayer.LoadChildrenFromRelation(_parentRoEntity, _applicableParentType, _connection, _relation, true);
                 }
                 finally
                 {

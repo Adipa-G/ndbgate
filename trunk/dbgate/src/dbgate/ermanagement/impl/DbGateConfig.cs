@@ -1,8 +1,8 @@
 namespace dbgate.ermanagement.impl
 {
-    public class ErLayerConfig : IErLayerConfig
+    public class DbGateConfig : IDbGateConfig
     {
-        public ErLayerConfig()
+        public DbGateConfig()
         {
             AutoTrackChanges = true;
             ShowQueries = true;

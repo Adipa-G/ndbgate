@@ -16,7 +16,7 @@ namespace dbgate.ermanagement
 
         public void Persist(IDbConnection con)
         {
-            ErLayer.GetSharedInstance().Save(this,con);
+            DbGate.GetSharedInstance().Save(this,con);
         }
 
         #endregion

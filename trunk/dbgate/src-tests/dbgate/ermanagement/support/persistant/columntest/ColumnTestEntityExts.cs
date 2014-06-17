@@ -38,12 +38,12 @@ namespace dbgate.ermanagement.support.persistant.columntest
 
         public void Persist(IDbConnection con)
         {
-            ErLayer.GetSharedInstance().Save(this,con);
+            DbGate.GetSharedInstance().Save(this,con);
         }
 
         public void Retrieve(IDataReader reader, IDbConnection con)
         {
-            ErLayer.GetSharedInstance().Load(this,reader,con);
+            DbGate.GetSharedInstance().Load(this,reader,con);
         }
 
         public IEntityContext Context

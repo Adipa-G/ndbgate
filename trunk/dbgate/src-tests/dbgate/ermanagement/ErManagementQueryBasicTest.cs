@@ -59,7 +59,7 @@ namespace dbgate.ermanagement
         {
             if (DbConnector.GetSharedInstance() != null)
             {
-                ErLayer.GetSharedInstance().ClearCache();
+                DbGate.GetSharedInstance().ClearCache();
             }
         }
 

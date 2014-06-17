@@ -9,7 +9,7 @@ namespace dbgate.ermanagement.caches
     {
         private static IEntityInfoCache _entityInfoCache;
 
-        public static void Init(IErLayerConfig config)
+        public static void Init(IDbGateConfig config)
         {
             _entityInfoCache = new EntityInfoCache(config);
         }

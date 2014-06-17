@@ -49,7 +49,7 @@ namespace dbgate.ermanagement
         {
             if (DbConnector.GetSharedInstance() != null)
             {
-                ErLayer.GetSharedInstance().ClearCache();
+                DbGate.GetSharedInstance().ClearCache();
             }
         }
 
@@ -64,7 +64,7 @@ namespace dbgate.ermanagement
             types.Add(typeof(Transaction));
             types.Add(typeof(Product));
             types.Add(typeof(Service));
-            ErLayer.GetSharedInstance().PatchDataBase(connection,types,true);
+            DbGate.GetSharedInstance().PatchDataBase(connection,types,true);
 
             transaction.Commit();
             return connection;

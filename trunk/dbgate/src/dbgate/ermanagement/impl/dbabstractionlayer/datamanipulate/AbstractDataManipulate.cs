@@ -213,7 +213,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate
                 {
                     sb.Append(" AND ");
                 }
-                sb.Append( ErDataManagerUtils.FindColumnByAttribute(entityInfo.Columns,columnMapping.ToField).ColumnName);
+                sb.Append( OperationUtils.FindColumnByAttribute(entityInfo.Columns,columnMapping.ToField).ColumnName);
                 sb.Append("= ?");
                 i++;
             }

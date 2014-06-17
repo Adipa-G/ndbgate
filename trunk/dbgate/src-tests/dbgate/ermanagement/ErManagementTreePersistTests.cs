@@ -52,7 +52,7 @@ namespace  dbgate.ermanagement
         {
             if (DbConnector.GetSharedInstance() != null)
             {
-                ErLayer.GetSharedInstance().ClearCache();
+                DbGate.GetSharedInstance().ClearCache();
             }
         }
 
@@ -87,15 +87,15 @@ namespace  dbgate.ermanagement
         private void RegisterForExternal()
         {
             Type objType = typeof(TreeTestRootEntityExt);
-            ErLayer.GetSharedInstance().RegisterEntity(objType, TreeTestExtFactory.GetTableNames(objType),
+            DbGate.GetSharedInstance().RegisterEntity(objType, TreeTestExtFactory.GetTableNames(objType),
                                                        TreeTestExtFactory.GetFieldInfo(objType));
             
             objType = typeof(TreeTestOne2ManyEntityExt);
-            ErLayer.GetSharedInstance().RegisterEntity(objType, TreeTestExtFactory.GetTableNames(objType),
+            DbGate.GetSharedInstance().RegisterEntity(objType, TreeTestExtFactory.GetTableNames(objType),
                                                        TreeTestExtFactory.GetFieldInfo(objType));
 
             objType = typeof(TreeTestOne2OneEntityExt);
-            ErLayer.GetSharedInstance().RegisterEntity(objType, TreeTestExtFactory.GetTableNames(objType),
+            DbGate.GetSharedInstance().RegisterEntity(objType, TreeTestExtFactory.GetTableNames(objType),
                                                        TreeTestExtFactory.GetFieldInfo(objType));
         }
 

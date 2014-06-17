@@ -2,7 +2,7 @@
 
 namespace dbgate.ermanagement
 {
-    public interface IErLayerStatistics
+    public interface IDbGateStatistics
     {
         void Reset();
 

@@ -15,12 +15,12 @@ namespace dbgate.ermanagement.support.persistant.inheritancetest
 
         public override void Persist(IDbConnection con)
         {
-            ErLayer.GetSharedInstance().Save(this,con);
+            DbGate.GetSharedInstance().Save(this,con);
         }
 
         public override void Retrieve(IDataReader rs, IDbConnection con)
         {
-            ErLayer.GetSharedInstance().Load(this,rs,con);
+            DbGate.GetSharedInstance().Load(this,rs,con);
         }
     }
 }

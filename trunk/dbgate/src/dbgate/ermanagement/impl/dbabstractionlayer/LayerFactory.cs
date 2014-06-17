@@ -4,7 +4,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer
 {
     public class LayerFactory
     {
-        public static IDbLayer CreateLayer(int dbType,IErLayerConfig config)
+        public static IDbLayer CreateLayer(int dbType,IDbGateConfig config)
         {
             switch (dbType)
             {

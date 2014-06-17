@@ -18,9 +18,9 @@ using log4net;
 
 namespace dbgate.ermanagement.impl
 {
-    public class ErDataPersistManager : ErDataCommonManager
+    public class PersistOperationLayer : BaseOperationLayer
     {
-        public ErDataPersistManager(IDbLayer dbLayer,IErLayerStatistics statistics, IErLayerConfig config)
+        public PersistOperationLayer(IDbLayer dbLayer,IDbGateStatistics statistics, IDbGateConfig config)
             : base(dbLayer,statistics, config)
         {
         }
@@ -29,7 +29,7 @@ namespace dbgate.ermanagement.impl
         {
             try
             {
-                ErSessionUtils.InitSession(entity);
+                SessionUtils.InitSession(entity);
                 TrackAndCommitChanges(entity, con);
 
                 var entityInfoStack = new Stack<EntityInfo>();
@@ -46,7 +46,7 @@ namespace dbgate.ermanagement.impl
                     SaveForType(entity, entityInfo.EntityType, con);
                 }
                 entity.Status = EntityStatus.Unmodified;
-                ErSessionUtils.DestroySession(entity);
+                SessionUtils.DestroySession(entity);
             }
             catch (Exception e)
             {
@@ -78,7 +78,7 @@ namespace dbgate.ermanagement.impl
 
             ICollection<ITypeFieldValueList> currentChildren = GetChildEntityValueListExcludingDeletedStatusItems(entity);
             ValidateForChildDeletion(entity, currentChildren);
-            ICollection<ITypeFieldValueList> deletedChildren = ErDataManagerUtils.FindDeletedChildren(originalChildren, currentChildren);
+            ICollection<ITypeFieldValueList> deletedChildren = OperationUtils.FindDeletedChildren(originalChildren, currentChildren);
             DeleteOrphanChildren(con, deletedChildren);
         }
 
@@ -101,7 +101,7 @@ namespace dbgate.ermanagement.impl
                 {
                     continue;
                 }
-                ICollection<IEntity> childObjects = ErDataManagerUtils.GetRelationEntities(entity, relation);
+                ICollection<IEntity> childObjects = OperationUtils.GetRelationEntities(entity, relation);
                 if (childObjects != null)
                 {
                     if (relation.NonIdentifyingRelation)
@@ -114,7 +114,7 @@ namespace dbgate.ermanagement.impl
                 }
             }
 
-            ITypeFieldValueList fieldValues = ErDataManagerUtils.ExtractEntityTypeFieldValues(entity, type);
+            ITypeFieldValueList fieldValues = OperationUtils.ExtractEntityTypeFieldValues(entity, type);
             if (entity.Status == EntityStatus.Unmodified)
             {
                 //do nothing
@@ -131,7 +131,7 @@ namespace dbgate.ermanagement.impl
                     {
                         throw new DataUpdatedFromAnotherSourceException(String.Format("The type {0} updated from another transaction", type));
                     }
-                    ErDataManagerUtils.IncrementVersion(fieldValues);
+                    OperationUtils.IncrementVersion(fieldValues);
                     SetValues(entity, fieldValues);
                 }
                 Update(entity, fieldValues, type, con);
@@ -146,7 +146,7 @@ namespace dbgate.ermanagement.impl
                 throw new IncorrectStatusException(message);
             }
 
-            fieldValues = ErDataManagerUtils.ExtractEntityTypeFieldValues(entity, type);
+            fieldValues = OperationUtils.ExtractEntityTypeFieldValues(entity, type);
             IEntityContext entityContext = entity.Context;
             if (entityContext != null)
             {
@@ -163,7 +163,7 @@ namespace dbgate.ermanagement.impl
                     }
                 }
             }
-            ErSessionUtils.AddToSession(entity, ErDataManagerUtils.ExtractEntityKeyValues(entity));
+            SessionUtils.AddToSession(entity, OperationUtils.ExtractEntityKeyValues(entity));
 
             foreach (IRelation relation in dbRelations)
             {
@@ -177,23 +177,23 @@ namespace dbgate.ermanagement.impl
                     continue;
                 }
 
-                ICollection<IEntity> childObjects = ErDataManagerUtils.GetRelationEntities(entity, relation);
+                ICollection<IEntity> childObjects = OperationUtils.GetRelationEntities(entity, relation);
                 if (childObjects != null)
                 {
 
                     SetRelationObjectKeyValues(fieldValues, type,relation.RelatedObjectType, childObjects, relation);
                     foreach (IEntity fieldObject in childObjects)
                     {
-                        IEntityFieldValueList childEntityKeyList = ErDataManagerUtils.ExtractEntityKeyValues(fieldObject);
-                        if (ErSessionUtils.ExistsInSession(entity, childEntityKeyList))
+                        IEntityFieldValueList childEntityKeyList = OperationUtils.ExtractEntityKeyValues(fieldObject);
+                        if (SessionUtils.ExistsInSession(entity, childEntityKeyList))
                         {
                             continue;
                         }
-                        ErSessionUtils.TransferSession(entity, fieldObject);
+                        SessionUtils.TransferSession(entity, fieldObject);
                         if (fieldObject.Status != EntityStatus.Deleted) //deleted items are already deleted
                         {
                             fieldObject.Persist(con);
-                            ErSessionUtils.AddToSession(entity, childEntityKeyList);
+                            SessionUtils.AddToSession(entity, childEntityKeyList);
                         }
                     }
                 }
@@ -265,7 +265,7 @@ namespace dbgate.ermanagement.impl
                 if (values.Count == 0)
                     return;
 
-                keys = ErDataManagerUtils.ExtractEntityKeyValues(entity).FieldValues;
+                keys = OperationUtils.ExtractEntityKeyValues(entity).FieldValues;
                 ICollection<IColumn> keysAndModified = new List<IColumn>();
                 foreach (EntityFieldValue fieldValue in values)
                 {
@@ -382,7 +382,7 @@ namespace dbgate.ermanagement.impl
             ICollection<IColumn> columns = entityInfo.Columns;
             foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
             {
-                IColumn matchColumn = ErDataManagerUtils.FindColumnByAttribute(columns, mapping.FromField);
+                IColumn matchColumn = OperationUtils.FindColumnByAttribute(columns, mapping.FromField);
                 EntityFieldValue fieldValue = valueTypeList.GetFieldValue(matchColumn.AttributeName);
 
                 if (fieldValue != null)
@@ -407,7 +407,7 @@ namespace dbgate.ermanagement.impl
             while (entityInfo != null)
             {
                 ICollection<IColumn> subLevelColumns = entityInfo.Columns;
-                IColumn subLevelMatchedColumn = ErDataManagerUtils.FindColumnByAttribute(subLevelColumns, mapping.ToField);
+                IColumn subLevelMatchedColumn = OperationUtils.FindColumnByAttribute(subLevelColumns, mapping.ToField);
 
                 if (subLevelMatchedColumn != null)
                 {
@@ -448,7 +448,7 @@ namespace dbgate.ermanagement.impl
             while (parentInfo != null)
             {
                 ICollection<IColumn> parentColumns = parentInfo.Columns;
-                IColumn parentMatchedColumn = ErDataManagerUtils.FindColumnByAttribute(parentColumns, mapping.FromField);
+                IColumn parentMatchedColumn = OperationUtils.FindColumnByAttribute(parentColumns, mapping.FromField);
                 if (parentMatchedColumn != null)
                 {
                     foundOnce = true;
@@ -466,14 +466,14 @@ namespace dbgate.ermanagement.impl
             while (childInfo != null)
             {
                 ICollection<IColumn> subLevelColumns = childInfo.Columns;
-                IColumn childMatchedColumn = ErDataManagerUtils.FindColumnByAttribute(subLevelColumns, mapping.ToField);
+                IColumn childMatchedColumn = OperationUtils.FindColumnByAttribute(subLevelColumns, mapping.ToField);
 
                 if (childMatchedColumn != null)
                 {
                     foundOnce = true;
                     foreach (IReadOnlyEntity dbObject in childObjects)
                     {
-                        ITypeFieldValueList fieldValueList = ErDataManagerUtils.ExtractEntityTypeFieldValues(dbObject, childInfo.EntityType);
+                        ITypeFieldValueList fieldValueList = OperationUtils.ExtractEntityTypeFieldValues(dbObject, childInfo.EntityType);
                         EntityFieldValue childFieldValue = fieldValueList.GetFieldValue(childMatchedColumn.AttributeName);
                         setter.SetValue(parentEntity, childFieldValue.Value, null);
                     }
@@ -558,7 +558,7 @@ namespace dbgate.ermanagement.impl
                     ICollection<IReadOnlyEntity> children = ReadRelationChildrenFromDb(entity,entityInfo.EntityType,con,relation);
                     foreach (IReadOnlyEntity childEntity in children)
                     {
-                        ITypeFieldValueList valueTypeList = ErDataManagerUtils.ExtractRelationKeyValues(childEntity,relation);
+                        ITypeFieldValueList valueTypeList = OperationUtils.ExtractRelationKeyValues(childEntity,relation);
                         if (valueTypeList != null)
                         {
                             entityContext.ChangeTracker.ChildEntityKeys.Add(valueTypeList);
@@ -670,7 +670,7 @@ namespace dbgate.ermanagement.impl
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
             ICollection<IColumn> typeColumns = entityInfo.Columns;
-            ITypeFieldValueList currentValues = ErDataManagerUtils.ExtractEntityTypeFieldValues(entity,type);
+            ITypeFieldValueList currentValues = OperationUtils.ExtractEntityTypeFieldValues(entity,type);
             ICollection<EntityFieldValue> modifiedColumns = new  List<EntityFieldValue>();
 
             foreach (IColumn typeColumn in typeColumns)
@@ -695,7 +695,7 @@ namespace dbgate.ermanagement.impl
         {
             Object versionValue = null;
 
-            ITypeFieldValueList keyFieldValueList = ErDataManagerUtils.ExtractEntityTypeKeyValues(entity, type);
+            ITypeFieldValueList keyFieldValueList = OperationUtils.ExtractEntityTypeKeyValues(entity, type);
             IDbCommand cmd = null;
             IDataReader reader = null;
             try
@@ -725,7 +725,7 @@ namespace dbgate.ermanagement.impl
         {
             ITypeFieldValueList fieldValueList = null;
 
-            ITypeFieldValueList keyFieldValueList = ErDataManagerUtils.ExtractEntityTypeKeyValues(entity, type);
+            ITypeFieldValueList keyFieldValueList = OperationUtils.ExtractEntityTypeKeyValues(entity, type);
             IDbCommand cmd = null;
             IDataReader reader = null;
             try

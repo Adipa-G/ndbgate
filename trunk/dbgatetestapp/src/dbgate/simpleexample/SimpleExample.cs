@@ -25,7 +25,7 @@ namespace dbgatetestapp.dbgate.simpleexample
             ICollection<Type> entityTypes = new List<Type>();
             entityTypes.Add(typeof(SimpleEntity));
             IDbTransaction transaction = con.BeginTransaction();
-            ErLayer.GetSharedInstance().PatchDataBase(con,entityTypes,false);
+            DbGate.GetSharedInstance().PatchDataBase(con,entityTypes,false);
             transaction.Commit();
         }
 

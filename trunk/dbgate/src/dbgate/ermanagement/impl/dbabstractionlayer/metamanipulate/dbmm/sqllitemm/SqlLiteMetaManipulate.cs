@@ -10,7 +10,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.sqllit
 {
 	public class SqlLiteMetaManipulate : DefaultMetaManipulate
     {
-        public SqlLiteMetaManipulate(IDbLayer dbLayer,IErLayerConfig config) : base(dbLayer,config)
+        public SqlLiteMetaManipulate(IDbLayer dbLayer,IDbGateConfig config) : base(dbLayer,config)
         {
         }
 

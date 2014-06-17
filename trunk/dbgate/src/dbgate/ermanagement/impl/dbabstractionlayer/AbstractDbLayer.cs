@@ -6,11 +6,11 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer
 {
     public abstract class AbstractDbLayer : IDbLayer
     {
-        protected IErLayerConfig Config;
+        protected IDbGateConfig Config;
         private IDataManipulate _dataManipulate;
         private IMetaManipulate _metaManipulate;
 
-        protected AbstractDbLayer(IErLayerConfig config)
+        protected AbstractDbLayer(IDbGateConfig config)
         {
             Config = config;
         }

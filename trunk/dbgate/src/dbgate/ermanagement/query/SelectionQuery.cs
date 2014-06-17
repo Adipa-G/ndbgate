@@ -9,7 +9,7 @@ namespace dbgate.ermanagement.query
     {
         public ICollection<object> ToList(IDbConnection con)
         {
-            return ErLayer.GetSharedInstance().Select(this, con);
+            return DbGate.GetSharedInstance().Select(this, con);
         }
         
      	public ISelectionQuery Distinct()

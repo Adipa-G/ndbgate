@@ -17,9 +17,9 @@ namespace dbgate.ermanagement.caches.impl
     public class EntityInfoCache : IEntityInfoCache
     {
         private static readonly Dictionary<Type, EntityInfo> Cache = new Dictionary<Type, EntityInfo>();
-        private IErLayerConfig _config;
+        private IDbGateConfig _config;
 
-        public EntityInfoCache(IErLayerConfig config)
+        public EntityInfoCache(IDbGateConfig config)
         {
             _config = config;
         }

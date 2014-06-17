@@ -21,7 +21,7 @@ namespace dbgate.ermanagement.context.impl
         {
             foreach (IEntityFieldValueList existingEntity in _entityFieldValueList)
             {
-                if (ErDataManagerUtils.IsTypeKeyEquals(typeKeyFieldList, existingEntity))
+                if (OperationUtils.IsTypeKeyEquals(typeKeyFieldList, existingEntity))
                 {
                     return existingEntity.Entity;
                 }

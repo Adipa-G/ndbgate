@@ -54,7 +54,7 @@ namespace dbgate.ermanagement
                 IDbTransaction transaction = connection.BeginTransaction();
                 ICollection<Type> types = new List<Type>();
                 types.Add(typeof(ThreeColumnEntity));
-                ErLayer.GetSharedInstance().PatchDataBase(connection, types,true);
+                DbGate.GetSharedInstance().PatchDataBase(connection, types,true);
                 transaction.Commit();
                 connection.Close();
 
@@ -62,7 +62,7 @@ namespace dbgate.ermanagement
                 transaction = connection.BeginTransaction();
                 types = new List<Type>();
                 types.Add(typeof(FourColumnEntity));
-                ErLayer.GetSharedInstance().PatchDataBase(connection, types, false);
+                DbGate.GetSharedInstance().PatchDataBase(connection, types, false);
                 transaction.Commit();
                 connection.Close();
 
@@ -90,7 +90,7 @@ namespace dbgate.ermanagement
                 IDbTransaction transaction = connection.BeginTransaction();
                 ICollection<Type> types = new List<Type>();
                 types.Add(typeof(FourColumnEntity));
-                ErLayer.GetSharedInstance().PatchDataBase(connection, types, true);
+                DbGate.GetSharedInstance().PatchDataBase(connection, types, true);
                 transaction.Commit();
                 connection.Close();
 
@@ -98,7 +98,7 @@ namespace dbgate.ermanagement
                 transaction = connection.BeginTransaction();
                 types = new List<Type>();
                 types.Add(typeof(ThreeColumnEntity));
-                ErLayer.GetSharedInstance().PatchDataBase(connection, types, false);
+                DbGate.GetSharedInstance().PatchDataBase(connection, types, false);
                 transaction.Commit();
                 connection.Close();
 
@@ -122,7 +122,7 @@ namespace dbgate.ermanagement
                 IDbTransaction transaction = connection.BeginTransaction();
                 ICollection<Type> types = new List<Type>();
                 types.Add(typeof(ThreeColumnEntity));
-                ErLayer.GetSharedInstance().PatchDataBase(connection, types, true);
+                DbGate.GetSharedInstance().PatchDataBase(connection, types, true);
                 transaction.Commit();
                 connection.Close();
 
@@ -148,7 +148,7 @@ namespace dbgate.ermanagement
                 transaction = connection.BeginTransaction();
                 types = new List<Type>();
                 types.Add(typeof(ThreeColumnTypeDifferentEntity));
-                ErLayer.GetSharedInstance().PatchDataBase(connection, types, false);
+                DbGate.GetSharedInstance().PatchDataBase(connection, types, false);
                 transaction.Commit();
                 connection.Close();
 

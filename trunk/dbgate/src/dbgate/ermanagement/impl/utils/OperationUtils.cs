@@ -9,7 +9,7 @@ using dbgate.ermanagement.context.impl;
 
 namespace dbgate.ermanagement.impl.utils
 {
-    public class ErDataManagerUtils
+    public class OperationUtils
     {
         public static ICollection<IEntity> GetRelationEntities(IReadOnlyEntity rootEntity, IRelation relation)
         {

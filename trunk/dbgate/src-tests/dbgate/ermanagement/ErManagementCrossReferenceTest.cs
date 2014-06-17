@@ -48,7 +48,7 @@ namespace dbgate.ermanagement
         {
             if (DbConnector.GetSharedInstance() != null)
             {
-                ErLayer.GetSharedInstance().ClearCache();
+                DbGate.GetSharedInstance().ClearCache();
             }
         }
 
@@ -132,7 +132,7 @@ namespace dbgate.ermanagement
         {
             try
             {
-                ErLayer.GetSharedInstance().Config.AutoTrackChanges = true;
+                DbGate.GetSharedInstance().Config.AutoTrackChanges = true;
                 IDbConnection connection = SetupTables();
                 
                 IDbTransaction transaction = connection.BeginTransaction();
@@ -169,7 +169,7 @@ namespace dbgate.ermanagement
         {
             try
             {
-                ErLayer.GetSharedInstance().Config.AutoTrackChanges = true;
+                DbGate.GetSharedInstance().Config.AutoTrackChanges = true;
             
                 IDbConnection connection = SetupTables();
                 IDbTransaction transaction = connection.BeginTransaction();

@@ -3,7 +3,7 @@ using dbgate.ermanagement.context.impl;
 
 namespace dbgate.ermanagement.impl.utils
 {
-    public class ErSessionUtils
+    public class SessionUtils
     {
         public static void InitSession(IReadOnlyEntity roEntity)
         {

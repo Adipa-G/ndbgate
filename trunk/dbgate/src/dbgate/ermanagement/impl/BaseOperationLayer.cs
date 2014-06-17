@@ -17,13 +17,13 @@ using log4net;
 
 namespace dbgate.ermanagement.impl
 {
-    public abstract class ErDataCommonManager
+    public abstract class BaseOperationLayer
     {
         protected IDbLayer DbLayer;
-        protected IErLayerStatistics Statistics;
-        protected IErLayerConfig Config;
+        protected IDbGateStatistics Statistics;
+        protected IDbGateConfig Config;
 
-        protected ErDataCommonManager(IDbLayer dbLayer,IErLayerStatistics statistics, IErLayerConfig config)
+        protected BaseOperationLayer(IDbLayer dbLayer,IDbGateStatistics statistics, IDbGateConfig config)
         {
             DbLayer = dbLayer;
             Statistics = statistics;
@@ -131,7 +131,7 @@ namespace dbgate.ermanagement.impl
                         continue;
                     }
 
-                    ICollection<IEntity> childEntities = ErDataManagerUtils.GetRelationEntities(parentEntity, typeRelation);
+                    ICollection<IEntity> childEntities = OperationUtils.GetRelationEntities(parentEntity, typeRelation);
                     foreach (IEntity childEntity in childEntities)
                     {
                         if (parentEntity.Status == EntityStatus.Deleted
@@ -143,7 +143,7 @@ namespace dbgate.ermanagement.impl
                         {
                             continue;
                         }
-                        ITypeFieldValueList childKeyValueList = ErDataManagerUtils.ExtractRelationKeyValues(childEntity, typeRelation);
+                        ITypeFieldValueList childKeyValueList = OperationUtils.ExtractRelationKeyValues(childEntity, typeRelation);
                         if (childKeyValueList != null)
                         {
                             existingEntityChildRelations.Add(childKeyValueList);
@@ -192,7 +192,7 @@ namespace dbgate.ermanagement.impl
             for (int i = 0; i < fields.Count; i++)
             {
                 string field = fields[i];
-                IColumn matchColumn = ErDataManagerUtils.FindColumnByAttribute(dbColumns, field);
+                IColumn matchColumn = OperationUtils.FindColumnByAttribute(dbColumns, field);
 
                 if (matchColumn != null)
                 {
@@ -245,19 +245,19 @@ namespace dbgate.ermanagement.impl
                         Object value = DbLayer.DataManipulate().ReadFromResultSet(reader, childKey);
                         childTypeKeyList.FieldValues.Add(new EntityFieldValue(value, childKey));
                     }
-                    if (ErSessionUtils.ExistsInSession(entity, childTypeKeyList))
+                    if (SessionUtils.ExistsInSession(entity, childTypeKeyList))
                     {
-                        data.Add(ErSessionUtils.GetFromSession(entity, childTypeKeyList));
+                        data.Add(SessionUtils.GetFromSession(entity, childTypeKeyList));
                         continue;
                     }
 
                     IReadOnlyEntity rodbClass = (IReadOnlyEntity)Activator.CreateInstance(childType);
-                    ErSessionUtils.TransferSession(entity, rodbClass);
+                    SessionUtils.TransferSession(entity, rodbClass);
                     rodbClass.Retrieve(reader, con);
                     data.Add(rodbClass);
 
-                    IEntityFieldValueList childEntityKeyList = ErDataManagerUtils.ExtractEntityKeyValues(rodbClass);
-                    ErSessionUtils.AddToSession(entity, childEntityKeyList);
+                    IEntityFieldValueList childEntityKeyList = OperationUtils.ExtractEntityKeyValues(rodbClass);
+                    SessionUtils.AddToSession(entity, childEntityKeyList);
                 }
             }
             catch (Exception ex)

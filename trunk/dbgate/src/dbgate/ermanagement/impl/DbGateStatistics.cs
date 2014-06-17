@@ -3,14 +3,14 @@ using System.Collections;
 
 namespace dbgate.ermanagement.impl
 {
-    public class ErLayerStatistics : IErLayerStatistics
+    public class DbGateStatistics : IDbGateStatistics
     {
         private Hashtable _selectCount;
         private Hashtable _inertCount;
         private Hashtable _updateCount;
         private Hashtable _deleteCount;
 
-        public ErLayerStatistics()
+        public DbGateStatistics()
         {
             Reset();
         }

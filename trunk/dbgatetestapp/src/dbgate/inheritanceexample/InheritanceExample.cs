@@ -28,7 +28,7 @@ namespace dbgatetestapp.dbgate.inheritanceexample
             ICollection<Type> entityTypes = new List<Type>();
             entityTypes.Add(typeof(SubEntity));
             IDbTransaction transaction = con.BeginTransaction();
-            ErLayer.GetSharedInstance().PatchDataBase(con, entityTypes, false);
+            DbGate.GetSharedInstance().PatchDataBase(con, entityTypes, false);
             transaction.Commit();
         }
 

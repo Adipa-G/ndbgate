@@ -16,9 +16,9 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
         protected List<ColumnTypeMapItem> ColumnTypeMapItems;
         protected List<ReferentialRuleTypeMapItem> ReferentialRuleTypeMapItems;
         protected IDbLayer DBLayer;
-        protected IErLayerConfig Config;
+        protected IDbGateConfig Config;
 
-        public AbstractMetaManipulate(IDbLayer dbLayer,IErLayerConfig config)
+        public AbstractMetaManipulate(IDbLayer dbLayer,IDbGateConfig config)
         {
             DBLayer = dbLayer;
             Config = config;
@@ -176,7 +176,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                     string query = CreateCreateTableQuery(tableGroup);
                     if (!string.IsNullOrEmpty(query))
                     {
-                        holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_TABLE,MetaQueryHolder.OPERATION_TYPE_ADD, query));
+                        holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_TABLE,
+                                                        MetaQueryHolder.OPERATION_TYPE_ADD, query));
                     }
                 }
                 if (metaComparisonGroup.ShouldDeleteFromDb())
@@ -184,7 +185,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                     string query = CreateDropTableQuery(tableGroup);
                     if (!string.IsNullOrEmpty(query))
                     {
-                        holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_TABLE,MetaQueryHolder.OPERATION_TYPE_DELETE, query));
+                        holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_TABLE,
+                                                        MetaQueryHolder.OPERATION_TYPE_DELETE, query));
                     }
                 }
                 if (metaComparisonGroup.ShouldAlterInDb())
@@ -192,7 +194,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                     string query = CreateAlterTableQuery(tableGroup);
                     if (!string.IsNullOrEmpty(query))
                     {
-                        holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_TABLE,MetaQueryHolder.OPERATION_TYPE_ALTER, query));
+                        holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_TABLE,
+                                                        MetaQueryHolder.OPERATION_TYPE_ALTER, query));
                     }
                 }
                 if (tableGroup.PrimaryKey != null)
@@ -204,7 +207,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                         string query = CreateCreatePrimaryKeyQuery(tableGroup,primaryKeyGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_PRIMARY_KEY,MetaQueryHolder.OPERATION_TYPE_ADD, query));
+                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_PRIMARY_KEY,
+                                                            MetaQueryHolder.OPERATION_TYPE_ADD, query));
                         }
                     }
                     if (tableGroup.ShouldDeleteFromDb()
@@ -213,7 +217,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                         string query = CreateDropPrimaryKeyQuery(tableGroup,primaryKeyGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_PRIMARY_KEY,MetaQueryHolder.OPERATION_TYPE_DELETE, query));
+                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_PRIMARY_KEY,
+                                                            MetaQueryHolder.OPERATION_TYPE_DELETE, query));
                         }
                     }
                 }
@@ -225,7 +230,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                         string query = CreateCreateColumnQuery(tableGroup,comparisonColumnGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_COLUMN,MetaQueryHolder.OPERATION_TYPE_ADD, query));
+                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_COLUMN,
+                                                            MetaQueryHolder.OPERATION_TYPE_ADD, query));
                         }
                     }
                     if (comparisonColumnGroup.ShouldDeleteFromDb())
@@ -233,7 +239,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                         string query = CreateDropColumnQuery(tableGroup,comparisonColumnGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_COLUMN,MetaQueryHolder.OPERATION_TYPE_DELETE, query));
+                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_COLUMN,
+                                                            MetaQueryHolder.OPERATION_TYPE_DELETE, query));
                         }
                     }
                     if (comparisonColumnGroup.ShouldAlterInDb())
@@ -241,7 +248,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                         string query = CreateAlterColumnQuery(tableGroup,comparisonColumnGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_COLUMN,MetaQueryHolder.OPERATION_TYPE_ALTER, query));
+                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_COLUMN,
+                                                            MetaQueryHolder.OPERATION_TYPE_ALTER, query));
                         }
                     }
                 }
@@ -254,7 +262,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                         string query = CreateCreateForeginKeyQuery(tableGroup,foreignKeyGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_FOREIGN_KEY,MetaQueryHolder.OPERATION_TYPE_ADD, query));
+                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_FOREIGN_KEY,
+                                                            MetaQueryHolder.OPERATION_TYPE_ADD, query));
                         }
                     }
                     if (tableGroup.ShouldDeleteFromDb()
@@ -263,7 +272,8 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate
                         string query = CreateDropForeginKeyQuery(tableGroup,foreignKeyGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_FOREIGN_KEY,MetaQueryHolder.OPERATION_TYPE_DELETE, query));
+                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_FOREIGN_KEY,
+                                                            MetaQueryHolder.OPERATION_TYPE_DELETE, query));
                         }
                     }
                 }

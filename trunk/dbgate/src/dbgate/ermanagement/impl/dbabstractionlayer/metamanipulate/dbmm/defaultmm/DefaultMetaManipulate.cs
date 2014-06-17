@@ -12,7 +12,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaul
 {
     public class DefaultMetaManipulate : AbstractMetaManipulate
     {
-        public DefaultMetaManipulate(IDbLayer dbLayer,IErLayerConfig config) : base(dbLayer,config)
+        public DefaultMetaManipulate(IDbLayer dbLayer,IDbGateConfig config) : base(dbLayer,config)
         {
         }
 

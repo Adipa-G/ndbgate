@@ -17,7 +17,7 @@ namespace dbgate.ermanagement
 
         public void Retrieve(IDataReader reader, IDbConnection con)
         {
-            ErLayer.GetSharedInstance().Load(this,reader,con);
+            DbGate.GetSharedInstance().Load(this,reader,con);
         }
 
         public IEntityContext Context

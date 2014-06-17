@@ -5,7 +5,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer
 {
     public class MySqlDbLayer  : DefaultDbLayer
     {
-        public MySqlDbLayer(IErLayerConfig config) : base(config)
+        public MySqlDbLayer(IDbGateConfig config) : base(config)
         {
         }
 

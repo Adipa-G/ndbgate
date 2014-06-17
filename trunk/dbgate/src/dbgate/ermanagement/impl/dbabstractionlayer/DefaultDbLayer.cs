@@ -7,7 +7,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer
 {
     public class DefaultDbLayer : AbstractDbLayer
     {
-        public DefaultDbLayer(IErLayerConfig config) : base(config)
+        public DefaultDbLayer(IDbGateConfig config) : base(config)
         {
         }
 

@@ -51,7 +51,7 @@ namespace dbgate.ermanagement
         {
             if (DbConnector.GetSharedInstance() != null)
             {
-                ErLayer.GetSharedInstance().ClearCache();
+                DbGate.GetSharedInstance().ClearCache();
             }
         }
 
@@ -144,15 +144,15 @@ namespace dbgate.ermanagement
         private void RegisterForExternal()
         {
             Type objType = typeof(InheritanceTestSuperEntityExt);
-            ErLayer.GetSharedInstance().RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
+            DbGate.GetSharedInstance().RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
                                                        InheritanceTestExtFactory.GetFieldInfo(objType));
             
             objType = typeof(InheritanceTestSubEntityAExt);
-            ErLayer.GetSharedInstance().RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
+            DbGate.GetSharedInstance().RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
                                                        InheritanceTestExtFactory.GetFieldInfo(objType));
             
             objType = typeof(InheritanceTestSubEntityBExt);
-            ErLayer.GetSharedInstance().RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
+            DbGate.GetSharedInstance().RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
                                                        InheritanceTestExtFactory.GetFieldInfo(objType));
         }
 
@@ -187,7 +187,7 @@ namespace dbgate.ermanagement
                     }
                     ClearTables(connection);
                     
-                    ErLayer.GetSharedInstance().ClearCache();
+                    DbGate.GetSharedInstance().ClearCache();
                     if (type == TYPE_EXTERNAL)
                     {
                         RegisterForExternal();
@@ -251,7 +251,7 @@ namespace dbgate.ermanagement
                             break;
                     }
 
-                    ErLayer.GetSharedInstance().ClearCache();
+                    DbGate.GetSharedInstance().ClearCache();
                     if (type == TYPE_EXTERNAL)
                     {
                         RegisterForExternal();
@@ -335,7 +335,7 @@ namespace dbgate.ermanagement
 
                     ClearTables(connection);
 
-                    ErLayer.GetSharedInstance().ClearCache();
+                    DbGate.GetSharedInstance().ClearCache();
                     if (type == TYPE_EXTERNAL)
                     {
                         RegisterForExternal();

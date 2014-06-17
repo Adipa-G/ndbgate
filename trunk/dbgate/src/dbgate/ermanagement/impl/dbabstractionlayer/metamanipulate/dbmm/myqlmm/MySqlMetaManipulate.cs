@@ -6,7 +6,7 @@ namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.mysqlm
 {
 	public class MySqlMetaManipulate : DefaultMetaManipulate
     {
-        public MySqlMetaManipulate(IDbLayer dbLayer,IErLayerConfig config) : base(dbLayer,config)
+        public MySqlMetaManipulate(IDbLayer dbLayer,IDbGateConfig config) : base(dbLayer,config)
         {
         }
 

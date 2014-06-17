@@ -24,12 +24,12 @@ namespace dbgate.ermanagement.support.persistant.treetest
 
         public void Retrieve(IDataReader reader, IDbConnection con)
         {
-            ErLayer.GetSharedInstance().Load(this, reader, con);
+            DbGate.GetSharedInstance().Load(this, reader, con);
         }
 
         public void Persist(IDbConnection con)
         {
-            ErLayer.GetSharedInstance().Save(this, con);
+            DbGate.GetSharedInstance().Save(this, con);
         }
 
         public IEntityContext Context
