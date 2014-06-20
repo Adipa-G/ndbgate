@@ -16,6 +16,7 @@ using dbgate.ermanagement.exceptions.retrival;
 using dbgate.ermanagement.impl.dbabstractionlayer;
 using dbgate.ermanagement.impl.utils;
 using dbgate.ermanagement.lazy;
+using dbgate.utility;
 using log4net;
 using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate;
 using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.selection;
@@ -78,7 +79,7 @@ namespace dbgate.ermanagement.impl
 			} 
 			finally 
 			{
-				DbMgmtUtility.Close (rs);
+				DbMgtUtility.Close (rs);
 			}
 		}
 
@@ -141,8 +142,8 @@ namespace dbgate.ermanagement.impl
                     }
                     finally
                     {
-                        DbMgmtUtility.Close(superReader);
-                        DbMgmtUtility.Close(superCmd);
+                        DbMgtUtility.Close(superReader);
+                        DbMgtUtility.Close(superCmd);
                     }
                 }
                 entityInfo = entityInfo.SuperEntityInfo;

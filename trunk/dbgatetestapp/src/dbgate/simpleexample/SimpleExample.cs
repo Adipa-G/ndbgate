@@ -4,6 +4,7 @@ using System.Data;
 using dbgate;
 using dbgate.dbutility;
 using dbgate.ermanagement.impl;
+using dbgate.utility;
 using dbgatetestapp.dbgate.simpleexample.entities;
 
 namespace dbgatetestapp.dbgate.simpleexample
@@ -53,8 +54,8 @@ namespace dbgatetestapp.dbgate.simpleexample
                 entity = new SimpleEntity();
                 entity.Retrieve(reader, con);
             }
-            DbMgmtUtility.Close(reader);
-            DbMgmtUtility.Close(cmd);
+            DbMgtUtility.Close(reader);
+            DbMgtUtility.Close(cmd);
             return entity;
         }
 

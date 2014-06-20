@@ -13,6 +13,7 @@ using dbgate.ermanagement.exceptions;
 using dbgate.ermanagement.exceptions.common;
 using dbgate.ermanagement.impl.dbabstractionlayer;
 using dbgate.ermanagement.impl.utils;
+using dbgate.utility;
 using log4net;
 
 namespace dbgate.ermanagement.impl
@@ -267,8 +268,8 @@ namespace dbgate.ermanagement.impl
             }
             finally
             {
-                DbMgmtUtility.Close(reader);
-                DbMgmtUtility.Close(cmd);     
+                DbMgtUtility.Close(reader);
+                DbMgtUtility.Close(cmd);     
             }
 
             return data;

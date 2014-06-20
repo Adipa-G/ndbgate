@@ -4,6 +4,7 @@ using System.Data;
 using dbgate;
 using dbgate.dbutility;
 using dbgate.ermanagement.impl;
+using dbgate.utility;
 using dbgatetestapp.dbgate.complexexample.entities.order;
 using dbgatetestapp.dbgate.complexexample.entities.product;
 
@@ -106,8 +107,8 @@ namespace dbgatetestapp.dbgate.complexexample
                 entity = new Transaction();
                 entity.Retrieve(reader, con);
             }
-            DbMgmtUtility.Close(reader);
-            DbMgmtUtility.Close(cmd);
+            DbMgtUtility.Close(reader);
+            DbMgtUtility.Close(cmd);
             return entity;
         }
 

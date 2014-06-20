@@ -4,6 +4,7 @@ using System.Data;
 using dbgate;
 using dbgate.dbutility;
 using dbgate.ermanagement.impl;
+using dbgate.utility;
 using dbgatetestapp.dbgate.one2oneexample.entities;
 
 namespace dbgatetestapp.dbgate.one2oneexample
@@ -69,8 +70,8 @@ namespace dbgatetestapp.dbgate.one2oneexample
                 entity = new One2OneParentEntity();
                 entity.Retrieve(reader, con);
             }
-            DbMgmtUtility.Close(reader);
-            DbMgmtUtility.Close(cmd);
+            DbMgtUtility.Close(reader);
+            DbMgtUtility.Close(cmd);
             return entity;
         }
 

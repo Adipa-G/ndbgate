@@ -1,4 +1,3 @@
-using dbgate.dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from;
 using dbgate.ermanagement.impl.dbabstractionlayer.datamanipulate.query.from;
 using System;
 

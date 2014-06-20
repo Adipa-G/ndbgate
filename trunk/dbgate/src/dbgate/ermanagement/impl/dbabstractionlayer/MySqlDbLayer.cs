@@ -1,5 +1,5 @@
 ﻿using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate;
-using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.mysqlmm;
+using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.myqlmm;
 
 namespace dbgate.ermanagement.impl.dbabstractionlayer
 {

@@ -2,7 +2,7 @@
 using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.datastructures;
 using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.defaultmm;
 
-namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.mysqlmm
+namespace dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.dbmm.myqlmm
 {
 	public class MySqlMetaManipulate : DefaultMetaManipulate
     {

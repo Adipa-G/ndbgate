@@ -4,6 +4,7 @@ using System.Data;
 using dbgate;
 using dbgate.dbutility;
 using dbgate.ermanagement.impl;
+using dbgate.utility;
 using dbgatetestapp.dbgate.inheritanceexample.entities;
 using dbgatetestapp.dbgate.simpleexample.entities;
 
@@ -56,8 +57,8 @@ namespace dbgatetestapp.dbgate.inheritanceexample
                 entity = new SubEntity();
                 entity.Retrieve(reader, con);
             }
-            DbMgmtUtility.Close(reader);
-            DbMgmtUtility.Close(cmd);
+            DbMgtUtility.Close(reader);
+            DbMgtUtility.Close(cmd);
             return entity;
         }
 

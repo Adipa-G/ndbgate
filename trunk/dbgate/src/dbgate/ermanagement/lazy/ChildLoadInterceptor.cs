@@ -6,6 +6,7 @@ using dbgate.dbutility;
 using dbgate.ermanagement.caches;
 using dbgate.ermanagement.caches.impl;
 using dbgate.ermanagement.impl;
+using dbgate.utility;
 
 namespace dbgate.ermanagement.lazy
 {
@@ -48,7 +49,7 @@ namespace dbgate.ermanagement.lazy
                 {
                     if (newConnection)
                     {
-                        DbMgmtUtility.Close(_connection);
+                        DbMgtUtility.Close(_connection);
                         _connection = null;
                     }
                 }

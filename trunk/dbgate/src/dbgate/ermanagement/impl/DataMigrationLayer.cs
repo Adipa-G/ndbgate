@@ -12,6 +12,7 @@ using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.compare;
 using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.datastructures;
 using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.support;
 using dbgate.ermanagement.impl.utils;
+using dbgate.utility;
 using log4net;
 
 namespace dbgate.ermanagement.impl
@@ -86,7 +87,7 @@ namespace dbgate.ermanagement.impl
                     IDbCommand cmd = con.CreateCommand();
                     cmd.CommandText = holder.QueryString;
                     cmd.ExecuteNonQuery();
-                    DbMgmtUtility.Close(cmd);
+                    DbMgtUtility.Close(cmd);
 
                     if (_config.EnableStatistics) _statistics.RegisterPatch();
                 }

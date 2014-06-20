@@ -14,6 +14,7 @@ using dbgate.ermanagement.exceptions.common;
 using dbgate.ermanagement.exceptions.persist;
 using dbgate.ermanagement.impl.dbabstractionlayer;
 using dbgate.ermanagement.impl.utils;
+using dbgate.utility;
 using log4net;
 
 namespace dbgate.ermanagement.impl
@@ -247,7 +248,7 @@ namespace dbgate.ermanagement.impl
                 Statistics.RegisterInsert(entityType);
             }
             cmd.ExecuteNonQuery();
-            DbMgmtUtility.Close(cmd);
+            DbMgtUtility.Close(cmd);
         }
 
         private void Update(IEntity entity, ITypeFieldValueList valueTypeList, Type type, IDbConnection con)
@@ -328,7 +329,7 @@ namespace dbgate.ermanagement.impl
                 Statistics.RegisterUpdate(type);
             }
             cmd.ExecuteNonQuery();
-            DbMgmtUtility.Close(cmd);
+            DbMgtUtility.Close(cmd);
         }
 
         private void Delete(ITypeFieldValueList valueTypeList, Type type, IDbConnection con)
@@ -372,7 +373,7 @@ namespace dbgate.ermanagement.impl
                 Statistics.RegisterDelete(type);
             }
             ps.ExecuteNonQuery();
-            DbMgmtUtility.Close(ps);
+            DbMgtUtility.Close(ps);
         }
 
         private static void SetRelationObjectKeyValues(ITypeFieldValueList valueTypeList, Type entityType,Type childEntityType
@@ -611,8 +612,8 @@ namespace dbgate.ermanagement.impl
                 }
                 finally
                 {
-                    DbMgmtUtility.Close(reader);
-                    DbMgmtUtility.Close(cmd);
+                    DbMgtUtility.Close(reader);
+                    DbMgtUtility.Close(cmd);
                 }
                 
                 if (recordExists)
@@ -715,8 +716,8 @@ namespace dbgate.ermanagement.impl
             }
             finally
             {
-                DbMgmtUtility.Close(reader);
-                DbMgmtUtility.Close(cmd);  
+                DbMgtUtility.Close(reader);
+                DbMgtUtility.Close(cmd);  
             }
             return versionValue;
         }
@@ -745,8 +746,8 @@ namespace dbgate.ermanagement.impl
             }
             finally
             {
-                DbMgmtUtility.Close(reader);
-                DbMgmtUtility.Close(cmd);   
+                DbMgtUtility.Close(reader);
+                DbMgtUtility.Close(cmd);   
             }
             return fieldValueList;
         }

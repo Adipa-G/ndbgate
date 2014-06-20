@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.IO;
 using System.Reflection;
+using dbgate;
 using dbgate.dbutility;
 using log4net.Core;
 

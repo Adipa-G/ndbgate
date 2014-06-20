@@ -6,6 +6,7 @@ using dbgate.dbutility;
 using dbgate.ermanagement.impl;
 using dbgate.support.persistant.featureintegration.order;
 using dbgate.support.persistant.featureintegration.product;
+using dbgate.utility;
 using log4net;
 using NUnit.Framework;
 
@@ -86,7 +87,7 @@ namespace dbgate
 
                 Transaction loadedTransaction = new Transaction();
                 LoadWithId(connection,loadedTransaction,transId);
-                DbMgmtUtility.Close(connection);
+                DbMgtUtility.Close(connection);
 
                 VerifyEquals(transaction, loadedTransaction);
             }

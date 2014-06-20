@@ -1,3 +1,4 @@
+using dbgate;
 using dbgate.ermanagement;
 
 namespace dbgatetestapp.dbgate.one2manyexample.entities
