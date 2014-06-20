@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using dbgate.utility.support;
 using NUnit.Framework;
+using dbgate.utility.support;
 
 namespace dbgate.utility
 {

@@ -1,0 +1,7 @@
+﻿namespace dbgate.support.persistant.inheritancetest
+{
+    public interface IInheritanceTestSubEntityA : IInheritanceTestSuperEntity
+    {
+        string NameA { get; set;} 
+    }
+}
