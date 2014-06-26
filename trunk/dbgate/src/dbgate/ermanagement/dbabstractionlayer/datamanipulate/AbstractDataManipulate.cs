@@ -11,8 +11,8 @@ using dbgate.ermanagement.dbabstractionlayer.datamanipulate.query.groupcondition
 using dbgate.ermanagement.dbabstractionlayer.datamanipulate.query.@join;
 using dbgate.ermanagement.dbabstractionlayer.datamanipulate.query.@orderby;
 using dbgate.ermanagement.dbabstractionlayer.datamanipulate.query.selection;
-using dbgate.ermanagement.impl.utils;
 using System.Linq;
+using dbgate.ermanagement.ermapper.utils;
 using dbgate.ermanagement.query;
 
 namespace dbgate.ermanagement.dbabstractionlayer.datamanipulate

@@ -5,7 +5,7 @@ using Castle.DynamicProxy;
 using dbgate.caches;
 using dbgate.caches.impl;
 using dbgate.dbutility;
-using dbgate.ermanagement.impl;
+using dbgate.ermanagement.ermapper;
 using dbgate.utility;
 
 namespace dbgate.ermanagement.lazy

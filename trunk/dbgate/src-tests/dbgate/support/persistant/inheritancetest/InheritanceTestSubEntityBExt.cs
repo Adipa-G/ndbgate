@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using dbgate.ermanagement.impl;
+using dbgate.ermanagement.ermapper;
 
 namespace dbgate.support.persistant.inheritancetest
 {

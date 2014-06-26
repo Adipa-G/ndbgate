@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using dbgate.dbutility;
-using dbgate.ermanagement.impl;
+using dbgate.ermanagement.ermapper;
 using dbgate.support.patch.patchtabledifferences;
 using log4net;
 using NUnit.Framework;

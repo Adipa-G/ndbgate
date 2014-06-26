@@ -1,6 +1,6 @@
 using dbgate.dbutility;
 using dbgate.ermanagement;
-using dbgate.ermanagement.impl;
+using dbgate.ermanagement.ermapper;
 using dbgate.ermanagement.query;
 using dbgate.ermanagement.query.expr;
 using dbgate.support.query.basic;

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using dbgate;
 using dbgate.dbutility;
-using dbgate.ermanagement.impl;
+using dbgate.ermanagement.ermapper;
 using dbgate.utility;
 using dbgatetestapp.dbgate.complexexample.entities.order;
 using dbgatetestapp.dbgate.complexexample.entities.product;

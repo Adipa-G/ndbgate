@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using dbgate.ermanagement.impl.utils;
+using dbgate.ermanagement.ermapper.utils;
 using dbgate.exceptions;
 using dbgate.exceptions.common;
 using log4net;

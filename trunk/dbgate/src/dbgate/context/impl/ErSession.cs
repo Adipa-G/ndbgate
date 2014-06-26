@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using dbgate.ermanagement.impl.utils;
+using dbgate.ermanagement.ermapper.utils;
 
 namespace dbgate.context.impl
 {
