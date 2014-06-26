@@ -2,10 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using dbgate.ermanagement.caches;
-using dbgate.ermanagement.caches.impl;
-using dbgate.ermanagement.context;
-using dbgate.ermanagement.context.impl;
+using dbgate.caches;
+using dbgate.caches.impl;
+using dbgate.context;
+using dbgate.context.impl;
 
 namespace dbgate.ermanagement.impl.utils
 {

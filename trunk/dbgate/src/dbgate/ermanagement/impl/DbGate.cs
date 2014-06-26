@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using dbgate.caches;
 using dbgate.dbutility;
-using dbgate.ermanagement.caches;
-using dbgate.ermanagement.exceptions;
-using dbgate.ermanagement.exceptions.common;
-using dbgate.ermanagement.impl.dbabstractionlayer;
+using dbgate.ermanagement.dbabstractionlayer;
 using dbgate.ermanagement.query;
+using dbgate.exceptions.common;
 using log4net;
 
 namespace dbgate.ermanagement.impl

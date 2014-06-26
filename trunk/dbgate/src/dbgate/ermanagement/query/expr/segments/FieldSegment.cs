@@ -1,5 +1,5 @@
 ﻿using System;
-using dbgate.ermanagement.exceptions;
+using dbgate.exceptions;
 
 namespace dbgate.ermanagement.query.expr.segments
 {

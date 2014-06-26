@@ -1,17 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using dbgate.caches;
+using dbgate.caches.impl;
 using dbgate.dbutility;
-using dbgate.ermanagement.caches;
-using dbgate.ermanagement.caches.impl;
-using dbgate.ermanagement.exceptions;
-using dbgate.ermanagement.exceptions.migration;
-using dbgate.ermanagement.impl.dbabstractionlayer;
-using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate;
-using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.compare;
-using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.datastructures;
-using dbgate.ermanagement.impl.dbabstractionlayer.metamanipulate.support;
+using dbgate.ermanagement.dbabstractionlayer;
+using dbgate.ermanagement.dbabstractionlayer.metamanipulate;
+using dbgate.ermanagement.dbabstractionlayer.metamanipulate.compare;
+using dbgate.ermanagement.dbabstractionlayer.metamanipulate.datastructures;
+using dbgate.ermanagement.dbabstractionlayer.metamanipulate.support;
 using dbgate.ermanagement.impl.utils;
+using dbgate.exceptions.migration;
 using dbgate.utility;
 using log4net;
 

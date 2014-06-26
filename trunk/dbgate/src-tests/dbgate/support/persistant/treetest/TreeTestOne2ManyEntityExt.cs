@@ -1,6 +1,6 @@
 ﻿using System.Data;
-using dbgate.ermanagement.context;
-using dbgate.ermanagement.context.impl;
+using dbgate.context;
+using dbgate.context.impl;
 using dbgate.ermanagement.impl;
 
 namespace dbgate.support.persistant.treetest

@@ -2,9 +2,9 @@
 using System.Data;
 using System.Reflection;
 using Castle.DynamicProxy;
+using dbgate.caches;
+using dbgate.caches.impl;
 using dbgate.dbutility;
-using dbgate.ermanagement.caches;
-using dbgate.ermanagement.caches.impl;
 using dbgate.ermanagement.impl;
 using dbgate.utility;
 

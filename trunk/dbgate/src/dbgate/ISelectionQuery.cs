@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Data;
+using dbgate.ermanagement.query;
 
 namespace dbgate
 {

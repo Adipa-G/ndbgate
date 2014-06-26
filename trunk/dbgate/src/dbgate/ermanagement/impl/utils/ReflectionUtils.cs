@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using dbgate.ermanagement.exceptions.common;
+using dbgate.exceptions.common;
 
 namespace dbgate.ermanagement.impl.utils
 {

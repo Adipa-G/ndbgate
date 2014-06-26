@@ -1,5 +1,5 @@
 ﻿using System.Data;
-using dbgate.ermanagement.context;
+using dbgate.context;
 
 namespace dbgate
 {
