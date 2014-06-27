@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3B458BCC-EC93-4F3D-AB40-B33F14323728}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DbGateTestApp</RootNamespace>
+    <AssemblyName>DbGateTestApp</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <NoWin32Manifest>False</NoWin32Manifest>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+    <NoStdLib>False</NoStdLib>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>Full</DebugType>
+    <Optimize>False</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
+    <BaseAddress>4194304</BaseAddress>
+    <PlatformTarget>x86</PlatformTarget>
+    <RegisterForComInterop>False</RegisterForComInterop>
+    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\lib\log4net\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\lib\sqllite\x86\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Compile Include="src\ComplexExample\Entities\Order\ItemTransaction.cs" />
+    <Compile Include="src\ComplexExample\Entities\Order\ItemTransactionCharge.cs" />
+    <Compile Include="src\ComplexExample\Entities\Order\Transaction.cs" />
+    <Compile Include="src\ComplexExample\Entities\Product\Item.cs" />
+    <Compile Include="src\ComplexExample\Entities\Product\Product.cs" />
+    <Compile Include="src\ComplexExample\Entities\Product\Service.cs" />
+    <Compile Include="src\ExampleBase.cs" />
+    <Compile Include="src\MainProgram.cs" />
+    <Compile Include="src\SimpleExample\Entities\SimpleEntity.cs" />
+    <Compile Include="src\SimpleExample\SimpleExample.cs" />
+    <Compile Include="src\InheritanceExample\Entities\MiddleEntity.cs" />
+    <Compile Include="src\InheritanceExample\Entities\SubEntity.cs" />
+    <Compile Include="src\InheritanceExample\Entities\SuperEntity.cs" />
+    <Compile Include="src\InheritanceExample\InheritanceExample.cs" />
+    <Compile Include="src\One2OneExample\Entities\One2OneChildEntity.cs" />
+    <Compile Include="src\One2OneExample\Entities\One2OneChildEntityA.cs" />
+    <Compile Include="src\One2OneExample\Entities\One2OneChildEntityB.cs" />
+    <Compile Include="src\One2OneExample\Entities\One2OneParentEntity.cs" />
+    <Compile Include="src\One2OneExample\One2OneExample.cs" />
+    <Compile Include="src\One2ManyExample\Entities\One2ManyChildEntity.cs" />
+    <Compile Include="src\One2ManyExample\Entities\One2ManyChildEntityA.cs" />
+    <Compile Include="src\One2ManyExample\Entities\One2ManyChildEntityB.cs" />
+    <Compile Include="src\One2ManyExample\Entities\One2ManyParentEntity.cs" />
+    <Compile Include="src\One2ManyExample\One2ManyExample.cs" />
+    <Compile Include="src\ComplexExample\ComplexExample.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\dbgate\dbgate.csproj">
+      <Project>{13EB1070-FC28-4EF6-AB4A-E5333EAAE331}</Project>
+      <Name>dbgate</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
