@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using DbGate;
+using DbGate.ErManagement.Query;
 using DbGate.Utility;
 using DbGateTestApp.SimpleExample.Entities;
+using System.Linq;
 
 namespace DbGateTestApp.SimpleExample
 {
@@ -35,26 +37,18 @@ namespace DbGateTestApp.SimpleExample
             transaction.Commit();
         }
 
-        public SimpleEntity Retrieve(IDbConnection con)
+        public SimpleEntity RetrieveWithQuery(IDbConnection con)
         {
-            IDbCommand cmd = con.CreateCommand();
-            cmd.CommandText = "select * from simple_entity where id = ?";
+            ISelectionQuery query = new SelectionQuery()
+                .From(QueryFrom.EntityType(typeof(SimpleEntity)))
+                .Select(QuerySelection.EntityType(typeof(SimpleEntity)));
 
-            IDbDataParameter parameter = cmd.CreateParameter();
-            cmd.Parameters.Add(parameter);
-            parameter.DbType = DbType.Int32;
-            parameter.Value = Id;
+            var result = query.ToList(con).FirstOrDefault();
+            if (result == null)
+                return null;
 
-            SimpleEntity entity = null;
-            IDataReader reader = cmd.ExecuteReader();
-            if (reader.Read())
-            {
-                entity = new SimpleEntity();
-                entity.Retrieve(reader, con);
-            }
-            DbMgtUtility.Close(reader);
-            DbMgtUtility.Close(cmd);
-            return entity;
+            var retrieved = (SimpleEntity)((object[])result)[0];
+            return retrieved;
         }
 
         public static void DoTest()
@@ -66,19 +60,19 @@ namespace DbGateTestApp.SimpleExample
             SimpleEntity entity = example.CreateEntity();
             example.Persist(con, entity);
 
-            entity = example.Retrieve(con);
+            entity = example.RetrieveWithQuery(con);
             Console.WriteLine("Entity Name = " + entity.Name);
 
             entity.Name = "Updated";
             example.Persist(con, entity);
 
-            entity = example.Retrieve(con);
+            entity = example.RetrieveWithQuery(con);
             Console.WriteLine("Entity Name = " + entity.Name);
 
             entity.Status = EntityStatus.Deleted;
             example.Persist(con, entity);
 
-            entity = example.Retrieve(con);
+            entity = example.RetrieveWithQuery(con);
             Console.WriteLine("Entity = " + entity);
 
             ExampleBase.CloseDb();

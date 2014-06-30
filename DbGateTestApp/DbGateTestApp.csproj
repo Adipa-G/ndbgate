@@ -78,8 +78,8 @@
     <Compile Include="src\SimpleExample\Entities\SimpleEntity.cs" />
     <Compile Include="src\SimpleExample\SimpleExample.cs" />
     <Compile Include="src\InheritanceExample\Entities\MiddleEntity.cs" />
-    <Compile Include="src\InheritanceExample\Entities\SubEntity.cs" />
-    <Compile Include="src\InheritanceExample\Entities\SuperEntity.cs" />
+    <Compile Include="src\InheritanceExample\Entities\BottomEntity.cs" />
+    <Compile Include="src\InheritanceExample\Entities\TopEntity.cs" />
     <Compile Include="src\InheritanceExample\InheritanceExample.cs" />
     <Compile Include="src\One2OneExample\Entities\One2OneChildEntity.cs" />
     <Compile Include="src\One2OneExample\Entities\One2OneChildEntityA.cs" />

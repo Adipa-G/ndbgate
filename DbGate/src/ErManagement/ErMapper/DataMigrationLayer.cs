@@ -169,7 +169,7 @@ namespace DbGate.ErManagement.ErMapper
                 foreignKey.ToTable = relatedEntityInfo.TableName;
                 foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
                 {
-                    string fromCol = OperationUtils.FindColumnByAttribute(relatedEntityInfo.Columns,mapping.FromField).ColumnName;
+                    string fromCol = OperationUtils.FindColumnByAttribute(dbColumns, mapping.FromField).ColumnName;
                     string toCol = OperationUtils.FindColumnByAttribute(relatedEntityInfo.Columns,mapping.ToField).ColumnName;
                     foreignKey.ColumnMappings.Add(new MetaForeignKeyColumnMapping(fromCol,toCol));
                 }

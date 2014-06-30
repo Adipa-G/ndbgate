@@ -191,7 +191,7 @@ namespace DbGate.ErManagement.ErMapper.Utils
             return true;
         }
 
-        public static IColumn FindColumnByAttribute(ICollection<IColumn> columns,String attribute)
+        public static IColumn FindColumnByAttribute(IEnumerable<IColumn> columns,String attribute)
         {
             foreach (IColumn column in columns)
             {
