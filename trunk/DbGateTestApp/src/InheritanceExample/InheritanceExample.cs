@@ -11,9 +11,9 @@ namespace DbGateTestApp.InheritanceExample
     {
         private const int Id = 43;
 
-        public SubEntity CreateEntity()
+        public BottomEntity CreateEntity()
         {
-            SubEntity entity = new SubEntity();
+            BottomEntity entity = new BottomEntity();
             entity.Id = Id;
             entity.SuperName = "Super";
             entity.MiddleName = "Middle";
@@ -24,34 +24,34 @@ namespace DbGateTestApp.InheritanceExample
         public void Patch(IDbConnection con) 
         {
             ICollection<Type> entityTypes = new List<Type>();
-            entityTypes.Add(typeof(SubEntity));
+            entityTypes.Add(typeof(BottomEntity));
             IDbTransaction transaction = con.BeginTransaction();
             DbGate.ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(con, entityTypes, false);
             transaction.Commit();
         }
 
-        public void Persist(IDbConnection con, SubEntity entity)
+        public void Persist(IDbConnection con, BottomEntity entity)
         {
             IDbTransaction transaction = con.BeginTransaction();
             entity.Persist(con);
             transaction.Commit();
         }
 
-        public SubEntity Retrieve(IDbConnection con)
+        public BottomEntity Retrieve(IDbConnection con)
         {
             IDbCommand cmd = con.CreateCommand();
-            cmd.CommandText = "select * from sub_entity where id = ?";
+            cmd.CommandText = "select * from bottom_entity where id = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Value = Id;
 
-            SubEntity entity = null;
+            BottomEntity entity = null;
             IDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                entity = new SubEntity();
+                entity = new BottomEntity();
                 entity.Retrieve(reader, con);
             }
             DbMgtUtility.Close(reader);
@@ -65,7 +65,7 @@ namespace DbGateTestApp.InheritanceExample
             IDbConnection con = ExampleBase.SetupDb();
             example.Patch(con);
 
-            SubEntity entity = example.CreateEntity();
+            BottomEntity entity = example.CreateEntity();
             example.Persist(con, entity);
 
             entity = example.Retrieve(con);

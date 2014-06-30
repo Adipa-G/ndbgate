@@ -1,0 +1,53 @@
+#Different methods of mapping entities
+There are three distinctive methods to map the object model with database.
+
+# Use attributes
+# Manual registration
+# Using a abstract superclass and override methods
+
+=Use attributes=
+{{{
+[TableInfo("a")]
+public class A : DefaultEntity
+{
+    [ColumnInfo(ColumnType.Integer, Key = true]
+    public int Id { get; set; }
+
+    [ForeignKeyInfo("a2b", typeof (B), new string[] {"id"}, new string[] {"parentId"}
+            , NonIdentifyingRelation = true, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+    [ForeignKeyInfo("a2c", typeof (C), new string[] {"id"}, new string[] {"parentId"}
+        , NonIdentifyingRelation = true, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+    public Collection<Object> ChildEntities { get; set; }
+}
+}}}
+
+==1. {{{[TableInfo()]}}}==
+This one defines the relationship with table to the entity class
+===properties==
+tableName -> name of the table this class is related with
+
+==2. {{{[ColumnInfo()]}}}==
+Links a property of a class with the database table column
+===properties===
+columnType -> defines data type of the column
+columnName -> name of the column if not defined the column name will be auto calculated as camel case underscore of the field name (column name of field 'bankAccount' will be 'bank_account')
+key -> define if the column is a key (default is false)
+nullable -> define if the column supports nulls (default is false)
+subClassCommonColumn -> when it comes to the inheritance, this defines if this field is present in both the super class and the subclass (this is often useful for define keys shared among super and sub classes, default value is false)
+size -> describes the length of the column (default length is 20).
+readFromSequence -> this is used for key columns so that if the key value is automatically generated using a sequence (default false);
+sequenceGeneratorClassName -> defines the name of the sequence generator class (implementation of ISequenceGenerator)
+
+==3. {{{[ForeignKeyInfo()]}}==
+Defines a relationship between two tables
+===properties===
+name -> name of the foreign key
+fromColumnMappings -> which fields of the parent entity is related, where each defines parent entity field names to form relationship between two classes
+toColumnMappings -> which fields of the child entities are related, where each defines child entity field names to form relationship between two classes
+updateRule -> this is used to generate database metadata, and used this as the update rule when key of the parent changed (default value is ReferentialRuleType.RESTRICT)
+deleteRule -> defines the behaviour of the database when the parent object deleted (default value is ReferentialRuleType.CASCADE)
+relatedObjectType -> defines the type of the related entity;
+reverseRelation -> this has to true, when the relationship is defined from child to parent. (default value is false)
+nonIdentifyingRelation -> has to set to true if the relationship is not parent to child or vise versa. (default value is false)
+lazy -> defines if this is allowed to load lazily
+

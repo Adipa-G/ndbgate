@@ -7,13 +7,13 @@ This demonstrates one to one relationship capability of the library using 2 type
 = Details =
 ==Parent class==
 {{{
-[DbTableInfo("parent_entity")]
-public class One2OneParentEntity : DefaultServerDbClass
+[TableInfo("parent_entity")]
+public class One2OneParentEntity : DefaultEntity
 {
-    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    [ColumnInfo(ColumnType.Integer, Key = true)]
     public int Id { get; set; }
 
-    [DbColumnInfo(DbColumnType.Varchar)]
+    [ColumnInfo(ColumnType.Varchar)]
     public string Name { get; set; }
 
     [ForeignKeyInfo("parent2childA", typeof(One2OneChildEntityA), new string[] { "id" }
@@ -30,7 +30,7 @@ public class One2OneParentEntity : DefaultServerDbClass
 
 ==Child Base Class==
 {{{
-public abstract class One2OneChildEntity : DefaultServerDbClass
+public abstract class One2OneChildEntity : DefaultEntity
 {
     public abstract string Name { get; set; }
 }
@@ -38,26 +38,26 @@ public abstract class One2OneChildEntity : DefaultServerDbClass
 
 ==Child Sub Class 1==
 {{{
-[DbTableInfo("child_entity_a")]
+[TableInfo("child_entity_a")]
 public class One2OneChildEntityA : One2OneChildEntity
 {
-    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    [ColumnInfo(ColumnType.Integer, Key = true)]
     public int ParentId { get; set; }
 
-    [DbColumnInfo(DbColumnType.Varchar)]
+    [ColumnInfo(ColumnType.Varchar)]
     public override string Name { get; set; }
 }
 }}}
 
 ==Child Sub Class 2==
 {{{
-[DbTableInfo("child_entity_b")]
+[TableInfo("child_entity_b")]
 public class One2OneChildEntityB : One2OneChildEntity
 {
-    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    [ColumnInfo(ColumnType.Integer, Key = true)]
     public int ParentId { get; set; }
 
-    [DbColumnInfo(DbColumnType.Varchar)]
+    [ColumnInfo(ColumnType.Varchar)]
     public override string Name { get; set; }
 }
 }}}
@@ -94,12 +94,12 @@ public class One2OneExample
 
     public void Patch(IDbConnection con)
     {
-        ICollection<IServerDbClass> entities = new List<IServerDbClass>();
-        entities.Add(new One2OneParentEntity());
-        entities.Add(new One2OneChildEntityA());
-        entities.Add(new One2OneChildEntityB());
+        ICollection<Type> entityTypes = new List<Type>();
+        entityTypes.Add(typeof(One2OneParentEntity));
+        entityTypes.Add(typeof(One2OneChildEntityA));
+        entityTypes.Add(typeof(One2OneChildEntityB));
         IDbTransaction transaction = con.BeginTransaction();
-        ErLayer.GetSharedInstance().PatchDataBase(con,entities,false);
+        DbGate.getSharedInstance().PatchDataBase(con,entityTypes,false);
         transaction.Commit();
     }
 
@@ -127,8 +127,8 @@ public class One2OneExample
             entity = new One2OneParentEntity();
             entity.Retrieve(reader, con);
         }
-        DbMgmtUtility.Close(reader);
-        DbMgmtUtility.Close(cmd);
+        DBMgtUtility.Close(reader);
+        DBMgtUtility.Close(cmd);
         return entity;
     }
 
@@ -167,9 +167,9 @@ public class One2OneExample
         Console.WriteLine("Entity Name = " + entityB.Name);
         Console.WriteLine("Entity Child Name = " + entityB.ChildEntity.Name);
 
-        entityA.Status = DbClassStatus.Deleted;
+        entityA.Status = EntityStatus.Deleted;
         example.Persist(con, entityA);
-        entityB.Status = DbClassStatus.Deleted;
+        entityB.Status = EntityStatus.Deleted;
         example.Persist(con, entityB);
 
         entityA = example.Retrieve(con, One2OneExample.IdA);

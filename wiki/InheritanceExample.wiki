@@ -5,18 +5,18 @@
 This demonstrates inheritance capability of the library using 3 level inheritance structure.
 
 = Details =
-===Super class===
+===Top class===
 {{{
-[DbTableInfo("super_entity")]
-public class SuperEntity : DefaultServerDbClass
+[TableInfo("top_entity")]
+public class TopEntity : DefaultEntity
 {
-    [DbColumnInfo(DbColumnType.Integer, Key = true, SubClassCommonColumn = true)]
+    [ColumnInfo(ColumnType.Integer, Key = true, SubClassCommonColumn = true)]
     public int Id { get; set; }
 
-    [DbColumnInfo(DbColumnType.Varchar)]
+    [ColumnInfo(ColumnType.Varchar)]
     public string SuperName { get; set; }
 
-    public SuperEntity()
+    public TopEntity()
     {
     }
 }
@@ -24,10 +24,10 @@ public class SuperEntity : DefaultServerDbClass
 
 ===Middle Class===
 {{{
-[DbTableInfo("middle_entity")]
-public class MiddleEntity : SuperEntity
+[TableInfo("middle_entity")]
+public class MiddleEntity : TopEntity
 {
-    [DbColumnInfo(DbColumnType.Varchar)]
+    [ColumnInfo(ColumnType.Varchar)]
     public string MiddleName { get; set; }
 
     public MiddleEntity()
@@ -38,13 +38,13 @@ public class MiddleEntity : SuperEntity
 
 ===Base Class===
 {{{
-[DbTableInfo("sub_entity")]
-public class SubEntity : MiddleEntity
+[TableInfo("bottom_entity")]
+public class BottomEntity : MiddleEntity
 {
-    [DbColumnInfo(DbColumnType.Varchar)]
+    [ColumnInfo(ColumnType.Varchar)]
     public string SubName { get; set; }
 
-    public SubEntity()
+    public BottomEntity()
     {
     }
 }
@@ -58,9 +58,9 @@ public class InheritanceExample
 {
     private const int Id = 43;
 
-    public SubEntity CreateEntity()
+    public BottomEntity CreateEntity()
     {
-        SubEntity entity = new SubEntity();
+        BottomEntity entity = new BottomEntity();
         entity.Id = Id;
         entity.SuperName = "Super";
         entity.MiddleName = "Middle";
@@ -70,39 +70,39 @@ public class InheritanceExample
 
     public void Patch(IDbConnection con)
     {
-        ICollection<IServerDbClass> entities = new List<IServerDbClass>();
-        entities.Add(CreateEntity());
+        ICollection<Type> entityTypes = new List<Type>();
+        entityTypes.Add(typeof(BottomEntity));
         IDbTransaction transaction = con.BeginTransaction();
-        ErLayer.GetSharedInstance().PatchDataBase(con,entities,false);
+        DbGate.ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(con, entityTypes, false);
         transaction.Commit();
     }
 
-    public void Persist(IDbConnection con, SubEntity entity)
+    public void Persist(IDbConnection con, BottomEntity entity)
     {
         IDbTransaction transaction = con.BeginTransaction();
         entity.Persist(con);
         transaction.Commit();
     }
 
-    public SubEntity Retrieve(IDbConnection con)
+    public BottomEntity Retrieve(IDbConnection con)
     {
         IDbCommand cmd = con.CreateCommand();
-        cmd.CommandText = "select * from sub_entity where id = ?";
+        cmd.CommandText = "select * from bottom_entity where id = ?";
 
         IDbDataParameter parameter = cmd.CreateParameter();
         cmd.Parameters.Add(parameter);
         parameter.DbType = DbType.Int32;
         parameter.Value = Id;
 
-        SubEntity entity = null;
+        BottomEntity entity = null;
         IDataReader reader = cmd.ExecuteReader();
         if (reader.Read())
         {
-            entity = new SubEntity();
+            entity = new BottomEntity();
             entity.Retrieve(reader, con);
         }
-        DbMgmtUtility.Close(reader);
-        DbMgmtUtility.Close(cmd);
+        DbMgtUtility.Close(reader);
+        DbMgtUtility.Close(cmd);
         return entity;
     }
 
@@ -112,7 +112,7 @@ public class InheritanceExample
         IDbConnection con = ExampleBase.SetupDb();
         example.Patch(con);
 
-        SubEntity entity = example.CreateEntity();
+        BottomEntity entity = example.CreateEntity();
         example.Persist(con, entity);
 
         entity = example.Retrieve(con);
@@ -130,7 +130,7 @@ public class InheritanceExample
         Console.WriteLine("Entity Middle Name = " + entity.MiddleName);
         Console.WriteLine("Entity Sub Name = " + entity.SubName);
 
-        entity.Status = DbClassStatus.Deleted;
+        entity.Status = EntityStatus.Deleted;
         example.Persist(con, entity);
 
         entity = example.Retrieve(con);

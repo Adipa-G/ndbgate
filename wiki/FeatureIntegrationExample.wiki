@@ -7,12 +7,12 @@ This demonstrates no of features working together, with reverse relationships an
 = Details =
 ===Item class===
 {{{
-[DbTableInfo("product_item")]
-public abstract class Item : DefaultServerDbClass
+[TableInfo("product_item")]
+public abstract class Item : DefaultEntity
 {
-    [DbColumnInfo(DbColumnType.Integer, Key = true, SubClassCommonColumn = true)]
+    [ColumnInfo(ColumnType.Integer, Key = true, SubClassCommonColumn = true)]
     public int ItemId { get; set; }
-    [DbColumnInfo(DbColumnType.Varchar)]
+    [ColumnInfo(ColumnType.Varchar)]
     public string Name { get; set; }
 
     protected Item()
@@ -23,35 +23,35 @@ public abstract class Item : DefaultServerDbClass
 
 ===Product Class===
 {{{
-[DbTableInfo("product_product")]
+[TableInfo("product_product")]
 public class Product : dbgatetestapp.dbgate.complexexample.entities.product.Item
 {
-    [DbColumnInfo(DbColumnType.Double)]
+    [ColumnInfo(ColumnType.Double)]
     public double UnitPrice { get; set; }
 
-    [DbColumnInfo(DbColumnType.Double,Nullable = true)]
+    [ColumnInfo(ColumnType.Double,Nullable = true)]
     public double? BulkUnitPrice { get; set; }
 }
 }}}
 
 ===Service Class===
 {{{
-[DbTableInfo("product_service")]
+[TableInfo("product_service")]
 public class Service : Item
 {
-    [DbColumnInfo(DbColumnType.Double)]
+    [ColumnInfo(ColumnType.Double)]
     public double HourlyRate { get; set; }
 }
 }}}
 
 ===Transaction Class===
 {{{
-[DbTableInfo("order_transaction")]
-public class Transaction : DefaultServerDbClass
+[TableInfo("order_transaction")]
+public class Transaction : DefaultEntity
 {
-    [DbColumnInfo(DbColumnType.Integer,Key = true)]
+    [ColumnInfo(ColumnType.Integer,Key = true)]
     public int TransactionId { get; set; }
-    [DbColumnInfo(DbColumnType.Varchar)]
+    [ColumnInfo(ColumnType.Varchar)]
     public string Name { get; set; }
 
     [ForeignKeyInfo("tx2item_tx", typeof(dbgatetestapp.dbgate.complexexample.entities.order.ItemTransaction), new string[] { "transactionId" },new string[] { "transactionId"}
@@ -67,14 +67,14 @@ public class Transaction : DefaultServerDbClass
 
 ===ItemTransaction Class===
 {{{
-[DbTableInfo("order_item_transaction")]
-public class ItemTransaction  : DefaultServerDbClass
+[TableInfo("order_item_transaction")]
+public class ItemTransaction  : DefaultEntity
 {
-    [DbColumnInfo(DbColumnType.Integer,Key = true)]
+    [ColumnInfo(ColumnType.Integer,Key = true)]
     public int TransactionId { get; set; }
-    [DbColumnInfo(DbColumnType.Integer,Key = true)]
+    [ColumnInfo(ColumnType.Integer,Key = true)]
     public int IndexNo { get; set; }
-    [DbColumnInfo(DbColumnType.Integer)]
+    [ColumnInfo(ColumnType.Integer)]
     public int ItemId { get; set; }
 
     [ForeignKeyInfo("item_tx2product", typeof (Product), new string[] {"itemId"}, new string[] {"itemId"}
@@ -106,16 +106,16 @@ public class ItemTransaction  : DefaultServerDbClass
 
 ===ItemTransactionCharge Class===
 {{{
-[DbTableInfo("order_item_transaction_charge")]
-public class ItemTransactionCharge  : DefaultServerDbClass
+[TableInfo("order_item_transaction_charge")]
+public class ItemTransactionCharge  : DefaultEntity
 {
-    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    [ColumnInfo(ColumnType.Integer, Key = true)]
     public int TransactionId { get; set; }
-    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    [ColumnInfo(ColumnType.Integer, Key = true)]
     public int IndexNo { get; set; }
-    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    [ColumnInfo(ColumnType.Integer, Key = true)]
     public int ChargeIndex { get; set; }
-    [DbColumnInfo(DbColumnType.Varchar)]
+    [ColumnInfo(ColumnType.Varchar)]
     public string ChargeCode { get; set; }
 
     [ForeignKeyInfo("item_tx_charge2tx_rev", typeof (Transaction), new string[] {"transactionId"},new string[] {"transactionId"}
@@ -202,16 +202,16 @@ public class ComplexExample
         return transaction;
     }
 
-    public void Patch(IDbConnection con)
+     public void Patch(IDbConnection con)
     {
-        ICollection<IServerDbClass> entities = new List<IServerDbClass>();
-        entities.Add(new Product());
-        entities.Add(new Service());
-        entities.Add(new Transaction());
-        entities.Add(new ItemTransaction());
-        entities.Add(new ItemTransactionCharge());
+        ICollection<Type> entityTypes = new List<Type>();
+        entityTypes.Add(typeof (Product));
+        entityTypes.Add(typeof (Service));
+        entityTypes.Add(typeof (Transaction));
+        entityTypes.Add(typeof (ItemTransaction));
+        entityTypes.Add(typeof (ItemTransactionCharge));
         IDbTransaction transaction = con.BeginTransaction();
-        ErLayer.GetSharedInstance().PatchDataBase(con,entities,false);
+        DbGate.ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(con, entityTypes, false);
         transaction.Commit();
     }
 
@@ -239,8 +239,8 @@ public class ComplexExample
             entity = new Transaction();
             entity.Retrieve(reader, con);
         }
-        DbMgmtUtility.Close(reader);
-        DbMgmtUtility.Close(cmd);
+        DBMgtUtility.Close(reader);
+        DBMgtUtility.Close(cmd);
         return entity;
     }
 

@@ -7,13 +7,13 @@ This demonstrates one to many relationship capability of the library using 2 typ
 = Details =
 ===Parent class===
 {{{
-[DbTableInfo("parent_entity")]
-public class One2ManyParentEntity : DefaultServerDbClass
+[TableInfo("parent_entity")]
+public class One2ManyParentEntity : DefaultEntity
 {
-    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    [ColumnInfo(ColumnType.Integer, Key = true)]
     public int Id { get; set; }
 
-    [DbColumnInfo(DbColumnType.Varchar)]
+    [ColumnInfo(ColumnType.Varchar)]
     public string Name { get; set; }
 
     [ForeignKeyInfo("parent2childA", typeof(One2ManyChildEntityA), new string[] { "id" }
@@ -31,7 +31,7 @@ public class One2ManyParentEntity : DefaultServerDbClass
 
 ===Child Base Class===
 {{{
-public abstract class One2ManyChildEntity : DefaultServerDbClass
+public abstract class One2ManyChildEntity : DefaultEntity
 {
     public abstract string Name { get; set; }
 }
@@ -39,32 +39,32 @@ public abstract class One2ManyChildEntity : DefaultServerDbClass
 
 ===Child Sub Class 1===
 {{{
-[DbTableInfo("child_entity_a")]
+[TableInfo("child_entity_a")]
 public class One2ManyChildEntityA : One2ManyChildEntity
 {
-    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    [ColumnInfo(ColumnType.Integer, Key = true)]
     public int ParentId { get; set; }
 
-    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    [ColumnInfo(ColumnType.Integer, Key = true)]
     public int IndexNo { get; set; }
 
-    [DbColumnInfo(DbColumnType.Varchar)]
+    [ColumnInfo(ColumnType.Varchar)]
     public override string Name { get; set; }
 }
 }}}
 
 ===Child Sub Class 2===
 {{{
-[DbTableInfo("child_entity_b")]
+[TableInfo("child_entity_b")]
 public class One2ManyChildEntityB : One2ManyChildEntity
 {
-    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    [ColumnInfo(ColumnType.Integer, Key = true)]
     public int ParentId { get; set; }
 
-    [DbColumnInfo(DbColumnType.Integer, Key = true)]
+    [ColumnInfo(ColumnType.Integer, Key = true)]
     public int IndexNo { get; set; }
 
-    [DbColumnInfo(DbColumnType.Varchar)]
+    [ColumnInfo(ColumnType.Varchar)]
     public override string Name { get; set; }
 }
 }}}
@@ -98,12 +98,12 @@ public class One2ManyExample
 
     public void Patch(IDbConnection con)
     {
-        ICollection<IServerDbClass> entities = new List<IServerDbClass>();
-        entities.Add(new One2ManyParentEntity());
-        entities.Add(new One2ManyChildEntityA());
-        entities.Add(new One2ManyChildEntityB());
+        ICollection<Type> entityTypes = new List<Type>();
+        entityTypes.Add(typeof(One2ManyParentEntity));
+        entityTypes.Add(typeof(One2ManyChildEntityA));
+        entityTypes.Add(typeof(One2ManyChildEntityB));
         IDbTransaction transaction = con.BeginTransaction();
-        ErLayer.GetSharedInstance().PatchDataBase(con,entities,false);
+        DbGate.getSharedInstance().PatchDataBase(con,entityTypes,false);
         transaction.Commit();
     }
 
@@ -131,8 +131,8 @@ public class One2ManyExample
             entity = new One2ManyParentEntity();
             entity.Retrieve(reader, con);
         }
-        DbMgmtUtility.Close(reader);
-        DbMgmtUtility.Close(cmd);
+        DBMgtUtility.Close(reader);
+        DBMgtUtility.Close(cmd);
         return entity;
     }
 
@@ -166,7 +166,7 @@ public class One2ManyExample
             Console.WriteLine("Entity Child Name = " + childEntity.Name);
         }
 
-        entity.Status = DbClassStatus.Deleted;
+        entity.Status = EntityStatus.Deleted;
         example.Persist(con, entity);
 
         entity = example.Retrieve(con);
