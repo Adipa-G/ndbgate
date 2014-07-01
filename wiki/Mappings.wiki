@@ -1,53 +1,218 @@
-#Different methods of mapping entities
+#summary Different methods of mapping entities
 There are three distinctive methods to map the object model with database.
 
-# Use attributes
-# Manual registration
-# Using a abstract superclass and override methods
+ # Use attributes
+ # Using a abstract superclass and override methods
+ # Manual registration
 
 =Use attributes=
+This is the most preferred/easiest way to define the relationships
 {{{
-[TableInfo("a")]
-public class A : DefaultEntity
+[TableInfo("a")] //1
+public class A extends DefaultEntity
 {
-    [ColumnInfo(ColumnType.Integer, Key = true]
+    [ColumnInfo(ColumnType.Integer, Key = true)] //2
     public int Id { get; set; }
 
-    [ForeignKeyInfo("a2b", typeof (B), new string[] {"id"}, new string[] {"parentId"}
-            , NonIdentifyingRelation = true, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
-    [ForeignKeyInfo("a2c", typeof (C), new string[] {"id"}, new string[] {"parentId"}
-        , NonIdentifyingRelation = true, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
-    public Collection<Object> ChildEntities { get; set; }
+    [ForeignKeyInfo("a2b", typeof(B), new string[] { "id" }   //3
+            , new string[] { "parentId" }, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+    [ForeignKeyInfo("a2c", typeof(C), new string[] { "id" }
+        , new string[] { "parentId" }, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+    public Collection<Object> childEntities { get; set; }
+}
+
+[TableInfo("b")]
+public class B extends DefaultEntity
+{
+    [ColumnInfo(ColumnType.Integer,Key = true)]
+    public int ParentId { get; set; }
+}
+
+[TableInfo("c")]
+public class C extends DefaultEntity
+{
+    [ColumnInfo(ColumnType.Integer,Key = true)
+    public int ParentId { get; set; }
 }
 }}}
 
 ==1. {{{[TableInfo()]}}}==
 This one defines the relationship with table to the entity class
-===properties==
-tableName -> name of the table this class is related with
+ ===properties==
+  * tableName -> name of the table this class is related with
 
-==2. {{{[ColumnInfo()]}}}==
+==2. {{{[ColumnInfo()]}}==
 Links a property of a class with the database table column
-===properties===
-columnType -> defines data type of the column
-columnName -> name of the column if not defined the column name will be auto calculated as camel case underscore of the field name (column name of field 'bankAccount' will be 'bank_account')
-key -> define if the column is a key (default is false)
-nullable -> define if the column supports nulls (default is false)
-subClassCommonColumn -> when it comes to the inheritance, this defines if this field is present in both the super class and the subclass (this is often useful for define keys shared among super and sub classes, default value is false)
+ ===properties===
+  * columnType -> defines data type of the column
+  * columnName -> name of the column if not defined the column name will be auto calculated as camel case underscore of the field name (column name of field 'bankAccount' will be 'bank_account')
+  * key -> define if the column is a key (default is false)
+  * nullable -> define if the column supports nulls (default is false)
+  * subClassCommonColumn -> when it comes to the inheritance, this defines if this field is present in both the super class and the subclass (this is often useful for define keys shared among super and sub classes, default value is false)
 size -> describes the length of the column (default length is 20).
-readFromSequence -> this is used for key columns so that if the key value is automatically generated using a sequence (default false);
-sequenceGeneratorClassName -> defines the name of the sequence generator class (implementation of ISequenceGenerator)
+  * readFromSequence -> this is used for key columns so that if the key value is automatically generated using a sequence (default false);
+  * sequenceGeneratorClassName -> defines the name of the sequence generator class (implementation of ISequenceGenerator)
 
-==3. {{{[ForeignKeyInfo()]}}==
+==3. {{{[ForeignKeyInfo()]}}}==
 Defines a relationship between two tables
-===properties===
-name -> name of the foreign key
-fromColumnMappings -> which fields of the parent entity is related, where each defines parent entity field names to form relationship between two classes
-toColumnMappings -> which fields of the child entities are related, where each defines child entity field names to form relationship between two classes
-updateRule -> this is used to generate database metadata, and used this as the update rule when key of the parent changed (default value is ReferentialRuleType.RESTRICT)
-deleteRule -> defines the behaviour of the database when the parent object deleted (default value is ReferentialRuleType.CASCADE)
-relatedObjectType -> defines the type of the related entity;
-reverseRelation -> this has to true, when the relationship is defined from child to parent. (default value is false)
-nonIdentifyingRelation -> has to set to true if the relationship is not parent to child or vise versa. (default value is false)
-lazy -> defines if this is allowed to load lazily
+ ===properties===
+  * name -> name of the foreign key
+  * columnMappings -> which fields of the entities are related (this use list of {{{ForeignKeyColumnMapping}}}, where each defines relationship between two fields of two classes, fromField -> defines the related field of the parent entity, toField -> defines the related field of child entity )
+  * updateRule -> this is used to generate database metadata, and used this as the update rule when key of the parent changed (default value is {{{ReferentialRuleType.RESTRICT}}})
+  * deleteRule -> defines the behaviour of the database when the parent object deleted (default value is {{{ReferentialRuleType.CASCADE}}})
+  * relatedObjectType -> defines the type of the related entity;
+  * reverseRelation -> this has to true, when the relationship is defined from child to parent. (default value is false)
+  * nonIdentifyingRelation -> has to set to true if the relationship is not parent to child or vise versa. (default value is false)
+  * lazy -> defines if this is allowed to load lazily
 
+=Using a abstract superclass and override methods=
+{{{
+public class A : AbstractManagedEntity
+{
+    public int Id { get; set; }
+    public Collection<Object> ChildEntities { get; set; }
+
+    //getters and setters
+    public Dictionary<Type, string> TableNames  //1
+    {
+        get
+        {
+            var map = new Dictionary<Type, String>();
+            map.Add(this.GetType(), "a");
+            return map;
+        }
+    }
+
+    public override Dictionary<Type, ICollection<IField>> FieldInfo //2
+    {
+        get
+        {
+            var map = new Dictionary<Type, ICollection<IField>>();
+            var dbColumns = new List<IField>();
+
+            dbColumns.Add(new DefaultColumn("id",true,false, ColumnType.Integer));  //3
+            dbColumns.Add(new DefaultRelation("one2ManyEntities","a2b"                    //4
+                   ,typeof(B),new RelationColumnMapping[]{new RelationColumnMapping("id","parentId")}));
+            dbColumns.Add(new DefaultRelation("one2ManyEntities","a2c"
+                   ,typeof(C),new RelationColumnMapping[]{new RelationColumnMapping("id","parentId")}));
+
+            map.Add(this.getType(), dbColumns);
+            return map;
+        }
+    }
+}
+
+public class B : AbstractManagedEntity
+{
+    public int ParentId { get; set; }
+
+    public Dictionary<Type, string> TableNames
+    {
+        get
+        {
+            var map = new Dictionary<Type, String>();
+            map.Add(this.GetType(), "b");
+            return map;
+        }
+    }
+
+    public override Dictionary<Type, ICollection<IField>> FieldInfo //2
+    {
+        get
+        {
+            var map = new Dictionary<Type, ICollection<IField>>();
+            var dbColumns = new List<IField>();
+
+            dbColumns.Add(new DefaultColumn("parentId",true,false, ColumnType.Integer));
+
+            map.Add(this.getType(), dbColumns);
+            return map;
+        }
+    }
+}
+
+public class C : AbstractManagedEntity
+{
+    public int ParentId { get; set; }
+
+    public Dictionary<Type, string> TableNames
+    {
+        get
+        {
+            var map = new Dictionary<Type, String>();
+            map.Add(this.GetType(), "c");
+            return map;
+        }
+    }
+
+    public override Dictionary<Type, ICollection<IField>> FieldInfo //2
+    {
+        get
+        {
+            var map = new Dictionary<Type, ICollection<IField>>();
+            var dbColumns = new List<IField>();
+
+            dbColumns.Add(new DefaultColumn("parentId",true,false, ColumnType.Integer));
+
+            map.Add(this.getType(), dbColumns);
+            return map;
+        }
+    }
+}
+}}}
+
+==1. {{{public Dictionary<Type, string> TableNames { get; }}}}==
+this method returns map of the class with table names (it uses a map when it comes to inheritance it has to contain many entity class to table mapping pairs)
+
+==2. {{{public override Dictionary<Type, ICollection<IField>> FieldInfo { get; }}}}==
+this method returns list of fields (columns/relationships) as a map against the class it's mapped (uses a map for the same reason it used a map for table names)
+
+==3. {{{DefaultColumn}}} or any implementation of {{{IColumn}}}
+same as {{{@ColumnInfo}}}, and the parameters are the same
+
+==4. {{{DefaultRelation}}} or any implementation of {{{IRelation}}}
+same as {{{@ForeignKeyInfo}}}, and the parameters are the same
+
+=Manual registration=
+{{{
+public class A : IEntity
+{
+    public EntityStatus Status { get; set; }
+    private EntityContext Context  { get; set; }
+    private int Id  { get; set; }
+    private Collection<Object> ChildEntities  { get; set; }
+
+    public A()
+    {
+        Context = new EntityContext();
+        Status = EntityStatus.New;
+    }
+
+    public void persist(Connection con) throws PersistException
+    {
+        DbGate.getSharedInstance().save(this,con);
+    }
+
+    public void retrieve(ResultSet rs, Connection con) throws RetrievalException
+    {
+        DbGate.getSharedInstance().load(this,rs,con);
+    }
+
+    public IEntityContext getContext()
+    {
+        return context;
+    }
+}
+
+//somewhere in the startup
+var dbColumns = new List<IField>();
+dbColumns.add(new DefaultColumn("id",true,false, ColumnType.Integer));  //3
+dbColumns.add(new DefaultRelation("one2ManyEntities","a2b"                    //4
+        ,typeof(B),new RelationColumnMapping[]{new RelationColumnMapping("id","parentId")}));
+dbColumns.add(new DefaultRelation("one2ManyEntities","a2c"
+        ,typeof(C),new RelationColumnMapping[]{new RelationColumnMapping("id","parentId")}));
+
+DbGate.GetSharedInstance().RegisterEntity(objType, "a", dbColumns)
+}}}
+
+this is more of the same as using the abstract class, other than the registration happens somewhere in the application startup, and the information does not have to defined in the entity itself
