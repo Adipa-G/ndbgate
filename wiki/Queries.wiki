@@ -1,0 +1,118 @@
+#summary DbGate Queries
+DbGate provides a strong object query language, which minimizes usage of magic string eventually maximizing the maintainability of the code, db gate query is made out of different sections
+
+ # {{{Select}}}
+ # {{{From}}}
+ # {{{Join}}}
+ # {{{Where}}}
+ # {{{GroupBy}}}
+ # {{{OrderBy}}}
+ # {{{Having}}}
+
+Each of these sections are directly correspond to their sql counterparts
+
+=Structure=
+This is the structure of a given query (note that the order of the sections is not important)
+{{{
+    ISelectionQuery query = new SelectionQuery()
+                                .Select(QuerySelection.<expression>)
+                                .From(QueryFrom.<expression>)
+                                .Join(QueryJoin.<expression>)
+                                .Where(QueryCondition.<expression>)
+                                .GroupBy(QueryGroup.<expression>)
+                                .OrderBy(QueryOrderBy.<expression>)
+                                .Having(QueryGroupCondition.<expression>);
+
+    Collection results = query.ToList(databaseConnection);
+}}}
+
+=Expressions=
+To enable greater flexibility DbGate offers expression builders so that custom expressions can be build. Depending on the section some of the expressions will not be supported.
+
+{{{
+    //simple between using expression builder
+    <section restriction>Expr.Build()
+        .Field(typeof(Entity), "Id").Between().Values(ColumnType.Integer,35,55)
+
+    //complex condition using expression builder
+   <section restriction>Expr.Build()
+        .And
+        (
+            <section restriction>Expr.Build()
+                .Field(typeof(Entity), "Id").in().values(ColumnType.Integer, 35, 55)
+            ,<section restriction>Expr.build()
+                .Field(typeof(Entity), "Id").eq().value(ColumnType.Integer, 55)
+        )
+        .Or()
+        .Field(typeof(Entity), "Id").eq().value(ColumnType.Integer,45)
+}}}
+
+==Supported Expressions==
+ * Field -> denotes a field of an entity
+ * Value -> denotes a constant
+ * Values -> denotes a list of values
+ * Query -> denotes a sub query
+ * Sum -> sum operation
+ * Count -> count operation
+ * CustFunc -> sql function
+ * Eq -> equals
+ * Ge -> greater than or equals
+ * Gt -> greater than
+ * Le -> less than or equals
+ * Lt -> less than
+ * Neq -> not equals
+ * Like -> sql like operator
+ * Between -> self explanatory
+ * In -> self explanatory
+ * Exists -> self explanatory
+ * NotExists -> self explanatory
+ * And -> simple and outer options available simple and would add another condition to the current expression, outer and option could be used to join to expressions into one
+ * Or -> same as and operation
+
+All the expression types cannot be combined as desired, it has to form a logical expression in order to achieve a valid output
+{{{
+    .Field(typeof(Entity), "Id").Sum().Ge.Value(ColumnType.Integer, 55)
+}}}
+is a valid expression while
+{{{
+    .Field(typeof(Entity), "Id").Sum().Ge.Field(typeof(Entity), "id2")
+}}}
+is not
+
+
+={{{Selection}}}=
+Following options are available
+ * RawSql -> use a sql to do the selection
+ * Type -> directly fetch an entity
+ * Query -> uses a sub query to fetch data
+ * Expression -> use a expression built using SelectExpr
+ * Field -> same as the expression builder field
+ * Sum -> same as the expression builder sum
+ * Count -> same as the expression builder count
+ * CustFunction -> same as the expression builder custFunction
+
+=={{{From}}}==
+ * RawSql -> use a sql to select from
+ * Type -> use an entity type, so that from is the table associated with the entity type
+ * Query -> use a query, to select from
+ * QueryUnion -> use a union of queries, to select from
+
+=={{{Join}}}==
+ * RawSql -> use a sql to join tables
+ * Type -> join with another entity type, there are many options available, if two entities has a relationship it would fetch the join condition automatically and there is option to manually specify conditions if required
+
+=={{{Where}}}==
+ * RawSql -> use a sql to specify the limiting conditions
+ * Expression -> build a logical expression using expression builder to provide the limiting conditions
+
+=={{{GroupBy}}}==
+ * RawSql -> use a sql to specify grouping
+ * Field -> use a field to group
+
+=={{{OrderBy}}}==
+ * RawSql -> use a sql to specify the ordering
+ * Field -> use a field to order by
+
+=={{{Having}}}==
+ * RawSql -> use a sql to specify the grouping conditions
+ * Expression -> build a logical expression using expression builder to provide the grouping conditions

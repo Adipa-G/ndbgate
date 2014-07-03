@@ -97,12 +97,11 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\dbgate\dbgate.csproj">
-      <Project>{13EB1070-FC28-4EF6-AB4A-E5333EAAE331}</Project>
-      <Name>dbgate</Name>
+    <ProjectReference Include="..\DbGate\DbGate.csproj">
+      <Project>{13eb1070-fc28-4ef6-ab4a-e5333eaae331}</Project>
+      <Name>DbGate</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

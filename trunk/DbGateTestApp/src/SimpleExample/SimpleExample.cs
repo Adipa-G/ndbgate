@@ -47,7 +47,7 @@ namespace DbGateTestApp.SimpleExample
             if (result == null)
                 return null;
 
-            var retrieved = (SimpleEntity)((object[])result)[0];
+            var retrieved = (SimpleEntity)result;
             return retrieved;
         }
 
