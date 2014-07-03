@@ -299,8 +299,7 @@ namespace DbGate
                 int count = 0;
                 foreach (object result in results)
                 {
-                    var resultArray = (object[]) result;
-                    var name = (string) resultArray[0];
+                    var name = result.ToString();
                     foreach (QueryBasicEntity basicEntity in _basicEntities)
                     {
                         if (basicEntity.Name.Equals(name))
@@ -413,8 +412,7 @@ namespace DbGate
                 Assert.IsTrue(results.Count == 4);
                 foreach (object result in results)
                 {
-                    var resultArray = (object[]) result;
-                    var loadedEntity = (QueryBasicEntity) resultArray[0];
+                    var loadedEntity = (QueryBasicEntity)result;
 
                     QueryBasicEntity orgEntity = GetById(loadedEntity.IdCol);
                     Assert.AreEqual(loadedEntity.Name, orgEntity.Name);
@@ -487,9 +485,7 @@ namespace DbGate
                 int index = 0;
                 foreach (object result in results)
                 {
-                    var resultArray = (object[]) result;
-                    var name = (String) resultArray[0];
-
+                    var name = result.ToString();
                     Assert.IsTrue(_basicEntityNames[index++].Equals(name));
                 }
                 connection.Close();
@@ -524,8 +520,7 @@ namespace DbGate
                 }
                 foreach (Object result in results)
                 {
-                    var resultArray = (Object[]) result;
-                    var resultSum = (long) resultArray[0];
+                    var resultSum = (long)result;
                     Assert.IsTrue(sum == resultSum);
                 }
                 connection.Close();
@@ -555,8 +550,7 @@ namespace DbGate
                 Assert.IsTrue(results.Count == 1);
                 foreach (Object result in results)
                 {
-                    var resultArray = (Object[]) result;
-                    var resultCount = (long) resultArray[0];
+                    var resultCount = (long)result;
                     Assert.IsTrue(resultCount == 4);
                 }
                 connection.Close();
@@ -586,8 +580,7 @@ namespace DbGate
                 Assert.IsTrue(results.Count == 1);
                 foreach (Object result in results)
                 {
-                    var resultArray = (Object[]) result;
-                    var resultCount = (long) resultArray[0];
+                    var resultCount = (long)result;
                     Assert.IsTrue(resultCount == 4);
                 }
                 connection.Close();
@@ -679,9 +672,7 @@ namespace DbGate
                 int index = 0;
                 foreach (object result in results)
                 {
-                    var resultArray = (object[]) result;
-                    var name = (string) resultArray[0];
-
+                    var name = result.ToString();
                     if (index < 4)
                     {
                         Assert.IsTrue(_basicEntityNames[index++].Equals(name));
@@ -1410,7 +1401,7 @@ namespace DbGate
 
 
                 ICollection<object> results = selectionQuery.ToList(connection);
-                HasIds(results, _basicEntityIds);
+                Assert.AreEqual(4,results.Count);
                 connection.Close();
             }
             catch (Exception e)

@@ -52,20 +52,29 @@ namespace DbGate.ErManagement.ErMapper
 				}
 		
 				rs = DbLayer.DataManipulate().CreateResultSet(con, execInfo);
-		
-				IList<Object> retList = new List<Object> ();
+
+                IList<Object> retList = new List<Object> ();
 				ICollection<IQuerySelection> selections = query.Structure.SelectList;
-		
+                var selectionCount = selections.Count;
+
 				while (rs.Read()) 
 				{
 					int count = 0;
-					Object[] rowObjects = new Object[selections.Count];
+				    
+				    object rowObject = selectionCount > 1 ? new object[selectionCount] : null;
 					foreach (IQuerySelection selection in selections) 
 					{
 						Object loaded = ((IAbstractSelection)selection).Retrieve (rs,con,buildInfo);
-						rowObjects [count++] = loaded;
+                        if (selectionCount > 1)
+                        {
+                            ((object[])rowObject)[count++] = loaded;
+                        }
+                        else
+                        {
+                            rowObject = loaded;
+                        }
 					}
-					retList.Add (rowObjects);
+                    retList.Add(rowObject);
 				}
 		
 				return retList;
