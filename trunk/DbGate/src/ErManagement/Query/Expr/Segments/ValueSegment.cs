@@ -1,3 +1,4 @@
+using System;
 using DbGate.Exceptions;
 
 namespace DbGate.ErManagement.Query.Expr.Segments
@@ -11,6 +12,13 @@ namespace DbGate.ErManagement.Query.Expr.Segments
         {
             _type = type;
             _values = values;
+        }
+
+        public ValueSegment(object[] values)
+        {
+            _values = values;
+            Type valueType = _values[0].GetType();
+            _type = ColumnTypeMapping.GetColumnType(valueType);
         }
 
         public override SegmentType SegmentType
