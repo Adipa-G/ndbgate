@@ -163,6 +163,7 @@
     <Compile Include="src\ErManagement\Query\IQueryJoin.cs" />
     <Compile Include="src\ErManagement\Query\IQueryOrderBy.cs" />
     <Compile Include="src\ErManagement\Query\IQuerySelection.cs" />
+    <Compile Include="src\Exceptions\Common\InvalidDataTypeException.cs" />
     <Compile Include="src\Utility\DbMgtUtility.cs" />
     <Compile Include="src\AbstractColumn.cs" />
     <Compile Include="src\AbstractRelation.cs" />

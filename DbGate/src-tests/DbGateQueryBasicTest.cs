@@ -498,6 +498,37 @@ namespace DbGate
         }
 
         [Test]
+        public void QueryBasic_Select_WithFieldSelectionWithoutClass_ShouldSelectColumn()
+        {
+            try
+            {
+                IDbConnection connection = SetupTables();
+                IDbTransaction transaction = connection.BeginTransaction();
+                CreateTestData(connection);
+                transaction.Commit();
+
+                ISelectionQuery query = new SelectionQuery()
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity), "qb1"))
+                    .Select(QuerySelection.Field("Name", "name1"));
+
+                ICollection<object> results = query.ToList(connection);
+                Assert.IsTrue(results.Count == 4);
+                int index = 0;
+                foreach (object result in results)
+                {
+                    var name = result.ToString();
+                    Assert.IsTrue(_basicEntityNames[index++].Equals(name));
+                }
+                connection.Close();
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
         public void QueryBasic_Select_WithSumSelection_ShouldSelectSum()
         {
             try

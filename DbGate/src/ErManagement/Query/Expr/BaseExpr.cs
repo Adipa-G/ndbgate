@@ -43,6 +43,12 @@ namespace DbGate.ErManagement.Query.Expr
             return AddSegment(segment);
         }
 
+        protected T BaseValues(params object[] values)
+        {
+            var segment = new ValueSegment(values);
+            return AddSegment(segment);
+        }
+
         protected T BaseQuery(ISelectionQuery query)
         {
             return BaseQuery(query,null);

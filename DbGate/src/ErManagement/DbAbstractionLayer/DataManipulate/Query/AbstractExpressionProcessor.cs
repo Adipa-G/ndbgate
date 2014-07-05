@@ -9,25 +9,26 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
 {
     public class AbstractExpressionProcessor
     {
-        private string AppendAlias(string sql, FieldSegment fieldSegment)
+        public IColumn GetColumn(FieldSegment segment, QueryBuildInfo buildInfo)
         {
-            if (!string.IsNullOrEmpty(fieldSegment.Alias))
-            {
-                return sql + " AS " + fieldSegment.Alias + " ";
-            }
-            return sql;
+            var fieldType = GetFieldType(segment, buildInfo);
+            var columns = FindColumnsForType(fieldType);
+            return FindColumn(segment.Field, columns);
         }
 
-        public IColumn GetColumn(FieldSegment segment)
+        private ICollection<IColumn> FindColumnsForType(Type fieldType)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(segment.EntityType);
-            ICollection<IColumn> columns = entityInfo.Columns;
+            EntityInfo entityInfo = CacheManager.GetEntityInfo(fieldType);
+            return entityInfo.Columns;
+        }
 
+        private static IColumn FindColumn(String field, ICollection<IColumn> columns)
+        {
             if (columns != null)
             {
                 foreach (IColumn column in columns)
                 {
-                    if (column.AttributeName.Equals(segment.Field))
+                    if (column.AttributeName.Equals(field))
                     {
                         return column;
                     }
@@ -38,13 +39,14 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
 
         public string GetFieldName(FieldSegment fieldSegment, bool withAlias, QueryBuildInfo buildInfo)
         {
-            string tableAlias = buildInfo.GetAlias(fieldSegment.EntityType);
+            var fieldSegmentType = GetFieldType(fieldSegment, buildInfo);
+            string tableAlias = buildInfo.GetAlias(fieldSegmentType);
             if (!string.IsNullOrEmpty(fieldSegment.TypeAlias))
             {
                 tableAlias = fieldSegment.TypeAlias;
             }
             tableAlias = (tableAlias == null) ? "" : tableAlias + ".";
-            IColumn column = GetColumn(fieldSegment);
+            IColumn column = GetColumn(fieldSegment,buildInfo);
 
             if (column != null)
             {
@@ -59,6 +61,41 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
             {
                 return "<incorrect column for " + fieldSegment.Field + ">";
             }
+        }
+
+        private Type GetFieldType(FieldSegment segment, QueryBuildInfo buildInfo)
+        {
+            if (segment.EntityType != null)
+            {
+                return segment.EntityType;
+            }
+            else
+            {
+                var values =  buildInfo.Aliases.Values;
+                foreach (Object value in values)
+                {
+                    if (value is Type)
+                    {
+                        var targetType = (Type) value;
+                        var columns = FindColumnsForType(targetType);
+                        IColumn column = FindColumn(segment.Field, columns);
+                        if (column != null)
+                        {
+                            return targetType;
+                        }
+                    }
+                }
+                return null;
+            }
+        }
+
+        private string AppendAlias(string sql, FieldSegment fieldSegment)
+        {
+            if (!string.IsNullOrEmpty(fieldSegment.Alias))
+            {
+                return sql + " AS " + fieldSegment.Alias + " ";
+            }
+            return sql;
         }
 
         public string GetGroupFunction(GroupFunctionSegment groupSegment, bool withAlias, QueryBuildInfo buildInfo)

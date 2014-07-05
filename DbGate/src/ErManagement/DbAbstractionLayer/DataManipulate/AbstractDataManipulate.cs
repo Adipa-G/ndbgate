@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Text;
@@ -270,38 +271,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 				((OleDbParameter)parameter).IsNullable = true;
 			}
 			cmd.Parameters.Add(parameter);
-
-            switch (columnType)
-            {
-                case ColumnType.Boolean:
-                    parameter.DbType = DbType.Boolean;
-                    break;
-                case ColumnType.Char:
-                    parameter.DbType = DbType.StringFixedLength;
-                    break;
-                case ColumnType.Date:
-                    parameter.DbType = DbType.Date;
-                    break;
-                case ColumnType.Double:
-                    parameter.DbType = DbType.Double;
-                    break;
-                case ColumnType.Float:
-                    parameter.DbType = DbType.VarNumeric;
-                    break;
-                case ColumnType.Integer:
-                case ColumnType.Version:
-                    parameter.DbType = DbType.Int32;
-                    break;
-                case ColumnType.Long:
-                    parameter.DbType = DbType.Int64;
-                    break;
-                case ColumnType.Timestamp:
-                    parameter.DbType = DbType.DateTime;
-                    break;
-                case ColumnType.Varchar:
-                    parameter.DbType = DbType.String;
-                    break;
-            }
+		    parameter.DbType = ColumnTypeMapping.GetSqlType(columnType);
         }
 
         public IDataReader CreateResultSet(IDbConnection con, QueryExecInfo execInfo)

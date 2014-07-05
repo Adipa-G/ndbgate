@@ -24,9 +24,19 @@ namespace DbGate.ErManagement.Query.Expr
             return Values(type, value);
         }
 
+        public GroupConditionExpr Value(object value)
+        {
+            return Values(value);
+        }
+
         public GroupConditionExpr Values(ColumnType type, params object[] value)
         {
             return BaseValues(type, value);
+        }
+
+        public GroupConditionExpr Values(params object[] value)
+        {
+            return BaseValues(value);
         }
 
         public GroupConditionExpr Sum()

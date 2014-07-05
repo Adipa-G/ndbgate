@@ -54,11 +54,11 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
                 {
                     case SegmentType.Group:
                         fieldSegment = ((GroupFunctionSegment) rootSegment).SegmentToGroup;
-                        column = GetColumnName(fieldSegment);
+                        column = GetColumnName(fieldSegment,buildInfo);
                         break;
                     case SegmentType.Field:
                         fieldSegment = (FieldSegment) rootSegment;
-                        column = GetColumnName(fieldSegment);
+                        column = GetColumnName(fieldSegment,buildInfo);
                         break;
                     case SegmentType.Query:
                         var querySegment = (QuerySegment) rootSegment;
@@ -78,10 +78,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
 
         #endregion
 
-        private string GetColumnName(FieldSegment fieldSegment)
+        private string GetColumnName(FieldSegment fieldSegment,QueryBuildInfo buildInfo)
         {
             string alias = fieldSegment.Alias;
-            string column = !string.IsNullOrEmpty(alias) ? alias : _processor.GetColumn(fieldSegment).ColumnName;
+            string column = !string.IsNullOrEmpty(alias) ? alias : _processor.GetColumn(fieldSegment,buildInfo).ColumnName;
             return column;
         }
     }
