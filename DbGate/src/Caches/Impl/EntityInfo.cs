@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using DbGate.ErManagement.DbAbstractionLayer;
 using DbGate.Exceptions.Common;
@@ -14,6 +15,7 @@ namespace DbGate.Caches.Impl
         private readonly ICollection<IColumn> _columns;
         private readonly ICollection<IRelation> _relations;
         private readonly IDictionary<string,string> _queries;
+        private readonly ICollection<EntityInfo> _subEntityInfo;
     
         public EntityInfo(Type entityType)
         {
@@ -22,6 +24,7 @@ namespace DbGate.Caches.Impl
             _relations = new List<IRelation>();
             _propertyMap = new Dictionary<string, PropertyInfo>();
             _queries = new Dictionary<string, string>();
+            _subEntityInfo = new List<EntityInfo>();
         }
 
         public Type EntityType
@@ -32,6 +35,11 @@ namespace DbGate.Caches.Impl
         public string TableName { get; set; }
 
         public EntityInfo SuperEntityInfo { get; set; }
+
+        public ICollection<EntityInfo> SubEntityInfo
+	    {
+            get { return _subEntityInfo; }
+	    }
 
         public ICollection<IColumn> Columns
         {

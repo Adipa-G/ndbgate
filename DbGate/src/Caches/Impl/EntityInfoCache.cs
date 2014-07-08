@@ -67,6 +67,7 @@ namespace DbGate.Caches.Impl
             {
                 EntityInfo immediateSuperEntityInfo = Cache[immediateSuper];
                 subEntityInfo.SuperEntityInfo = immediateSuperEntityInfo;
+                immediateSuperEntityInfo.SubEntityInfo.Add(subEntityInfo);
             }
 
             lock (Cache)
@@ -108,9 +109,11 @@ namespace DbGate.Caches.Impl
                                                                                      new[] {typeof (IReadOnlyEntity)});
             foreach (Type regType in typeList)
             {
-                if (Cache.ContainsKey(regType))
+                if (subEntity != null && Cache.ContainsKey(regType))
                 {
-                    subEntity.SuperEntityInfo = Cache[regType];
+                    EntityInfo superEntityInfo = Cache[regType];
+                    subEntity.SuperEntityInfo = superEntityInfo;
+                    superEntityInfo.SubEntityInfo.Add(subEntity);
                     continue;
                 }
 
@@ -125,6 +128,7 @@ namespace DbGate.Caches.Impl
                     if (subEntity != null)
                     {
                         subEntity.SuperEntityInfo = entityInfo;
+                        entityInfo.SubEntityInfo.Add(subEntity);
                     }
                     entityInfoMap.Add(regType, entityInfo);
                     subEntity = entityInfo;

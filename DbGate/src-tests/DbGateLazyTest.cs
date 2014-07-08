@@ -20,13 +20,13 @@ namespace DbGate
             {
                 log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
-                LogManager.GetLogger(typeof (DbGateLazyTest)).Info("Starting in-memory database for unit tests");
+                LogManager.GetLogger(typeof (DbGateSuperEntityRefTest)).Info("Starting in-memory database for unit tests");
                 var dbConnector = new DbConnector("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DbConnector.DbSqllite);
 				Assert.IsNotNull(dbConnector.Connection);
             }
             catch (Exception ex)
             {
-                LogManager.GetLogger(typeof (DbGateLazyTest)).Fatal("Exception during database startup.", ex);
+                LogManager.GetLogger(typeof (DbGateSuperEntityRefTest)).Fatal("Exception during database startup.", ex);
             }
         }
 
@@ -40,7 +40,7 @@ namespace DbGate
             }
             catch (Exception ex)
             {
-                LogManager.GetLogger(typeof (DbGateLazyTest)).Fatal("Exception during test cleanup.", ex);
+                LogManager.GetLogger(typeof (DbGateSuperEntityRefTest)).Fatal("Exception during test cleanup.", ex);
             }
         }
 
@@ -90,7 +90,7 @@ namespace DbGate
             }
             catch (Exception ex)
             {
-                LogManager.GetLogger(typeof(DbGateLazyTest)).Fatal("Exception during test cleanup.", ex);
+                LogManager.GetLogger(typeof(DbGateSuperEntityRefTest)).Fatal("Exception during test cleanup.", ex);
             }
         }
         
@@ -158,7 +158,7 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateLazyTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateSuperEntityRefTest)).Fatal(e.Message,e);
                 Assert.Fail(e.Message);
             }
         }
@@ -211,7 +211,7 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateLazyTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateSuperEntityRefTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -264,7 +264,7 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateLazyTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateSuperEntityRefTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -313,7 +313,7 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateLazyTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateSuperEntityRefTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }

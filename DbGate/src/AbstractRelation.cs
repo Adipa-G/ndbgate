@@ -48,6 +48,11 @@ namespace DbGate
 
         public bool Lazy { get; set; }
 
+        public IRelation Clone()
+        {
+            return (AbstractRelation)MemberwiseClone();
+        }
+
         #endregion
     }
 }

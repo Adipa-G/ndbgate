@@ -167,10 +167,7 @@ namespace DbGate.ErManagement.ErMapper
 
             if (entityContext != null)
             {
-                foreach (EntityFieldValue fieldValue in valueTypeList.FieldValues)
-                {
-                    entityContext.ChangeTracker.Fields.Add(fieldValue);
-                }
+                entityContext.ChangeTracker.AddFields(valueTypeList.FieldValues);
             }
 
             ICollection<IRelation> dbRelations = entityInfo.Relations;
@@ -204,7 +201,7 @@ namespace DbGate.ErManagement.ErMapper
                     ITypeFieldValueList valueTypeList = OperationUtils.ExtractRelationKeyValues(childEntity, relation);
                     if (valueTypeList != null)
                     {
-                        entityContext.ChangeTracker.ChildEntityKeys.Add(valueTypeList);
+                        entityContext.ChangeTracker.AddChildEntityKey(valueTypeList);
                     }
                 }
             }

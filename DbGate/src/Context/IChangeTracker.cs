@@ -4,11 +4,16 @@ namespace DbGate.Context
 {
     public interface IChangeTracker
     {
-        ICollection<EntityFieldValue> Fields { get; }
+        IEnumerable<EntityFieldValue> Fields { get; }
 
-        ICollection<ITypeFieldValueList> ChildEntityKeys { get; }
+        IEnumerable<ITypeFieldValueList> ChildEntityKeys { get; }
 
         bool Valid { get; }
+
         EntityFieldValue GetFieldValue(string attributeName);
+
+        void AddChildEntityKey(ITypeFieldValueList list);
+
+        void AddFields(ICollection<EntityFieldValue> fieldValues);
     }
 }

@@ -20,5 +20,7 @@ namespace DbGate
         bool NonIdentifyingRelation { get; set; }
 
         bool Lazy { get; set; }
+
+        IRelation Clone();
     }
 }

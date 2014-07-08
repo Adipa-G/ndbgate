@@ -57,7 +57,7 @@ namespace DbGate.ErManagement.ErMapper
         private void TrackAndCommitChanges(IEntity entity, IDbConnection con)
         {
             IEntityContext entityContext = entity.Context;
-            ICollection<ITypeFieldValueList> originalChildren;
+            IEnumerable<ITypeFieldValueList> originalChildren;
 
             if (entityContext != null)
             {
@@ -149,18 +149,7 @@ namespace DbGate.ErManagement.ErMapper
             IEntityContext entityContext = entity.Context;
             if (entityContext != null)
             {
-                foreach (EntityFieldValue fieldValue in fieldValues.FieldValues)
-                {
-                    EntityFieldValue entityFieldValue = entityContext.ChangeTracker.GetFieldValue(fieldValue.Column.AttributeName);
-                    if (entityFieldValue == null)
-                    {
-                        entityContext.ChangeTracker.Fields.Add(fieldValue);
-                    }
-                    else
-                    {
-                        entityFieldValue.Value = fieldValue.Value;
-                    }
-                }
+                entityContext.ChangeTracker.AddFields(fieldValues.FieldValues);
             }
             SessionUtils.AddToSession(entity, OperationUtils.ExtractEntityKeyValues(entity));
 
@@ -546,11 +535,8 @@ namespace DbGate.ErManagement.ErMapper
             while (entityInfo != null)
             {
                 ITypeFieldValueList values = ExtractCurrentRowValues(entity,entityInfo.EntityType,con);
-                foreach (EntityFieldValue fieldValue in values.FieldValues)
-                {
-                    entityContext.ChangeTracker.Fields.Add(fieldValue);
-                }
-
+                entityContext.ChangeTracker.AddFields(values.FieldValues);
+                
                 ICollection<IRelation> dbRelations = entityInfo.Relations;
                 foreach (IRelation relation in dbRelations)
                 {
@@ -560,7 +546,7 @@ namespace DbGate.ErManagement.ErMapper
                         ITypeFieldValueList valueTypeList = OperationUtils.ExtractRelationKeyValues(childEntity,relation);
                         if (valueTypeList != null)
                         {
-                            entityContext.ChangeTracker.ChildEntityKeys.Add(valueTypeList);
+                            entityContext.ChangeTracker.AddChildEntityKey(valueTypeList);
                         }
                     }
                 }
