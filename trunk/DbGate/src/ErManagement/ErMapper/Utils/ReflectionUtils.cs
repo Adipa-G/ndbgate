@@ -121,5 +121,19 @@ namespace DbGate.ErManagement.ErMapper.Utils
                 throw new EntityInstantiationException(message, ex);
             }
         }
+
+        public static object GetFieldValue(FieldInfo field,object target)
+        {
+            try
+            {
+                var value = field.GetValue(target);
+                return value;
+            }
+            catch (Exception ex)
+            {
+                string message = string.Format("Exception while trying to extract field value of {0} of entity {1}",field,target.GetType().FullName);
+                throw new FieldValueExtractionException(message,ex);
+            }
+        }
     }
 }

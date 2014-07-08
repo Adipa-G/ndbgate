@@ -13,6 +13,7 @@ using DbGate.ErManagement.ErMapper.Utils;
 using DbGate.Exceptions.Common;
 using DbGate.Utility;
 using log4net;
+using System.Linq;
 
 namespace DbGate.ErManagement.ErMapper
 {
@@ -157,68 +158,104 @@ namespace DbGate.ErManagement.ErMapper
         protected ICollection<IReadOnlyEntity> ReadRelationChildrenFromDb(IReadOnlyEntity entity, Type entityType
                 , IDbConnection con, IRelation relation)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(entityType);
-            Type childEntityType = relation.RelatedObjectType;
-            IReadOnlyEntity childTypeInstance = (IReadOnlyEntity)Activator.CreateInstance(childEntityType);
+            var retrievedEntities = new List<IReadOnlyEntity>();
+	        ICollection<Type> childTypesToProcess = GetChildTypesToProcess(relation);
 
-            StringBuilder logSb = new StringBuilder();
-            string query = entityInfo.GetRelationObjectLoad(DbLayer, relation);
+            int index = 0;
+            foreach (var childType in childTypesToProcess)
+            {
+                index++;
+                IRelation effectiveRelation = relation.Clone();
+                effectiveRelation.RelatedObjectType = childType;
+                effectiveRelation.RelationShipName = relation.RelationShipName + "_" + index;
 
-            IList<string> fields = new List<string>();
-            foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
-            {
-                fields.Add(mapping.FromField);
-            }
+                EntityInfo entityInfo = CacheManager.GetEntityInfo(entityType);
+                var logSb = new StringBuilder();
+                var query = entityInfo.GetRelationObjectLoad(DbLayer, effectiveRelation);
 
-            IDbCommand cmd = null;
-            try
-            {
-                cmd = con.CreateCommand();
-                cmd.CommandText = query;
-            }
-            catch (Exception ex)
-            {
-                string message = String.Format("SQL Exception while trying create command for sql {0}",query);
-                throw new CommandCreationException(message,ex);  
-            }
-            
-            bool showQuery = Config.ShowQueries;
-            if (showQuery)
-            {
-                logSb.Append(query);
-            }
-            ICollection<IColumn> dbColumns = entityInfo.Columns;
-            for (int i = 0; i < fields.Count; i++)
-            {
-                string field = fields[i];
-                IColumn matchColumn = OperationUtils.FindColumnByAttribute(dbColumns, field);
-
-                if (matchColumn != null)
+                IList<string> fields = new List<string>();
+                foreach (RelationColumnMapping mapping in effectiveRelation.TableColumnMappings)
                 {
-                    PropertyInfo getter = entityInfo.GetProperty(matchColumn.AttributeName);
-                    Object fieldValue = ReflectionUtils.GetValue(getter, entity);
-                    
-                    if (showQuery)
+                    fields.Add(mapping.FromField);
+                }
+
+                IDbCommand cmd = null;
+                try
+                {
+                    cmd = con.CreateCommand();
+                    cmd.CommandText = query;
+                }
+                catch (Exception ex)
+                {
+                    string message = String.Format("SQL Exception while trying create command for sql {0}", query);
+                    throw new CommandCreationException(message, ex);
+                }
+
+                bool showQuery = Config.ShowQueries;
+                if (showQuery)
+                {
+                    logSb.Append(query);
+                }
+
+                ICollection<IColumn> dbColumns = entityInfo.Columns;
+                for (int i = 0; i < fields.Count; i++)
+                {
+                    string field = fields[i];
+                    IColumn matchColumn = OperationUtils.FindColumnByAttribute(dbColumns, field);
+
+                    if (matchColumn != null)
                     {
-                        logSb.Append(" ,").Append(matchColumn.ColumnName).Append("=").Append(fieldValue);
+                        PropertyInfo getter = entityInfo.GetProperty(matchColumn.AttributeName);
+                        Object fieldValue = ReflectionUtils.GetValue(getter, entity);
+
+                        if (showQuery)
+                        {
+                            logSb.Append(" ,").Append(matchColumn.ColumnName).Append("=").Append(fieldValue);
+                        }
+                        DbLayer.DataManipulate().SetToPreparedStatement(cmd, fieldValue, i + 1, matchColumn);
                     }
-                    DbLayer.DataManipulate().SetToPreparedStatement(cmd, fieldValue, i + 1, matchColumn);
+                    else
+                    {
+                        string message = String.Format("The field {0} does not have a matching field in the object {1}"
+                            , field,entity.GetType().FullName);
+                        throw new NoMatchingColumnFoundException(message);
+                    }
                 }
-                else
+
+                if (showQuery)
                 {
-                    string message = String.Format("The field {0} does not have a matching field in the object {1}", field, entity.GetType().FullName);
-                    throw new NoMatchingColumnFoundException(message);
+                    LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
+                }
+                if (Config.EnableStatistics)
+                {
+                    Statistics.RegisterSelect(childType);
+                }
+
+                ICollection<IReadOnlyEntity> retrievedEntitiesForType = ExecuteAndReadFromPreparedStatement(entity, con, cmd, childType);
+                retrievedEntities.AddRange(retrievedEntitiesForType);
+            }
+            return retrievedEntities;
+        }
+
+        private ICollection<Type> GetChildTypesToProcess(IRelation relation)
+        {
+            ICollection<Type> childTypesToProcess = new List<Type>();
+            Type childType = relation.RelatedObjectType;
+            EntityInfo childEntityInfo = CacheManager.GetEntityInfo(childType);
+
+            if (childEntityInfo.SubEntityInfo.Count > 0)
+            {
+                foreach (EntityInfo entityInfo in childEntityInfo.SubEntityInfo)
+                {
+                    childTypesToProcess.Add(entityInfo.EntityType);
                 }
             }
-            if (showQuery)
+            else
             {
-                LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
+                childTypesToProcess.Add(childType);
             }
-            if (Config.EnableStatistics)
-            {
-                Statistics.RegisterSelect(entityType);
-            }
-            return ExecuteAndReadFromPreparedStatement(entity, con, cmd, childEntityType);
+
+            return childTypesToProcess.OrderBy(t => t.FullName).ToList();
         }
 
         private ICollection<IReadOnlyEntity> ExecuteAndReadFromPreparedStatement(IReadOnlyEntity entity, IDbConnection con, IDbCommand cmd

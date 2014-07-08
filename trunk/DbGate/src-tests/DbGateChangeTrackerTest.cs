@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
+using System.Reflection;
+using DbGate.Context;
 using DbGate.Support.Persistant.ChangeTracker;
 using DbGate.DbUtility;
 using DbGate.ErManagement.ErMapper;
@@ -182,9 +185,13 @@ namespace DbGate
 
                 ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
                 LoadEntityWithId(connection, loadedEntity, id);
-                loadedEntity.Context.ChangeTracker.Fields.Clear();
-                loadedEntity.Context.ChangeTracker.ChildEntityKeys.Clear();
 
+                var changeTracker = loadedEntity.Context.ChangeTracker;
+                changeTracker.GetType().GetField("_fields",BindingFlags.Instance|BindingFlags.NonPublic)
+                    .SetValue(changeTracker,new ReadOnlyCollection<EntityFieldValue>(new List<EntityFieldValue>()));
+                changeTracker.GetType().GetField("_childEntityRelationKeys",BindingFlags.Instance|BindingFlags.NonPublic)
+                    .SetValue(changeTracker,new ReadOnlyCollection<ITypeFieldValueList>(new List<ITypeFieldValueList>()));
+                
                 transaction = connection.BeginTransaction();
                 loadedEntity.Name = "Changed-Name";
                 loadedEntity.Persist(connection);

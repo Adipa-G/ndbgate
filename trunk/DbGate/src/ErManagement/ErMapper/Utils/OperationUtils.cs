@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using DbGate.Caches;
 using DbGate.Caches.Impl;
@@ -120,6 +121,10 @@ namespace DbGate.ErManagement.ErMapper.Utils
                 {
                     if (!key || (subLevelColumn.Key && key))
                     {
+                        if (AlreadyHasTheColumnAdded(entityFieldValues, subLevelColumn))
+                        {
+                            continue;
+                        }
                         PropertyInfo getter = entityInfo.GetProperty(subLevelColumn.AttributeName);
                         Object value = ReflectionUtils.GetValue(getter,entity);
 
@@ -131,7 +136,19 @@ namespace DbGate.ErManagement.ErMapper.Utils
             return entityFieldValues;
         }
 
-        public static ICollection<ITypeFieldValueList> FindDeletedChildren(ICollection<ITypeFieldValueList> startListRelation
+        private static bool AlreadyHasTheColumnAdded(ICollection<EntityFieldValue> entityFieldValues,IColumn column)
+        {
+            foreach (EntityFieldValue fieldValue in entityFieldValues)
+            {
+                if (fieldValue.Column.AttributeName.Equals(column.AttributeName))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static ICollection<ITypeFieldValueList> FindDeletedChildren(IEnumerable<ITypeFieldValueList> startListRelation
                                                                            ,ICollection<ITypeFieldValueList> currentListRelation)
         {
             ICollection<ITypeFieldValueList> deletedListRelation = new List<ITypeFieldValueList>();
