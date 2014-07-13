@@ -10,21 +10,46 @@ namespace DbGate.DbUtility
     public class DbUtilsTests
     {
         #region Setup/Teardown
+        private static ITransactionFactory _transactionFactory;
+        [TestFixtureSetUp]
+        public static void Before()
+        {
+            try
+            {
+                XmlConfigurator.Configure();
+
+                LogManager.GetLogger(typeof(DbUtilsTests)).Info("Starting in-memory database for unit tests");
+                _transactionFactory = new DefaultTransactionFactory(
+                    "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1", DefaultTransactionFactory.DbSqllite);
+
+                var transaction = _transactionFactory.CreateTransaction();
+
+                IDbCommand command = transaction.CreateCommand();
+                command.CommandText = "CREATE TABLE ROOT_ENTITY (ID INT PRIMARY KEY,NAME VARCHAR(12))";
+                command.ExecuteNonQuery();
+
+                transaction.Commit();
+                transaction.Close();
+            }
+            catch (Exception ex)
+            {
+                LogManager.GetLogger(typeof(DbUtilsTests)).Fatal("Exception during database startup.", ex);
+            }
+        }
 
         [SetUp]
         public void BeforeEach()
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
+                var transaction = _transactionFactory.CreateTransaction();
 
-                IDbCommand command = connection.CreateCommand();
+                IDbCommand command = transaction.CreateCommand();
                 command.CommandText = "INSERT INTO ROOT_ENTITY VALUES (10,'TEN'),(20,'TWENTY'),(30,'THIRTY')";
                 command.ExecuteNonQuery();
 
                 transaction.Commit();
-                connection.Close();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -37,15 +62,14 @@ namespace DbGate.DbUtility
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
+                var transaction = _transactionFactory.CreateTransaction();
 
-                IDbCommand command = connection.CreateCommand();
+                IDbCommand command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM ROOT_ENTITY";
                 command.ExecuteNonQuery();
 
                 transaction.Commit();
-                connection.Close();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -55,47 +79,21 @@ namespace DbGate.DbUtility
 
         #endregion
 
-        [TestFixtureSetUp]
-        public static void Before()
-        {
-            try
-            {
-                XmlConfigurator.Configure();
-
-                LogManager.GetLogger(typeof (DbUtilsTests)).Info("Starting in-memory database for unit tests");
-                var dbConnector = new DbConnector(
-                    "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1", DbConnector.DbSqllite);
-
-                IDbConnection connection = dbConnector.Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
-
-                IDbCommand command = connection.CreateCommand();
-                command.CommandText = "CREATE TABLE ROOT_ENTITY (ID INT PRIMARY KEY,NAME VARCHAR(12))";
-                command.ExecuteNonQuery();
-
-                transaction.Commit();
-                connection.Close();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbUtilsTests)).Fatal("Exception during database startup.", ex);
-            }
-        }
+        
 
         [TestFixtureTearDown]
         public static void After()
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
+                var transaction = _transactionFactory.CreateTransaction();
 
-                IDbCommand command = connection.CreateCommand();
+                IDbCommand command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM ROOT_ENTITY";
                 command.ExecuteNonQuery();
 
                 transaction.Commit();
-                connection.Close();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -108,9 +106,10 @@ namespace DbGate.DbUtility
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
+                var transaction = _transactionFactory.CreateTransaction();
+                IDbConnection connection = transaction.Connection;
                 Assert.IsTrue(connection.State != ConnectionState.Closed);
-                connection.Close();
+                transaction.Close();
             }
             catch (Exception ex)
             {

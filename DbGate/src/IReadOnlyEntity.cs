@@ -6,6 +6,6 @@ namespace DbGate
     public interface IReadOnlyEntity : IReadOnlyClientEntity
     {
         IEntityContext Context { get; }
-        void Retrieve(IDataReader reader, IDbConnection con);
+        void Retrieve(IDataReader reader, ITransaction tx);
     }
 }

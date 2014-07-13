@@ -15,17 +15,19 @@ namespace DbGate.ErManagement.Lazy
         private readonly RetrievalOperationLayer _dataRetrievalOperationLayer;
         private readonly IReadOnlyEntity _parentRoEntity;
         private readonly IRelation _relation;
-        private IDbConnection _connection;
+        private readonly ITransactionFactory _transactionFactory;
+        private ITransaction _transaction;
 
         private bool _intercepted;
 
         public ChildLoadInterceptor(RetrievalOperationLayer dataRetrievalOperationLayer, IReadOnlyEntity parentRoEntity
-                                    , Type applicableParentType, IDbConnection connection, IRelation relation)
+                                    , Type applicableParentType, ITransaction transaction, IRelation relation)
         {
             _dataRetrievalOperationLayer = dataRetrievalOperationLayer;
             _parentRoEntity = parentRoEntity;
             _applicableParentType = applicableParentType;
-            _connection = connection;
+            _transaction = transaction;
+            _transactionFactory = transaction.Factory;
             _relation = relation;
         }
 
@@ -36,23 +38,23 @@ namespace DbGate.ErManagement.Lazy
             if (!_intercepted)
             {
                 _intercepted = true;
-                bool newConnection = false;
+                bool newTransaction = false;
                 try
                 {
-                    if (_connection == null || _connection.State != ConnectionState.Open)
+                    if (_transaction.Closed)
                     {
-                        _connection = DbConnector.GetSharedInstance().Connection;
-                        newConnection = true;
+                        _transaction = _transactionFactory.CreateTransaction();
+                        newTransaction = true;
                     }
                     _dataRetrievalOperationLayer.LoadChildrenFromRelation(_parentRoEntity, _applicableParentType,
-                                                                          _connection, _relation, true);
+                                                                          _transaction, _relation, true);
                 }
                 finally
                 {
-                    if (newConnection)
+                    if (newTransaction)
                     {
-                        DbMgtUtility.Close(_connection);
-                        _connection = null;
+                        DbMgtUtility.Close(_transaction);
+                        _transaction = null;
                     }
                 }
 

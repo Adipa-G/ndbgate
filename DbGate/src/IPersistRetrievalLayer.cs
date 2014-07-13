@@ -6,11 +6,11 @@ namespace DbGate
 {
     public interface IPersistRetrievalLayer
     {
-        void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, IDbConnection con);
+        void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, ITransaction tx);
 
-        void Save(IEntity entity, IDbConnection con);
+        void Save(IEntity entity, ITransaction tx);
 
-        ICollection<Object> Select(ISelectionQuery query, IDbConnection con);
+        ICollection<Object> Select(ISelectionQuery query, ITransaction tx);
 
         void ClearCache();
 

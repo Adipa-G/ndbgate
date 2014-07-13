@@ -18,7 +18,7 @@ namespace DbGate
 
         new ISelectionQuery Where(IQueryCondition queryCondition);
 
-        ICollection<object> ToList(IDbConnection con);
+        ICollection<object> ToList(ITransaction tx);
 
         ISelectionQuery Select(IQuerySelection querySelection);
 

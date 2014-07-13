@@ -24,6 +24,24 @@ namespace DbGate.Utility
             }
         }
 
+        public static void Close(ITransaction tx)
+        {
+            if (tx != null)
+            {
+                try
+                {
+                    if (!tx.Closed)
+                    {
+                        tx.Close();
+                    }
+                }
+                catch (Exception e)
+                {
+                    LogManager.GetLogger(typeof(DbMgtUtility)).Fatal("Exception during closing transaction", e);
+                }
+            }
+        }
+
         public static void Close(IDbCommand dc)
         {
             if (dc != null)

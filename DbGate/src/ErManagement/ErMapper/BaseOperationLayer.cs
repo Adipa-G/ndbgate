@@ -30,7 +30,7 @@ namespace DbGate.ErManagement.ErMapper
             Config = config;
         }
 
-        protected IDbCommand CreateRetrievalPreparedStatement(ITypeFieldValueList keyValueList, IDbConnection con)
+        protected IDbCommand CreateRetrievalPreparedStatement(ITypeFieldValueList keyValueList, ITransaction tx)
         {
             Type targetType = keyValueList.Type;
             EntityInfo entityInfo = CacheManager.GetEntityInfo(targetType);
@@ -39,7 +39,7 @@ namespace DbGate.ErManagement.ErMapper
             IDbCommand cmd;
             try
             {
-                cmd = con.CreateCommand();
+                cmd = tx.CreateCommand();
                 cmd.CommandText = query;
             }
             catch (Exception ex)
@@ -156,7 +156,7 @@ namespace DbGate.ErManagement.ErMapper
         }
 
         protected ICollection<IReadOnlyEntity> ReadRelationChildrenFromDb(IReadOnlyEntity entity, Type entityType
-                , IDbConnection con, IRelation relation)
+                , ITransaction tx, IRelation relation)
         {
             var retrievedEntities = new List<IReadOnlyEntity>();
 	        ICollection<Type> childTypesToProcess = GetChildTypesToProcess(relation);
@@ -182,7 +182,7 @@ namespace DbGate.ErManagement.ErMapper
                 IDbCommand cmd = null;
                 try
                 {
-                    cmd = con.CreateCommand();
+                    cmd = tx.CreateCommand();
                     cmd.CommandText = query;
                 }
                 catch (Exception ex)
@@ -231,7 +231,7 @@ namespace DbGate.ErManagement.ErMapper
                     Statistics.RegisterSelect(childType);
                 }
 
-                ICollection<IReadOnlyEntity> retrievedEntitiesForType = ExecuteAndReadFromPreparedStatement(entity, con, cmd, childType);
+                ICollection<IReadOnlyEntity> retrievedEntitiesForType = ExecuteAndReadFromPreparedStatement(entity, tx, cmd, childType);
                 retrievedEntities.AddRange(retrievedEntitiesForType);
             }
             return retrievedEntities;
@@ -258,7 +258,7 @@ namespace DbGate.ErManagement.ErMapper
             return childTypesToProcess.OrderBy(t => t.FullName).ToList();
         }
 
-        private ICollection<IReadOnlyEntity> ExecuteAndReadFromPreparedStatement(IReadOnlyEntity entity, IDbConnection con, IDbCommand cmd
+        private ICollection<IReadOnlyEntity> ExecuteAndReadFromPreparedStatement(IReadOnlyEntity entity, ITransaction tx, IDbCommand cmd
             , Type childType)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(childType);
@@ -289,7 +289,7 @@ namespace DbGate.ErManagement.ErMapper
 
                     IReadOnlyEntity rodbClass = (IReadOnlyEntity)Activator.CreateInstance(childType);
                     SessionUtils.TransferSession(entity, rodbClass);
-                    rodbClass.Retrieve(reader, con);
+                    rodbClass.Retrieve(reader, tx);
                     data.Add(rodbClass);
 
                     IEntityFieldValueList childEntityKeyList = OperationUtils.ExtractEntityKeyValues(rodbClass);

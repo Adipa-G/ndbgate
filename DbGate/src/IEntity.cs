@@ -4,6 +4,6 @@ namespace DbGate
 {
     public interface IEntity : IReadOnlyEntity, IClientEntity
     {
-        void Persist(IDbConnection con);
+        void Persist(ITransaction tx);
     }
 }

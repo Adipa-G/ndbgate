@@ -11,6 +11,8 @@ namespace DbGate
 {
     public class DbGatePatchTableDifferenceDbTests
     {
+        private static ITransactionFactory _transactionFactory;
+
         [TestFixtureSetUp]
         public static void Before()
         {
@@ -20,13 +22,13 @@ namespace DbGate
 
                 LogManager.GetLogger(typeof (DbGatePatchTableDifferenceDbTests)).Info(
                     "Starting in-memory database for unit tests");
-                var dbConnector =
-                    new DbConnector(
+                _transactionFactory =
+                    new DefaultTransactionFactory(
                         "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=4;foreign_keys = ON",
-                        DbConnector.DbSqllite);
+                        DefaultTransactionFactory.DbSqllite);
 
-                IDbConnection connection = dbConnector.Connection;
-                connection.Close();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -40,8 +42,8 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                connection.Close();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -55,28 +57,29 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
                 ICollection<Type> types = new List<Type>();
                 types.Add(typeof (ThreeColumnEntity));
-                ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(connection, types, true);
+                _transactionFactory.DbGate.PatchDataBase(transaction, types, true);
+                var connection = transaction.Connection;
                 transaction.Commit();
                 connection.Close();
 
-                connection = DbConnector.GetSharedInstance().Connection;
-                transaction = connection.BeginTransaction();
+                transaction = _transactionFactory.CreateTransaction();
                 types = new List<Type>();
                 types.Add(typeof (FourColumnEntity));
-                ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(connection, types, false);
+                _transactionFactory.DbGate.PatchDataBase(transaction, types, false);
+                connection = transaction.Connection;
                 transaction.Commit();
                 connection.Close();
 
                 int id = 35;
-                connection = DbConnector.GetSharedInstance().Connection;
-                transaction = connection.BeginTransaction();
+                transaction = _transactionFactory.CreateTransaction();
                 FourColumnEntity columnEntity = CreateFourColumnEntity(id);
-                columnEntity.Persist(connection);
-                columnEntity = LoadFourColumnEntityWithId(connection, id);
+                columnEntity.Persist(transaction);
+                columnEntity = LoadFourColumnEntityWithId(transaction, id);
+                connection = transaction.Connection;
+                transaction.Commit();
                 connection.Close();
             }
             catch (Exception e)
@@ -91,19 +94,19 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = _transactionFactory.CreateTransaction(); 
                 ICollection<Type> types = new List<Type>();
                 types.Add(typeof (FourColumnEntity));
-                ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(connection, types, true);
+                transaction.DbGate.PatchDataBase(transaction, types, true);
+                var connection = transaction.Connection;
                 transaction.Commit();
                 connection.Close();
 
-                connection = DbConnector.GetSharedInstance().Connection;
-                transaction = connection.BeginTransaction();
+                transaction = _transactionFactory.CreateTransaction(); 
                 types = new List<Type>();
                 types.Add(typeof (ThreeColumnEntity));
-                ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(connection, types, false);
+                transaction.DbGate.PatchDataBase(transaction, types, false);
+                connection = transaction.Connection;
                 transaction.Commit();
                 connection.Close();
 
@@ -123,22 +126,21 @@ namespace DbGate
             {
                 var longStr = new string('A', 220);
 
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = _transactionFactory.CreateTransaction(); 
                 ICollection<Type> types = new List<Type>();
                 types.Add(typeof (ThreeColumnEntity));
-                ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(connection, types, true);
+                transaction.DbGate.PatchDataBase(transaction, types, true);
+                var connection = transaction.Connection;
                 transaction.Commit();
                 connection.Close();
 
                 int id = 34;
-                connection = DbConnector.GetSharedInstance().Connection;
-                transaction = connection.BeginTransaction();
+                transaction = _transactionFactory.CreateTransaction(); 
                 ThreeColumnEntity columnEntity = CreateThreeColumnEntity(id);
                 columnEntity.Name = longStr;
                 try
                 {
-                    columnEntity.Persist(connection);
+                    columnEntity.Persist(transaction);
                 }
                 catch (AssertionException)
                 {
@@ -147,22 +149,23 @@ namespace DbGate
                 catch (Exception)
                 {
                 }
-                connection.Close();
+                transaction.Close();
 
-                connection = DbConnector.GetSharedInstance().Connection;
-                transaction = connection.BeginTransaction();
+                transaction = _transactionFactory.CreateTransaction(); 
                 types = new List<Type>();
                 types.Add(typeof (ThreeColumnTypeDifferentEntity));
-                ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(connection, types, false);
+                transaction.DbGate.PatchDataBase(transaction, types, false);
+                connection = transaction.Connection;
                 transaction.Commit();
                 connection.Close();
 
                 id = 35;
-                connection = DbConnector.GetSharedInstance().Connection;
-                transaction = connection.BeginTransaction();
+                transaction = _transactionFactory.CreateTransaction(); 
                 columnEntity = CreateThreeColumnEntity(id);
                 columnEntity.Name = longStr;
-                columnEntity.Persist(connection);
+                columnEntity.Persist(transaction);
+                connection = transaction.Connection;
+                transaction.Commit();
                 connection.Close();
             }
             catch (Exception e)
@@ -172,11 +175,11 @@ namespace DbGate
             }
         }
 
-        private FourColumnEntity LoadFourColumnEntityWithId(IDbConnection connection, int id)
+        private FourColumnEntity LoadFourColumnEntityWithId(ITransaction transaction, int id)
         {
             FourColumnEntity loadedEntity = null;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from table_change_test_entity where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -188,7 +191,7 @@ namespace DbGate
             if (rs.Read())
             {
                 loadedEntity = new FourColumnEntity();
-                loadedEntity.Retrieve(rs, connection);
+                loadedEntity.Retrieve(rs, transaction);
             }
 
             return loadedEntity;

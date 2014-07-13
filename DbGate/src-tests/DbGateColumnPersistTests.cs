@@ -11,6 +11,8 @@ namespace DbGate
 {
     public class DbGateColumnPersistTests
     {
+        private static ITransactionFactory _transactionFactory;
+
         [TestFixtureSetUp]
         public static void Before()
         {
@@ -19,8 +21,8 @@ namespace DbGate
                 log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
                 LogManager.GetLogger(typeof (DbGateColumnPersistTests)).Info("Starting in-memory database for unit tests");
-                var dbConnector = new DbConnector("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DbConnector.DbSqllite);
-				Assert.IsNotNull(dbConnector.Connection);
+                _transactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
+                Assert.IsNotNull(_transactionFactory.CreateTransaction());
             }
             catch (Exception ex)
             {
@@ -33,8 +35,8 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                connection.Close();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -45,10 +47,7 @@ namespace DbGate
         [SetUp]
         public void BeforeEach()
         {
-            if (DbConnector.GetSharedInstance() != null)
-            {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().ClearCache();
-            }
+            _transactionFactory.DbGate.ClearCache();
         }
 
         [TearDown]
@@ -56,19 +55,18 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
 
-                IDbCommand command = connection.CreateCommand();
+                IDbCommand command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM column_test_entity";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table column_test_entity";
                 command.ExecuteNonQuery();
 
                 transaction.Commit();
-                connection.Close();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -78,8 +76,8 @@ namespace DbGate
         
         private IDbConnection SetupTables()
         {
-            IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-            IDbTransaction transaction = connection.BeginTransaction();
+            ITransaction transaction = _transactionFactory.CreateTransaction();
+            IDbConnection connection = transaction.Connection;
 
             string sql = "Create table column_test_entity (\n" +
                         "\tid_col Int NOT NULL,\n" +
@@ -104,12 +102,17 @@ namespace DbGate
                         " Primary Key (id_col))";
 
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
             transaction.Commit();
             return connection;
+        }
+
+        private ITransaction CreateTransaction(IDbConnection connection)
+        {
+            return new Transaction(_transactionFactory, connection.BeginTransaction());
         }
 
         [Test]
@@ -118,17 +121,19 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityFields();
                 CreateEntityWithNonNullValues(entity);
 
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(entity,loadedEntity);
@@ -146,21 +151,23 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                ErManagement.ErMapper.DbGate.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                _transactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityExts();
                 CreateEntityWithNonNullValues(entity);
 
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(entity,loadedEntity);
@@ -178,17 +185,19 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityAnnotations();
                 
                 CreateEntityWithNonNullValues(entity);
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(entity,loadedEntity);
@@ -206,18 +215,20 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityFields();
                 
                 CreateEntityWithNullValues(entity);
 
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(entity,loadedEntity);
@@ -235,22 +246,24 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                ErManagement.ErMapper.DbGate.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                _transactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
  
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityExts();
                 
                 CreateEntityWithNullValues(entity);
 
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(entity,loadedEntity);
@@ -268,17 +281,19 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityAnnotations();
                 CreateEntityWithNullValues(entity);
 
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(entity,loadedEntity);
@@ -296,26 +311,26 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
 
-                int id =(int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id =(int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
                 CreateEntityWithNonNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(connection,loadedEntity,id);
-                
+                LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNonNullValues(loadedEntity);
                 loadedEntity.Status =EntityStatus.Modified;
-
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(connection,reLoadedEntity,id);
+                LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
@@ -333,30 +348,30 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                 IDbTransaction transaction = connection.BeginTransaction();
+                 ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof (ColumnTestEntityExts);
-                ErManagement.ErMapper.DbGate.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                _transactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
                 CreateEntityWithNonNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
-               
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(connection,loadedEntity,id);
-               
+                LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNonNullValues(loadedEntity);
                 loadedEntity.Status =EntityStatus.Modified;
-
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
-               
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(connection,reLoadedEntity,id);
+                LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
@@ -374,26 +389,26 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
                 CreateEntityWithNonNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
-                LoadEntityWithId(connection,loadedEntity,id);
-                
+                LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNonNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
-
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityAnnotations();
-                LoadEntityWithId(connection,reLoadedEntity,id);
+                LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
@@ -411,26 +426,26 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
                 CreateEntityWithNonNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
-               
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(connection,loadedEntity,id);
-                
+                LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
-
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(connection,reLoadedEntity,id);
+                LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
@@ -448,30 +463,30 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                 IDbTransaction transaction = connection.BeginTransaction();
+                 ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                ErManagement.ErMapper.DbGate.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                _transactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
                 CreateEntityWithNonNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
-                
-                IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(connection,loadedEntity,id);
 
+                transaction = CreateTransaction(connection);
+                IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
+                LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
-
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(connection,reLoadedEntity,id);
+                LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
@@ -489,26 +504,26 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                 IDbTransaction transaction = connection.BeginTransaction();
+                 ITransaction transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
                 CreateEntityWithNonNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
-                LoadEntityWithId(connection,loadedEntity,id);
-                
+                LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
-
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityAnnotations();
-                LoadEntityWithId(connection,reLoadedEntity,id);
+                LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
@@ -526,26 +541,26 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
                 CreateEntityWithNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(connection,loadedEntity,id);
-               
+                LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNonNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
-
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(connection,reLoadedEntity,id);
+                LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
@@ -563,30 +578,30 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                 IDbTransaction transaction = connection.BeginTransaction();
+                 ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                ErManagement.ErMapper.DbGate.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                _transactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
                 CreateEntityWithNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(connection,loadedEntity,id);
-                
+                LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNonNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
-
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(connection,reLoadedEntity,id);
+                LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
@@ -604,26 +619,26 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                 IDbTransaction transaction = connection.BeginTransaction();
+                 ITransaction transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
                 CreateEntityWithNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
-                LoadEntityWithId(connection,loadedEntity,id);
-                
+                LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNonNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
-
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
-                
+
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityAnnotations();
-                LoadEntityWithId(connection,reLoadedEntity,id);
+                LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
@@ -641,26 +656,26 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                 IDbTransaction transaction = connection.BeginTransaction();
+                 ITransaction transaction = CreateTransaction(connection);
 
-                int id =(int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id =(int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
                 CreateEntityWithNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(connection,loadedEntity,id);
-
+                LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
-
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(connection,reLoadedEntity,id);
+                LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
@@ -678,30 +693,30 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                 IDbTransaction transaction = connection.BeginTransaction();
+                 ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                ErManagement.ErMapper.DbGate.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                _transactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
                 CreateEntityWithNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(connection,loadedEntity,id);
-
+                LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
-
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(connection,reLoadedEntity,id);
+                LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
@@ -719,26 +734,26 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
                 CreateEntityWithNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
-                LoadEntityWithId(connection,loadedEntity,id);
-
+                LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
-
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityAnnotations();
-                LoadEntityWithId(connection,reLoadedEntity,id);
+                LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
@@ -756,24 +771,25 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                 IDbTransaction transaction = connection.BeginTransaction();
+                 ITransaction transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
                 CreateEntityWithNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(connection,loadedEntity,id);
-
+                LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.Status = EntityStatus.Deleted;
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityFields();
-                bool  loaded = LoadEntityWithId(connection,reLoadedEntity,id);
+                bool  loaded = LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsFalse(loaded);
@@ -791,28 +807,29 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                ErManagement.ErMapper.DbGate.GetSharedInstance().RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                _transactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
                 CreateEntityWithNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(connection,loadedEntity,id);
-
+                LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.Status = EntityStatus.Deleted;
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityExts();
-                bool loaded = LoadEntityWithId(connection,reLoadedEntity,id);
+                bool loaded = LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsFalse(loaded);
@@ -830,24 +847,25 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(connection);
+                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
                 CreateEntityWithNullValues(newEntity);
-                newEntity.Persist(connection);
+                newEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
-                LoadEntityWithId(connection,loadedEntity,id);
-
+                LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.Status = EntityStatus.Deleted;
-                transaction = connection.BeginTransaction();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityAnnotations();
-                bool  loaded = LoadEntityWithId(connection,reLoadedEntity,id);
+                bool  loaded = LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsFalse(loaded);
@@ -859,11 +877,11 @@ namespace DbGate
             }
         }
 
-        private bool LoadEntityWithId(IDbConnection connection, IColumnTestEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, IColumnTestEntity loadEntity,int id)
         {
             bool loaded = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from column_test_entity where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -875,7 +893,7 @@ namespace DbGate
             IDataReader dataReader = cmd.ExecuteReader();
             if (dataReader.Read())
             {
-                loadEntity.Retrieve(dataReader, connection);
+                loadEntity.Retrieve(dataReader, transaction);
                 loaded = true;
             }
 

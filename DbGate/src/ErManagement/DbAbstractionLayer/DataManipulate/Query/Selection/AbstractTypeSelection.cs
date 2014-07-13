@@ -24,12 +24,12 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
 			return "*";
 		}
 
-		public Object Retrieve (IDataReader rs, IDbConnection con,QueryBuildInfo buildInfo)
+		public Object Retrieve (IDataReader rs, ITransaction tx,QueryBuildInfo buildInfo)
 		{
 			try 
 			{
                 var instance = (IReadOnlyEntity)Activator.CreateInstance(EntityType);
-				instance.Retrieve(rs,con);
+				instance.Retrieve(rs,tx);
 				return instance;
 			} 
 			catch (Exception ex) 

@@ -13,6 +13,8 @@ namespace DbGate
 {
     public class DbGatePatchEmptyDbTests
     {
+        private static ITransactionFactory _transactionFactory;
+
         [TestFixtureSetUp]
         public static void Before()
         {
@@ -21,10 +23,10 @@ namespace DbGate
                 log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
                 LogManager.GetLogger(typeof (DbGatePatchEmptyDbTests)).Info("Starting in-memory database for unit tests");
-                var dbConnector = new DbConnector("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=4;foreign_keys = ON", DbConnector.DbSqllite);
+                _transactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=4;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
 
-                IDbConnection connection = dbConnector.Connection;
-                connection.Close();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -37,14 +39,16 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                
                 ICollection<Type> types = new List<Type>();
                 types.Add(typeof(LeafEntitySubA));
                 types.Add(typeof(LeafEntitySubB));
                 types.Add(typeof(RootEntity));
-                ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(connection, types, true);
+                _transactionFactory.DbGate.PatchDataBase(transaction, types, true);
 
+                var connection = transaction.Connection;
+                transaction.Commit();
                 connection.Close();
             }
             catch (Exception ex)
@@ -58,8 +62,8 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                connection.Close();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -72,26 +76,21 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
-
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                
                 int id = 36;
                 RootEntity entity = CreateRootEntityWithoutNullValues(id);
                 entity.LeafEntities.Add(CreateLeafEntityA(id,1));
                 entity.LeafEntities.Add(CreateLeafEntityB(id,2));
-                entity.Persist(connection);
-
+                entity.Persist(transaction);
+                var connection = transaction.Connection;
                 transaction.Commit();
                 connection.Close();
 
-                connection = DbConnector.GetSharedInstance().Connection;
-                transaction = connection.BeginTransaction();
-                
-                RootEntity loadedEntity = LoadRootEntityWithId(connection,id);
-                
+                transaction = _transactionFactory.CreateTransaction();
+                RootEntity loadedEntity = LoadRootEntityWithId(transaction,id);
                 transaction.Commit();
-                connection.Close();
-
+                
                 AssertTwoRootEntitiesEquals(entity,loadedEntity);
             }
             catch (Exception e)
@@ -106,22 +105,21 @@ namespace DbGate
         [ExpectedException(typeof(PersistException))]
         public void PatchEmpty_PatchDataBase_WithEmptyDb_ShouldCreatePrimaryKeys_ShouldNotAbleToPutDuplicateData()
         {
-            IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-            IDbTransaction transaction = connection.BeginTransaction();
+            ITransaction transaction = _transactionFactory.CreateTransaction();
 
             int id = 37;
             RootEntity entity = CreateRootEntityWithoutNullValues(id);
             entity.LeafEntities.Add(CreateLeafEntityA(id,1));
             entity.LeafEntities.Add(CreateLeafEntityB(id,1));
-            entity.Persist(connection);
+            entity.Persist(transaction);
 
             transaction.Commit();
-            connection.Close();
+            transaction.Close();
 
-            connection = DbConnector.GetSharedInstance().Connection;
-            connection.Open();
-            RootEntity loadedEntity = LoadRootEntityWithId(connection,id);
-            connection.Close();
+            transaction = _transactionFactory.CreateTransaction();
+            RootEntity loadedEntity = LoadRootEntityWithId(transaction, id);
+            transaction.Commit();
+            transaction.Close();
 
             AssertTwoRootEntitiesEquals(entity,loadedEntity);
         }
@@ -130,22 +128,20 @@ namespace DbGate
         [ExpectedException(typeof(PersistException))]
         public void PatchEmpty_PatchDataBase_WithEmptyDb_ShouldCreateForeignKeys_ShouldNotAbleToInconsistantData()
         {
-            IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-            IDbTransaction transaction = connection.BeginTransaction();
+            ITransaction transaction = _transactionFactory.CreateTransaction();
 
             int id = 38;
             RootEntity entity = CreateRootEntityWithoutNullValues(id);
             entity.LeafEntities.Add(CreateLeafEntityA(id + 1,1));
             entity.LeafEntities.Add(CreateLeafEntityB(id,1));
-            entity.Persist(connection);
+            entity.Persist(transaction);
 
             transaction.Commit();
-            connection.Close();
+            transaction.Close();
 
-            connection = DbConnector.GetSharedInstance().Connection;
-            connection.Open();
-            RootEntity loadedEntity = LoadRootEntityWithId(connection,id);
-            connection.Close();
+            transaction = _transactionFactory.CreateTransaction();
+            RootEntity loadedEntity = LoadRootEntityWithId(transaction, id);
+            transaction.Commit();
 
             AssertTwoRootEntitiesEquals(entity,loadedEntity);
         }
@@ -153,14 +149,15 @@ namespace DbGate
         [Test]
         public void PatchEmpty_PatchDataBase_PatchTwice_ShouldNotThrowException()
         {
-            IDbConnection connection = DbConnector.GetSharedInstance().Connection;
+            ITransaction transaction = _transactionFactory.CreateTransaction();
 
             ICollection<Type> types = new List<Type>();
             types.Add(typeof(LeafEntitySubA));
             types.Add(typeof(LeafEntitySubB));
             types.Add(typeof(RootEntity));
 
-            ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(connection,types,true);
+            _transactionFactory.DbGate.PatchDataBase(transaction, types, true);
+            transaction.Commit();
         }
 
         private void AssertTwoRootEntitiesEquals(RootEntity entityA, RootEntity entityB)
@@ -222,11 +219,11 @@ namespace DbGate
             }
         }
 
-        private RootEntity LoadRootEntityWithId(IDbConnection connection,int id) 
+        private RootEntity LoadRootEntityWithId(ITransaction transaction,int id) 
         {
             RootEntity loadedEntity = null;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from root_entity where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -238,7 +235,7 @@ namespace DbGate
             if (rs.Read())
             {
                 loadedEntity = new RootEntity();
-                loadedEntity.Retrieve(rs,connection);
+                loadedEntity.Retrieve(rs,transaction);
             }
 
             return loadedEntity;

@@ -28,7 +28,7 @@ namespace DbGate.ErManagement.ErMapper
             _config = config;
         }
 
-        public void PatchDataBase(IDbConnection con, ICollection<Type> entityTypes,bool dropAll)
+        public void PatchDataBase(ITransaction tx, ICollection<Type> entityTypes,bool dropAll)
         {
             try
             {
@@ -37,8 +37,8 @@ namespace DbGate.ErManagement.ErMapper
                     CacheManager.Register(entityType);
                 }
 
-                IMetaManipulate metaManipulate =  _dbLayer.MetaManipulate(con);
-                ICollection<IMetaItem> existingItems = metaManipulate.GetMetaData(con);
+                IMetaManipulate metaManipulate =  _dbLayer.MetaManipulate(tx);
+                ICollection<IMetaItem> existingItems = metaManipulate.GetMetaData(tx);
                 ICollection<IMetaItem> requiredItems = CreateMetaItemsFromEntityTypes(entityTypes);
 
                 List<MetaQueryHolder> queryHolders = new List<MetaQueryHolder>();
@@ -51,14 +51,14 @@ namespace DbGate.ErManagement.ErMapper
                     List<MetaQueryHolder> queryHoldersExisting = new List<MetaQueryHolder>();
                     foreach (IMetaComparisonGroup comparisonGroup in groupExisting)
                     {
-                        queryHoldersExisting.AddRange(_dbLayer.MetaManipulate(con).CreateDbPathSql(comparisonGroup));
+                        queryHoldersExisting.AddRange(_dbLayer.MetaManipulate(tx).CreateDbPathSql(comparisonGroup));
                     }
                     queryHoldersExisting.Sort();
 
                     List<MetaQueryHolder> queryHoldersRequired = new List<MetaQueryHolder>();
                     foreach (IMetaComparisonGroup comparisonGroup in groupRequired)
                     {
-                        queryHoldersRequired.AddRange(_dbLayer.MetaManipulate(con).CreateDbPathSql(comparisonGroup));
+                        queryHoldersRequired.AddRange(_dbLayer.MetaManipulate(tx).CreateDbPathSql(comparisonGroup));
                     }
                     queryHoldersRequired.Sort();
 
@@ -70,7 +70,7 @@ namespace DbGate.ErManagement.ErMapper
                     ICollection<IMetaComparisonGroup> groups = CompareUtility.Compare(metaManipulate,existingItems,requiredItems);
                     foreach (IMetaComparisonGroup comparisonGroup in groups)
                     {
-                        queryHolders.AddRange(_dbLayer.MetaManipulate(con).CreateDbPathSql(comparisonGroup));
+                        queryHolders.AddRange(_dbLayer.MetaManipulate(tx).CreateDbPathSql(comparisonGroup));
                     }
                     queryHolders.Sort();
                 }
@@ -82,7 +82,7 @@ namespace DbGate.ErManagement.ErMapper
 
                     LogManager.GetLogger(_config.LoggerName).Debug(holder.QueryString);
 
-                    IDbCommand cmd = con.CreateCommand();
+                    IDbCommand cmd = tx.CreateCommand();
                     cmd.CommandText = holder.QueryString;
                     cmd.ExecuteNonQuery();
                     DbMgtUtility.Close(cmd);

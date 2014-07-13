@@ -14,9 +14,9 @@ namespace DbGate
             _context = new EntityContext();
         }
 
-        public void Retrieve(IDataReader reader, IDbConnection con)
+        public void Retrieve(IDataReader reader, ITransaction tx)
         {
-            ErManagement.ErMapper.DbGate.GetSharedInstance().Load(this, reader, con);
+            tx.DbGate.Load(this,reader,tx);
         }
 
         public IEntityContext Context

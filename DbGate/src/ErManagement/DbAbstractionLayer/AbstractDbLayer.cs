@@ -26,12 +26,12 @@ namespace DbGate.ErManagement.DbAbstractionLayer
             return _dataManipulate;
         }
 
-        public IMetaManipulate MetaManipulate(IDbConnection con)
+        public IMetaManipulate MetaManipulate(ITransaction tx)
         {
             if (_metaManipulate == null)
             {
                 _metaManipulate = CreateMetaManipulate();
-                _metaManipulate.Initialize(con);
+                _metaManipulate.Initialize(tx);
             }
             return _metaManipulate;
         }

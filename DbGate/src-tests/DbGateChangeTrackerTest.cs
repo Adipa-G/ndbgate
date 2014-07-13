@@ -15,6 +15,8 @@ namespace DbGate
 {
     public class DbGateChangeTrackerTest
     {
+        private static ITransactionFactory _transactionFactory;
+
         [TestFixtureSetUp]
         public static void Before()
         {
@@ -23,8 +25,8 @@ namespace DbGate
                 log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
                 LogManager.GetLogger(typeof (DbGateChangeTrackerTest)).Info("Starting in-memory database for unit tests");
-                var dbConnector = new DbConnector("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DbConnector.DbSqllite);
-				Assert.IsNotNull(dbConnector.Connection);
+                _transactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
+                Assert.IsNotNull(_transactionFactory.CreateTransaction());
             }
             catch (Exception ex)
             {
@@ -37,8 +39,8 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                connection.Close();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -49,10 +51,7 @@ namespace DbGate
         [SetUp]
         public void BeforeEach()
         {
-            if (DbConnector.GetSharedInstance() != null)
-            {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().ClearCache();
-            }
+            _transactionFactory.DbGate.ClearCache();
         }
 
         [TearDown]
@@ -60,35 +59,34 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
 
-                IDbCommand command = connection.CreateCommand();
+                IDbCommand command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM change_tracker_test_root";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table change_tracker_test_root";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM change_tracker_test_one2many";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table change_tracker_test_one2many";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM change_tracker_test_one2one";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table change_tracker_test_one2one";
                 command.ExecuteNonQuery();
 
                 transaction.Commit();
-                connection.Close();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -98,14 +96,14 @@ namespace DbGate
         
         private IDbConnection SetupTables()
         {
-            IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-            IDbTransaction transaction = connection.BeginTransaction();
+            ITransaction transaction = _transactionFactory.CreateTransaction();
+            IDbConnection connection = transaction.Connection;
 
             string sql = "Create table change_tracker_test_root (\n" +
                              "\tid_col Int NOT NULL,\n" +
                              "\tname Varchar(20) NOT NULL,\n" +
                              " Primary Key (id_col))";
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -114,7 +112,7 @@ namespace DbGate
                       "\tindex_no Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col,index_no))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -122,12 +120,17 @@ namespace DbGate
                       "\tid_col Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
             transaction.Commit();
             return connection;
+        }
+
+        private ITransaction CreateTransaction(IDbConnection connection)
+        {
+            return new Transaction(_transactionFactory, connection.BeginTransaction());
         }
     
         [Test]
@@ -135,27 +138,31 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = true;
+                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
                 IDbConnection connection = SetupTables();
                 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
-
-                transaction = connection.BeginTransaction();
-                loadedEntity.Name = "Changed-Name";
-                loadedEntity.Persist(connection);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
+                loadedEntity.Name = "Changed-Name";
+                loadedEntity.Persist(transaction);
+                transaction.Commit();
+
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity reloadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,reloadedEntity,id);
+                LoadEntityWithId(transaction, reloadedEntity, id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.AreEqual(loadedEntity.Name, reloadedEntity.Name);
@@ -172,19 +179,21 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = true;
+                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
                 IDbConnection connection = SetupTables();
 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection, loadedEntity, id);
+                LoadEntityWithId(transaction, loadedEntity, id);
+                transaction.Commit();
 
                 var changeTracker = loadedEntity.Context.ChangeTracker;
                 changeTracker.GetType().GetField("_fields",BindingFlags.Instance|BindingFlags.NonPublic)
@@ -192,13 +201,15 @@ namespace DbGate
                 changeTracker.GetType().GetField("_childEntityRelationKeys",BindingFlags.Instance|BindingFlags.NonPublic)
                     .SetValue(changeTracker,new ReadOnlyCollection<ITypeFieldValueList>(new List<ITypeFieldValueList>()));
                 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 loadedEntity.Name = "Changed-Name";
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity reloadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection, reloadedEntity, id);
+                LoadEntityWithId(transaction, reloadedEntity, id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.AreEqual(loadedEntity.Name, reloadedEntity.Name);
@@ -215,27 +226,31 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = false;
+                _transactionFactory.DbGate.Config.AutoTrackChanges = false;
                 IDbConnection connection = SetupTables();
                 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
-
-                transaction = connection.BeginTransaction();
-                loadedEntity.Name = "Changed-Name";
-                loadedEntity.Persist(connection);
+                LoadEntityWithId(transaction,loadedEntity,id);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
+                loadedEntity.Name = "Changed-Name";
+                loadedEntity.Persist(transaction);
+                transaction.Commit();
+
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity reloadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,reloadedEntity,id);
+                LoadEntityWithId(transaction,reloadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.AreEqual(entity.Name, reloadedEntity.Name);
@@ -252,27 +267,29 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = true;
+                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
                 IDbConnection connection = SetupTables();
                 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
                 entity.One2OneEntity =new ChangeTrackerTestOne2OneEntity();
                 entity.One2OneEntity.Name = "Child-Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2OneEntity = null;
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
-                bool hasOneToOne = ExistsOne2OneChild(connection,id);
+                transaction = CreateTransaction(connection);
+                bool hasOneToOne = ExistsOne2OneChild(transaction, id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsFalse(hasOneToOne);
@@ -289,27 +306,29 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = false;
+                _transactionFactory.DbGate.Config.AutoTrackChanges = false;
                 IDbConnection connection = SetupTables();
                 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
                 entity.One2OneEntity =new ChangeTrackerTestOne2OneEntity();
                 entity.One2OneEntity.Name = "Child-Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2OneEntity = null;
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
-                bool hasOneToOne = ExistsOne2OneChild(connection,id);
+                transaction = CreateTransaction(connection);
+                bool hasOneToOne = ExistsOne2OneChild(transaction, id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsFalse(hasOneToOne);
@@ -326,28 +345,30 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = true;
+                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
                 IDbConnection connection = SetupTables();
                 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
                 entity.One2OneEntity =new ChangeTrackerTestOne2OneEntity();
                 entity.One2OneEntity.Name = "Child-Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2OneEntity.Name = "Child-Upd-Name";
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity reLoadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,reLoadedEntity,id);
+                LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.AreEqual(loadedEntity.One2OneEntity.Name,reLoadedEntity.One2OneEntity.Name);
@@ -364,28 +385,30 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = false;
+                _transactionFactory.DbGate.Config.AutoTrackChanges = false;
                 IDbConnection connection = SetupTables();
                 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
                 entity.One2OneEntity =new ChangeTrackerTestOne2OneEntity();
                 entity.One2OneEntity.Name = "Child-Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2OneEntity.Name = "Child-Upd-Name";
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity reLoadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,reLoadedEntity,id);
+                LoadEntityWithId(transaction,reLoadedEntity,id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.AreEqual(entity.One2OneEntity.Name,reLoadedEntity.One2OneEntity.Name);
@@ -402,10 +425,10 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = true;
+                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
                 IDbConnection connection = SetupTables();
                 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
                 entity.IdCol = id;
@@ -416,17 +439,19 @@ namespace DbGate
                 one2ManyEntity.IndexNo = 1;
                 one2ManyEntity.Name = "Child-Org-Name";
                 entity.One2ManyEntities.Add(one2ManyEntity);
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2ManyEntities.Clear();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
-                bool hasOne2Many = ExistsOne2ManyChild(connection,id);
+                transaction = CreateTransaction(connection);
+                bool hasOne2Many = ExistsOne2ManyChild(transaction, id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsFalse(hasOne2Many);
@@ -443,10 +468,10 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = false;
+                _transactionFactory.DbGate.Config.AutoTrackChanges = false;
                 IDbConnection connection = SetupTables();
                 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
                 entity.IdCol = id;
@@ -457,17 +482,19 @@ namespace DbGate
                 one2ManyEntity.IndexNo = 1;
                 one2ManyEntity.Name = "Child-Org-Name";
                 entity.One2ManyEntities.Add(one2ManyEntity);
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2ManyEntities.Clear();
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
-                bool hasOne2Many = ExistsOne2ManyChild(connection,id);
+                transaction = CreateTransaction(connection);
+                bool hasOne2Many = ExistsOne2ManyChild(transaction, id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsFalse(hasOne2Many);
@@ -484,10 +511,10 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = true;
+                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
                 IDbConnection connection = SetupTables();
                 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
                 entity.IdCol = id;
@@ -498,24 +525,26 @@ namespace DbGate
                 one2ManyEntity.IndexNo = 1;
                 one2ManyEntity.Name = "Child-Org-Name";
                 entity.One2ManyEntities.Add(one2ManyEntity);
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
                 IEnumerator<ChangeTrackerTestOne2ManyEntity> enumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
                 ChangeTrackerTestOne2ManyEntity loadedChild = enumerator.Current;
                 loadedChild.Name = "Child-Upd-Name";
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity reloadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,reloadedEntity,id);
+                LoadEntityWithId(transaction,reloadedEntity,id);
                 enumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
                 ChangeTrackerTestOne2ManyEntity reLoadedChild = enumerator.Current;
+                transaction.Commit();
                 connection.Close();
 
                 Assert.AreEqual(loadedChild.Name, reLoadedChild.Name);
@@ -532,10 +561,10 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = false;
+                _transactionFactory.DbGate.Config.AutoTrackChanges = false;
                 IDbConnection connection = SetupTables();
                 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
                 entity.IdCol = id;
@@ -546,24 +575,26 @@ namespace DbGate
                 one2ManyEntity.IndexNo = 1;
                 one2ManyEntity.Name = "Child-Org-Name";
                 entity.One2ManyEntities.Add(one2ManyEntity);
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
                 IEnumerator<ChangeTrackerTestOne2ManyEntity> enumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
                 ChangeTrackerTestOne2ManyEntity loadedChild = enumerator.Current;
                 loadedChild.Name = "Child-Upd-Name";
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(connection);
                 ChangeTrackerTestRootEntity reloadedEntity = new ChangeTrackerTestRootEntity();
-                LoadEntityWithId(connection,reloadedEntity,id);
+                LoadEntityWithId(transaction,reloadedEntity,id);
                 enumerator = reloadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
                 ChangeTrackerTestOne2ManyEntity reLoadedChild = enumerator.Current;
+                transaction.Commit();
                 connection.Close();
 
                 Assert.AreEqual(reLoadedChild.Name, one2ManyEntity.Name);
@@ -575,11 +606,11 @@ namespace DbGate
             }
         }
 
-        private bool LoadEntityWithId(IDbConnection connection, ChangeTrackerTestRootEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, ChangeTrackerTestRootEntity loadEntity,int id)
         {
             bool loaded = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from change_tracker_test_root where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -591,18 +622,18 @@ namespace DbGate
             IDataReader dataReader = cmd.ExecuteReader();
             if (dataReader.Read())
             {
-                loadEntity.Retrieve(dataReader, connection);
+                loadEntity.Retrieve(dataReader, transaction);
                 loaded = true;
             }
 
             return loaded;
         }
 
-        private bool ExistsOne2OneChild(IDbConnection connection,int id)
+        private bool ExistsOne2OneChild(ITransaction transaction,int id)
         {
             bool exists = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from change_tracker_test_one2one where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -618,11 +649,11 @@ namespace DbGate
             return exists;
         }
 
-        private bool ExistsOne2ManyChild(IDbConnection connection,int id)
+        private bool ExistsOne2ManyChild(ITransaction transaction,int id)
         {
             bool exists = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from change_tracker_test_one2many where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();

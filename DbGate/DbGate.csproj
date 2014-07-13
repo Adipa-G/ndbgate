@@ -163,7 +163,8 @@
     <Compile Include="src-tests\Utility\Support\RootEntity.cs" />
     <Compile Include="src\EntityStatus.cs" />
     <Compile Include="src\ColumnType.cs" />
-    <Compile Include="src\DbConnector.cs" />
+    <Compile Include="src\DefaultTransactionFactory.cs" />
+    <Compile Include="src\ErManagement\ErMapper\Transaction.cs" />
     <Compile Include="src\ErManagement\Query\IQueryCondition.cs" />
     <Compile Include="src\ErManagement\Query\IQueryFrom.cs" />
     <Compile Include="src\ErManagement\Query\IQueryGroup.cs" />
@@ -171,8 +172,14 @@
     <Compile Include="src\ErManagement\Query\IQueryJoin.cs" />
     <Compile Include="src\ErManagement\Query\IQueryOrderBy.cs" />
     <Compile Include="src\ErManagement\Query\IQuerySelection.cs" />
+    <Compile Include="src\Exceptions\Common\TransactionCloseFailedException.cs" />
+    <Compile Include="src\Exceptions\Common\TransactionCommitFailedException.cs" />
+    <Compile Include="src\Exceptions\Common\TransactionCreationFailedException.cs" />
+    <Compile Include="src\Exceptions\Common\TransactionRollbackFailedException.cs" />
     <Compile Include="src\Exceptions\Common\FieldValueExtractionException.cs" />
     <Compile Include="src\Exceptions\Common\InvalidDataTypeException.cs" />
+    <Compile Include="src\ITransaction.cs" />
+    <Compile Include="src\ITransactionFactory.cs" />
     <Compile Include="src\Utility\DbMgtUtility.cs" />
     <Compile Include="src\AbstractColumn.cs" />
     <Compile Include="src\AbstractRelation.cs" />
@@ -362,7 +369,6 @@
     <Compile Include="src\Exceptions\Migration\MetaDataException.cs" />
     <Compile Include="src\ErManagement\ErMapper\DbGateConfig.cs" />
     <Compile Include="src\ErManagement\ErMapper\DbGate.cs" />
-    <Compile Include="src\Exceptions\Common\DBConnectorNotInitializedException.cs" />
     <Compile Include="src\ErManagement\ErMapper\PersistOperationLayer.cs" />
     <Compile Include="src\Exceptions\PersistException.cs" />
     <Compile Include="src\Exceptions\Persist\DataUpdatedFromAnotherSourceException.cs" />

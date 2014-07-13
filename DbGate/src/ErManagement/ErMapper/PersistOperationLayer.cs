@@ -24,12 +24,12 @@ namespace DbGate.ErManagement.ErMapper
         {
         }
 
-        public void Save(IEntity entity, IDbConnection con)
+        public void Save(IEntity entity, ITransaction tx)
         {
             try
             {
                 SessionUtils.InitSession(entity);
-                TrackAndCommitChanges(entity, con);
+                TrackAndCommitChanges(entity, tx);
 
                 var entityInfoStack = new Stack<EntityInfo>();
                 EntityInfo entityInfo = CacheManager.GetEntityInfo(entity);
@@ -42,7 +42,7 @@ namespace DbGate.ErManagement.ErMapper
                 while (entityInfoStack.Count != 0)
                 {
                     entityInfo = entityInfoStack.Pop();
-                    SaveForType(entity, entityInfo.EntityType, con);
+                    SaveForType(entity, entityInfo.EntityType, tx);
                 }
                 entity.Status = EntityStatus.Unmodified;
                 SessionUtils.DestroySession(entity);
@@ -54,7 +54,7 @@ namespace DbGate.ErManagement.ErMapper
             }
         }
 
-        private void TrackAndCommitChanges(IEntity entity, IDbConnection con)
+        private void TrackAndCommitChanges(IEntity entity, ITransaction tx)
         {
             IEntityContext entityContext = entity.Context;
             IEnumerable<ITypeFieldValueList> originalChildren;
@@ -63,7 +63,7 @@ namespace DbGate.ErManagement.ErMapper
             {
                 if (Config.AutoTrackChanges)
                 {
-                    if (CheckForModification(entity,con, entityContext))
+                    if (CheckForModification(entity,tx, entityContext))
                     {
                         MiscUtils.Modify(entity);
                     }
@@ -78,10 +78,10 @@ namespace DbGate.ErManagement.ErMapper
             ICollection<ITypeFieldValueList> currentChildren = GetChildEntityValueListExcludingDeletedStatusItems(entity);
             ValidateForChildDeletion(entity, currentChildren);
             ICollection<ITypeFieldValueList> deletedChildren = OperationUtils.FindDeletedChildren(originalChildren, currentChildren);
-            DeleteOrphanChildren(con, deletedChildren);
+            DeleteOrphanChildren(tx, deletedChildren);
         }
 
-        private void SaveForType(IEntity entity, Type type, IDbConnection con)
+        private void SaveForType(IEntity entity, Type type, ITransaction tx)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
             if (entityInfo == null)
@@ -120,24 +120,24 @@ namespace DbGate.ErManagement.ErMapper
             }
             else if (entity.Status == EntityStatus.New)
             {
-                Insert(entity,fieldValues, type, con);
+                Insert(entity,fieldValues, type, tx);
             }
             else if (entity.Status == EntityStatus.Modified)
             {
                 if (Config.CheckVersion)
                 {
-                    if (!VersionValidated(entity, type, con))
+                    if (!VersionValidated(entity, type, tx))
                     {
                         throw new DataUpdatedFromAnotherSourceException(String.Format("The type {0} updated from another transaction", type));
                     }
                     OperationUtils.IncrementVersion(fieldValues);
                     SetValues(entity, fieldValues);
                 }
-                Update(entity, fieldValues, type, con);
+                Update(entity, fieldValues, type, tx);
             }
             else if (entity.Status == EntityStatus.Deleted)
             {
-                Delete(fieldValues, type, con);
+                Delete(fieldValues, type, tx);
             }
             else
             {
@@ -180,7 +180,7 @@ namespace DbGate.ErManagement.ErMapper
                         SessionUtils.TransferSession(entity, fieldObject);
                         if (fieldObject.Status != EntityStatus.Deleted) //deleted items are already deleted
                         {
-                            fieldObject.Persist(con);
+                            fieldObject.Persist(tx);
                             SessionUtils.AddToSession(entity, childEntityKeyList);
                         }
                     }
@@ -188,13 +188,13 @@ namespace DbGate.ErManagement.ErMapper
             }
         }
 
-        private void Insert(IEntity entity,ITypeFieldValueList valueTypeList, Type entityType, IDbConnection con)
+        private void Insert(IEntity entity,ITypeFieldValueList valueTypeList, Type entityType, ITransaction tx)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(entityType);
 
             StringBuilder logSb = new StringBuilder();
             string query = entityInfo.GetInsertQuery(DbLayer);
-            IDbCommand cmd = con.CreateCommand();
+            IDbCommand cmd = tx.CreateCommand();
             cmd.CommandText = query;
 
             bool showQuery = Config.ShowQueries;
@@ -211,7 +211,7 @@ namespace DbGate.ErManagement.ErMapper
                 if (column.ReadFromSequence
                         && column.SequenceGenerator != null)
                 {
-                    columnValue = column.SequenceGenerator.GetNextSequenceValue(con);
+                    columnValue = column.SequenceGenerator.GetNextSequenceValue(tx);
                     PropertyInfo setter = entityType.GetProperty(column.AttributeName);
                     ReflectionUtils.SetValue(setter,entity,columnValue);
                 }
@@ -238,7 +238,7 @@ namespace DbGate.ErManagement.ErMapper
             DbMgtUtility.Close(cmd);
         }
 
-        private void Update(IEntity entity, ITypeFieldValueList valueTypeList, Type type, IDbConnection con)
+        private void Update(IEntity entity, ITypeFieldValueList valueTypeList, Type type, ITransaction tx)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
             ICollection<EntityFieldValue> keys = new List<EntityFieldValue>();
@@ -287,7 +287,7 @@ namespace DbGate.ErManagement.ErMapper
                 logSb.Append(query);
             }
 
-            IDbCommand cmd = con.CreateCommand();
+            IDbCommand cmd = tx.CreateCommand();
             cmd.CommandText = query;
             int count = 0;
             foreach (EntityFieldValue fieldValue in values)
@@ -319,7 +319,7 @@ namespace DbGate.ErManagement.ErMapper
             DbMgtUtility.Close(cmd);
         }
 
-        private void Delete(ITypeFieldValueList valueTypeList, Type type, IDbConnection con)
+        private void Delete(ITypeFieldValueList valueTypeList, Type type, ITransaction tx)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
             StringBuilder logSb = new StringBuilder();
@@ -339,7 +339,7 @@ namespace DbGate.ErManagement.ErMapper
             {
                 logSb.Append(query);
             }
-            IDbCommand ps = con.CreateCommand();
+            IDbCommand ps = tx.CreateCommand();
             ps.CommandText = query;
             for (int i = 0; i < keys.Count; i++)
             {
@@ -489,11 +489,11 @@ namespace DbGate.ErManagement.ErMapper
             }
         }
 
-        private bool CheckForModification(IEntity entity,IDbConnection con, IEntityContext entityContext)
+        private bool CheckForModification(IEntity entity,ITransaction tx, IEntityContext entityContext)
         {
             if (!entityContext.ChangeTracker.Valid)
             {
-                FillChangeTrackerValues(entity, con, entityContext);
+                FillChangeTrackerValues(entity, tx, entityContext);
             }
 
             EntityInfo entityInfo = CacheManager.GetEntityInfo(entity);
@@ -523,7 +523,7 @@ namespace DbGate.ErManagement.ErMapper
             return false;
         }
 
-        private void FillChangeTrackerValues(IEntity entity, IDbConnection con, IEntityContext entityContext)
+        private void FillChangeTrackerValues(IEntity entity, ITransaction tx, IEntityContext entityContext)
         {
             if (entity.Status == EntityStatus.New
                     || entity.Status == EntityStatus.Deleted)
@@ -534,13 +534,13 @@ namespace DbGate.ErManagement.ErMapper
             EntityInfo entityInfo = CacheManager.GetEntityInfo(entity);
             while (entityInfo != null)
             {
-                ITypeFieldValueList values = ExtractCurrentRowValues(entity,entityInfo.EntityType,con);
+                ITypeFieldValueList values = ExtractCurrentRowValues(entity,entityInfo.EntityType,tx);
                 entityContext.ChangeTracker.AddFields(values.FieldValues);
                 
                 ICollection<IRelation> dbRelations = entityInfo.Relations;
                 foreach (IRelation relation in dbRelations)
                 {
-                    ICollection<IReadOnlyEntity> children = ReadRelationChildrenFromDb(entity,entityInfo.EntityType,con,relation);
+                    ICollection<IReadOnlyEntity> children = ReadRelationChildrenFromDb(entity,entityInfo.EntityType,tx,relation);
                     foreach (IReadOnlyEntity childEntity in children)
                     {
                         ITypeFieldValueList valueTypeList = OperationUtils.ExtractRelationKeyValues(childEntity,relation);
@@ -554,7 +554,7 @@ namespace DbGate.ErManagement.ErMapper
             }
         }
 
-        private void DeleteOrphanChildren(IDbConnection con, IEnumerable<ITypeFieldValueList> childrenToDelete)
+        private void DeleteOrphanChildren(ITransaction tx, IEnumerable<ITypeFieldValueList> childrenToDelete)
         {
             foreach (ITypeFieldValueList relationKeyValueList in childrenToDelete)
             {
@@ -579,7 +579,7 @@ namespace DbGate.ErManagement.ErMapper
                 IDataReader reader = null;
                 try
                 {
-                    cmd = CreateRetrievalPreparedStatement(relationKeyValueList, con);
+                    cmd = CreateRetrievalPreparedStatement(relationKeyValueList, tx);
                     reader = cmd.ExecuteReader();
                     if (reader.Read())
                     {
@@ -602,12 +602,12 @@ namespace DbGate.ErManagement.ErMapper
                 
                 if (recordExists)
                 {
-                    Delete(relationKeyValueList,relationKeyValueList.Type,con);
+                    Delete(relationKeyValueList,relationKeyValueList.Type,tx);
                 }
             }
         }
 
-        private bool VersionValidated(IReadOnlyEntity entity, Type type, IDbConnection con)
+        private bool VersionValidated(IReadOnlyEntity entity, Type type, ITransaction tx)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
             ICollection<IColumn> typeColumns = entityInfo.Columns;
@@ -615,7 +615,7 @@ namespace DbGate.ErManagement.ErMapper
             {
                 if (typeColumn.ColumnType == ColumnType.Version)
                 {
-                    Object classValue = ExtractCurrentVersionValue(entity,typeColumn,type,con);
+                    Object classValue = ExtractCurrentVersionValue(entity,typeColumn,type,tx);
                     EntityFieldValue originalFieldValue = entity.Context.ChangeTracker.GetFieldValue(typeColumn.AttributeName);
                     return originalFieldValue != null && classValue == originalFieldValue.Value
                             || (originalFieldValue != null && classValue != null && classValue.Equals(originalFieldValue.Value));
@@ -632,7 +632,7 @@ namespace DbGate.ErManagement.ErMapper
 		 	    }
 		 	}
 
-            ITypeFieldValueList fieldValueList = ExtractCurrentRowValues(entity,type,con);
+            ITypeFieldValueList fieldValueList = ExtractCurrentRowValues(entity,type,tx);
             if (fieldValueList == null)
             {
                 return false;
@@ -676,7 +676,7 @@ namespace DbGate.ErManagement.ErMapper
         }
 
         private Object ExtractCurrentVersionValue(IReadOnlyEntity entity, IColumn versionColumn, Type type
-            , IDbConnection con)
+            , ITransaction tx)
         {
             Object versionValue = null;
 
@@ -685,7 +685,7 @@ namespace DbGate.ErManagement.ErMapper
             IDataReader reader = null;
             try
             {
-                cmd = CreateRetrievalPreparedStatement(keyFieldValueList, con);
+                cmd = CreateRetrievalPreparedStatement(keyFieldValueList, tx);
                 reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {
@@ -706,7 +706,7 @@ namespace DbGate.ErManagement.ErMapper
             return versionValue;
         }
 
-        private ITypeFieldValueList ExtractCurrentRowValues(IReadOnlyEntity entity, Type type, IDbConnection con)
+        private ITypeFieldValueList ExtractCurrentRowValues(IReadOnlyEntity entity, Type type, ITransaction tx)
         {
             ITypeFieldValueList fieldValueList = null;
 
@@ -715,7 +715,7 @@ namespace DbGate.ErManagement.ErMapper
             IDataReader reader = null;
             try
             {
-                cmd = CreateRetrievalPreparedStatement(keyFieldValueList, con);
+                cmd = CreateRetrievalPreparedStatement(keyFieldValueList, tx);
                 reader = cmd.ExecuteReader();
                 if (reader.Read())
                 {

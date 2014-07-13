@@ -6,7 +6,7 @@ namespace DbGate.Support.Persistant.ColumnTest
     {
         #region ISequenceGenerator Members
 
-        public object GetNextSequenceValue(IDbConnection con)
+        public object GetNextSequenceValue(ITransaction tx)
         {
             return 35;
         }

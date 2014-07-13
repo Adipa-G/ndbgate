@@ -77,7 +77,7 @@ namespace DbGateTestApp.ComplexExample
             entityTypes.Add(typeof (ItemTransaction));
             entityTypes.Add(typeof (ItemTransactionCharge));
             IDbTransaction transaction = con.BeginTransaction();
-            DbGate.ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(con, entityTypes, false);
+            DbGate._transactionFactory.DbGate.PatchDataBase(con, entityTypes, false);
             transaction.Commit();
         }
 

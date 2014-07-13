@@ -20,14 +20,15 @@ namespace DbGate.Support.Persistant.TreeTest
             _context = new EntityContext();
         }
 
-        public void Retrieve(IDataReader reader, IDbConnection con)
+        public void Retrieve(IDataReader reader, ITransaction tx)
         {
-            ErManagement.ErMapper.DbGate.GetSharedInstance().Load(this, reader, con);
+            tx.DbGate.Load(this, reader, tx);
+ 
         }
 
-        public void Persist(IDbConnection con)
+        public void Persist(ITransaction tx)
         {
-            ErManagement.ErMapper.DbGate.GetSharedInstance().Save(this, con);
+            tx.DbGate.Save(this, tx);
         }
 
         public IEntityContext Context

@@ -16,7 +16,7 @@ namespace DbGateTestApp
                 log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
                 LoggerManager.GetLogger(Assembly.GetExecutingAssembly(),typeof(ExampleBase)).Log(typeof(ExampleBase),Level.Info,"Starting in-memory database for unit tests",null);
-                var dbConnector = new DbConnector("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DbConnector.DbSqllite);
+                var dbConnector = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
                 return dbConnector.Connection;
             }
             catch (Exception ex)
@@ -31,7 +31,7 @@ namespace DbGateTestApp
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
+                IDbConnection connection = DefaultTransactionFactory.GetSharedInstance().Connection;
                 connection.Close();
             }
             catch (Exception ex)

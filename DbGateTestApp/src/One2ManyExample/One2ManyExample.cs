@@ -37,7 +37,7 @@ namespace DbGateTestApp.One2ManyExample
             entityTypes.Add(typeof(One2ManyChildEntityA));
             entityTypes.Add(typeof(One2ManyChildEntityB));
             IDbTransaction transaction = con.BeginTransaction();
-            DbGate.ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(con,entityTypes,false);
+            DbGate._transactionFactory.DbGate.PatchDataBase(con,entityTypes,false);
             transaction.Commit();
         }
 
