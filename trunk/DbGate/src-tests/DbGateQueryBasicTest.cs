@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using DbGate.ErManagement.ErMapper;
 using DbGate.ErManagement.Query;
 using DbGate.ErManagement.Query.Expr;
 using DbGate.Support.Query.Basic;
@@ -14,6 +15,8 @@ namespace DbGate
 {
     public class DbGateQueryBasicTest
     {
+        private static ITransactionFactory _transactionFactory;
+
         private ICollection<QueryBasicEntity> _basicEntities;
         private int[] _basicEntityIds;
         private string[] _basicEntityNames;
@@ -28,11 +31,11 @@ namespace DbGate
                 XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
                 LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Info("Starting in-memory database for unit tests");
-                var dbConnector =
-                    new DbConnector(
+                _transactionFactory =
+                    new DefaultTransactionFactory(
                         "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON",
-                        DbConnector.DbSqllite);
-                Assert.IsNotNull(dbConnector.Connection);
+                        DefaultTransactionFactory.DbSqllite);
+                Assert.IsNotNull(_transactionFactory.CreateTransaction());
             }
             catch (Exception ex)
             {
@@ -45,8 +48,8 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                connection.Close();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -57,10 +60,7 @@ namespace DbGate
         [SetUp]
         public void BeforeEach()
         {
-            if (DbConnector.GetSharedInstance() != null)
-            {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().ClearCache();
-            }
+            _transactionFactory.DbGate.ClearCache();
         }
 
         [TearDown]
@@ -68,35 +68,34 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
 
-                IDbCommand command = connection.CreateCommand();
+                IDbCommand command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM query_basic";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table query_basic";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM query_basic_details";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table query_basic_details";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM query_basic_join";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table query_basic_join";
                 command.ExecuteNonQuery();
 
                 transaction.Commit();
-                connection.Close();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -106,14 +105,14 @@ namespace DbGate
 
         private IDbConnection SetupTables()
         {
-            IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-            IDbTransaction transaction = connection.BeginTransaction();
+            ITransaction transaction = _transactionFactory.CreateTransaction();
+            IDbConnection connection = transaction.Connection;
 
             string sql = "Create table query_basic (\n" +
                          "\tid_col Int NOT NULL,\n" +
                          "\tname Varchar(20) NOT NULL,\n" +
                          " Primary Key (id_col))";
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -121,7 +120,7 @@ namespace DbGate
             sql = "Create table query_basic_details (\n" +
                   "\tname Varchar(20) NOT NULL,\n" +
                   "\tdescription Varchar(50) NOT NULL )";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -129,12 +128,17 @@ namespace DbGate
                   "\tid_col Int NOT NULL,\n" +
                   "\tname Varchar(20) NOT NULL,\n" +
                   "\toverride_description Varchar(50) NOT NULL )";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
             transaction.Commit();
             return connection;
+        }
+
+        private ITransaction CreateTransaction(IDbConnection connection)
+        {
+            return new Transaction(_transactionFactory, connection.BeginTransaction());
         }
 
         private QueryBasicEntity GetById(int id)
@@ -196,7 +200,7 @@ namespace DbGate
             return true;
         }
 
-        private void CreateTestData(IDbConnection connection)
+        private void CreateTestData(ITransaction transaction)
         {
             _basicEntityIds = new[] {35, 45, 55, 65};
             _basicEntityNames = new[] {"Org-NameA", "Org-NameA", "Org-NameA", "Org-NameB"};
@@ -217,7 +221,7 @@ namespace DbGate
                     joinEntity.OverrideDescription = entity.Name + "Details";
                     entity.JoinEntity = joinEntity;
                 }
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 _basicEntities.Add(entity);
             }
 
@@ -239,7 +243,7 @@ namespace DbGate
                 var detailsEntity = new QueryBasicDetailsEntity();
                 detailsEntity.Name = basicEntityName;
                 detailsEntity.Description = basicEntityName + "Details";
-                detailsEntity.Persist(connection);
+                detailsEntity.Persist(transaction);
                 _detailedEntities.Add(detailsEntity);
             }
         }
@@ -249,17 +253,18 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .Select(QuerySelection.RawSql("id_col"))
                     .Select(QuerySelection.RawSql("name as name_col"));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 Assert.IsTrue(results.Count == 4);
                 foreach (object result in results)
                 {
@@ -270,7 +275,8 @@ namespace DbGate
                     QueryBasicEntity entity = GetById(id);
                     Assert.AreEqual(entity.Name, name);
                 }
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -284,17 +290,18 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .Select(QuerySelection.RawSql("name as name_col"))
                     .Distinct();
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 Assert.IsTrue(results.Count == 2);
                 int count = 0;
                 foreach (object result in results)
@@ -307,7 +314,8 @@ namespace DbGate
                     }
                 }
                 Assert.IsTrue(count == 4);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -321,19 +329,21 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)))
                     .Skip(1);
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 HasIds(results, _basicEntityIds.Skip(1).ToArray());
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -347,19 +357,21 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)))
                     .Fetch(2);
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 HasIds(results, _basicEntityIds.Take(2).ToArray());
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -373,19 +385,21 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)))
                     .Skip(1).Fetch(2);
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 HasIds(results, _basicEntityIds.Skip(1).Take(2).ToArray());
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -399,16 +413,17 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 Assert.IsTrue(results.Count == 4);
                 foreach (object result in results)
                 {
@@ -417,7 +432,8 @@ namespace DbGate
                     QueryBasicEntity orgEntity = GetById(loadedEntity.IdCol);
                     Assert.AreEqual(loadedEntity.Name, orgEntity.Name);
                 }
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -431,11 +447,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery descriptionQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicDetailsEntity), "qbd1"))
                     .Where(QueryCondition.RawSql("qbd1.name = qb1.name"))
@@ -446,7 +463,7 @@ namespace DbGate
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)))
                     .Select(QuerySelection.Query(descriptionQuery, "description"));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 Assert.IsTrue(results.Count == 4);
                 foreach (object result in results)
                 {
@@ -457,7 +474,8 @@ namespace DbGate
                     QueryBasicDetailsEntity detailsEntity = GetDescriptionForName(entity.Name);
                     Assert.AreEqual(detailsEntity.Description, description);
                 }
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -471,16 +489,17 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity), "qb1"))
                     .Select(QuerySelection.Field(typeof (QueryBasicEntity), "Name", "name1"));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 Assert.IsTrue(results.Count == 4);
                 int index = 0;
                 foreach (object result in results)
@@ -488,7 +507,8 @@ namespace DbGate
                     var name = result.ToString();
                     Assert.IsTrue(_basicEntityNames[index++].Equals(name));
                 }
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -502,16 +522,17 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof(QueryBasicEntity), "qb1"))
                     .Select(QuerySelection.Field("Name", "name1"));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 Assert.IsTrue(results.Count == 4);
                 int index = 0;
                 foreach (object result in results)
@@ -519,7 +540,8 @@ namespace DbGate
                     var name = result.ToString();
                     Assert.IsTrue(_basicEntityNames[index++].Equals(name));
                 }
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -533,16 +555,17 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity), "qb1"))
                     .Select(QuerySelection.Sum(typeof (QueryBasicEntity), "IdCol", "id_sum"));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 Assert.IsTrue(results.Count == 1);
                 int sum = 0;
                 foreach (QueryBasicEntity entity in _basicEntities)
@@ -554,7 +577,8 @@ namespace DbGate
                     var resultSum = (long)result;
                     Assert.IsTrue(sum == resultSum);
                 }
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -568,23 +592,25 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity), "qb1"))
                     .Select(QuerySelection.Count(typeof (QueryBasicEntity), "IdCol", "id_count"));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 Assert.IsTrue(results.Count == 1);
                 foreach (Object result in results)
                 {
                     var resultCount = (long)result;
                     Assert.IsTrue(resultCount == 4);
                 }
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -598,23 +624,25 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity), "qb1"))
                     .Select(QuerySelection.CustFunction("COUNT", typeof (QueryBasicEntity), "IdCol", "id_count"));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 Assert.IsTrue(results.Count == 1);
                 foreach (Object result in results)
                 {
                     var resultCount = (long)result;
                     Assert.IsTrue(resultCount == 4);
                 }
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -628,18 +656,20 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity), "qb1"))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 HasIds(results, _basicEntityIds);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -653,11 +683,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery fromQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)));
 
@@ -665,9 +696,10 @@ namespace DbGate
                     .From(QueryFrom.Query(fromQuery, "qb1"))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 HasIds(results, _basicEntityIds);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -681,11 +713,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery fromBasic = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Select(QuerySelection.RawSql("name as name1"));
@@ -698,7 +731,7 @@ namespace DbGate
                     .From(QueryFrom.QueryUnion(true, new[] {fromBasic, fromDetails}))
                     .Select(QuerySelection.RawSql("name1"));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 Assert.IsTrue(results.Count == 6);
                 int index = 0;
                 foreach (object result in results)
@@ -714,7 +747,8 @@ namespace DbGate
                         Assert.IsTrue(detailsEntity.Name.Equals(name));
                     }
                 }
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -728,20 +762,22 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .Where(QueryCondition.RawSql("id_col = 35"))
                     .Where(QueryCondition.RawSql("name like 'Org-NameA'"))
                     .Select(QuerySelection.RawSql("id_col,name"));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 HasIds(results, 35);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -755,11 +791,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -767,8 +804,10 @@ namespace DbGate
                                                              ColumnType.Integer, 35)))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, 35);
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -782,11 +821,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -794,8 +834,10 @@ namespace DbGate
                                                              ColumnType.Integer, 35)))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, _basicEntityIds.Where(id => id != 35).ToArray());
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -809,11 +851,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -821,8 +864,10 @@ namespace DbGate
                                                              ColumnType.Integer, 45)))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, _basicEntityIds.Where(id => id > 45).ToArray());
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -836,11 +881,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -848,8 +894,10 @@ namespace DbGate
                                                              ColumnType.Integer, 45)))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, _basicEntityIds.Where(id => id >= 45).ToArray());
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -863,11 +911,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -875,8 +924,10 @@ namespace DbGate
                                                              ColumnType.Integer, 45)))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, _basicEntityIds.Where(id => id < 45).ToArray());
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -890,11 +941,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -902,8 +954,10 @@ namespace DbGate
                                                              ColumnType.Integer, 45)))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, _basicEntityIds.Where(id => id <= 45).ToArray());
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -917,11 +971,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -929,8 +984,10 @@ namespace DbGate
                                                              ColumnType.Varchar, "Org-NameA")))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, 35, 45, 55);
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -944,11 +1001,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicDetailsEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -956,8 +1014,10 @@ namespace DbGate
                                                              typeof (QueryBasicDetailsEntity), "Description")))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicDetailsEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 Assert.IsTrue(results.Count == 2);
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -971,11 +1031,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery subQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity), "qbd1"))
                     .OrderBy(QueryOrderBy.RawSql("id_col"))
@@ -987,8 +1048,10 @@ namespace DbGate
                                                          .Field(typeof (QueryBasicEntity), "IdCol").Gt().Query(subQuery)))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, _basicEntityIds.Skip(1).ToArray());
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1002,11 +1065,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -1014,8 +1078,10 @@ namespace DbGate
                                                              ColumnType.Integer, new object[] {35, 55})))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, 35, 45, 55);
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1029,11 +1095,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -1041,8 +1108,10 @@ namespace DbGate
                                                              ColumnType.Integer, new object[] {35, 55})))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, 35, 55);
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1056,11 +1125,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery subQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Select(QuerySelection.Field(typeof (QueryBasicEntity), "IdCol", null));
@@ -1071,8 +1141,10 @@ namespace DbGate
                                                          .Field(typeof (QueryBasicEntity), "IdCol").In().Query(subQuery)))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, _basicEntityIds);
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1086,11 +1158,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery subQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicDetailsEntity), "qbd1"))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -1104,8 +1177,10 @@ namespace DbGate
                                                          .Query(subQuery).Exists()))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, _basicEntityIds);
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1119,11 +1194,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery subQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicDetailsEntity), "qbd1"))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -1137,8 +1213,10 @@ namespace DbGate
                                                          .Query(subQuery).NotExists()))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 Assert.IsTrue(results.Count == 0);
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1152,11 +1230,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -1166,8 +1245,10 @@ namespace DbGate
                                                              ColumnType.Integer, new object[] {45, 55})))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, 55);
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1181,11 +1262,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -1197,8 +1279,10 @@ namespace DbGate
                                                              ColumnType.Integer, new object[] {45, 55})))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, 35, 45, 55);
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1212,11 +1296,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -1228,8 +1313,10 @@ namespace DbGate
                                                              ColumnType.Integer, new object[] {45, 55})))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, 35, 55);
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1243,11 +1330,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -1261,8 +1349,10 @@ namespace DbGate
                                                              ColumnType.Integer, 45)))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, 45, 55);
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1276,11 +1366,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity)))
                     .Where(QueryCondition.Expression(ConditionExpr.Build()
@@ -1294,8 +1385,10 @@ namespace DbGate
                                                              ColumnType.Integer, 45)))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 HasIds(results, 35, 45, 55);
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1309,20 +1402,22 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .Join(QueryJoin.RawSql("inner join query_basic_details qbd1 on qb1.name = qbd1.name"))
                     .OrderBy(QueryOrderBy.RawSql("qb1.name"))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 HasIds(results, _basicEntityIds);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1336,19 +1431,21 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity), "qb1"))
                     .Join(QueryJoin.EntityType(typeof (QueryBasicEntity), typeof (QueryBasicJoinEntity), "qbj1"))
                     .Select(QuerySelection.Field(typeof (QueryBasicEntity), "IdCol", null));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 HasIds(results, 35, 65);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1362,19 +1459,21 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicJoinEntity), "qbj1"))
                     .Join(QueryJoin.EntityType(typeof (QueryBasicJoinEntity), typeof (QueryBasicEntity), "qb1"))
                     .Select(QuerySelection.Field(typeof (QueryBasicJoinEntity), "IdCol", null));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 HasIds(results, 35, 65);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1388,20 +1487,22 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicJoinEntity), "qbj1"))
                     .Join(QueryJoin.EntityType(typeof (QueryBasicJoinEntity), typeof (QueryBasicEntity), "qb1",
                                                QueryJoinType.Left))
                     .Select(QuerySelection.Field(typeof (QueryBasicJoinEntity), "IdCol", null));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 HasIds(results, _basicEntityIds);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1415,11 +1516,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity), "qb1"))
                     .Join(QueryJoin.EntityType(typeof (QueryBasicEntity)
@@ -1431,9 +1533,10 @@ namespace DbGate
                     .Select(QuerySelection.Field(typeof (QueryBasicDetailsEntity), "Description", null));
 
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 Assert.AreEqual(4,results.Count);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1447,19 +1550,21 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .GroupBy(QueryGroup.RawSql("Name"))
                     .Select(QuerySelection.RawSql("Name"));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 Assert.IsTrue(results.Count == 2);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1473,19 +1578,21 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity), "qb"))
                     .GroupBy(QueryGroup.Field(typeof (QueryBasicEntity), "Name"))
                     .Select(QuerySelection.Field(typeof (QueryBasicEntity), "Name", null));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 Assert.IsTrue(results.Count == 2);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1499,20 +1606,22 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .GroupBy(QueryGroup.RawSql("name"))
                     .Having(QueryGroupCondition.RawSql("count(id_col)>1"))
                     .Select(QuerySelection.RawSql("name"));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 Assert.IsTrue(results.Count == 1);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1526,11 +1635,12 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery query = new SelectionQuery()
                     .From(QueryFrom.EntityType(typeof (QueryBasicEntity), "qb"))
                     .Select(QuerySelection.Field(typeof (QueryBasicEntity), "Name", null))
@@ -1540,9 +1650,10 @@ namespace DbGate
                             .Field(typeof (QueryBasicEntity), "Name").Count().Gt().Value(ColumnType.Integer, 1)
                                 ));
 
-                ICollection<object> results = query.ToList(connection);
+                ICollection<object> results = query.ToList(transaction);
                 Assert.IsTrue(results.Count == 1);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1556,19 +1667,21 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .OrderBy(QueryOrderBy.RawSql("name"))
                     .Select(QuerySelection.RawSql("name"));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 Assert.IsTrue(results.Count == 4);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1582,20 +1695,22 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .OrderBy(QueryOrderBy.Field(typeof (QueryBasicEntity), "Name"))
                     .OrderBy(QueryOrderBy.Field(typeof (QueryBasicEntity), "IdCol"))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 Assert.IsTrue(results.Count == 4);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -1608,20 +1723,22 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-                CreateTestData(connection);
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                CreateTestData(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ISelectionQuery selectionQuery = new SelectionQuery()
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .OrderBy(QueryOrderBy.Field(typeof (QueryBasicEntity), "Name", QueryOrderType.Descend))
                     .OrderBy(QueryOrderBy.Field(typeof (QueryBasicEntity), "IdCol", QueryOrderType.Descend))
                     .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
 
-                ICollection<object> results = selectionQuery.ToList(connection);
+                ICollection<object> results = selectionQuery.ToList(transaction);
                 Assert.IsTrue(results.Count == 4);
-                connection.Close();
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {

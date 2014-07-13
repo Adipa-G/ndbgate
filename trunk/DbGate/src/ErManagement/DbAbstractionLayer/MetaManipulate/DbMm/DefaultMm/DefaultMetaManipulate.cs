@@ -16,12 +16,12 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
         {
         }
 
-        protected override ICollection<MetaTable> ExtractTableData(IDbConnection con)
+        protected override ICollection<MetaTable> ExtractTableData(ITransaction tx)
         {
             var metaItems = new List<MetaTable>();
             try
             {
-                var dbConnection = (DbConnection) con;
+                var dbConnection = (DbConnection) tx.Connection;
                 DataTable dbTableTable = dbConnection.GetSchema("Tables");
                 if (dbTableTable == null)
                 {
@@ -44,11 +44,11 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
             return metaItems;
         }
 
-        protected override void ExtractColumnData(IDbConnection con, MetaTable table)
+        protected override void ExtractColumnData(ITransaction tx, MetaTable table)
         {
             try
             {
-                var dbConnection = (DbConnection) con;
+                var dbConnection = (DbConnection) tx.Connection;
                 DataTable columnTable = dbConnection.GetSchema("Columns", new[] {null, null, table.Name, null});
                 if (columnTable == null)
                 {
@@ -75,12 +75,12 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
             }
         }
 
-        protected override void ExtractPrimaryKeyData(IDbConnection con, MetaTable table)
+        protected override void ExtractPrimaryKeyData(ITransaction tx, MetaTable table)
         {
             var keyColMap = new Dictionary<int, string>();
             try
             {
-                var dbConnection = (DbConnection) con;
+                var dbConnection = (DbConnection) tx.Connection;
                 DataTable pkTable = dbConnection.GetSchema("Primary_Keys", new[] {null, null, table.Name, null});
                 if (pkTable == null)
                 {
@@ -116,7 +116,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
             }
         }
 
-        protected override void ExtractForeignKeyData(IDbConnection con, MetaTable table)
+        protected override void ExtractForeignKeyData(ITransaction tx, MetaTable table)
         {
             var foreignKeyMap = new Dictionary<string, MetaForeignKey>();
 
@@ -125,7 +125,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
 
             try
             {
-                var dbConnection = (DbConnection) con;
+                var dbConnection = (DbConnection) tx;
                 DataTable fkTable = dbConnection.GetSchema("Foreign_Keys", new[] {null, null, table.Name, null});
                 if (fkTable == null)
                 {

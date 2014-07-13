@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using DbGate.ErManagement.ErMapper;
 using DbGate.Support.Persistant.TreeTest;
 using NUnit.Framework;
 using log4net;
@@ -15,6 +16,8 @@ namespace DbGate
         public const int TYPE_FIELD = 2;
         public const int TYPE_EXTERNAL = 3;
 
+        private static ITransactionFactory _transactionFactory;
+
         [TestFixtureSetUp]
         public static void Before()
         {
@@ -23,11 +26,11 @@ namespace DbGate
                 XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
                 LogManager.GetLogger(typeof (DbGateTreePersistTests)).Info("Starting in-memory database for unit tests");
-                var dbConnector =
-                    new DbConnector(
+                _transactionFactory =
+                    new DefaultTransactionFactory(
                         "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON",
-                        DbConnector.DbSqllite);
-                Assert.IsNotNull(dbConnector.Connection);
+                        DefaultTransactionFactory.DbSqllite);
+                Assert.IsNotNull(_transactionFactory.CreateTransaction());
             }
             catch (Exception ex)
             {
@@ -40,8 +43,8 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                connection.Close();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -52,10 +55,7 @@ namespace DbGate
         [SetUp]
         public void BeforeEach()
         {
-            if (DbConnector.GetSharedInstance() != null)
-            {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().ClearCache();
-            }
+            _transactionFactory.DbGate.ClearCache();
         }
 
         [TearDown]
@@ -63,22 +63,21 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
-                IDbCommand command = connection.CreateCommand();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                IDbCommand command = transaction.CreateCommand();
                 command.CommandText = "drop table tree_test_root";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table tree_test_one2many";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table tree_test_one2one";
                 command.ExecuteNonQuery();
                 transaction.Commit();
 
-                connection.Close();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -89,31 +88,31 @@ namespace DbGate
         private void RegisterForExternal()
         {
             Type objType = typeof (TreeTestRootEntityExt);
-            ErManagement.ErMapper.DbGate.GetSharedInstance().RegisterEntity(objType,
-                                                                            TreeTestExtFactory.GetTableNames(objType),
-                                                                            TreeTestExtFactory.GetFieldInfo(objType));
+            _transactionFactory.DbGate.RegisterEntity(objType,
+                                                      TreeTestExtFactory.GetTableNames(objType),
+                                                      TreeTestExtFactory.GetFieldInfo(objType));
 
             objType = typeof (TreeTestOne2ManyEntityExt);
-            ErManagement.ErMapper.DbGate.GetSharedInstance().RegisterEntity(objType,
-                                                                            TreeTestExtFactory.GetTableNames(objType),
-                                                                            TreeTestExtFactory.GetFieldInfo(objType));
+            _transactionFactory.DbGate.RegisterEntity(objType,
+                                                      TreeTestExtFactory.GetTableNames(objType),
+                                                      TreeTestExtFactory.GetFieldInfo(objType));
 
             objType = typeof (TreeTestOne2OneEntityExt);
-            ErManagement.ErMapper.DbGate.GetSharedInstance().RegisterEntity(objType,
-                                                                            TreeTestExtFactory.GetTableNames(objType),
-                                                                            TreeTestExtFactory.GetFieldInfo(objType));
+            _transactionFactory.DbGate.RegisterEntity(objType,
+                                                      TreeTestExtFactory.GetTableNames(objType),
+                                                      TreeTestExtFactory.GetFieldInfo(objType));
         }
 
         private IDbConnection SetupTables()
         {
-            IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-            IDbTransaction transaction = connection.BeginTransaction();
-
+            ITransaction transaction = _transactionFactory.CreateTransaction();
+            IDbConnection connection = transaction.Connection;
+            
             string sql = "Create table tree_test_root (\n" +
                          "\tid_col Int NOT NULL,\n" +
                          "\tname Varchar(20) NOT NULL,\n" +
                          " Primary Key (id_col))";
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -122,7 +121,7 @@ namespace DbGate
                   "\tindex_no Int NOT NULL,\n" +
                   "\tname Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col,index_no))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -130,7 +129,7 @@ namespace DbGate
                   "\tid_col Int NOT NULL,\n" +
                   "\tname Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -138,22 +137,28 @@ namespace DbGate
             return connection;
         }
 
+        private ITransaction CreateTransaction(IDbConnection connection)
+        {
+            return new Transaction(_transactionFactory, connection.BeginTransaction());
+        }
+
         [Test]
         public void TreePersist_Insert_WithAnnotationsDifferentTypeOfChildren_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                
                 int id = 35;
                 ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_ANNOTATION);
-                rootEntity.Persist(connection);
+                rootEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ITreeTestRootEntity loadedEntity = new TreeTestRootEntityAnnotations();
-                LoadEntityWithId(connection, loadedEntity, id);
-                connection.Close();
+                LoadEntityWithId(transaction, loadedEntity, id);
+                con.Close();
 
                 bool compareResult = CompareEntities(rootEntity, loadedEntity);
                 Assert.IsTrue(compareResult);
@@ -170,17 +175,18 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
 
                 int id = 35;
                 ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_FIELD);
-                rootEntity.Persist(connection);
+                rootEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ITreeTestRootEntity loadedEntity = new TreeTestRootEntityFields();
-                LoadEntityWithId(connection, loadedEntity, id);
-                connection.Close();
+                LoadEntityWithId(transaction, loadedEntity, id);
+                con.Close();
 
                 bool compareResult = CompareEntities(rootEntity, loadedEntity);
                 Assert.IsTrue(compareResult);
@@ -197,19 +203,21 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+               
                 RegisterForExternal();
 
                 int id = 35;
                 ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_EXTERNAL);
-                rootEntity.Persist(connection);
+                rootEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ITreeTestRootEntity loadedEntity = new TreeTestRootEntityExt();
-                LoadEntityWithId(connection, loadedEntity, id);
-                connection.Close();
+                LoadEntityWithId(transaction, loadedEntity, id);
+                transaction.Commit();
+                con.Close();
 
                 bool compareResult = CompareEntities(rootEntity, loadedEntity);
                 Assert.IsTrue(compareResult);
@@ -226,16 +234,17 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
-
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+               
                 int id = 35;
                 ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_ANNOTATION);
-                rootEntity.Persist(connection);
+                rootEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ITreeTestRootEntity loadedEntity = new TreeTestRootEntityAnnotations();
-                LoadEntityWithId(connection, loadedEntity, id);
+                LoadEntityWithId(transaction, loadedEntity, id);
 
                 loadedEntity.Name = "changed-name";
                 loadedEntity.Status = EntityStatus.Modified;
@@ -249,11 +258,11 @@ namespace DbGate
                 one2ManyEntity.Name = "changed-one2many";
                 one2ManyEntity.Status = EntityStatus.Modified;
 
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
 
                 ITreeTestRootEntity reLoadedEntity = new TreeTestRootEntityAnnotations();
-                LoadEntityWithId(connection, reLoadedEntity, id);
-                connection.Close();
+                LoadEntityWithId(transaction, reLoadedEntity, id);
+                con.Close();
 
                 bool compareResult = CompareEntities(loadedEntity, reLoadedEntity);
                 Assert.IsTrue(compareResult);
@@ -270,16 +279,17 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
 
                 int id = 35;
                 ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_FIELD);
-                rootEntity.Persist(connection);
+                rootEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ITreeTestRootEntity loadedEntity = new TreeTestRootEntityFields();
-                LoadEntityWithId(connection, loadedEntity, id);
+                LoadEntityWithId(transaction, loadedEntity, id);
 
                 loadedEntity.Name = "changed-name";
                 loadedEntity.Status = EntityStatus.Modified;
@@ -293,11 +303,11 @@ namespace DbGate
                 one2ManyEntity.Name = "changed-one2many";
                 one2ManyEntity.Status = EntityStatus.Modified;
 
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
 
                 ITreeTestRootEntity reLoadedEntity = new TreeTestRootEntityFields();
-                LoadEntityWithId(connection, reLoadedEntity, id);
-                connection.Close();
+                LoadEntityWithId(transaction, reLoadedEntity, id);
+                con.Close();
 
                 bool compareResult = CompareEntities(loadedEntity, reLoadedEntity);
                 Assert.IsTrue(compareResult);
@@ -314,18 +324,19 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
 
                 RegisterForExternal();
 
                 int id = 35;
                 ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_EXTERNAL);
-                rootEntity.Persist(connection);
+                rootEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ITreeTestRootEntity loadedEntity = new TreeTestRootEntityExt();
-                LoadEntityWithId(connection, loadedEntity, id);
+                LoadEntityWithId(transaction, loadedEntity, id);
 
                 loadedEntity.Name = "changed-name";
                 loadedEntity.Status = EntityStatus.Modified;
@@ -339,11 +350,11 @@ namespace DbGate
                 one2ManyEntity.Name = "changed-one2many";
                 one2ManyEntity.Status = EntityStatus.Modified;
 
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
 
                 ITreeTestRootEntity reLoadedEntity = new TreeTestRootEntityExt();
-                LoadEntityWithId(connection, reLoadedEntity, id);
-                connection.Close();
+                LoadEntityWithId(transaction, reLoadedEntity, id);
+                con.Close();
 
                 bool compareResult = CompareEntities(loadedEntity, reLoadedEntity);
                 Assert.IsTrue(compareResult);
@@ -360,27 +371,28 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
 
                 int id = 35;
                 ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_ANNOTATION);
-                rootEntity.Persist(connection);
+                rootEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ITreeTestRootEntity loadedEntity = new TreeTestRootEntityAnnotations();
-                LoadEntityWithId(connection, loadedEntity, id);
+                LoadEntityWithId(transaction, loadedEntity, id);
 
                 loadedEntity.Name = "changed-name";
                 loadedEntity.Status = EntityStatus.Deleted;
 
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
 
                 ITreeTestRootEntity reLoadedEntity = new TreeTestRootEntityAnnotations();
-                bool loaded = LoadEntityWithId(connection, reLoadedEntity, id);
-                bool existsOne2one = ExistsOne2ManyChild(connection, id);
-                bool existsOne2many = ExistsOne2ManyChild(connection, id);
-                connection.Close();
+                bool loaded = LoadEntityWithId(transaction, reLoadedEntity, id);
+                bool existsOne2one = ExistsOne2ManyChild(transaction, id);
+                bool existsOne2many = ExistsOne2ManyChild(transaction, id);
+                transaction.Close();
 
                 Assert.IsFalse(loaded);
                 Assert.IsFalse(existsOne2one);
@@ -398,27 +410,28 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
 
                 int id = 35;
                 ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_FIELD);
-                rootEntity.Persist(connection);
+                rootEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ITreeTestRootEntity loadedEntity = new TreeTestRootEntityFields();
-                LoadEntityWithId(connection, loadedEntity, id);
+                LoadEntityWithId(transaction, loadedEntity, id);
 
                 loadedEntity.Name = "changed-name";
                 loadedEntity.Status = EntityStatus.Deleted;
 
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
 
                 ITreeTestRootEntity reLoadedEntity = new TreeTestRootEntityFields();
-                bool loaded = LoadEntityWithId(connection, reLoadedEntity, id);
-                bool existsOne2one = ExistsOne2ManyChild(connection, id);
-                bool existsOne2many = ExistsOne2ManyChild(connection, id);
-                connection.Close();
+                bool loaded = LoadEntityWithId(transaction, reLoadedEntity, id);
+                bool existsOne2one = ExistsOne2ManyChild(transaction, id);
+                bool existsOne2many = ExistsOne2ManyChild(transaction, id);
+                transaction.Close();
 
                 Assert.IsFalse(loaded);
                 Assert.IsFalse(existsOne2one);
@@ -436,29 +449,30 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                IDbTransaction transaction = connection.BeginTransaction();
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
 
                 RegisterForExternal();
 
                 int id = 35;
                 ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_EXTERNAL);
-                rootEntity.Persist(connection);
+                rootEntity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 ITreeTestRootEntity loadedEntity = new TreeTestRootEntityExt();
-                LoadEntityWithId(connection, loadedEntity, id);
+                LoadEntityWithId(transaction, loadedEntity, id);
 
                 loadedEntity.Name = "changed-name";
                 loadedEntity.Status = EntityStatus.Deleted;
 
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
 
                 ITreeTestRootEntity reLoadedEntity = new TreeTestRootEntityExt();
-                bool loaded = LoadEntityWithId(connection, reLoadedEntity, id);
-                bool existsOne2one = ExistsOne2ManyChild(connection, id);
-                bool existsOne2many = ExistsOne2ManyChild(connection, id);
-                connection.Close();
+                bool loaded = LoadEntityWithId(transaction, reLoadedEntity, id);
+                bool existsOne2one = ExistsOne2ManyChild(transaction, id);
+                bool existsOne2many = ExistsOne2ManyChild(transaction, id);
+                transaction.Close();
 
                 Assert.IsFalse(loaded);
                 Assert.IsFalse(existsOne2one);
@@ -471,11 +485,11 @@ namespace DbGate
             }
         }
 
-        private bool LoadEntityWithId(IDbConnection connection, ITreeTestRootEntity loadEntity, int id)
+        private bool LoadEntityWithId(ITransaction transaction, ITreeTestRootEntity loadEntity, int id)
         {
             bool loaded = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from tree_test_root where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -486,18 +500,18 @@ namespace DbGate
             IDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                loadEntity.Retrieve(reader, connection);
+                loadEntity.Retrieve(reader, transaction);
                 loaded = true;
             }
 
             return loaded;
         }
 
-        private bool ExistsOne2ManyChild(IDbConnection connection, int id)
+        private bool ExistsOne2ManyChild(ITransaction transaction, int id)
         {
             bool exists = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from tree_test_one2many where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();

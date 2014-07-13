@@ -9,13 +9,14 @@ namespace DbGate
         IDbGateConfig Config { get; }
 
         IDbGateStatistics Statistics { get; }
-        void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, IDbConnection con);
 
-        void Save(IEntity entity, IDbConnection con);
+        void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, ITransaction tx);
 
-        ICollection<Object> Select(ISelectionQuery query, IDbConnection con);
+        void Save(IEntity entity, ITransaction tx);
 
-        void PatchDataBase(IDbConnection con, ICollection<Type> entityTypes, bool dropAll);
+        ICollection<Object> Select(ISelectionQuery query, ITransaction tx);
+
+        void PatchDataBase(ITransaction tx, ICollection<Type> entityTypes, bool dropAll);
 
         void ClearCache();
 

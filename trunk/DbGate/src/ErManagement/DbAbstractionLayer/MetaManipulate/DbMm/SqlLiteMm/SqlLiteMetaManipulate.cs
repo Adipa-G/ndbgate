@@ -13,7 +13,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlLiteMm
         {
         }
 
-        protected override void FillDataMappings(IDbConnection con)
+        protected override void FillDataMappings(ITransaction tx)
         {
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("INTEGER", ColumnType.Integer, "0"));
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("BOOL", ColumnType.Boolean, "true"));
@@ -26,11 +26,11 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlLiteMm
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("VARCHAR", ColumnType.Varchar, "''"));
         }
 
-        protected override void ExtractPrimaryKeyData(IDbConnection con, MetaTable table)
+        protected override void ExtractPrimaryKeyData(ITransaction tx, MetaTable table)
         {
         }
 
-        protected override void ExtractForeignKeyData(IDbConnection con, MetaTable table)
+        protected override void ExtractForeignKeyData(ITransaction tx, MetaTable table)
         {
         }
 

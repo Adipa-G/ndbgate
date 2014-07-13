@@ -13,6 +13,8 @@ namespace DbGate
 {
     public class DbGateFeatureIntegrationTest
     {
+        private static ITransactionFactory _transactionFactory;
+
         [TestFixtureSetUp]
         public static void Before()
         {
@@ -22,11 +24,11 @@ namespace DbGate
 
                 LogManager.GetLogger(typeof (DbGateFeatureIntegrationTest)).Info(
                     "Starting in-memory database for unit tests");
-                var dbConnector =
-                    new DbConnector(
+                _transactionFactory =
+                    new DefaultTransactionFactory(
                         "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON",
-                        DbConnector.DbSqllite);
-                Assert.IsNotNull(dbConnector.Connection);
+                        DefaultTransactionFactory.DbSqllite);
+                Assert.IsNotNull(_transactionFactory.CreateTransaction());
             }
             catch (Exception ex)
             {
@@ -40,8 +42,8 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                connection.Close();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -52,16 +54,13 @@ namespace DbGate
         [SetUp]
         public void BeforeEach()
         {
-            if (DbConnector.GetSharedInstance() != null)
-            {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().ClearCache();
-            }
+            _transactionFactory.DbGate.ClearCache();
         }
 
         private IDbConnection SetupTables()
         {
-            IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-            IDbTransaction transaction = connection.BeginTransaction();
+            ITransaction transaction = _transactionFactory.CreateTransaction();
+            IDbConnection connection = transaction.Connection;
 
             ICollection<Type> types = new List<Type>();
             types.Add(typeof (ItemTransaction));
@@ -69,10 +68,15 @@ namespace DbGate
             types.Add(typeof (Transaction));
             types.Add(typeof (Product));
             types.Add(typeof (Service));
-            ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(connection, types, true);
+            _transactionFactory.DbGate.PatchDataBase(transaction, types, true);
 
             transaction.Commit();
             return connection;
+        }
+
+        private ITransaction CreateTransaction(IDbConnection connection)
+        {
+            return new ErManagement.ErMapper.Transaction(_transactionFactory, connection.BeginTransaction());
         }
 
         [Test]
@@ -85,12 +89,15 @@ namespace DbGate
                 int serviceId = 235;
 
                 IDbConnection connection = SetupTables();
+                
                 Product product = CreateDefaultProduct(connection, productId);
                 Service service = CreateDefaultService(connection, serviceId);
                 Transaction transaction = CreateDefaultTransaction(connection, transId, product, service);
 
+                ITransaction tx = CreateTransaction(connection);
                 var loadedTransaction = new Transaction();
-                LoadWithId(connection, loadedTransaction, transId);
+                LoadWithId(tx, loadedTransaction, transId);
+                tx.Commit();
                 DbMgtUtility.Close(connection);
 
                 VerifyEquals(transaction, loadedTransaction);
@@ -143,11 +150,11 @@ namespace DbGate
             Assert.AreEqual(loadedTransaction.Name, transaction.Name);
         }
 
-        private bool LoadWithId(IDbConnection connection, Transaction loadEntity, int id)
+        private bool LoadWithId(ITransaction transaction, Transaction loadEntity, int id)
         {
             bool loaded = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from order_transaction where transaction_id = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -159,7 +166,7 @@ namespace DbGate
             IDataReader dataReader = cmd.ExecuteReader();
             if (dataReader.Read())
             {
-                loadEntity.Retrieve(dataReader, connection);
+                loadEntity.Retrieve(dataReader, transaction);
                 loaded = true;
             }
 
@@ -172,8 +179,8 @@ namespace DbGate
             product.ItemId = productId;
             product.Name = "Product";
             product.UnitPrice = 54;
-            IDbTransaction transaction = con.BeginTransaction();
-            product.Persist(con);
+            ITransaction transaction = CreateTransaction(con);
+            product.Persist(transaction);
             transaction.Commit();
             return product;
         }
@@ -184,8 +191,8 @@ namespace DbGate
             service.ItemId = serviceId;
             service.Name = "Service";
             service.HourlyRate = 65;
-            IDbTransaction transaction = con.BeginTransaction();
-            service.Persist(con);
+            ITransaction transaction = CreateTransaction(con);
+            service.Persist(transaction);
             transaction.Commit();
             return service;
         }
@@ -215,9 +222,9 @@ namespace DbGate
             serviceTransactionCharge.ChargeCode = "Service-Sell-Code";
             serviceTransaction.ItemTransactionCharges.Add(serviceTransactionCharge);
 
-            IDbTransaction dbTransaction = con.BeginTransaction();
-            transaction.Persist(con);
-            dbTransaction.Commit();
+            ITransaction tx = CreateTransaction(con);
+            transaction.Persist(tx);
+            tx.Commit();
             return transaction;
         }
     }

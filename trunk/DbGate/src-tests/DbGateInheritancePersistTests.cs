@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.IO;
+using DbGate.ErManagement.ErMapper;
 using DbGate.Support.Persistant.InheritanceTest;
 using NUnit.Framework;
 using log4net;
@@ -10,6 +11,8 @@ namespace DbGate
 {
     public class DbGateInheritancePersistTests
     {
+        private static ITransactionFactory _transactionFactory;
+
         public const int TYPE_ANNOTATION = 1;
         public const int TYPE_FIELD = 2;
         public const int TYPE_EXTERNAL = 3;
@@ -23,11 +26,11 @@ namespace DbGate
 
                 LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
                     "Starting in-memory database for unit tests");
-                var dbConnector =
-                    new DbConnector(
+                _transactionFactory =
+                    new DefaultTransactionFactory(
                         "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON",
-                        DbConnector.DbSqllite);
-                Assert.IsNotNull(dbConnector.Connection);
+                        DefaultTransactionFactory.DbSqllite);
+                Assert.IsNotNull(_transactionFactory.CreateTransaction());
             }
             catch (Exception ex)
             {
@@ -41,8 +44,8 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                connection.Close();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -53,10 +56,7 @@ namespace DbGate
         [SetUp]
         public void BeforeEach()
         {
-            if (DbConnector.GetSharedInstance() != null)
-            {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().ClearCache();
-            }
+            _transactionFactory.DbGate.ClearCache();
         }
 
         [TearDown]
@@ -64,22 +64,22 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
-                IDbCommand command = connection.CreateCommand();
+                ITransaction transaction = _transactionFactory.CreateTransaction(); 
+                
+                IDbCommand command = transaction.CreateCommand();
                 command.CommandText = "drop table inheritance_test_super";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table inheritance_test_suba";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table inheritance_test_subb";
                 command.ExecuteNonQuery();
                 transaction.Commit();
 
-                connection.Close();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -89,14 +89,14 @@ namespace DbGate
 
         private IDbConnection SetupTables()
         {
-            IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-            IDbTransaction transaction = connection.BeginTransaction();
+            ITransaction transaction = _transactionFactory.CreateTransaction();
+            IDbConnection connection = transaction.Connection;
 
             string sql = "Create table inheritance_test_super (\n" +
                          "\tid_col Int NOT NULL,\n" +
                          "\tname Varchar(20) NOT NULL,\n" +
                          " Primary Key (id_col))";
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -104,7 +104,7 @@ namespace DbGate
                   "\tid_col Int NOT NULL,\n" +
                   "\tname_a Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -112,7 +112,7 @@ namespace DbGate
                   "\tid_col Int NOT NULL,\n" +
                   "\tname_b Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -120,11 +120,17 @@ namespace DbGate
             return connection;
         }
 
+        private ITransaction CreateTransaction(IDbConnection connection)
+        {
+            return new Transaction(_transactionFactory, connection.BeginTransaction());
+        }
+
         private void ClearTables(IDbConnection connection)
         {
             try
             {
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
+
                 IDbCommand command = connection.CreateCommand();
                 command.CommandText = "DELETE FROM inheritance_test_super";
                 command.ExecuteNonQuery();
@@ -148,25 +154,16 @@ namespace DbGate
         private void RegisterForExternal()
         {
             Type objType = typeof (InheritanceTestSuperEntityExt);
-            ErManagement.ErMapper.DbGate.GetSharedInstance().RegisterEntity(objType,
-                                                                            InheritanceTestExtFactory.GetTableNames(
-                                                                                objType),
-                                                                            InheritanceTestExtFactory.GetFieldInfo(
-                                                                                objType));
+            _transactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
+                                                      InheritanceTestExtFactory.GetFieldInfo(objType));
 
             objType = typeof (InheritanceTestSubEntityAExt);
-            ErManagement.ErMapper.DbGate.GetSharedInstance().RegisterEntity(objType,
-                                                                            InheritanceTestExtFactory.GetTableNames(
-                                                                                objType),
-                                                                            InheritanceTestExtFactory.GetFieldInfo(
-                                                                                objType));
+            _transactionFactory.DbGate.RegisterEntity(objType,InheritanceTestExtFactory.GetTableNames(objType),
+                                                      InheritanceTestExtFactory.GetFieldInfo(objType));
 
             objType = typeof (InheritanceTestSubEntityBExt);
-            ErManagement.ErMapper.DbGate.GetSharedInstance().RegisterEntity(objType,
-                                                                            InheritanceTestExtFactory.GetTableNames(
-                                                                                objType),
-                                                                            InheritanceTestExtFactory.GetFieldInfo(
-                                                                                objType));
+            _transactionFactory.DbGate.RegisterEntity(objType,InheritanceTestExtFactory.GetTableNames(objType),
+                                                      InheritanceTestExtFactory.GetFieldInfo(objType));
         }
 
         [Test]
@@ -203,7 +200,7 @@ namespace DbGate
                     }
                     ClearTables(connection);
 
-                    ErManagement.ErMapper.DbGate.GetSharedInstance().ClearCache();
+                    _transactionFactory.DbGate.ClearCache();
                     if (type == TYPE_EXTERNAL)
                     {
                         RegisterForExternal();
@@ -212,16 +209,17 @@ namespace DbGate
                     IInheritanceTestSuperEntity entityA = CreateObjectWithDataTypeA(idA, type);
                     IInheritanceTestSuperEntity entityB = CreateObjectWithDataTypeB(idB, type);
 
-                    IDbTransaction transaction = connection.BeginTransaction();
-                    entityA.Persist(connection);
-                    entityB.Persist(connection);
+                    ITransaction transaction = CreateTransaction(connection);
+                    entityA.Persist(transaction);
+                    entityB.Persist(transaction);
                     transaction.Commit();
 
+                    transaction = CreateTransaction(connection);
                     IInheritanceTestSuperEntity loadedEntityA = CreateObjectEmptyTypeA(type);
                     IInheritanceTestSuperEntity loadedEntityB = CreateObjectEmptyTypeB(type);
-                    LoadEntityWithTypeA(connection, loadedEntityA, idA);
-                    LoadEntityWithTypeB(connection, loadedEntityB, idB);
-
+                    LoadEntityWithTypeA(transaction, loadedEntityA, idA);
+                    LoadEntityWithTypeB(transaction, loadedEntityB, idB);
+                    transaction.Commit();
 
                     bool compareResult = CompareEntities(entityA, loadedEntityA);
                     Assert.IsTrue(compareResult);
@@ -270,7 +268,7 @@ namespace DbGate
                             break;
                     }
 
-                    ErManagement.ErMapper.DbGate.GetSharedInstance().ClearCache();
+                    _transactionFactory.DbGate.ClearCache();
                     if (type == TYPE_EXTERNAL)
                     {
                         RegisterForExternal();
@@ -281,15 +279,16 @@ namespace DbGate
                     IInheritanceTestSuperEntity entityA = CreateObjectWithDataTypeA(idA, type);
                     IInheritanceTestSuperEntity entityB = CreateObjectWithDataTypeB(idB, type);
 
-                    IDbTransaction transaction = connection.BeginTransaction();
-                    entityA.Persist(connection);
-                    entityB.Persist(connection);
+                    ITransaction transaction = CreateTransaction(connection);
+                    entityA.Persist(transaction);
+                    entityB.Persist(transaction);
                     transaction.Commit();
 
+                    transaction = CreateTransaction(connection);
                     IInheritanceTestSubEntityA loadedEntityA = CreateObjectEmptyTypeA(type);
                     IInheritanceTestSubEntityB loadedEntityB = CreateObjectEmptyTypeB(type);
-                    LoadEntityWithTypeA(connection, loadedEntityA, idA);
-                    LoadEntityWithTypeB(connection, loadedEntityB, idB);
+                    LoadEntityWithTypeA(transaction, loadedEntityA, idA);
+                    LoadEntityWithTypeB(transaction, loadedEntityB, idB);
 
                     loadedEntityA.Name = "typeA-changed-name";
                     loadedEntityA.NameA = "changed-nameA";
@@ -299,13 +298,14 @@ namespace DbGate
                     loadedEntityB.NameB = "changed-nameB";
                     loadedEntityB.Status = EntityStatus.Modified;
 
-                    loadedEntityA.Persist(connection);
-                    loadedEntityB.Persist(connection);
+                    loadedEntityA.Persist(transaction);
+                    loadedEntityB.Persist(transaction);
 
                     IInheritanceTestSubEntityA reLoadedEntityA = CreateObjectEmptyTypeA(type);
                     IInheritanceTestSubEntityB reLoadedEntityB = CreateObjectEmptyTypeB(type);
-                    LoadEntityWithTypeA(connection, reLoadedEntityA, idA);
-                    LoadEntityWithTypeB(connection, reLoadedEntityB, idB);
+                    LoadEntityWithTypeA(transaction, reLoadedEntityA, idA);
+                    LoadEntityWithTypeB(transaction, reLoadedEntityB, idB);
+                    transaction.Commit();
 
                     bool compareResult = CompareEntities(loadedEntityA, reLoadedEntityA);
                     Assert.IsTrue(compareResult);
@@ -357,7 +357,7 @@ namespace DbGate
 
                     ClearTables(connection);
 
-                    ErManagement.ErMapper.DbGate.GetSharedInstance().ClearCache();
+                    _transactionFactory.DbGate.ClearCache();
                     if (type == TYPE_EXTERNAL)
                     {
                         RegisterForExternal();
@@ -366,15 +366,16 @@ namespace DbGate
                     IInheritanceTestSuperEntity entityA = CreateObjectWithDataTypeA(idA, type);
                     IInheritanceTestSuperEntity entityB = CreateObjectWithDataTypeB(idB, type);
 
-                    IDbTransaction transaction = connection.BeginTransaction();
-                    entityA.Persist(connection);
-                    entityB.Persist(connection);
+                    ITransaction transaction = CreateTransaction(connection);
+                    entityA.Persist(transaction);
+                    entityB.Persist(transaction);
                     transaction.Commit();
 
+                    transaction = CreateTransaction(connection);
                     IInheritanceTestSubEntityA loadedEntityA = CreateObjectEmptyTypeA(type);
                     IInheritanceTestSubEntityB loadedEntityB = CreateObjectEmptyTypeB(type);
-                    LoadEntityWithTypeA(connection, loadedEntityA, idA);
-                    LoadEntityWithTypeB(connection, loadedEntityB, idB);
+                    LoadEntityWithTypeA(transaction, loadedEntityA, idA);
+                    LoadEntityWithTypeB(transaction, loadedEntityB, idB);
 
                     loadedEntityA.Name = "typeA-changed-name";
                     loadedEntityA.NameA = "changed-nameA";
@@ -384,18 +385,18 @@ namespace DbGate
                     loadedEntityB.NameB = "changed-nameB";
                     loadedEntityB.Status = EntityStatus.Deleted;
 
-                    loadedEntityA.Persist(connection);
-                    loadedEntityB.Persist(connection);
+                    loadedEntityA.Persist(transaction);
+                    loadedEntityB.Persist(transaction);
 
                     IInheritanceTestSubEntityA reLoadedEntityA = CreateObjectEmptyTypeA(type);
                     IInheritanceTestSubEntityB reLoadedEntityB = CreateObjectEmptyTypeB(type);
 
-                    bool reLoadedA = LoadEntityWithTypeA(connection, reLoadedEntityA, idA);
-                    bool existesSuperA = ExistsSuper(connection, idA);
-                    bool existesSubA = ExistsSubA(connection, idA);
-                    bool reLoadedB = LoadEntityWithTypeB(connection, reLoadedEntityB, idB);
-                    bool existesSuperB = ExistsSuper(connection, idB);
-                    bool existesSubB = ExistsSubB(connection, idB);
+                    bool reLoadedA = LoadEntityWithTypeA(transaction, reLoadedEntityA, idA);
+                    bool existesSuperA = ExistsSuper(transaction, idA);
+                    bool existesSubA = ExistsSubA(transaction, idA);
+                    bool reLoadedB = LoadEntityWithTypeB(transaction, reLoadedEntityB, idB);
+                    bool existesSuperB = ExistsSuper(transaction, idB);
+                    bool existesSubB = ExistsSubB(transaction, idB);
 
                     Assert.IsFalse(reLoadedA);
                     Assert.IsFalse(existesSuperA);
@@ -403,6 +404,7 @@ namespace DbGate
                     Assert.IsFalse(reLoadedB);
                     Assert.IsFalse(existesSuperB);
                     Assert.IsFalse(existesSubB);
+                    transaction.Commit();
                 }
 
                 connection.Close();
@@ -414,11 +416,11 @@ namespace DbGate
             }
         }
 
-        private bool LoadEntityWithTypeA(IDbConnection connection, IInheritanceTestSuperEntity loadEntity, int id)
+        private bool LoadEntityWithTypeA(ITransaction transaction, IInheritanceTestSuperEntity loadEntity, int id)
         {
             bool loaded = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from inheritance_test_suba where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -429,18 +431,18 @@ namespace DbGate
             IDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                loadEntity.Retrieve(reader, connection);
+                loadEntity.Retrieve(reader, transaction);
                 loaded = true;
             }
 
             return loaded;
         }
 
-        private bool LoadEntityWithTypeB(IDbConnection connection, IInheritanceTestSuperEntity loadEntity, int id)
+        private bool LoadEntityWithTypeB(ITransaction transaction, IInheritanceTestSuperEntity loadEntity, int id)
         {
             bool loaded = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from inheritance_test_subb where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -451,18 +453,18 @@ namespace DbGate
             IDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                loadEntity.Retrieve(reader, connection);
+                loadEntity.Retrieve(reader, transaction);
                 loaded = true;
             }
 
             return loaded;
         }
 
-        private bool ExistsSuper(IDbConnection connection, int id)
+        private bool ExistsSuper(ITransaction transaction, int id)
         {
             bool exists = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from inheritance_test_super where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -478,11 +480,11 @@ namespace DbGate
             return exists;
         }
 
-        private bool ExistsSubA(IDbConnection connection, int id)
+        private bool ExistsSubA(ITransaction transaction, int id)
         {
             bool exists = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from inheritance_test_suba where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -498,11 +500,11 @@ namespace DbGate
             return exists;
         }
 
-        private bool ExistsSubB(IDbConnection connection, int id)
+        private bool ExistsSubB(ITransaction transaction, int id)
         {
             bool exists = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from inheritance_test_subb where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();

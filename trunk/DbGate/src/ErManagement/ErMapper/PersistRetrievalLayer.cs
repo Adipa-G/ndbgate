@@ -17,19 +17,19 @@ namespace DbGate.ErManagement.ErMapper
             _persistOperationLayer = new PersistOperationLayer(dbLayer,statistics,config);
         }
 
-        public void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, IDbConnection con) 
+        public void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, ITransaction tx) 
         {
-            _retrievalOperationLayer.Load(readOnlyEntity, reader, con);
+            _retrievalOperationLayer.Load(readOnlyEntity, reader, tx);
         }
 
-        public void Save(IEntity entity,IDbConnection con )
+        public void Save(IEntity entity, ITransaction tx)
         {
-            _persistOperationLayer.Save(entity,con);
+            _persistOperationLayer.Save(entity,tx);
         }
 
-        public ICollection<Object> Select(ISelectionQuery query, IDbConnection con)
+        public ICollection<Object> Select(ISelectionQuery query, ITransaction tx)
         {
-            return _retrievalOperationLayer.Select(query,con);
+            return _retrievalOperationLayer.Select(query,tx);
         }
 
         public void ClearCache()

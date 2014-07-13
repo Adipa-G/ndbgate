@@ -18,13 +18,8 @@ namespace DbGate.ErManagement.ErMapper
         private readonly IPersistRetrievalLayer _persistRetrievalLayer;
         private readonly IDbGateStatistics _statistics;
 
-        private DbGate()
+        public DbGate(int dbType)
         {
-            if (DbConnector.GetSharedInstance() == null)
-            {
-                throw new DbConnectorNotInitializedException("The DBConnector is not initialized");
-            }
-            int dbType = DbConnector.GetSharedInstance().DbType;
             _config = new DbGateConfig();
             _statistics = new DbGateStatistics();
             InitializeDefaults();
@@ -37,24 +32,24 @@ namespace DbGate.ErManagement.ErMapper
 
         #region IDbGate Members
 
-        public void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, IDbConnection con)
+        public void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, ITransaction tx)
         {
-            _persistRetrievalLayer.Load(readOnlyEntity, reader, con);
+            _persistRetrievalLayer.Load(readOnlyEntity, reader, tx);
         }
 
-        public void Save(IEntity entity, IDbConnection con)
+        public void Save(IEntity entity, ITransaction tx)
         {
-            _persistRetrievalLayer.Save(entity, con);
+            _persistRetrievalLayer.Save(entity, tx);
         }
 
-        public ICollection<Object> Select(ISelectionQuery query, IDbConnection con)
+        public ICollection<Object> Select(ISelectionQuery query, ITransaction tx)
         {
-            return _persistRetrievalLayer.Select(query, con);
+            return _persistRetrievalLayer.Select(query, tx);
         }
 
-        public void PatchDataBase(IDbConnection con, ICollection<Type> entityTypes, bool dropAll)
+        public void PatchDataBase(ITransaction tx, ICollection<Type> entityTypes, bool dropAll)
         {
-            _dataMigrationLayer.PatchDataBase(con, entityTypes, dropAll);
+            _dataMigrationLayer.PatchDataBase(tx, entityTypes, dropAll);
         }
 
         public void ClearCache()
@@ -83,22 +78,6 @@ namespace DbGate.ErManagement.ErMapper
         {
             _config.AutoTrackChanges = true;
             _config.LoggerName = DefaultLoggerName;
-        }
-
-        public static IDbGate GetSharedInstance()
-        {
-            if (_dbGate == null)
-            {
-                try
-                {
-                    _dbGate = new DbGate();
-                }
-                catch (DbConnectorNotInitializedException e)
-                {
-                    LogManager.GetLogger(DefaultLoggerName).Fatal(e.Message, e);
-                }
-            }
-            return _dbGate;
         }
     }
 }

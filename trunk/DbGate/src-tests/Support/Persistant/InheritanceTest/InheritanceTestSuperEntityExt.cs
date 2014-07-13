@@ -20,9 +20,9 @@ namespace DbGate.Support.Persistant.InheritanceTest
         public int IdCol { get; set; }
         public string Name { get; set; }
 
-        public abstract void Retrieve(IDataReader reader, IDbConnection con);
+        public abstract void Retrieve(IDataReader reader, ITransaction tx);
 
-        public abstract void Persist(IDbConnection con);
+        public abstract void Persist(ITransaction tx);
 
         public IEntityContext Context
         {

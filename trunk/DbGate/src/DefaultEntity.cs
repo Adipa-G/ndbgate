@@ -14,9 +14,9 @@ namespace DbGate
 
         public EntityStatus Status { get; set; }
 
-        public void Persist(IDbConnection con)
+        public void Persist(ITransaction tx)
         {
-            ErManagement.ErMapper.DbGate.GetSharedInstance().Save(this, con);
+            tx.DbGate.Save(this,tx);
         }
 
         #endregion

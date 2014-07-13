@@ -25,13 +25,13 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
             ColumnTypeMapItems = new List<ColumnTypeMapItem>();
             ReferentialRuleTypeMapItems = new List<ReferentialRuleTypeMapItem>();
         }
-        protected abstract ICollection<MetaTable> ExtractTableData(IDbConnection connection);
+        protected abstract ICollection<MetaTable> ExtractTableData(ITransaction tx);
 
-        protected abstract void ExtractColumnData(IDbConnection connection, MetaTable table);
+        protected abstract void ExtractColumnData(ITransaction tx, MetaTable table);
 
-        protected abstract void ExtractForeignKeyData(IDbConnection connection, MetaTable table);
+        protected abstract void ExtractForeignKeyData(ITransaction tx, MetaTable table);
 
-        protected abstract void ExtractPrimaryKeyData(IDbConnection connection, MetaTable table);
+        protected abstract void ExtractPrimaryKeyData(ITransaction tx, MetaTable table);
 
         protected abstract string CreateCreateTableQuery(MetaComparisonTableGroup tableGroup);
 
@@ -53,19 +53,19 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
 
         protected abstract string CreateDropForeginKeyQuery(MetaComparisonTableGroup tableGroup, MetaComparisonForeignKeyGroup foreignKeyGroup);
 
-        public void Initialize(IDbConnection con)
+        public void Initialize(ITransaction tx)
         {
-            FillDataMappings(con);
-            FillReferentialRuleMappings(con);
+            FillDataMappings(tx);
+            FillReferentialRuleMappings(tx);
         }
 
-        protected virtual void FillDataMappings(IDbConnection con)
+        protected virtual void FillDataMappings(ITransaction tx)
         {
             try
             {
-                if (con is OleDbConnection)
+                if (tx.Connection is OleDbConnection)
                 {
-                    OleDbConnection oleDbConnection = (OleDbConnection) con;
+                    OleDbConnection oleDbConnection = (OleDbConnection) tx.Connection;
                     DataTable typeTable = oleDbConnection.GetOleDbSchemaTable(OleDbSchemaGuid.Provider_Types, null);
                     if (typeTable == null)
                     {
@@ -92,7 +92,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
             }  
         }
 
-        protected void FillReferentialRuleMappings(IDbConnection con)
+        protected void FillReferentialRuleMappings(ITransaction tx)
         {
             ReferentialRuleTypeMapItems.Add(new ReferentialRuleTypeMapItem(ReferentialRuleType.Cascade,"0"));
             ReferentialRuleTypeMapItems.Add(new ReferentialRuleTypeMapItem(ReferentialRuleType.Restrict,"1"));
@@ -147,18 +147,18 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
             return ReferentialRuleType.Unknown;
         }
 
-        public ICollection<IMetaItem> GetMetaData(IDbConnection con)
+        public ICollection<IMetaItem> GetMetaData(ITransaction tx)
         {
-            ICollection<MetaTable> metaTables = ExtractTableData(con);
+            ICollection<MetaTable> metaTables = ExtractTableData(tx);
             ICollection<IMetaItem> metaItems = new List<IMetaItem>();
 
             foreach (MetaTable metaTable in metaTables)
             {
-                ExtractColumnData(con, metaTable);
+                ExtractColumnData(tx, metaTable);
 
-                ExtractPrimaryKeyData(con, metaTable);
+                ExtractPrimaryKeyData(tx, metaTable);
 
-                ExtractForeignKeyData(con, metaTable); 
+                ExtractForeignKeyData(tx, metaTable); 
 
                 metaItems.Add(metaTable);
             }

@@ -7,9 +7,9 @@ namespace DbGate.ErManagement.Query
 {
     public class SelectionQuery : Query , ISelectionQuery
     {
-        public ICollection<object> ToList(IDbConnection con)
+        public ICollection<object> ToList(ITransaction tx)
         {
-            return ErMapper.DbGate.GetSharedInstance().Select(this, con);
+            return tx.DbGate.Select(this, tx);
         }
         
      	public ISelectionQuery Distinct()

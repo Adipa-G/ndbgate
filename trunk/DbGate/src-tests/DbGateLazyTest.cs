@@ -13,6 +13,8 @@ namespace DbGate
 {
     public class DbGateLazyTest
     {
+        private static ITransactionFactory _transactionFactory;
+
         [TestFixtureSetUp]
         public static void Before()
         {
@@ -21,8 +23,8 @@ namespace DbGate
                 log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
                 LogManager.GetLogger(typeof (DbGateSuperEntityRefTest)).Info("Starting in-memory database for unit tests");
-                var dbConnector = new DbConnector("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DbConnector.DbSqllite);
-				Assert.IsNotNull(dbConnector.Connection);
+                _transactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
+                Assert.IsNotNull(_transactionFactory.CreateTransaction());
             }
             catch (Exception ex)
             {
@@ -35,8 +37,8 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                connection.Close();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -47,10 +49,7 @@ namespace DbGate
         [SetUp]
         public void BeforeEach()
         {
-            if (DbConnector.GetSharedInstance() != null)
-            {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().ClearCache();
-            }
+            _transactionFactory.DbGate.ClearCache();
         }
 
         [TearDown]
@@ -58,35 +57,34 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
 
-                IDbCommand command = connection.CreateCommand();
+                IDbCommand command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM lazy_test_root";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table lazy_test_root";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM lazy_test_one2many";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table lazy_test_one2many";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM lazy_test_one2one";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table lazy_test_one2one";
                 command.ExecuteNonQuery();
 
                 transaction.Commit();
-                connection.Close();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -96,14 +94,14 @@ namespace DbGate
         
         private IDbConnection SetupTables()
         {
-            IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-            IDbTransaction transaction = connection.BeginTransaction();
+            ITransaction transaction = _transactionFactory.CreateTransaction();
+            IDbConnection connection = transaction.Connection;
 
             string sql = "Create table lazy_test_root (\n" +
                              "\tid_col Int NOT NULL,\n" +
                              "\tname Varchar(20) NOT NULL,\n" +
                              " Primary Key (id_col))";
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -112,7 +110,7 @@ namespace DbGate
                       "\tindex_no Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col,index_no))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -120,12 +118,17 @@ namespace DbGate
                       "\tid_col Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
             transaction.Commit();
             return connection;
+        }
+
+        private ITransaction CreateTransaction(IDbConnection connection)
+        {
+            return new Transaction(_transactionFactory, connection.BeginTransaction());
         }
     
         [Test]
@@ -133,28 +136,30 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.EnableStatistics = true;
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Statistics.Reset();
-                IDbConnection connection = SetupTables();
-                
-                IDbTransaction transaction = connection.BeginTransaction();
+                _transactionFactory.DbGate.Config.EnableStatistics = true;
+                _transactionFactory.DbGate.Statistics.Reset();
+                IDbConnection con = SetupTables();
+
+                ITransaction transaction = CreateTransaction(con);
                 int id = 45;
                 LazyTestRootEntity entity = new LazyTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 LazyTestRootEntity entityReloaded = new LazyTestRootEntity();
-                LoadEntityWithId(connection,entityReloaded,id);
-                connection.Close();
+                LoadEntityWithId(transaction,entityReloaded,id);
+                transaction.Commit();
+                con.Close();
 
 
                 bool isProxyOneToMany = ProxyUtil.IsProxyType(entityReloaded.One2ManyEntities.GetType());
                 bool isProxyOneToOne = ProxyUtil.IsProxyType(entityReloaded.One2OneEntity.GetType());
                 Assert.IsTrue(isProxyOneToMany);
                 Assert.IsTrue(isProxyOneToOne);
-                Assert.IsTrue(ErManagement.ErMapper.DbGate.GetSharedInstance().Statistics.SelectQueryCount == 0);
+                Assert.IsTrue(_transactionFactory.DbGate.Statistics.SelectQueryCount == 0);
             }
             catch (Exception e)
             {
@@ -168,11 +173,12 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.EnableStatistics = true;
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Statistics.Reset();
-                IDbConnection connection = SetupTables();
-
-                IDbTransaction transaction = connection.BeginTransaction();
+                _transactionFactory.DbGate.Config.EnableStatistics = true;
+                _transactionFactory.DbGate.Statistics.Reset();
+                
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                
                 int id = 45;
                 LazyTestRootEntity entity = new LazyTestRootEntity();
                 entity.IdCol = id;
@@ -192,11 +198,12 @@ namespace DbGate
                 one2One.Name ="One2One";
                 entity.One2OneEntity =one2One;
 
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
-
+                
+                transaction = CreateTransaction(con);
                 LazyTestRootEntity entityReloaded = new LazyTestRootEntity();
-                LoadEntityWithId(connection, entityReloaded, id);
+                LoadEntityWithId(transaction, entityReloaded, id);
                 
                 Assert.IsTrue(entityReloaded.One2ManyEntities.Count == 2);
                 IEnumerator<LazyTestOne2ManyEntity> enumerator = entityReloaded.One2ManyEntities.GetEnumerator();
@@ -206,8 +213,10 @@ namespace DbGate
                 Assert.IsTrue(enumerator.Current.Name.Equals(one2Many2.Name));
                 Assert.IsTrue(entityReloaded.One2OneEntity != null);
                 Assert.IsTrue(entityReloaded.One2OneEntity.Name.Equals(one2One.Name));
-                Assert.IsTrue(ErManagement.ErMapper.DbGate.GetSharedInstance().Statistics.SelectQueryCount == 2);
-                connection.Close();
+                Assert.IsTrue(_transactionFactory.DbGate.Statistics.SelectQueryCount == 2);
+                
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -221,11 +230,12 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.EnableStatistics = true;
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Statistics.Reset();
-                IDbConnection connection = SetupTables();
+                _transactionFactory.DbGate.Config.EnableStatistics = true;
+                _transactionFactory.DbGate.Statistics.Reset();
 
-                IDbTransaction transaction = connection.BeginTransaction();
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                
                 int id = 45;
                 LazyTestRootEntity entity = new LazyTestRootEntity();
                 entity.IdCol = id;
@@ -245,12 +255,13 @@ namespace DbGate
                 one2One.Name = "One2One";
                 entity.One2OneEntity = one2One;
 
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 LazyTestRootEntity entityReloaded = new LazyTestRootEntity();
-                LoadEntityWithId(connection, entityReloaded, id);
-                connection.Close();
+                LoadEntityWithId(transaction, entityReloaded, id);
+                
 
                 Assert.IsTrue(entityReloaded.One2ManyEntities.Count == 2);
                 IEnumerator<LazyTestOne2ManyEntity> enumerator = entityReloaded.One2ManyEntities.GetEnumerator();
@@ -260,7 +271,10 @@ namespace DbGate
                 Assert.IsTrue(enumerator.Current.Name.Equals(one2Many2.Name));
                 Assert.IsTrue(entityReloaded.One2OneEntity != null);
                 Assert.IsTrue(entityReloaded.One2OneEntity.Name.Equals(one2One.Name));
-                Assert.IsTrue(ErManagement.ErMapper.DbGate.GetSharedInstance().Statistics.SelectQueryCount == 2);
+                Assert.IsTrue(_transactionFactory.DbGate.Statistics.SelectQueryCount == 2);
+
+                transaction.Commit();
+                con.Close();
             }
             catch (Exception e)
             {
@@ -274,11 +288,12 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.EnableStatistics = true;
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Statistics.Reset();
-                IDbConnection connection = SetupTables();
+                _transactionFactory.DbGate.Config.EnableStatistics = true;
+                _transactionFactory.DbGate.Statistics.Reset();
 
-                IDbTransaction transaction = connection.BeginTransaction();
+                IDbConnection con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                
                 int id = 45;
                 LazyTestRootEntity entity = new LazyTestRootEntity();
                 entity.IdCol = id;
@@ -298,18 +313,17 @@ namespace DbGate
                 one2One.Name = "One2One";
                 entity.One2OneEntity = one2One;
 
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 LazyTestRootEntity entityReloaded = new LazyTestRootEntity();
-                LoadEntityWithId(connection, entityReloaded, id);
-
-                transaction = connection.BeginTransaction();
-                entity.Persist(connection);
+                LoadEntityWithId(transaction, entityReloaded, id);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                Assert.IsTrue(ErManagement.ErMapper.DbGate.GetSharedInstance().Statistics.SelectQueryCount == 0);
-                connection.Close();
+                Assert.IsTrue(_transactionFactory.DbGate.Statistics.SelectQueryCount == 0);
+                con.Close();
             }
             catch (Exception e)
             {
@@ -318,11 +332,11 @@ namespace DbGate
             }
         }
 
-        private bool LoadEntityWithId(IDbConnection connection, LazyTestRootEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, LazyTestRootEntity loadEntity,int id)
         {
             bool loaded = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from lazy_test_root where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -334,7 +348,7 @@ namespace DbGate
             IDataReader dataReader = cmd.ExecuteReader();
             if (dataReader.Read())
             {
-                loadEntity.Retrieve(dataReader, connection);
+                loadEntity.Retrieve(dataReader, transaction);
                 loaded = true;
             }
 

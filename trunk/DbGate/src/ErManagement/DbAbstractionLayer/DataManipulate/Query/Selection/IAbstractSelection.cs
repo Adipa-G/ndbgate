@@ -8,6 +8,6 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
     {
         String CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo);
 
-        Object Retrieve(IDataReader rs, IDbConnection con, QueryBuildInfo buildInfo);
+        Object Retrieve(IDataReader rs, ITransaction tx, QueryBuildInfo buildInfo);
     }
 }

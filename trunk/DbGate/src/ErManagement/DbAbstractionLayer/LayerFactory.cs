@@ -6,11 +6,11 @@
         {
             switch (dbType)
             {
-                case DbConnector.DbAccess:
+                case DefaultTransactionFactory.DbAccess:
                     return new AccessDbLayer(config);
-                case DbConnector.DbMysql:
+                case DefaultTransactionFactory.DbMysql:
                     return new MySqlDbLayer(config);
-                case DbConnector.DbSqllite:
+                case DefaultTransactionFactory.DbSqllite:
                     return new SqlLiteDbLayer(config);
                 default:
                     return new DefaultDbLayer(config);

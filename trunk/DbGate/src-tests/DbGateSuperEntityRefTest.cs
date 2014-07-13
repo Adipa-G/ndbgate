@@ -13,6 +13,8 @@ namespace DbGate
 {
     public class DbGateSuperEntityRefTest
     {
+        private static ITransactionFactory _transactionFactory;
+
         [TestFixtureSetUp]
         public static void Before()
         {
@@ -21,8 +23,8 @@ namespace DbGate
                 log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
                 LogManager.GetLogger(typeof (DbGateSuperEntityRefTest)).Info("Starting in-memory database for unit tests");
-                var dbConnector = new DbConnector("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DbConnector.DbSqllite);
-				Assert.IsNotNull(dbConnector.Connection);
+                _transactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
+				Assert.IsNotNull(_transactionFactory.CreateTransaction());
             }
             catch (Exception ex)
             {
@@ -35,8 +37,8 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                connection.Close();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -47,10 +49,7 @@ namespace DbGate
         [SetUp]
         public void BeforeEach()
         {
-            if (DbConnector.GetSharedInstance() != null)
-            {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().ClearCache();
-            }
+            _transactionFactory.DbGate.ClearCache();
         }
 
         [TearDown]
@@ -58,67 +57,66 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
 
-                IDbCommand command = connection.CreateCommand();
+                IDbCommand command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM super_entity_ref_test_root";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table super_entity_ref_test_root";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM super_entity_ref_test_one2many";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table super_entity_ref_test_one2many";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM super_entity_ref_test_one2many_a";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table super_entity_ref_test_one2many_a";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM super_entity_ref_test_one2many_b";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table super_entity_ref_test_one2many_b";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM super_entity_ref_test_one2one";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table super_entity_ref_test_one2one";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM super_entity_ref_test_one2one_a";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table super_entity_ref_test_one2one_a";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM super_entity_ref_test_one2one_b";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table super_entity_ref_test_one2one_b";
                 command.ExecuteNonQuery();
 
                 transaction.Commit();
-                connection.Close();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -128,14 +126,14 @@ namespace DbGate
         
         private IDbConnection SetupTables()
         {
-            IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-            IDbTransaction transaction = connection.BeginTransaction();
-
+            ITransaction transaction = _transactionFactory.CreateTransaction();
+            IDbConnection connection = transaction.Connection;
+   
             string sql = "Create table super_entity_ref_test_root (\n" +
                              "\tid_col Int NOT NULL,\n" +
                              "\tname Varchar(100) NOT NULL,\n" +
                              " Primary Key (id_col))";
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -144,7 +142,7 @@ namespace DbGate
                       "\tindex_no Int NOT NULL,\n" +
                       "\tname Varchar(100) NOT NULL,\n" +
                       " Primary Key (id_col,index_no))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -153,7 +151,7 @@ namespace DbGate
                       "\tindex_no Int NOT NULL,\n" +
                       "\tname_a Varchar(100) NOT NULL,\n" +
                       " Primary Key (id_col,index_no))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -162,7 +160,7 @@ namespace DbGate
                       "\tindex_no Int NOT NULL,\n" +
                       "\tname_b Varchar(100) NOT NULL,\n" +
                       " Primary Key (id_col,index_no))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -170,7 +168,7 @@ namespace DbGate
                       "\tid_col Int NOT NULL,\n" +
                       "\tname Varchar(100) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -178,7 +176,7 @@ namespace DbGate
                       "\tid_col Int NOT NULL,\n" +
                       "\tname_a Varchar(100) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -186,12 +184,17 @@ namespace DbGate
                       "\tid_col Int NOT NULL,\n" +
                       "\tname_b Varchar(100) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
             transaction.Commit();
             return connection;
+        }
+
+        private ITransaction CreateTransaction(IDbConnection connection)
+        {
+            return new Transaction(_transactionFactory, connection.BeginTransaction());
         }
     
         [Test]
@@ -199,18 +202,20 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = true;
-                IDbConnection connection = SetupTables();
+                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
                 
-                IDbTransaction transaction = connection.BeginTransaction();
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                
                 int id = 35;
                 SuperEntityRefRootEntity entity = CreateDefaultRootEntity(id, 1, 0, true, false);
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 SuperEntityRefRootEntity entityReloaded = new SuperEntityRefRootEntity();
-                LoadEntityWithId(connection,entityReloaded,id);
-                connection.Close();
+                LoadEntityWithId(transaction,entityReloaded,id);
+                con.Close();
 
                 VerifyEquals(entity, entityReloaded);
             }
@@ -226,18 +231,20 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = true;
-                IDbConnection connection = SetupTables();
+                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
+                
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
 
-                IDbTransaction transaction = connection.BeginTransaction();
                 int id = 35;
                 SuperEntityRefRootEntity entity = CreateDefaultRootEntity(id, 0, 1, true, false);
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 SuperEntityRefRootEntity entityReloaded = new SuperEntityRefRootEntity();
-                LoadEntityWithId(connection, entityReloaded, id);
-                connection.Close();
+                LoadEntityWithId(transaction, entityReloaded, id);
+                transaction.Close();
 
                 VerifyEquals(entity, entityReloaded);
             }
@@ -253,18 +260,20 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = true;
-                IDbConnection connection = SetupTables();
+                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
+                
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
 
-                IDbTransaction transaction = connection.BeginTransaction();
                 int id = 35;
                 SuperEntityRefRootEntity entity = CreateDefaultRootEntity(id, 10, 0, true, false);
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 SuperEntityRefRootEntity entityReloaded = new SuperEntityRefRootEntity();
-                LoadEntityWithId(connection, entityReloaded, id);
-                connection.Close();
+                LoadEntityWithId(transaction, entityReloaded, id);
+                transaction.Close();
 
                 VerifyEquals(entity, entityReloaded);
             }
@@ -280,18 +289,20 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = true;
-                IDbConnection connection = SetupTables();
+                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
+                
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
 
-                IDbTransaction transaction = connection.BeginTransaction();
                 int id = 35;
                 SuperEntityRefRootEntity entity = CreateDefaultRootEntity(id, 0, 10, true, false);
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 SuperEntityRefRootEntity entityReloaded = new SuperEntityRefRootEntity();
-                LoadEntityWithId(connection, entityReloaded, id);
-                connection.Close();
+                LoadEntityWithId(transaction, entityReloaded, id);
+                transaction.Close();
 
                 VerifyEquals(entity, entityReloaded);
             }
@@ -307,18 +318,20 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = true;
-                IDbConnection connection = SetupTables();
+                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
+                
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
 
-                IDbTransaction transaction = connection.BeginTransaction();
                 int id = 35;
                 SuperEntityRefRootEntity entity = CreateDefaultRootEntity(id, 10, 10, true, false);
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 SuperEntityRefRootEntity entityReloaded = new SuperEntityRefRootEntity();
-                LoadEntityWithId(connection, entityReloaded, id);
-                connection.Close();
+                LoadEntityWithId(transaction, entityReloaded, id);
+                transaction.Close();
 
                 VerifyEquals(entity, entityReloaded);
             }
@@ -334,18 +347,20 @@ namespace DbGate
         {
             try
             {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().Config.AutoTrackChanges = true;
-                IDbConnection connection = SetupTables();
-
-                IDbTransaction transaction = connection.BeginTransaction();
+                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
+                
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+                
                 int id = 35;
                 SuperEntityRefRootEntity entity = CreateDefaultRootEntity(id, 0, 0, false, false);
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
+                transaction = CreateTransaction(con);
                 SuperEntityRefRootEntity entityReloaded = new SuperEntityRefRootEntity();
-                LoadEntityWithId(connection, entityReloaded, id);
-                connection.Close();
+                LoadEntityWithId(transaction, entityReloaded, id);
+                transaction.Close();
 
                 VerifyEquals(entity, entityReloaded);
             }
@@ -480,11 +495,11 @@ namespace DbGate
 	        return entity;
         }
 
-        private bool LoadEntityWithId(IDbConnection connection, SuperEntityRefRootEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, SuperEntityRefRootEntity loadEntity,int id)
         {
             bool loaded = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from super_entity_ref_test_root where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -496,7 +511,7 @@ namespace DbGate
             IDataReader dataReader = cmd.ExecuteReader();
             if (dataReader.Read())
             {
-                loadEntity.Retrieve(dataReader, connection);
+                loadEntity.Retrieve(dataReader, transaction);
                 loaded = true;
             }
 

@@ -8,6 +8,6 @@ namespace DbGate.ErManagement.DbAbstractionLayer
     {
         IDataManipulate DataManipulate();
 
-        IMetaManipulate MetaManipulate(IDbConnection con);
+        IMetaManipulate MetaManipulate(ITransaction tx);
     }
 }

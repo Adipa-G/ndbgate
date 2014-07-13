@@ -23,7 +23,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
             return Sql;
         }
 
-        public Object Retrieve(IDataReader rs, IDbConnection con, QueryBuildInfo buildInfo)
+        public Object Retrieve(IDataReader rs, ITransaction tx, QueryBuildInfo buildInfo)
         {
             try
             {

@@ -21,7 +21,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 
         void SetToPreparedStatement(IDbCommand cmd, object obj, int parameterIndex, IColumn column);
 
-        IDataReader CreateResultSet(IDbConnection con, QueryExecInfo execInfo);
+        IDataReader CreateResultSet(ITransaction tx, QueryExecInfo execInfo);
 
         QueryBuildInfo ProcessQuery(QueryBuildInfo buildInfo, QueryStructure structure);
     }

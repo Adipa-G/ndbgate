@@ -11,14 +11,14 @@ namespace DbGate.Support.Persistant.InheritanceTest
         {
         }
 
-        public override void Persist(IDbConnection con)
+        public override void Persist(ITransaction tx)
         {
-            ErManagement.ErMapper.DbGate.GetSharedInstance().Save(this, con);
+            tx.DbGate.Save(this,tx);
         }
 
-        public override void Retrieve(IDataReader rs, IDbConnection con)
+        public override void Retrieve(IDataReader rs, ITransaction tx)
         {
-            ErManagement.ErMapper.DbGate.GetSharedInstance().Load(this, rs, con);
+            tx.DbGate.Load(this,rs,tx);
         }
     }
 }

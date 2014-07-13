@@ -13,6 +13,8 @@ namespace DbGate
 {
     public class DbGateConstraintValidationTest
     {
+        private static ITransactionFactory _transactionFactory;
+
         [TestFixtureSetUp]
         public static void Before()
         {
@@ -21,8 +23,8 @@ namespace DbGate
                 log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
                 LogManager.GetLogger(typeof (DbGateConstraintValidationTest)).Info("Starting in-memory database for unit tests");
-                var dbConnector = new DbConnector("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DbConnector.DbSqllite);
-				Assert.IsNotNull(dbConnector.Connection);
+                _transactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
+                Assert.IsNotNull(_transactionFactory.CreateTransaction());
             }
             catch (Exception ex)
             {
@@ -35,8 +37,8 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                connection.Close();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -47,10 +49,7 @@ namespace DbGate
         [SetUp]
         public void BeforeEach()
         {
-            if (DbConnector.GetSharedInstance() != null)
-            {
-                ErManagement.ErMapper.DbGate.GetSharedInstance().ClearCache();
-            }
+            _transactionFactory.DbGate.ClearCache();
         }
 
         [TearDown]
@@ -58,35 +57,34 @@ namespace DbGate
         {
             try
             {
-                IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = _transactionFactory.CreateTransaction();
 
-                IDbCommand command = connection.CreateCommand();
+                IDbCommand command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM constraint_test_root";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table constraint_test_root";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM constraint_test_one2many";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table constraint_test_one2many";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "DELETE FROM constraint_test_one2one";
                 command.ExecuteNonQuery();
 
-                command = connection.CreateCommand();
+                command = transaction.CreateCommand();
                 command.CommandText = "drop table constraint_test_one2one";
                 command.ExecuteNonQuery();
 
                 transaction.Commit();
-                connection.Close();
+                transaction.Close();
             }
             catch (Exception ex)
             {
@@ -96,14 +94,14 @@ namespace DbGate
         
         private IDbConnection SetupTables()
         {
-            IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-            IDbTransaction transaction = connection.BeginTransaction();
+            ITransaction transaction = _transactionFactory.CreateTransaction();
+            IDbConnection connection = transaction.Connection;
 
             string sql = "Create table constraint_test_root (\n" +
                          "\tid_col Int NOT NULL,\n" +
                          "\tname Varchar(20) NOT NULL,\n" +
                          " Primary Key (id_col))";
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -112,7 +110,7 @@ namespace DbGate
                   "\tindex_no Int NOT NULL,\n" +
                   "\tname Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col,index_no))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
@@ -120,12 +118,17 @@ namespace DbGate
                   "\tid_col Int NOT NULL,\n" +
                   "\tname Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col))";
-            cmd = connection.CreateCommand();
+            cmd = transaction.CreateCommand();
             cmd.CommandText = sql;
             cmd.ExecuteNonQuery();
 
             transaction.Commit();
             return connection;
+        }
+
+        private ITransaction CreateTransaction(IDbConnection connection)
+        {
+            return new Transaction(_transactionFactory, connection.BeginTransaction());
         }
 
         [Test]
@@ -134,31 +137,32 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ConstraintTestReverseRootEntity entity = new ConstraintTestReverseRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestOne2OneEntity one2OneEntity = new ConstraintTestOne2OneEntity();
                 one2OneEntity.IdCol = id;
                 one2OneEntity.Name = "Child-Org-Name";
-                one2OneEntity.Persist(connection);
+                one2OneEntity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestReverseRootEntity loadedEntity = new ConstraintTestReverseRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.One2OneEntity.Status =EntityStatus.Deleted;
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
-                bool hasOneToOne = ExistsOne2OneChild(connection,id);
-                bool hasRoot = ExistsRoot(connection,id);
+                transaction = CreateTransaction(connection);
+                bool hasOneToOne = ExistsOne2OneChild(transaction, id);
+                bool hasRoot = ExistsRoot(transaction, id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsTrue(hasOneToOne);
@@ -177,35 +181,36 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ConstraintTestReverseRootEntity entity = new ConstraintTestReverseRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestOne2ManyEntity one2ManyEntity = new ConstraintTestOne2ManyEntity();
                 one2ManyEntity.IdCol= id;
                 one2ManyEntity.IndexNo = 1;
                 one2ManyEntity.Name = "Child-Org-Name";
-                one2ManyEntity.Persist(connection);
+                one2ManyEntity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestReverseRootEntity loadedEntity = new ConstraintTestReverseRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 IEnumerator<ConstraintTestOne2ManyEntity> childEnumarator = loadedEntity.One2ManyEntities.GetEnumerator();
                 childEnumarator.MoveNext();
                 ConstraintTestOne2ManyEntity loadedOne2ManyEntity = childEnumarator.Current;
                 loadedOne2ManyEntity.Status = EntityStatus.Deleted;
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
-                bool hasOneToMany = ExistsOne2ManyChild(connection,id);
-                bool hasRoot = ExistsRoot(connection,id);
+                transaction = CreateTransaction(connection);
+                bool hasOneToMany = ExistsOne2ManyChild(transaction, id);
+                bool hasRoot = ExistsRoot(transaction, id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsTrue(hasOneToMany);
@@ -224,31 +229,33 @@ namespace DbGate
             try
             {
                 IDbConnection connection = SetupTables();
-
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
+                
                 int id = 45;
                 ConstraintTestReverseRootEntity entity = new ConstraintTestReverseRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestOne2OneEntity one2OneEntity = new ConstraintTestOne2OneEntity();
                 one2OneEntity.IdCol = id;
                 one2OneEntity.Name = "Child-Org-Name";
-                one2OneEntity.Persist(connection);
+                one2OneEntity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestReverseRootEntity loadedEntity = new ConstraintTestReverseRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.Status = EntityStatus.Deleted;
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
-                bool hasOneToOne = ExistsOne2OneChild(connection,id);
-                bool hasRoot = ExistsRoot(connection,id);
+                transaction = CreateTransaction(connection);
+                bool hasOneToOne = ExistsOne2OneChild(transaction,id);
+                bool hasRoot = ExistsRoot(transaction,id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsTrue(hasOneToOne);
@@ -268,31 +275,33 @@ namespace DbGate
             {
                 IDbConnection connection = SetupTables();
 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ConstraintTestReverseRootEntity entity = new ConstraintTestReverseRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestOne2ManyEntity one2ManyEntity = new ConstraintTestOne2ManyEntity();
                 one2ManyEntity.IdCol = id;
                 one2ManyEntity.IndexNo = 1;
                 one2ManyEntity.Name = "Child-Org-Name";
-                one2ManyEntity.Persist(connection);
+                one2ManyEntity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestReverseRootEntity loadedEntity = new ConstraintTestReverseRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.Status = EntityStatus.Deleted;
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
-                bool hasOneToMany = ExistsOne2ManyChild(connection,id);
-                bool hasRoot = ExistsRoot(connection,id);
+                transaction = CreateTransaction(connection);
+                bool hasOneToMany = ExistsOne2ManyChild(transaction,id);
+                bool hasRoot = ExistsRoot(transaction,id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsTrue(hasOneToMany);
@@ -311,26 +320,26 @@ namespace DbGate
         {
             IDbConnection connection = SetupTables();
 
-            IDbTransaction transaction = connection.BeginTransaction();
+            ITransaction transaction = CreateTransaction(connection);
             int id = 45;
             ConstraintTestDeleteRestrictRootEntity entity = new ConstraintTestDeleteRestrictRootEntity();
             entity.IdCol =id;
             entity.Name = "Org-Name";
-            entity.Persist(connection);
+            entity.Persist(transaction);
             transaction.Commit();
 
-            transaction = connection.BeginTransaction();
+            transaction = CreateTransaction(connection);
             ConstraintTestOne2OneEntity one2OneEntity = new ConstraintTestOne2OneEntity();
             one2OneEntity.IdCol = id;
             one2OneEntity.Name = "Child-Org-Name";
-            one2OneEntity.Persist(connection);
+            one2OneEntity.Persist(transaction);
             transaction.Commit();
 
-            transaction = connection.BeginTransaction();
+            transaction = CreateTransaction(connection);
             ConstraintTestDeleteRestrictRootEntity loadedEntity = new ConstraintTestDeleteRestrictRootEntity();
-            LoadEntityWithId(connection,loadedEntity,id);
+            LoadEntityWithId(transaction,loadedEntity,id);
             loadedEntity.Status = EntityStatus.Deleted;
-            loadedEntity.Persist(connection);
+            loadedEntity.Persist(transaction);
             transaction.Commit();
             connection.Close();
         }
@@ -341,26 +350,26 @@ namespace DbGate
         {
             IDbConnection connection = SetupTables();
 
-            IDbTransaction transaction = connection.BeginTransaction();
+            ITransaction transaction = CreateTransaction(connection);
             int id = 45;
             ConstraintTestDeleteRestrictRootEntity entity = new ConstraintTestDeleteRestrictRootEntity();
             entity.IdCol = id;
             entity.Name = "Org-Name";
-            entity.Persist(connection);
+            entity.Persist(transaction);
             transaction.Commit();
 
-            transaction = connection.BeginTransaction();
+            transaction = CreateTransaction(connection);
             ConstraintTestOne2ManyEntity one2ManyEntity = new ConstraintTestOne2ManyEntity();
             one2ManyEntity.IdCol = id;
             one2ManyEntity.Name = "Child-Org-Name";
-            one2ManyEntity.Persist(connection);
+            one2ManyEntity.Persist(transaction);
             transaction.Commit();
 
-            transaction = connection.BeginTransaction();
+            transaction = CreateTransaction(connection);
             ConstraintTestDeleteRestrictRootEntity loadedEntity = new ConstraintTestDeleteRestrictRootEntity();
-            LoadEntityWithId(connection,loadedEntity,id);
+            LoadEntityWithId(transaction,loadedEntity,id);
             loadedEntity.Status = EntityStatus.Deleted;
-            loadedEntity.Persist(connection);
+            loadedEntity.Persist(transaction);
             transaction.Commit();
             connection.Close();
         }
@@ -372,34 +381,36 @@ namespace DbGate
             {
                 IDbConnection connection = SetupTables();
 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ConstraintTestDeleteCascadeRootEntity entity = new ConstraintTestDeleteCascadeRootEntity();
                 entity.IdCol =id;
                 entity.Name ="Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestOne2ManyEntity one2ManyEntity = new ConstraintTestOne2ManyEntity();
                 one2ManyEntity.IdCol =id;
                 one2ManyEntity.IndexNo=1;
                 one2ManyEntity.Name ="Child-Org-Name";
-                one2ManyEntity.Persist(connection);
+                one2ManyEntity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestDeleteCascadeRootEntity loadedEntity = new ConstraintTestDeleteCascadeRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
                 IEnumerator<ConstraintTestOne2ManyEntity> childEnumarator = loadedEntity.One2ManyEntities.GetEnumerator();
                 childEnumarator.MoveNext();
                 ConstraintTestOne2ManyEntity loadedOne2ManyEntity = childEnumarator.Current;
                 loadedOne2ManyEntity.Status = EntityStatus.Deleted;
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
-                bool hasOneToMany = ExistsOne2ManyChild(connection,id);
-                bool hasRoot = ExistsRoot(connection,id);
+                transaction = CreateTransaction(connection);
+                bool hasOneToMany = ExistsOne2ManyChild(transaction,id);
+                bool hasRoot = ExistsRoot(transaction,id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsFalse(hasOneToMany);
@@ -419,30 +430,32 @@ namespace DbGate
             {
                 IDbConnection connection = SetupTables();
 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ConstraintTestDeleteCascadeRootEntity entity = new ConstraintTestDeleteCascadeRootEntity();
                 entity.IdCol =id;
                 entity.Name ="Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestOne2OneEntity one2ManyEntity = new ConstraintTestOne2OneEntity();
                 one2ManyEntity.IdCol =id;
                 one2ManyEntity.Name ="Child-Org-Name";
-                one2ManyEntity.Persist(connection);
+                one2ManyEntity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestDeleteCascadeRootEntity loadedEntity = new ConstraintTestDeleteCascadeRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2OneEntity.Status = EntityStatus.Deleted;
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
-                bool hasOneToOne = ExistsOne2ManyChild(connection,id);
-                bool hasRoot = ExistsRoot(connection,id);
+                transaction = CreateTransaction(connection);
+                bool hasOneToOne = ExistsOne2ManyChild(transaction,id);
+                bool hasRoot = ExistsRoot(transaction,id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsFalse(hasOneToOne);
@@ -462,31 +475,33 @@ namespace DbGate
             {
                 IDbConnection connection = SetupTables();
 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ConstraintTestDeleteCascadeRootEntity entity = new ConstraintTestDeleteCascadeRootEntity();
                 entity.IdCol =id;
                 entity.Name ="Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestOne2ManyEntity one2ManyEntity = new ConstraintTestOne2ManyEntity();
                 one2ManyEntity.IdCol =id;
                 one2ManyEntity.IndexNo=1;
                 one2ManyEntity.Name ="Child-Org-Name";
-                one2ManyEntity.Persist(connection);
+                one2ManyEntity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestDeleteCascadeRootEntity loadedEntity = new ConstraintTestDeleteCascadeRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.Status = EntityStatus.Deleted;
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
-                bool hasOneToMany = ExistsOne2ManyChild(connection,id);
-                bool hasRoot = ExistsRoot(connection,id);
+                transaction = CreateTransaction(connection);
+                bool hasOneToMany = ExistsOne2ManyChild(transaction,id);
+                bool hasRoot = ExistsRoot(transaction,id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsFalse(hasOneToMany);
@@ -506,30 +521,32 @@ namespace DbGate
             {
                 IDbConnection connection = SetupTables();
 
-                IDbTransaction transaction = connection.BeginTransaction();
+                ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
                 ConstraintTestDeleteCascadeRootEntity entity = new ConstraintTestDeleteCascadeRootEntity();
                 entity.IdCol =id;
                 entity.Name ="Org-Name";
-                entity.Persist(connection);
+                entity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestOne2OneEntity one2ManyEntity = new ConstraintTestOne2OneEntity();
                 one2ManyEntity.IdCol =id;
                 one2ManyEntity.Name ="Child-Org-Name";
-                one2ManyEntity.Persist(connection);
+                one2ManyEntity.Persist(transaction);
                 transaction.Commit();
 
-                transaction = connection.BeginTransaction();
+                transaction = CreateTransaction(connection);
                 ConstraintTestDeleteCascadeRootEntity loadedEntity = new ConstraintTestDeleteCascadeRootEntity();
-                LoadEntityWithId(connection,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.Status = EntityStatus.Deleted;
-                loadedEntity.Persist(connection);
+                loadedEntity.Persist(transaction);
                 transaction.Commit();
 
-                bool hasOneToOne = ExistsOne2ManyChild(connection,id);
-                bool hasRoot = ExistsRoot(connection,id);
+                transaction = CreateTransaction(connection);
+                bool hasOneToOne = ExistsOne2ManyChild(transaction, id);
+                bool hasRoot = ExistsRoot(transaction, id);
+                transaction.Commit();
                 connection.Close();
 
                 Assert.IsFalse(hasOneToOne);
@@ -542,11 +559,11 @@ namespace DbGate
             }
         }
 
-        private bool LoadEntityWithId(IDbConnection connection, ConstraintTestDeleteCascadeRootEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, ConstraintTestDeleteCascadeRootEntity loadEntity,int id)
         {
             bool loaded = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from constraint_test_root where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -558,18 +575,18 @@ namespace DbGate
             IDataReader dataReader = cmd.ExecuteReader();
             if (dataReader.Read())
             {
-                loadEntity.Retrieve(dataReader, connection);
+                loadEntity.Retrieve(dataReader, transaction);
                 loaded = true;
             }
 
             return loaded;
         }
 
-        private bool LoadEntityWithId(IDbConnection connection, ConstraintTestDeleteRestrictRootEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, ConstraintTestDeleteRestrictRootEntity loadEntity,int id)
         {
             bool loaded = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from constraint_test_root where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -581,18 +598,18 @@ namespace DbGate
             IDataReader dataReader = cmd.ExecuteReader();
             if (dataReader.Read())
             {
-                loadEntity.Retrieve(dataReader, connection);
+                loadEntity.Retrieve(dataReader, transaction);
                 loaded = true;
             }
 
             return loaded;
         }
 
-        private bool LoadEntityWithId(IDbConnection connection, ConstraintTestReverseRootEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, ConstraintTestReverseRootEntity loadEntity,int id)
         {
             bool loaded = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from constraint_test_root where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -604,18 +621,18 @@ namespace DbGate
             IDataReader dataReader = cmd.ExecuteReader();
             if (dataReader.Read())
             {
-                loadEntity.Retrieve(dataReader, connection);
+                loadEntity.Retrieve(dataReader, transaction);
                 loaded = true;
             }
 
             return loaded;
         }
 
-        private bool ExistsRoot(IDbConnection connection,int id)
+        private bool ExistsRoot(ITransaction transaction,int id)
         {
             bool exists = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from constraint_test_root where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -631,11 +648,11 @@ namespace DbGate
             return exists;
         }
 
-        private bool ExistsOne2OneChild(IDbConnection connection,int id)
+        private bool ExistsOne2OneChild(ITransaction transaction,int id)
         {
             bool exists = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from constraint_test_one2one where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -651,11 +668,11 @@ namespace DbGate
             return exists;
         }
 
-        private bool ExistsOne2ManyChild(IDbConnection connection,int id)
+        private bool ExistsOne2ManyChild(ITransaction transaction,int id)
         {
             bool exists = false;
 
-            IDbCommand cmd = connection.CreateCommand();
+            IDbCommand cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from constraint_test_one2many where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();

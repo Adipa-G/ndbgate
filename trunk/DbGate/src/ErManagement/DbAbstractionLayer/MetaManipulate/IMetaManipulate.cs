@@ -8,7 +8,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
 {
     public interface IMetaManipulate
     {
-        void Initialize(IDbConnection con);
+        void Initialize(ITransaction tx);
 
         ColumnType MapColumnTypeNameToType(string columnTypeName);
 
@@ -18,7 +18,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
 
         ReferentialRuleType MapReferentialRuleNameToType(string ruleTypeName);
 
-        ICollection<IMetaItem> GetMetaData(IDbConnection con);
+        ICollection<IMetaItem> GetMetaData(ITransaction tx);
 
         ICollection<MetaQueryHolder> CreateDbPathSql(IMetaComparisonGroup metaComparisonGroup);
 

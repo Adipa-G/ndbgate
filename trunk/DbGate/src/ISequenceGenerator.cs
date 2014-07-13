@@ -4,6 +4,6 @@ namespace DbGate
 {
     public interface ISequenceGenerator
     {
-        object GetNextSequenceValue(IDbConnection con);
+        object GetNextSequenceValue(ITransaction tx);
     }
 }

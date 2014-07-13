@@ -274,11 +274,11 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 		    parameter.DbType = ColumnTypeMapping.GetSqlType(columnType);
         }
 
-        public IDataReader CreateResultSet(IDbConnection con, QueryExecInfo execInfo)
+        public IDataReader CreateResultSet(ITransaction tx, QueryExecInfo execInfo)
         {
             IDbCommand cmd;
 
-            cmd = con.CreateCommand();
+            cmd = tx.CreateCommand();
             cmd.CommandText = execInfo.Sql;
 
             var cmdParams = execInfo.Params;
