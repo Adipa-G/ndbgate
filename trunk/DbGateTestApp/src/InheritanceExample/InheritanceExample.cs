@@ -21,25 +21,21 @@ namespace DbGateTestApp.InheritanceExample
             return entity;
         }
 
-        public void Patch(IDbConnection con) 
+        public void Patch(ITransaction tx) 
         {
             ICollection<Type> entityTypes = new List<Type>();
             entityTypes.Add(typeof(BottomEntity));
-            IDbTransaction transaction = con.BeginTransaction();
-            DbGate._transactionFactory.DbGate.PatchDataBase(con, entityTypes, false);
-            transaction.Commit();
+            tx.DbGate.PatchDataBase(tx, entityTypes, false);
         }
 
-        public void Persist(IDbConnection con, BottomEntity entity)
+        public void Persist(ITransaction tx, BottomEntity entity)
         {
-            IDbTransaction transaction = con.BeginTransaction();
-            entity.Persist(con);
-            transaction.Commit();
+            entity.Persist(tx);
         }
 
-        public BottomEntity Retrieve(IDbConnection con)
+        public BottomEntity Retrieve(ITransaction tx)
         {
-            IDbCommand cmd = con.CreateCommand();
+            IDbCommand cmd = tx.CreateCommand();
             cmd.CommandText = "select * from bottom_entity where id = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -52,7 +48,7 @@ namespace DbGateTestApp.InheritanceExample
             if (reader.Read())
             {
                 entity = new BottomEntity();
-                entity.Retrieve(reader, con);
+                entity.Retrieve(reader, tx);
             }
             DbMgtUtility.Close(reader);
             DbMgtUtility.Close(cmd);
@@ -62,13 +58,13 @@ namespace DbGateTestApp.InheritanceExample
         public static void DoTest()
         {
             InheritanceExample example = new InheritanceExample();
-            IDbConnection con = ExampleBase.SetupDb();
-            example.Patch(con);
+            ITransaction tx = ExampleBase.SetupDb();
+            example.Patch(tx);
 
             BottomEntity entity = example.CreateEntity();
-            example.Persist(con, entity);
+            example.Persist(tx, entity);
 
-            entity = example.Retrieve(con);
+            entity = example.Retrieve(tx);
             Console.WriteLine("Entity Super Name = " + entity.SuperName);
             Console.WriteLine("Entity Middle Name = " + entity.MiddleName);
             Console.WriteLine("Entity Sub Name = " + entity.SubName);
@@ -76,17 +72,17 @@ namespace DbGateTestApp.InheritanceExample
             entity.SuperName = "Updated Super";
             entity.MiddleName = "Updated Middle";
             entity.SubName = "Updated Sub";
-            example.Persist(con, entity);
+            example.Persist(tx, entity);
 
-            entity = example.Retrieve(con);
+            entity = example.Retrieve(tx);
             Console.WriteLine("Entity Super Name = " + entity.SuperName);
             Console.WriteLine("Entity Middle Name = " + entity.MiddleName);
             Console.WriteLine("Entity Sub Name = " + entity.SubName);
 
             entity.Status = EntityStatus.Deleted;
-            example.Persist(con, entity);
+            example.Persist(tx, entity);
 
-            entity = example.Retrieve(con);
+            entity = example.Retrieve(tx);
             Console.WriteLine("Entity = " + entity);
 
             ExampleBase.CloseDb();

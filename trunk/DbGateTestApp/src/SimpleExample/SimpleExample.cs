@@ -21,29 +21,25 @@ namespace DbGateTestApp.SimpleExample
             return entity;
         }
 
-        public void Patch(IDbConnection con) 
+        public void Patch(ITransaction tx) 
         {
             ICollection<Type> entityTypes = new List<Type>();
             entityTypes.Add(typeof(SimpleEntity));
-            IDbTransaction transaction = con.BeginTransaction();
-            DbGate._transactionFactory.DbGate.PatchDataBase(con, entityTypes, false);
-            transaction.Commit();
+            tx.DbGate.PatchDataBase(tx, entityTypes, false);
         }
 
-        public void Persist(IDbConnection con,SimpleEntity entity)
+        public void Persist(ITransaction tx,SimpleEntity entity)
         {
-            IDbTransaction transaction = con.BeginTransaction();
-            entity.Persist(con);
-            transaction.Commit();
+            entity.Persist(tx);
         }
 
-        public SimpleEntity RetrieveWithQuery(IDbConnection con)
+        public SimpleEntity RetrieveWithQuery(ITransaction tx)
         {
             ISelectionQuery query = new SelectionQuery()
                 .From(QueryFrom.EntityType(typeof(SimpleEntity)))
                 .Select(QuerySelection.EntityType(typeof(SimpleEntity)));
 
-            var result = query.ToList(con).FirstOrDefault();
+            var result = query.ToList(tx).FirstOrDefault();
             if (result == null)
                 return null;
 
@@ -54,25 +50,25 @@ namespace DbGateTestApp.SimpleExample
         public static void DoTest()
         {
             SimpleExample example = new SimpleExample();
-            IDbConnection con = ExampleBase.SetupDb();
-            example.Patch(con);
+            ITransaction tx = ExampleBase.SetupDb();
+            example.Patch(tx);
 
             SimpleEntity entity = example.CreateEntity();
-            example.Persist(con, entity);
+            example.Persist(tx, entity);
 
-            entity = example.RetrieveWithQuery(con);
+            entity = example.RetrieveWithQuery(tx);
             Console.WriteLine("Entity Name = " + entity.Name);
 
             entity.Name = "Updated";
-            example.Persist(con, entity);
+            example.Persist(tx, entity);
 
-            entity = example.RetrieveWithQuery(con);
+            entity = example.RetrieveWithQuery(tx);
             Console.WriteLine("Entity Name = " + entity.Name);
 
             entity.Status = EntityStatus.Deleted;
-            example.Persist(con, entity);
+            example.Persist(tx, entity);
 
-            entity = example.RetrieveWithQuery(con);
+            entity = example.RetrieveWithQuery(tx);
             Console.WriteLine("Entity = " + entity);
 
             ExampleBase.CloseDb();

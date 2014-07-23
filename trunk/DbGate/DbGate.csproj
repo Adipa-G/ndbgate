@@ -98,6 +98,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="src-tests\AbstractDbGateTestBase.cs" />
     <Compile Include="src-tests\DbGateSuperEntityRefTest.cs" />
     <Compile Include="src-tests\DbUtility\DbUtilsTests.cs" />
     <Compile Include="src-tests\DbGateQueryBasicTest.cs" />

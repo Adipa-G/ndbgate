@@ -11,198 +11,87 @@ using NUnit.Framework;
 
 namespace DbGate
 {
-    public class DbGateSuperEntityRefTest
+    public class DbGateSuperEntityRefTest : AbstractDbGateTestBase
     {
-        private static ITransactionFactory _transactionFactory;
+        private const string DBName = "unit-testing-super_entity_ref_test";
 
         [TestFixtureSetUp]
         public static void Before()
         {
-            try
-            {
-                log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
-
-                LogManager.GetLogger(typeof (DbGateSuperEntityRefTest)).Info("Starting in-memory database for unit tests");
-                _transactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
-				Assert.IsNotNull(_transactionFactory.CreateTransaction());
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGateSuperEntityRefTest)).Fatal("Exception during database startup.", ex);
-            }
-        }
-
-        [TestFixtureTearDown]
-        public static void After()
-        {
-            try
-            {
-                ITransaction transaction = _transactionFactory.CreateTransaction();
-                transaction.Close();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGateSuperEntityRefTest)).Fatal("Exception during test cleanup.", ex);
-            }
+            TestClass = typeof(DbGateSuperEntityRefTest);
         }
 
         [SetUp]
         public void BeforeEach()
         {
-            _transactionFactory.DbGate.ClearCache();
+            BeginInit(DBName);
+            TransactionFactory.DbGate.ClearCache();
         }
 
         [TearDown]
         public void AfterEach()
         {
-            try
-            {
-                ITransaction transaction = _transactionFactory.CreateTransaction();
-
-                IDbCommand command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM super_entity_ref_test_root";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table super_entity_ref_test_root";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM super_entity_ref_test_one2many";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table super_entity_ref_test_one2many";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM super_entity_ref_test_one2many_a";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table super_entity_ref_test_one2many_a";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM super_entity_ref_test_one2many_b";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table super_entity_ref_test_one2many_b";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM super_entity_ref_test_one2one";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table super_entity_ref_test_one2one";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM super_entity_ref_test_one2one_a";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table super_entity_ref_test_one2one_a";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM super_entity_ref_test_one2one_b";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table super_entity_ref_test_one2one_b";
-                command.ExecuteNonQuery();
-
-                transaction.Commit();
-                transaction.Close();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof(DbGateSuperEntityRefTest)).Fatal("Exception during test cleanup.", ex);
-            }
+            CleanupDb(DBName);
+            FinalizeDb(DBName);
         }
         
         private IDbConnection SetupTables()
         {
-            ITransaction transaction = _transactionFactory.CreateTransaction();
-            IDbConnection connection = transaction.Connection;
-   
             string sql = "Create table super_entity_ref_test_root (\n" +
                              "\tid_col Int NOT NULL,\n" +
                              "\tname Varchar(100) NOT NULL,\n" +
                              " Primary Key (id_col))";
-            IDbCommand cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            CreateTableFromSql(sql,DBName);
 
             sql = "Create table super_entity_ref_test_one2many (\n" +
                       "\tid_col Int NOT NULL,\n" +
                       "\tindex_no Int NOT NULL,\n" +
                       "\tname Varchar(100) NOT NULL,\n" +
                       " Primary Key (id_col,index_no))";
-            cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            CreateTableFromSql(sql, DBName);
 
             sql = "Create table super_entity_ref_test_one2many_a (\n" +
                       "\tid_col Int NOT NULL,\n" +
                       "\tindex_no Int NOT NULL,\n" +
                       "\tname_a Varchar(100) NOT NULL,\n" +
                       " Primary Key (id_col,index_no))";
-            cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            CreateTableFromSql(sql, DBName);
 
             sql = "Create table super_entity_ref_test_one2many_b (\n" +
                       "\tid_col Int NOT NULL,\n" +
                       "\tindex_no Int NOT NULL,\n" +
                       "\tname_b Varchar(100) NOT NULL,\n" +
                       " Primary Key (id_col,index_no))";
-            cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            CreateTableFromSql(sql, DBName);
 
             sql = "Create table super_entity_ref_test_one2one (\n" +
                       "\tid_col Int NOT NULL,\n" +
                       "\tname Varchar(100) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            CreateTableFromSql(sql, DBName);
 
             sql = "Create table super_entity_ref_test_one2one_a (\n" +
                       "\tid_col Int NOT NULL,\n" +
                       "\tname_a Varchar(100) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            CreateTableFromSql(sql, DBName);
 
             sql = "Create table super_entity_ref_test_one2one_b (\n" +
                       "\tid_col Int NOT NULL,\n" +
                       "\tname_b Varchar(100) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            CreateTableFromSql(sql, DBName);
 
-            transaction.Commit();
-            return connection;
+            EndInit(DBName);
+            return Connection;
         }
 
-        private ITransaction CreateTransaction(IDbConnection connection)
-        {
-            return new Transaction(_transactionFactory, connection.BeginTransaction());
-        }
-    
         [Test]
         public void SuperEntityRef_PersistAndLoadWithSingleTypeA_RetrievedShouldBeSameAsPersisted()
         {
             try
             {
-                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
+                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
                 
                 var con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
@@ -231,7 +120,7 @@ namespace DbGate
         {
             try
             {
-                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
+                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
                 
                 var con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
@@ -260,7 +149,7 @@ namespace DbGate
         {
             try
             {
-                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
+                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
                 
                 var con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
@@ -289,7 +178,7 @@ namespace DbGate
         {
             try
             {
-                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
+                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
                 
                 var con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
@@ -318,7 +207,7 @@ namespace DbGate
         {
             try
             {
-                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
+                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
                 
                 var con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
@@ -347,7 +236,7 @@ namespace DbGate
         {
             try
             {
-                _transactionFactory.DbGate.Config.AutoTrackChanges = true;
+                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
                 
                 var con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);

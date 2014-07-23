@@ -9,120 +9,56 @@ using log4net.Config;
 
 namespace DbGate
 {
-    public class DbGateInheritancePersistTests
+    public class DbGateInheritancePersistTests : AbstractDbGateTestBase
     {
-        private static ITransactionFactory _transactionFactory;
-
         public const int TYPE_ANNOTATION = 1;
         public const int TYPE_FIELD = 2;
         public const int TYPE_EXTERNAL = 3;
 
+        private const string DBName = "unit-testing-inheritance-persist";
+
         [TestFixtureSetUp]
         public static void Before()
         {
-            try
-            {
-                XmlConfigurator.Configure(new FileInfo("log4net.config"));
-
-                LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
-                    "Starting in-memory database for unit tests");
-                _transactionFactory =
-                    new DefaultTransactionFactory(
-                        "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON",
-                        DefaultTransactionFactory.DbSqllite);
-                Assert.IsNotNull(_transactionFactory.CreateTransaction());
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Fatal(
-                    "Exception during database startup.", ex);
-            }
-        }
-
-        [TestFixtureTearDown]
-        public static void After()
-        {
-            try
-            {
-                ITransaction transaction = _transactionFactory.CreateTransaction();
-                transaction.Close();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Fatal("Exception during test cleanup.", ex);
-            }
+            TestClass = typeof(DbGateInheritancePersistTests);
         }
 
         [SetUp]
         public void BeforeEach()
         {
-            _transactionFactory.DbGate.ClearCache();
+            BeginInit(DBName);
+            TransactionFactory.DbGate.ClearCache();
         }
 
         [TearDown]
         public void AfterEach()
         {
-            try
-            {
-                ITransaction transaction = _transactionFactory.CreateTransaction(); 
-                
-                IDbCommand command = transaction.CreateCommand();
-                command.CommandText = "drop table inheritance_test_super";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table inheritance_test_suba";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table inheritance_test_subb";
-                command.ExecuteNonQuery();
-                transaction.Commit();
-
-                transaction.Close();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Fatal("Exception during test cleanup.", ex);
-            }
+            CleanupDb(DBName);
+            FinalizeDb(DBName);
         }
 
         private IDbConnection SetupTables()
         {
-            ITransaction transaction = _transactionFactory.CreateTransaction();
-            IDbConnection connection = transaction.Connection;
-
             string sql = "Create table inheritance_test_super (\n" +
                          "\tid_col Int NOT NULL,\n" +
                          "\tname Varchar(20) NOT NULL,\n" +
                          " Primary Key (id_col))";
-            IDbCommand cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
-
+            CreateTableFromSql(sql,DBName);
+            
             sql = "Create table inheritance_test_suba (\n" +
                   "\tid_col Int NOT NULL,\n" +
                   "\tname_a Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col))";
-            cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            CreateTableFromSql(sql, DBName);
 
             sql = "Create table inheritance_test_subb (\n" +
                   "\tid_col Int NOT NULL,\n" +
                   "\tname_b Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col))";
-            cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            CreateTableFromSql(sql, DBName);
 
-            transaction.Commit();
-            return connection;
-        }
-
-        private ITransaction CreateTransaction(IDbConnection connection)
-        {
-            return new Transaction(_transactionFactory, connection.BeginTransaction());
+            EndInit(DBName);
+            return Connection;
         }
 
         private void ClearTables(IDbConnection connection)
@@ -154,15 +90,15 @@ namespace DbGate
         private void RegisterForExternal()
         {
             Type objType = typeof (InheritanceTestSuperEntityExt);
-            _transactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
+            TransactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
                                                       InheritanceTestExtFactory.GetFieldInfo(objType));
 
             objType = typeof (InheritanceTestSubEntityAExt);
-            _transactionFactory.DbGate.RegisterEntity(objType,InheritanceTestExtFactory.GetTableNames(objType),
+            TransactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
                                                       InheritanceTestExtFactory.GetFieldInfo(objType));
 
             objType = typeof (InheritanceTestSubEntityBExt);
-            _transactionFactory.DbGate.RegisterEntity(objType,InheritanceTestExtFactory.GetTableNames(objType),
+            TransactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
                                                       InheritanceTestExtFactory.GetFieldInfo(objType));
         }
 
@@ -200,7 +136,7 @@ namespace DbGate
                     }
                     ClearTables(connection);
 
-                    _transactionFactory.DbGate.ClearCache();
+                    TransactionFactory.DbGate.ClearCache();
                     if (type == TYPE_EXTERNAL)
                     {
                         RegisterForExternal();
@@ -268,7 +204,7 @@ namespace DbGate
                             break;
                     }
 
-                    _transactionFactory.DbGate.ClearCache();
+                    TransactionFactory.DbGate.ClearCache();
                     if (type == TYPE_EXTERNAL)
                     {
                         RegisterForExternal();
@@ -357,7 +293,7 @@ namespace DbGate
 
                     ClearTables(connection);
 
-                    _transactionFactory.DbGate.ClearCache();
+                    TransactionFactory.DbGate.ClearCache();
                     if (type == TYPE_EXTERNAL)
                     {
                         RegisterForExternal();

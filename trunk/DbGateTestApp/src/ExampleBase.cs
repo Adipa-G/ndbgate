@@ -9,15 +9,21 @@ namespace DbGateTestApp
 {
     public class ExampleBase
     {
-        public static IDbConnection SetupDb()
+        private static DefaultTransactionFactory _transactionFactory;
+
+        public static ITransaction SetupDb()
         {
             try
             {
-                log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
+                if (_transactionFactory == null)
+                {
+                    log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
-                LoggerManager.GetLogger(Assembly.GetExecutingAssembly(),typeof(ExampleBase)).Log(typeof(ExampleBase),Level.Info,"Starting in-memory database for unit tests",null);
-                var dbConnector = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
-                return dbConnector.Connection;
+
+                    LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(ExampleBase)).Log(typeof(ExampleBase), Level.Info, "Starting in-memory database for unit tests", null);
+                    _transactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
+                }
+                return _transactionFactory.CreateTransaction();
             }
             catch (Exception ex)
             {
@@ -31,8 +37,10 @@ namespace DbGateTestApp
         {
             try
             {
-                IDbConnection connection = DefaultTransactionFactory.GetSharedInstance().Connection;
+                ITransaction connection = _transactionFactory.CreateTransaction();
                 connection.Close();
+
+                _transactionFactory = null;
             }
             catch (Exception ex)
             {

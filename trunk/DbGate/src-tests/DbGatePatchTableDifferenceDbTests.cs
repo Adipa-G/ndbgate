@@ -9,47 +9,28 @@ using log4net.Config;
 
 namespace DbGate
 {
-    public class DbGatePatchTableDifferenceDbTests
+    public class DbGatePatchTableDifferenceDbTests : AbstractDbGateTestBase
     {
-        private static ITransactionFactory _transactionFactory;
+        private const string DBName = "unit-testing-metadata-table-difference";
 
         [TestFixtureSetUp]
         public static void Before()
         {
-            try
-            {
-                XmlConfigurator.Configure(new FileInfo("log4net.config"));
-
-                LogManager.GetLogger(typeof (DbGatePatchTableDifferenceDbTests)).Info(
-                    "Starting in-memory database for unit tests");
-                _transactionFactory =
-                    new DefaultTransactionFactory(
-                        "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=4;foreign_keys = ON",
-                        DefaultTransactionFactory.DbSqllite);
-
-                ITransaction transaction = _transactionFactory.CreateTransaction();
-                transaction.Close();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGatePatchTableDifferenceDbTests)).Fatal(
-                    "Exception during database startup.", ex);
-            }
+            TestClass = typeof(DbGatePatchTableDifferenceDbTests);
         }
 
-        [TestFixtureTearDown]
-        public static void After()
+        [SetUp]
+        public void BeforeEach()
         {
-            try
-            {
-                ITransaction transaction = _transactionFactory.CreateTransaction();
-                transaction.Close();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGatePatchTableDifferenceDbTests)).Fatal(
-                    "Exception during test cleanup.", ex);
-            }
+            BeginInit(DBName);
+            TransactionFactory.DbGate.ClearCache();
+        }
+
+        [TearDown]
+        public void AfterEach()
+        {
+            CleanupDb(DBName);
+            FinalizeDb(DBName);
         }
 
         [Test]
@@ -57,30 +38,24 @@ namespace DbGate
         {
             try
             {
-                ITransaction transaction = _transactionFactory.CreateTransaction();
+                ITransaction transaction = TransactionFactory.CreateTransaction();
                 ICollection<Type> types = new List<Type>();
                 types.Add(typeof (ThreeColumnEntity));
-                _transactionFactory.DbGate.PatchDataBase(transaction, types, true);
-                var connection = transaction.Connection;
+                TransactionFactory.DbGate.PatchDataBase(transaction, types, true);
                 transaction.Commit();
-                connection.Close();
 
-                transaction = _transactionFactory.CreateTransaction();
+                transaction = CreateTransaction(); 
                 types = new List<Type>();
                 types.Add(typeof (FourColumnEntity));
-                _transactionFactory.DbGate.PatchDataBase(transaction, types, false);
-                connection = transaction.Connection;
+                TransactionFactory.DbGate.PatchDataBase(transaction, types, false);
                 transaction.Commit();
-                connection.Close();
 
                 int id = 35;
-                transaction = _transactionFactory.CreateTransaction();
+                transaction = CreateTransaction(); 
                 FourColumnEntity columnEntity = CreateFourColumnEntity(id);
                 columnEntity.Persist(transaction);
                 columnEntity = LoadFourColumnEntityWithId(transaction, id);
-                connection = transaction.Connection;
                 transaction.Commit();
-                connection.Close();
             }
             catch (Exception e)
             {
@@ -94,22 +69,18 @@ namespace DbGate
         {
             try
             {
-                ITransaction transaction = _transactionFactory.CreateTransaction(); 
+                ITransaction transaction = TransactionFactory.CreateTransaction(); 
                 ICollection<Type> types = new List<Type>();
                 types.Add(typeof (FourColumnEntity));
                 transaction.DbGate.PatchDataBase(transaction, types, true);
-                var connection = transaction.Connection;
                 transaction.Commit();
-                connection.Close();
 
-                transaction = _transactionFactory.CreateTransaction(); 
+                transaction = CreateTransaction(); 
                 types = new List<Type>();
                 types.Add(typeof (ThreeColumnEntity));
                 transaction.DbGate.PatchDataBase(transaction, types, false);
-                connection = transaction.Connection;
                 transaction.Commit();
-                connection.Close();
-
+ 
                 //Sqllite does not support dropping columns, so this test does not work
             }
             catch (Exception e)
@@ -126,16 +97,14 @@ namespace DbGate
             {
                 var longStr = new string('A', 220);
 
-                ITransaction transaction = _transactionFactory.CreateTransaction(); 
+                ITransaction transaction = TransactionFactory.CreateTransaction(); 
                 ICollection<Type> types = new List<Type>();
                 types.Add(typeof (ThreeColumnEntity));
                 transaction.DbGate.PatchDataBase(transaction, types, true);
-                var connection = transaction.Connection;
                 transaction.Commit();
-                connection.Close();
-
+ 
                 int id = 34;
-                transaction = _transactionFactory.CreateTransaction(); 
+                transaction = CreateTransaction(); 
                 ThreeColumnEntity columnEntity = CreateThreeColumnEntity(id);
                 columnEntity.Name = longStr;
                 try
@@ -149,24 +118,19 @@ namespace DbGate
                 catch (Exception)
                 {
                 }
-                transaction.Close();
 
-                transaction = _transactionFactory.CreateTransaction(); 
+                transaction = CreateTransaction(); 
                 types = new List<Type>();
                 types.Add(typeof (ThreeColumnTypeDifferentEntity));
                 transaction.DbGate.PatchDataBase(transaction, types, false);
-                connection = transaction.Connection;
                 transaction.Commit();
-                connection.Close();
-
+ 
                 id = 35;
-                transaction = _transactionFactory.CreateTransaction(); 
+                transaction = CreateTransaction();  
                 columnEntity = CreateThreeColumnEntity(id);
                 columnEntity.Name = longStr;
                 columnEntity.Persist(transaction);
-                connection = transaction.Connection;
                 transaction.Commit();
-                connection.Close();
             }
             catch (Exception e)
             {

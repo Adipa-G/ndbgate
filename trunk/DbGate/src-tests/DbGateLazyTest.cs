@@ -11,133 +11,62 @@ using NUnit.Framework;
 
 namespace DbGate
 {
-    public class DbGateLazyTest
+    public class DbGateLazyTest : AbstractDbGateTestBase
     {
-        private static ITransactionFactory _transactionFactory;
+        private const string DBName = "unit-testing-lazy";
 
         [TestFixtureSetUp]
         public static void Before()
         {
-            try
-            {
-                log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
-
-                LogManager.GetLogger(typeof (DbGateSuperEntityRefTest)).Info("Starting in-memory database for unit tests");
-                _transactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
-                Assert.IsNotNull(_transactionFactory.CreateTransaction());
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGateSuperEntityRefTest)).Fatal("Exception during database startup.", ex);
-            }
-        }
-
-        [TestFixtureTearDown]
-        public static void After()
-        {
-            try
-            {
-                ITransaction transaction = _transactionFactory.CreateTransaction();
-                transaction.Close();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGateSuperEntityRefTest)).Fatal("Exception during test cleanup.", ex);
-            }
+            TestClass = typeof(DbGateLazyTest);
         }
 
         [SetUp]
         public void BeforeEach()
         {
-            _transactionFactory.DbGate.ClearCache();
+            BeginInit(DBName);
+            TransactionFactory.DbGate.ClearCache();
         }
 
         [TearDown]
         public void AfterEach()
         {
-            try
-            {
-                ITransaction transaction = _transactionFactory.CreateTransaction();
-
-                IDbCommand command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM lazy_test_root";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table lazy_test_root";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM lazy_test_one2many";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table lazy_test_one2many";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM lazy_test_one2one";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table lazy_test_one2one";
-                command.ExecuteNonQuery();
-
-                transaction.Commit();
-                transaction.Close();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof(DbGateSuperEntityRefTest)).Fatal("Exception during test cleanup.", ex);
-            }
+            CleanupDb(DBName);
+            FinalizeDb(DBName);
         }
         
         private IDbConnection SetupTables()
         {
-            ITransaction transaction = _transactionFactory.CreateTransaction();
-            IDbConnection connection = transaction.Connection;
-
             string sql = "Create table lazy_test_root (\n" +
                              "\tid_col Int NOT NULL,\n" +
                              "\tname Varchar(20) NOT NULL,\n" +
                              " Primary Key (id_col))";
-            IDbCommand cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            CreateTableFromSql(sql,DBName);
 
             sql = "Create table lazy_test_one2many (\n" +
                       "\tid_col Int NOT NULL,\n" +
                       "\tindex_no Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col,index_no))";
-            cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            CreateTableFromSql(sql, DBName);
 
             sql = "Create table lazy_test_one2one (\n" +
                       "\tid_col Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            CreateTableFromSql(sql, DBName);
 
-            transaction.Commit();
-            return connection;
+            EndInit(DBName);
+            return Connection;
         }
 
-        private ITransaction CreateTransaction(IDbConnection connection)
-        {
-            return new Transaction(_transactionFactory, connection.BeginTransaction());
-        }
-    
         [Test]
         public void Lazy_PersistAndLoad_WithEmptyLazyFieldsWithLazyOn_ShouldHaveProxiesForLazyFields()
         {
             try
             {
-                _transactionFactory.DbGate.Config.EnableStatistics = true;
-                _transactionFactory.DbGate.Statistics.Reset();
+                TransactionFactory.DbGate.Config.EnableStatistics = true;
+                TransactionFactory.DbGate.Statistics.Reset();
                 IDbConnection con = SetupTables();
 
                 ITransaction transaction = CreateTransaction(con);
@@ -159,7 +88,7 @@ namespace DbGate
                 bool isProxyOneToOne = ProxyUtil.IsProxyType(entityReloaded.One2OneEntity.GetType());
                 Assert.IsTrue(isProxyOneToMany);
                 Assert.IsTrue(isProxyOneToOne);
-                Assert.IsTrue(_transactionFactory.DbGate.Statistics.SelectQueryCount == 0);
+                Assert.IsTrue(TransactionFactory.DbGate.Statistics.SelectQueryCount == 0);
             }
             catch (Exception e)
             {
@@ -173,8 +102,8 @@ namespace DbGate
         {
             try
             {
-                _transactionFactory.DbGate.Config.EnableStatistics = true;
-                _transactionFactory.DbGate.Statistics.Reset();
+                TransactionFactory.DbGate.Config.EnableStatistics = true;
+                TransactionFactory.DbGate.Statistics.Reset();
                 
                 IDbConnection con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
@@ -213,7 +142,7 @@ namespace DbGate
                 Assert.IsTrue(enumerator.Current.Name.Equals(one2Many2.Name));
                 Assert.IsTrue(entityReloaded.One2OneEntity != null);
                 Assert.IsTrue(entityReloaded.One2OneEntity.Name.Equals(one2One.Name));
-                Assert.IsTrue(_transactionFactory.DbGate.Statistics.SelectQueryCount == 2);
+                Assert.IsTrue(TransactionFactory.DbGate.Statistics.SelectQueryCount == 2);
                 
                 transaction.Commit();
                 con.Close();
@@ -230,8 +159,8 @@ namespace DbGate
         {
             try
             {
-                _transactionFactory.DbGate.Config.EnableStatistics = true;
-                _transactionFactory.DbGate.Statistics.Reset();
+                TransactionFactory.DbGate.Config.EnableStatistics = true;
+                TransactionFactory.DbGate.Statistics.Reset();
 
                 IDbConnection con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
@@ -271,7 +200,7 @@ namespace DbGate
                 Assert.IsTrue(enumerator.Current.Name.Equals(one2Many2.Name));
                 Assert.IsTrue(entityReloaded.One2OneEntity != null);
                 Assert.IsTrue(entityReloaded.One2OneEntity.Name.Equals(one2One.Name));
-                Assert.IsTrue(_transactionFactory.DbGate.Statistics.SelectQueryCount == 2);
+                Assert.IsTrue(TransactionFactory.DbGate.Statistics.SelectQueryCount == 2);
 
                 transaction.Commit();
                 con.Close();
@@ -288,8 +217,8 @@ namespace DbGate
         {
             try
             {
-                _transactionFactory.DbGate.Config.EnableStatistics = true;
-                _transactionFactory.DbGate.Statistics.Reset();
+                TransactionFactory.DbGate.Config.EnableStatistics = true;
+                TransactionFactory.DbGate.Statistics.Reset();
 
                 IDbConnection con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
@@ -322,7 +251,7 @@ namespace DbGate
                 entity.Persist(transaction);
                 transaction.Commit();
 
-                Assert.IsTrue(_transactionFactory.DbGate.Statistics.SelectQueryCount == 0);
+                Assert.IsTrue(TransactionFactory.DbGate.Statistics.SelectQueryCount == 0);
                 con.Close();
             }
             catch (Exception e)
