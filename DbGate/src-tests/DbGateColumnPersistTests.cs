@@ -9,76 +9,32 @@ using NUnit.Framework;
 
 namespace DbGate
 {
-    public class DbGateColumnPersistTests
+    public class DbGateColumnPersistTests :  AbstractDbGateTestBase
     {
-        private static ITransactionFactory _transactionFactory;
+        private const string DBName = "unit-testing-column-persist";
 
         [TestFixtureSetUp]
         public static void Before()
         {
-            try
-            {
-                log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
-
-                LogManager.GetLogger(typeof (DbGateColumnPersistTests)).Info("Starting in-memory database for unit tests");
-                _transactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
-                Assert.IsNotNull(_transactionFactory.CreateTransaction());
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGateColumnPersistTests)).Fatal("Exception during database startup.", ex);
-            }
-        }
-
-        [TestFixtureTearDown]
-        public static void After()
-        {
-            try
-            {
-                ITransaction transaction = _transactionFactory.CreateTransaction();
-                transaction.Close();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGatePatchEmptyDbTests)).Fatal("Exception during test cleanup.", ex);
-            }
+            TestClass = typeof(DbGateColumnPersistTests);
         }
 
         [SetUp]
         public void BeforeEach()
         {
-            _transactionFactory.DbGate.ClearCache();
+            BeginInit(DBName);
+            TransactionFactory.DbGate.ClearCache();
         }
 
         [TearDown]
         public void AfterEach()
         {
-            try
-            {
-                ITransaction transaction = _transactionFactory.CreateTransaction();
-
-                IDbCommand command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM column_test_entity";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table column_test_entity";
-                command.ExecuteNonQuery();
-
-                transaction.Commit();
-                transaction.Close();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof(DbGatePatchEmptyDbTests)).Fatal("Exception during test cleanup.", ex);
-            }
+            CleanupDb(DBName);
+            FinalizeDb(DBName);
         }
         
         private IDbConnection SetupTables()
         {
-            ITransaction transaction = _transactionFactory.CreateTransaction();
-            IDbConnection connection = transaction.Connection;
-
             string sql = "Create table column_test_entity (\n" +
                         "\tid_col Int NOT NULL,\n" +
                         "\tlong_not_null Bigint NOT NULL,\n" +
@@ -100,19 +56,11 @@ namespace DbGate
                         "\tvarchar_not_null Varchar(20) NOT NULL,\n" +
                         "\tvarchar_null Varchar(20),\n" +
                         " Primary Key (id_col))";
+            
+            CreateTableFromSql(sql,DBName);
+            EndInit(DBName);
 
-
-            IDbCommand cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
-
-            transaction.Commit();
-            return connection;
-        }
-
-        private ITransaction CreateTransaction(IDbConnection connection)
-        {
-            return new Transaction(_transactionFactory, connection.BeginTransaction());
+            return Connection;
         }
 
         [Test]
@@ -154,7 +102,7 @@ namespace DbGate
                 ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                _transactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
@@ -249,7 +197,7 @@ namespace DbGate
                 ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                _transactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
  
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
@@ -351,7 +299,7 @@ namespace DbGate
                  ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof (ColumnTestEntityExts);
-                _transactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
@@ -466,7 +414,7 @@ namespace DbGate
                  ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                _transactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
@@ -581,7 +529,7 @@ namespace DbGate
                  ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                _transactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
@@ -696,7 +644,7 @@ namespace DbGate
                  ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                _transactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
@@ -810,7 +758,7 @@ namespace DbGate
                 ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                _transactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);

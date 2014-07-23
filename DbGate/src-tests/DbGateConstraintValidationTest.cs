@@ -11,124 +11,53 @@ using NUnit.Framework;
 
 namespace DbGate
 {
-    public class DbGateConstraintValidationTest
+    public class DbGateConstraintValidationTest : AbstractDbGateTestBase
     {
-        private static ITransactionFactory _transactionFactory;
+        private const string DBName = "unit-testing-constraint";
 
         [TestFixtureSetUp]
         public static void Before()
         {
-            try
-            {
-                log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
-
-                LogManager.GetLogger(typeof (DbGateConstraintValidationTest)).Info("Starting in-memory database for unit tests");
-                _transactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
-                Assert.IsNotNull(_transactionFactory.CreateTransaction());
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGateConstraintValidationTest)).Fatal("Exception during database startup.", ex);
-            }
-        }
-
-        [TestFixtureTearDown]
-        public static void After()
-        {
-            try
-            {
-                ITransaction transaction = _transactionFactory.CreateTransaction();
-                transaction.Close();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGateConstraintValidationTest)).Fatal("Exception during test cleanup.", ex);
-            }
+            TestClass = typeof(DbGateConstraintValidationTest);
         }
 
         [SetUp]
         public void BeforeEach()
         {
-            _transactionFactory.DbGate.ClearCache();
+            BeginInit(DBName);
+            TransactionFactory.DbGate.ClearCache();
         }
 
         [TearDown]
         public void AfterEach()
         {
-            try
-            {
-                ITransaction transaction = _transactionFactory.CreateTransaction();
-
-                IDbCommand command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM constraint_test_root";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table constraint_test_root";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM constraint_test_one2many";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table constraint_test_one2many";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM constraint_test_one2one";
-                command.ExecuteNonQuery();
-
-                command = transaction.CreateCommand();
-                command.CommandText = "drop table constraint_test_one2one";
-                command.ExecuteNonQuery();
-
-                transaction.Commit();
-                transaction.Close();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal("Exception during test cleanup.", ex);
-            }
+            CleanupDb(DBName);
+            FinalizeDb(DBName);
         }
         
         private IDbConnection SetupTables()
         {
-            ITransaction transaction = _transactionFactory.CreateTransaction();
-            IDbConnection connection = transaction.Connection;
-
             string sql = "Create table constraint_test_root (\n" +
                          "\tid_col Int NOT NULL,\n" +
                          "\tname Varchar(20) NOT NULL,\n" +
                          " Primary Key (id_col))";
-            IDbCommand cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            CreateTableFromSql(sql, DBName);
 
             sql = "Create table constraint_test_one2many (\n" +
                   "\tid_col Int NOT NULL,\n" +
                   "\tindex_no Int NOT NULL,\n" +
                   "\tname Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col,index_no))";
-            cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            CreateTableFromSql(sql, DBName);
 
             sql = "Create table constraint_test_one2one (\n" +
                   "\tid_col Int NOT NULL,\n" +
                   "\tname Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col))";
-            cmd = transaction.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
-
-            transaction.Commit();
-            return connection;
-        }
-
-        private ITransaction CreateTransaction(IDbConnection connection)
-        {
-            return new Transaction(_transactionFactory, connection.BeginTransaction());
+            CreateTableFromSql(sql,DBName);
+            EndInit(DBName);
+            
+            return Connection;
         }
 
         [Test]

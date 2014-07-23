@@ -33,27 +33,23 @@ namespace DbGateTestApp.One2OneExample
             return entity;
         }
 
-        public void Patch(IDbConnection con) 
+        public void Patch(ITransaction tx) 
         {
             ICollection<Type> entityTypes = new List<Type>();
             entityTypes.Add(typeof(One2OneParentEntity));
             entityTypes.Add(typeof(One2OneChildEntityA));
             entityTypes.Add(typeof(One2OneChildEntityB));
-            IDbTransaction transaction = con.BeginTransaction();
-            DbGate._transactionFactory.DbGate.PatchDataBase(con, entityTypes, false);
-            transaction.Commit();
+            tx.DbGate.PatchDataBase(tx, entityTypes, false);
         }
 
-        public void Persist(IDbConnection con, One2OneParentEntity entity)
+        public void Persist(ITransaction tx, One2OneParentEntity entity)
         {
-            IDbTransaction transaction = con.BeginTransaction();
-            entity.Persist(con);
-            transaction.Commit();
+            entity.Persist(tx);
         }
 
-        public One2OneParentEntity Retrieve(IDbConnection con,int id)
+        public One2OneParentEntity Retrieve(ITransaction tx,int id)
         {
-            IDbCommand cmd = con.CreateCommand();
+            IDbCommand cmd = tx.CreateCommand();
             cmd.CommandText = "select * from parent_entity where id = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -66,7 +62,7 @@ namespace DbGateTestApp.One2OneExample
             if (reader.Read())
             {
                 entity = new One2OneParentEntity();
-                entity.Retrieve(reader, con);
+                entity.Retrieve(reader, tx);
             }
             DbMgtUtility.Close(reader);
             DbMgtUtility.Close(cmd);
@@ -76,46 +72,46 @@ namespace DbGateTestApp.One2OneExample
         public static void DoTest()
         {
             One2OneExample example = new One2OneExample();
-            IDbConnection con = ExampleBase.SetupDb();
-            example.Patch(con);
+            ITransaction tx = ExampleBase.SetupDb();
+            example.Patch(tx);
 
             One2OneParentEntity entityA = example.CreateEntityWithChildA();
-            example.Persist(con, entityA);
+            example.Persist(tx, entityA);
             One2OneParentEntity entityB = example.CreateEntityWithChildB();
-            example.Persist(con, entityB);
+            example.Persist(tx, entityB);
 
-            entityA = example.Retrieve(con, One2OneExample.IdA);
+            entityA = example.Retrieve(tx, One2OneExample.IdA);
             Console.WriteLine("Entity Name = " + entityA.Name);
             Console.WriteLine("Entity Child Name = " + entityA.ChildEntity.Name);
 
-            entityB = example.Retrieve(con, One2OneExample.IdB);
+            entityB = example.Retrieve(tx, One2OneExample.IdB);
             Console.WriteLine("Entity Name = " + entityB.Name);
             Console.WriteLine("Entity Child Name = " + entityB.ChildEntity.Name);
 
             entityA.Name = "Updated Entity A";
             entityA.ChildEntity.Name = "Updated Child Entity A";
-            example.Persist(con, entityA);
+            example.Persist(tx, entityA);
 
             entityB.Name = "Updated Entity B";
             entityB.ChildEntity.Name = "Updated Child Entity B";
-            example.Persist(con, entityB);
+            example.Persist(tx, entityB);
 
-            entityA = example.Retrieve(con, One2OneExample.IdA);
+            entityA = example.Retrieve(tx, One2OneExample.IdA);
             Console.WriteLine("Entity Name = " + entityA.Name);
             Console.WriteLine("Entity Child Name = " + entityA.ChildEntity.Name);
 
-            entityB = example.Retrieve(con, One2OneExample.IdB);
+            entityB = example.Retrieve(tx, One2OneExample.IdB);
             Console.WriteLine("Entity Name = " + entityB.Name);
             Console.WriteLine("Entity Child Name = " + entityB.ChildEntity.Name);
 
             entityA.Status = EntityStatus.Deleted;
-            example.Persist(con, entityA);
+            example.Persist(tx, entityA);
             entityB.Status = EntityStatus.Deleted;
-            example.Persist(con, entityB);
+            example.Persist(tx, entityB);
 
-            entityA = example.Retrieve(con, One2OneExample.IdA);
+            entityA = example.Retrieve(tx, One2OneExample.IdA);
             Console.WriteLine("Entity A = " + entityA);
-            entityB = example.Retrieve(con, One2OneExample.IdB);
+            entityB = example.Retrieve(tx, One2OneExample.IdB);
             Console.WriteLine("Entity B = " + entityB);
 
             ExampleBase.CloseDb();

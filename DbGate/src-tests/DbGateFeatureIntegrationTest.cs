@@ -11,72 +11,40 @@ using log4net.Config;
 
 namespace DbGate
 {
-    public class DbGateFeatureIntegrationTest
+    public class DbGateFeatureIntegrationTest : AbstractDbGateTestBase
     {
-        private static ITransactionFactory _transactionFactory;
+        private const string DBName = "testing-feature_integreation";
 
         [TestFixtureSetUp]
         public static void Before()
         {
-            try
-            {
-                XmlConfigurator.Configure(new FileInfo("log4net.config"));
-
-                LogManager.GetLogger(typeof (DbGateFeatureIntegrationTest)).Info(
-                    "Starting in-memory database for unit tests");
-                _transactionFactory =
-                    new DefaultTransactionFactory(
-                        "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON",
-                        DefaultTransactionFactory.DbSqllite);
-                Assert.IsNotNull(_transactionFactory.CreateTransaction());
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGateFeatureIntegrationTest)).Fatal("Exception during database startup.",
-                                                                                  ex);
-            }
-        }
-
-        [TestFixtureTearDown]
-        public static void After()
-        {
-            try
-            {
-                ITransaction transaction = _transactionFactory.CreateTransaction();
-                transaction.Close();
-            }
-            catch (Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbGateFeatureIntegrationTest)).Fatal("Exception during test cleanup.", ex);
-            }
+            TestClass = typeof(DbGateFeatureIntegrationTest);
         }
 
         [SetUp]
         public void BeforeEach()
         {
-            _transactionFactory.DbGate.ClearCache();
+            BeginInit(DBName);
+            TransactionFactory.DbGate.ClearCache();
         }
 
+        [TearDown]
+        public void AfterEach()
+        {
+            CleanupDb(DBName);
+            FinalizeDb(DBName);
+        }
+ 
         private IDbConnection SetupTables()
         {
-            ITransaction transaction = _transactionFactory.CreateTransaction();
-            IDbConnection connection = transaction.Connection;
+            RegisterClassForDbPatching(typeof (ItemTransaction),DBName);
+            RegisterClassForDbPatching(typeof(ItemTransactionCharge), DBName);
+            RegisterClassForDbPatching(typeof(Transaction), DBName);
+            RegisterClassForDbPatching(typeof(Product), DBName);
+            RegisterClassForDbPatching(typeof(Service), DBName);
+            EndInit(DBName);
 
-            ICollection<Type> types = new List<Type>();
-            types.Add(typeof (ItemTransaction));
-            types.Add(typeof (ItemTransactionCharge));
-            types.Add(typeof (Transaction));
-            types.Add(typeof (Product));
-            types.Add(typeof (Service));
-            _transactionFactory.DbGate.PatchDataBase(transaction, types, true);
-
-            transaction.Commit();
-            return connection;
-        }
-
-        private ITransaction CreateTransaction(IDbConnection connection)
-        {
-            return new ErManagement.ErMapper.Transaction(_transactionFactory, connection.BeginTransaction());
+            return Connection;
         }
 
         [Test]

@@ -30,27 +30,23 @@ namespace DbGateTestApp.One2ManyExample
             return entity;
         }
 
-        public void Patch(IDbConnection con) 
+        public void Patch(ITransaction tx) 
         {
             ICollection<Type> entityTypes = new List<Type>();
             entityTypes.Add(typeof(One2ManyParentEntity));
             entityTypes.Add(typeof(One2ManyChildEntityA));
             entityTypes.Add(typeof(One2ManyChildEntityB));
-            IDbTransaction transaction = con.BeginTransaction();
-            DbGate._transactionFactory.DbGate.PatchDataBase(con,entityTypes,false);
-            transaction.Commit();
+            tx.DbGate.PatchDataBase(tx,entityTypes,false);
         }
 
-        public void Persist(IDbConnection con, One2ManyParentEntity entity)
+        public void Persist(ITransaction tx, One2ManyParentEntity entity)
         {
-            IDbTransaction transaction = con.BeginTransaction();
-            entity.Persist(con);
-            transaction.Commit();
+            entity.Persist(tx);
         }
 
-        public One2ManyParentEntity Retrieve(IDbConnection con)
+        public One2ManyParentEntity Retrieve(ITransaction tx)
         {
-            IDbCommand cmd = con.CreateCommand();
+            IDbCommand cmd = tx.CreateCommand();
             cmd.CommandText = "select * from parent_entity where id = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -63,7 +59,7 @@ namespace DbGateTestApp.One2ManyExample
             if (reader.Read())
             {
                 entity = new One2ManyParentEntity();
-                entity.Retrieve(reader, con);
+                entity.Retrieve(reader, tx);
             }
             DbMgtUtility.Close(reader);
             DbMgtUtility.Close(cmd);
@@ -73,13 +69,13 @@ namespace DbGateTestApp.One2ManyExample
         public static void DoTest()
         {
             One2ManyExample example = new One2ManyExample();
-            IDbConnection con = ExampleBase.SetupDb();
-            example.Patch(con);
+            ITransaction tx = ExampleBase.SetupDb();
+            example.Patch(tx);
 
             One2ManyParentEntity entity = example.CreateEntity();
-            example.Persist(con, entity);
+            example.Persist(tx, entity);
 
-            entity = example.Retrieve(con);
+            entity = example.Retrieve(tx);
             Console.WriteLine("Entity Name = " + entity.Name);
             foreach (One2ManyChildEntity childEntity in entity.ChildEntities)
             {
@@ -91,9 +87,9 @@ namespace DbGateTestApp.One2ManyExample
             {
                 childEntity.Name += " Updated";
             }
-            example.Persist(con, entity);
+            example.Persist(tx, entity);
 
-            entity = example.Retrieve(con);
+            entity = example.Retrieve(tx);
             Console.WriteLine("Entity Name = " + entity.Name);
             foreach (One2ManyChildEntity childEntity in entity.ChildEntities)
             {
@@ -101,9 +97,9 @@ namespace DbGateTestApp.One2ManyExample
             }
 
             entity.Status = EntityStatus.Deleted;
-            example.Persist(con, entity);
+            example.Persist(tx, entity);
 
-            entity = example.Retrieve(con);
+            entity = example.Retrieve(tx);
             Console.WriteLine("Entity = " + entity);
 
             ExampleBase.CloseDb();

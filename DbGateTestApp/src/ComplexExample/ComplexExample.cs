@@ -14,31 +14,27 @@ namespace DbGateTestApp.ComplexExample
         public const int ServiceId = 63;
         public const int TransactionId = 1243;
 
-        public Product CreateDefaultProduct(IDbConnection con)
+        public Product CreateDefaultProduct(ITransaction tx)
         {
             var product = new Product();
             product.ItemId = ProductId;
             product.Name = "Product";
             product.UnitPrice = 54;
-            IDbTransaction transaction = con.BeginTransaction();
-            product.Persist(con);
-            transaction.Commit();
+            product.Persist(tx);
             return product;
         }
 
-        public Service CreateDefaultService(IDbConnection con)
+        public Service CreateDefaultService(ITransaction tx)
         {
             var service = new Service();
             service.ItemId = ServiceId;
             service.Name = "Service";
             service.HourlyRate = 65;
-            IDbTransaction transaction = con.BeginTransaction();
-            service.Persist(con);
-            transaction.Commit();
+            service.Persist(tx);
             return service;
         }
 
-        public Transaction CreateDefaultTransaction(IDbConnection con, Product product, Service service)
+        public Transaction CreateDefaultTransaction(ITransaction tx, Product product, Service service)
         {
             var transaction = new Transaction();
             transaction.TransactionId = TransactionId;
@@ -62,13 +58,11 @@ namespace DbGateTestApp.ComplexExample
             serviceTransactionCharge.ChargeCode = "Service-Sell-Code";
             serviceTransaction.ItemTransactionCharges.Add(serviceTransactionCharge);
 
-            IDbTransaction dbTransaction = con.BeginTransaction();
-            transaction.Persist(con);
-            dbTransaction.Commit();
+            transaction.Persist(tx);
             return transaction;
         }
 
-        public void Patch(IDbConnection con)
+        public void Patch(ITransaction tx)
         {
             ICollection<Type> entityTypes = new List<Type>();
             entityTypes.Add(typeof (Product));
@@ -76,21 +70,18 @@ namespace DbGateTestApp.ComplexExample
             entityTypes.Add(typeof (Transaction));
             entityTypes.Add(typeof (ItemTransaction));
             entityTypes.Add(typeof (ItemTransactionCharge));
-            IDbTransaction transaction = con.BeginTransaction();
-            DbGate._transactionFactory.DbGate.PatchDataBase(con, entityTypes, false);
-            transaction.Commit();
+
+            tx.DbGate.PatchDataBase(tx, entityTypes, false);
         }
 
-        public void Persist(IDbConnection con, IEntity entity)
+        public void Persist(ITransaction tx, IEntity entity)
         {
-            IDbTransaction transaction = con.BeginTransaction();
-            entity.Persist(con);
-            transaction.Commit();
+            entity.Persist(tx);
         }
 
-        public Transaction Retrieve(IDbConnection con)
+        public Transaction Retrieve(ITransaction tx)
         {
-            IDbCommand cmd = con.CreateCommand();
+            IDbCommand cmd = tx.CreateCommand();
             cmd.CommandText = "select * from order_transaction where transaction_id = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
@@ -103,7 +94,7 @@ namespace DbGateTestApp.ComplexExample
             if (reader.Read())
             {
                 entity = new Transaction();
-                entity.Retrieve(reader, con);
+                entity.Retrieve(reader, tx);
             }
             DbMgtUtility.Close(reader);
             DbMgtUtility.Close(cmd);
@@ -113,19 +104,19 @@ namespace DbGateTestApp.ComplexExample
         public static void DoTest()
         {
             var example = new ComplexExample();
-            IDbConnection con = ExampleBase.SetupDb();
-            example.Patch(con);
+            ITransaction tx = ExampleBase.SetupDb();
+            example.Patch(tx);
 
-            Product product = example.CreateDefaultProduct(con);
-            example.Persist(con, product);
+            Product product = example.CreateDefaultProduct(tx);
+            example.Persist(tx, product);
 
-            Service service = example.CreateDefaultService(con);
-            example.Persist(con, service);
+            Service service = example.CreateDefaultService(tx);
+            example.Persist(tx, service);
 
-            Transaction transaction = example.CreateDefaultTransaction(con, product, service);
-            example.Persist(con, transaction);
+            Transaction transaction = example.CreateDefaultTransaction(tx, product, service);
+            example.Persist(tx, transaction);
 
-            transaction = example.Retrieve(con);
+            transaction = example.Retrieve(tx);
             Console.WriteLine("Transaction Name = " + transaction.Name);
             foreach (ItemTransaction itemTransaction in transaction.ItemTransactions)
             {
