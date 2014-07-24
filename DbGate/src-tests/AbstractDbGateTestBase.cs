@@ -57,11 +57,11 @@ namespace DbGate
             return new Transaction(TransactionFactory, Connection.BeginTransaction());
         }
 
-        protected static void CreateTableFromSql(string sql,string dbName)
+        protected static void CreateTableFromSql(string sql,string dbName,IDbConnection con = null)
         {
             try
             {
-                ITransaction tx = CreateTransaction();
+                ITransaction tx = CreateTransaction(con);
                 IDbCommand cmd = tx.CreateCommand();
                 cmd.CommandText = sql;
                 cmd.ExecuteNonQuery();
@@ -100,11 +100,11 @@ namespace DbGate
             }
         }
 
-        protected static void EndInit(string dbName)
+        protected static void EndInit(string dbName,IDbConnection con = null)
         {
             try
             {
-                ITransaction tx = CreateTransaction();
+                ITransaction tx = CreateTransaction(con);
                 if (DBEntityTypeMap.ContainsKey(dbName))
                 {
                     ICollection<Type> typeList = DBEntityTypeMap[dbName];
@@ -182,7 +182,7 @@ namespace DbGate
 
         protected static void FinalizeDb(string dbName)
         {
-            LogManager.GetLogger(TestClass).Fatal(string.Format("Stopping in-memory database {0}.",dbName));
+            LogManager.GetLogger(TestClass).Info(string.Format("Stopping in-memory database {0}.",dbName));
 
             try
             {
@@ -192,7 +192,7 @@ namespace DbGate
             }
             catch (Exception ex)
             {
-                LogManager.GetLogger(typeof (DbGateChangeTrackerTest)).Fatal("Exception during test cleanup.", ex);
+                LogManager.GetLogger(TestClass).Fatal("Exception during test cleanup.", ex);
             }
 
             DBEntityTypeMap.Clear();
