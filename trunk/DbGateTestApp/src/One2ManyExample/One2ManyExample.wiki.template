@@ -26,7 +26,7 @@ This demonstrates one to many relationship capability of the library using 2 typ
 }}}
 
 ===Testing Class===
-get the source for ExampleBase from http://code.google.com/p/dbgate/wiki/SimpleEntityExample
+get the source for ExampleBase from http://code.google.com/p/ndbgate/wiki/SimpleEntityExample
 
 {{{
 <wiki_code_block>one_2_many_example</wiki_code_block>

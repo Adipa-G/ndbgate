@@ -63,7 +63,7 @@ This demonstrates one to one relationship capability of the library using 2 type
 }}}
 
 ==Testing Class==
-get the source for ExampleBase from http://code.google.com/p/dbgate/wiki/SimpleEntityExample
+get the source for ExampleBase from http://code.google.com/p/ndbgate/wiki/SimpleEntityExample
 
 {{{
 
