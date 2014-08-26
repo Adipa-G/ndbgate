@@ -3,10 +3,12 @@ using System.Data;
 using System.IO;
 using System.Reflection;
 using DbGate;
+using DbGateTestApp.DocGenerate;
 using log4net.Core;
 
 namespace DbGateTestApp
 {
+    [WikiCodeBlock("example_base")]
     public class ExampleBase
     {
         private static DefaultTransactionFactory _transactionFactory;

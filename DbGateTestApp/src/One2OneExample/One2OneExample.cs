@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using DbGate;
 using DbGate.Utility;
+using DbGateTestApp.DocGenerate;
 using DbGateTestApp.One2OneExample.Entities;
 
 namespace DbGateTestApp.One2OneExample
 {
+    [WikiCodeBlock("one_2_one_example")]
     public class One2OneExample
     {
         public const int IdA = 43;

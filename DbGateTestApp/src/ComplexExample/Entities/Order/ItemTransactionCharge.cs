@@ -1,7 +1,9 @@
 using DbGate;
+using DbGateTestApp.DocGenerate;
 
 namespace DbGateTestApp.ComplexExample.Entities.Order
 {
+    [WikiCodeBlock("complex_example_order_item_transaction_charge")]
     [TableInfo("order_item_transaction_charge")]
     public class ItemTransactionCharge : DefaultEntity
     {

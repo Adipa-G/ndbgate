@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using DbGate;
 using DbGateTestApp.ComplexExample.Entities.Product;
+using DbGateTestApp.DocGenerate;
 
 namespace DbGateTestApp.ComplexExample.Entities.Order
 {
+    [WikiCodeBlock("complex_example_order_item_transaction")]
     [TableInfo("order_item_transaction")]
     public class ItemTransaction : DefaultEntity
     {

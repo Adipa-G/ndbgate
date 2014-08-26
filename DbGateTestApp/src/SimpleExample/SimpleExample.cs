@@ -4,11 +4,13 @@ using System.Data;
 using DbGate;
 using DbGate.ErManagement.Query;
 using DbGate.Utility;
+using DbGateTestApp.DocGenerate;
 using DbGateTestApp.SimpleExample.Entities;
 using System.Linq;
 
 namespace DbGateTestApp.SimpleExample
 {
+    [WikiCodeBlock("simple_example")]
     public class SimpleExample
     {
         private const int Id = 43;

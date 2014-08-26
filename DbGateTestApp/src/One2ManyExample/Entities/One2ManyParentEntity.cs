@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using DbGate;
+using DbGateTestApp.DocGenerate;
 
 namespace DbGateTestApp.One2ManyExample.Entities
 {
+    [WikiCodeBlock("one_2_many_example_parent_entity")]
     [TableInfo("parent_entity")]
     public class One2ManyParentEntity : DefaultEntity
     {
