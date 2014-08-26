@@ -1,7 +1,9 @@
 using DbGate;
+using DbGateTestApp.DocGenerate;
 
 namespace DbGateTestApp.One2OneExample.Entities
 {
+    [WikiCodeBlock("one_2_one_example_parent_entity")]
     [TableInfo("parent_entity")]
     public class One2OneParentEntity : DefaultEntity
     {

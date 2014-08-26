@@ -73,6 +73,11 @@
     <Compile Include="src\ComplexExample\Entities\Product\Item.cs" />
     <Compile Include="src\ComplexExample\Entities\Product\Product.cs" />
     <Compile Include="src\ComplexExample\Entities\Product\Service.cs" />
+    <Compile Include="src\DocGenerate\CodeReader.cs" />
+    <Compile Include="src\DocGenerate\Integrator.cs" />
+    <Compile Include="src\DocGenerate\TempleateProcessor.cs" />
+    <Compile Include="src\DocGenerate\WikiCodeBlockInfo.cs" />
+    <Compile Include="src\DocGenerate\WikiCodeBlock.cs" />
     <Compile Include="src\ExampleBase.cs" />
     <Compile Include="src\MainProgram.cs" />
     <Compile Include="src\SimpleExample\Entities\SimpleEntity.cs" />
@@ -95,12 +100,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="src\ComplexExample\FeatureIntegrationExample.wiki.template" />
+    <None Include="src\InheritanceExample\InheritanceExample.wiki.template" />
+    <None Include="src\One2ManyExample\One2ManyExample.wiki.template" />
+    <None Include="src\One2OneExample\One2OneExample.wiki.template" />
+    <None Include="src\SimpleExample\SimpleEntityExample.wiki.template" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DbGate\DbGate.csproj">
       <Project>{13eb1070-fc28-4ef6-ab4a-e5333eaae331}</Project>
       <Name>DbGate</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="wikigen\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

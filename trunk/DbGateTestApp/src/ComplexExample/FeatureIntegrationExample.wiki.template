@@ -1,0 +1,43 @@
+﻿#summary Feature Integration example
+
+= Introduction =
+
+This demonstrates no of features working together, with reverse relationships and non-identifying relationships.
+
+= Details =
+===Item class===
+{{{
+<wiki_code_block>complex_example_product_item</wiki_code_block>
+}}}
+
+===Product Class===
+{{{
+<wiki_code_block>complex_example_product_product</wiki_code_block>
+}}}
+
+===Service Class===
+{{{
+<wiki_code_block>complex_example_product_service</wiki_code_block>
+}}}
+
+===Transaction Class===
+{{{
+<wiki_code_block>complex_example_order_transaction</wiki_code_block>
+}}}
+
+===ItemTransaction Class===
+{{{
+<wiki_code_block>complex_example_order_item_transaction</wiki_code_block>
+}}}
+
+===ItemTransactionCharge Class===
+{{{
+<wiki_code_block>complex_example_order_item_transaction_charge</wiki_code_block>
+}}}
+
+===Testing Class===
+get the source for ExampleBase from http://code.google.com/p/ndbgate/wiki/SimpleEntityExample
+
+{{{
+<wiki_code_block>complex_example</wiki_code_block>
+}}}

@@ -7,177 +7,174 @@ This demonstrates one to one relationship capability of the library using 2 type
 = Details =
 ==Parent class==
 {{{
-[TableInfo("parent_entity")]
-public class One2OneParentEntity : DefaultEntity
-{
-    [ColumnInfo(ColumnType.Integer, Key = true)]
-    public int Id { get; set; }
 
-    [ColumnInfo(ColumnType.Varchar)]
-    public string Name { get; set; }
-
-    [ForeignKeyInfo("parent2childA", typeof(One2OneChildEntityA), new string[] { "id" }
-        , new string[] { "parentId" }, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
-    [ForeignKeyInfo("parent2childB", typeof(One2OneChildEntityB), new string[] { "id" }
-        , new string[] { "parentId" }, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
-    public One2OneChildEntity ChildEntity { get; set; }
-
-    public One2OneParentEntity()
+    [TableInfo("parent_entity")]
+    public class One2OneParentEntity : DefaultEntity
     {
+        [ColumnInfo(ColumnType.Integer, Key = true)]
+        public int Id { get; set; }
+
+        [ColumnInfo(ColumnType.Varchar)]
+        public string Name { get; set; }
+
+        [ForeignKeyInfo("parent2childA", typeof (One2OneChildEntityA), new[] {"id"}
+            , new[] {"parentId"}, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+        [ForeignKeyInfo("parent2childB", typeof (One2OneChildEntityB), new[] {"id"}
+            , new[] {"parentId"}, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+        public One2OneChildEntity ChildEntity { get; set; }
     }
-}
 }}}
 
 ==Child Base Class==
 {{{
-public abstract class One2OneChildEntity : DefaultEntity
-{
-    public abstract string Name { get; set; }
-}
+
+    public abstract class One2OneChildEntity : DefaultEntity
+    {
+        public abstract string Name { get; set; }
+    }
 }}}
 
 ==Child Sub Class 1==
 {{{
-[TableInfo("child_entity_a")]
-public class One2OneChildEntityA : One2OneChildEntity
-{
-    [ColumnInfo(ColumnType.Integer, Key = true)]
-    public int ParentId { get; set; }
 
-    [ColumnInfo(ColumnType.Varchar)]
-    public override string Name { get; set; }
-}
+    [TableInfo("child_entity_a")]
+    public class One2OneChildEntityA : One2OneChildEntity
+    {
+        [ColumnInfo(ColumnType.Integer, Key = true)]
+        public int ParentId { get; set; }
+
+        [ColumnInfo(ColumnType.Varchar)]
+        public override string Name { get; set; }
+    }
 }}}
 
 ==Child Sub Class 2==
 {{{
-[TableInfo("child_entity_b")]
-public class One2OneChildEntityB : One2OneChildEntity
-{
-    [ColumnInfo(ColumnType.Integer, Key = true)]
-    public int ParentId { get; set; }
 
-    [ColumnInfo(ColumnType.Varchar)]
-    public override string Name { get; set; }
-}
+    [TableInfo("child_entity_b")]
+    public class One2OneChildEntityB : One2OneChildEntity
+    {
+        [ColumnInfo(ColumnType.Integer, Key = true)]
+        public int ParentId { get; set; }
+
+        [ColumnInfo(ColumnType.Varchar)]
+        public override string Name { get; set; }
+    }
 }}}
 
 ==Testing Class==
-get the source for ExampleBase from http://code.google.com/p/ndbgate/wiki/SimpleEntityExample
+get the source for ExampleBase from http://code.google.com/p/dbgate/wiki/SimpleEntityExample
 
 {{{
-public class One2OneExample
-{
-    public const int IdA = 43;
-    public const int IdB = 44;
 
-    public One2OneParentEntity CreateEntityWithChildA()
+    public class One2OneExample
     {
-        One2OneParentEntity entity = new One2OneParentEntity();
-        entity.Id = IdA;
-        entity.Name = "Parent A";
-        entity.ChildEntity = new One2OneChildEntityA();
-        entity.ChildEntity.Name = "Child A";
-        return entity;
-    }
+        public const int IdA = 43;
+        public const int IdB = 44;
 
-
-    public One2OneParentEntity CreateEntityWithChildB()
-    {
-        One2OneParentEntity entity = new One2OneParentEntity();
-        entity.Id = IdB;
-        entity.Name = "Parent B";
-        entity.ChildEntity = new One2OneChildEntityB();
-        entity.ChildEntity.Name = "Child B";
-        return entity;
-    }
-
-    public void Patch(IDbConnection con)
-    {
-        ICollection<Type> entityTypes = new List<Type>();
-        entityTypes.Add(typeof(One2OneParentEntity));
-        entityTypes.Add(typeof(One2OneChildEntityA));
-        entityTypes.Add(typeof(One2OneChildEntityB));
-        IDbTransaction transaction = con.BeginTransaction();
-        DbGate.getSharedInstance().PatchDataBase(con,entityTypes,false);
-        transaction.Commit();
-    }
-
-    public void Persist(IDbConnection con, One2OneParentEntity entity)
-    {
-        IDbTransaction transaction = con.BeginTransaction();
-        entity.Persist(con);
-        transaction.Commit();
-    }
-
-    public One2OneParentEntity Retrieve(IDbConnection con,int id)
-    {
-        IDbCommand cmd = con.CreateCommand();
-        cmd.CommandText = "select * from parent_entity where id = ?";
-
-        IDbDataParameter parameter = cmd.CreateParameter();
-        cmd.Parameters.Add(parameter);
-        parameter.DbType = DbType.Int32;
-        parameter.Value = id;
-
-        One2OneParentEntity entity = null;
-        IDataReader reader = cmd.ExecuteReader();
-        if (reader.Read())
+        public One2OneParentEntity CreateEntityWithChildA()
         {
-            entity = new One2OneParentEntity();
-            entity.Retrieve(reader, con);
+            One2OneParentEntity entity = new One2OneParentEntity();
+            entity.Id = IdA;
+            entity.Name = "Parent A";
+            entity.ChildEntity = new One2OneChildEntityA();
+            entity.ChildEntity.Name = "Child A";
+            return entity;
         }
-        DBMgtUtility.Close(reader);
-        DBMgtUtility.Close(cmd);
-        return entity;
+
+
+        public One2OneParentEntity CreateEntityWithChildB()
+        {
+            One2OneParentEntity entity = new One2OneParentEntity();
+            entity.Id = IdB;
+            entity.Name = "Parent B";
+            entity.ChildEntity = new One2OneChildEntityB();
+            entity.ChildEntity.Name = "Child B";
+            return entity;
+        }
+
+        public void Patch(ITransaction tx) 
+        {
+            ICollection<Type> entityTypes = new List<Type>();
+            entityTypes.Add(typeof(One2OneParentEntity));
+            entityTypes.Add(typeof(One2OneChildEntityA));
+            entityTypes.Add(typeof(One2OneChildEntityB));
+            tx.DbGate.PatchDataBase(tx, entityTypes, false);
+        }
+
+        public void Persist(ITransaction tx, One2OneParentEntity entity)
+        {
+            entity.Persist(tx);
+        }
+
+        public One2OneParentEntity Retrieve(ITransaction tx,int id)
+        {
+            IDbCommand cmd = tx.CreateCommand();
+            cmd.CommandText = "select * from parent_entity where id = ?";
+
+            IDbDataParameter parameter = cmd.CreateParameter();
+            cmd.Parameters.Add(parameter);
+            parameter.DbType = DbType.Int32;
+            parameter.Value = id;
+
+            One2OneParentEntity entity = null;
+            IDataReader reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                entity = new One2OneParentEntity();
+                entity.Retrieve(reader, tx);
+            }
+            DbMgtUtility.Close(reader);
+            DbMgtUtility.Close(cmd);
+            return entity;
+        }
+
+        public static void DoTest()
+        {
+            One2OneExample example = new One2OneExample();
+            ITransaction tx = ExampleBase.SetupDb();
+            example.Patch(tx);
+
+            One2OneParentEntity entityA = example.CreateEntityWithChildA();
+            example.Persist(tx, entityA);
+            One2OneParentEntity entityB = example.CreateEntityWithChildB();
+            example.Persist(tx, entityB);
+
+            entityA = example.Retrieve(tx, One2OneExample.IdA);
+            Console.WriteLine("Entity Name = " + entityA.Name);
+            Console.WriteLine("Entity Child Name = " + entityA.ChildEntity.Name);
+
+            entityB = example.Retrieve(tx, One2OneExample.IdB);
+            Console.WriteLine("Entity Name = " + entityB.Name);
+            Console.WriteLine("Entity Child Name = " + entityB.ChildEntity.Name);
+
+            entityA.Name = "Updated Entity A";
+            entityA.ChildEntity.Name = "Updated Child Entity A";
+            example.Persist(tx, entityA);
+
+            entityB.Name = "Updated Entity B";
+            entityB.ChildEntity.Name = "Updated Child Entity B";
+            example.Persist(tx, entityB);
+
+            entityA = example.Retrieve(tx, One2OneExample.IdA);
+            Console.WriteLine("Entity Name = " + entityA.Name);
+            Console.WriteLine("Entity Child Name = " + entityA.ChildEntity.Name);
+
+            entityB = example.Retrieve(tx, One2OneExample.IdB);
+            Console.WriteLine("Entity Name = " + entityB.Name);
+            Console.WriteLine("Entity Child Name = " + entityB.ChildEntity.Name);
+
+            entityA.Status = EntityStatus.Deleted;
+            example.Persist(tx, entityA);
+            entityB.Status = EntityStatus.Deleted;
+            example.Persist(tx, entityB);
+
+            entityA = example.Retrieve(tx, One2OneExample.IdA);
+            Console.WriteLine("Entity A = " + entityA);
+            entityB = example.Retrieve(tx, One2OneExample.IdB);
+            Console.WriteLine("Entity B = " + entityB);
+
+            ExampleBase.CloseDb();
+        }
     }
-
-    public static void DoTest()
-    {
-        One2OneExample example = new One2OneExample();
-        IDbConnection con = ExampleBase.SetupDb();
-        example.Patch(con);
-
-        One2OneParentEntity entityA = example.CreateEntityWithChildA();
-        example.Persist(con, entityA);
-        One2OneParentEntity entityB = example.CreateEntityWithChildB();
-        example.Persist(con, entityB);
-
-        entityA = example.Retrieve(con, One2OneExample.IdA);
-        Console.WriteLine("Entity Name = " + entityA.Name);
-        Console.WriteLine("Entity Child Name = " + entityA.ChildEntity.Name);
-
-        entityB = example.Retrieve(con, One2OneExample.IdB);
-        Console.WriteLine("Entity Name = " + entityB.Name);
-        Console.WriteLine("Entity Child Name = " + entityB.ChildEntity.Name);
-
-        entityA.Name = "Updated Entity A";
-        entityA.ChildEntity.Name = "Updated Child Entity A";
-        example.Persist(con, entityA);
-
-        entityB.Name = "Updated Entity B";
-        entityB.ChildEntity.Name = "Updated Child Entity B";
-        example.Persist(con, entityB);
-
-        entityA = example.Retrieve(con, One2OneExample.IdA);
-        Console.WriteLine("Entity Name = " + entityA.Name);
-        Console.WriteLine("Entity Child Name = " + entityA.ChildEntity.Name);
-
-        entityB = example.Retrieve(con, One2OneExample.IdB);
-        Console.WriteLine("Entity Name = " + entityB.Name);
-        Console.WriteLine("Entity Child Name = " + entityB.ChildEntity.Name);
-
-        entityA.Status = EntityStatus.Deleted;
-        example.Persist(con, entityA);
-        entityB.Status = EntityStatus.Deleted;
-        example.Persist(con, entityB);
-
-        entityA = example.Retrieve(con, One2OneExample.IdA);
-        Console.WriteLine("Entity A = " + entityA);
-        entityB = example.Retrieve(con, One2OneExample.IdB);
-        Console.WriteLine("Entity B = " + entityB);
-
-        ExampleBase.CloseDb();
-    }
-}
 }}}

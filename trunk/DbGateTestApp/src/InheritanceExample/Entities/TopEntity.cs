@@ -1,7 +1,9 @@
 using DbGate;
+using DbGateTestApp.DocGenerate;
 
 namespace DbGateTestApp.InheritanceExample.Entities
 {
+    [WikiCodeBlock("inheritance_example_top_entity")]
     [TableInfo("top_entity")]
     public class TopEntity : DefaultEntity
     {

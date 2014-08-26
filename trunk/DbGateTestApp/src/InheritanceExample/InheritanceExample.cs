@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using DbGate;
 using DbGate.Utility;
+using DbGateTestApp.DocGenerate;
 using DbGateTestApp.InheritanceExample.Entities;
 
 namespace DbGateTestApp.InheritanceExample
 {
+    [WikiCodeBlock("inheritance_example")]
     public class InheritanceExample
     {
         private const int Id = 43;

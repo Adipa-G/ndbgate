@@ -7,265 +7,273 @@ This demonstrates no of features working together, with reverse relationships an
 = Details =
 ===Item class===
 {{{
-[TableInfo("product_item")]
-public abstract class Item : DefaultEntity
-{
-    [ColumnInfo(ColumnType.Integer, Key = true, SubClassCommonColumn = true)]
-    public int ItemId { get; set; }
-    [ColumnInfo(ColumnType.Varchar)]
-    public string Name { get; set; }
 
-    protected Item()
+    [TableInfo("product_item")]
+    public abstract class Item : DefaultEntity
     {
+        [ColumnInfo(ColumnType.Integer, Key = true, SubClassCommonColumn = true)]
+        public int ItemId { get; set; }
+
+        [ColumnInfo(ColumnType.Varchar)]
+        public string Name { get; set; }
     }
-}
 }}}
 
 ===Product Class===
 {{{
-[TableInfo("product_product")]
-public class Product : dbgatetestapp.dbgate.complexexample.entities.product.Item
-{
-    [ColumnInfo(ColumnType.Double)]
-    public double UnitPrice { get; set; }
 
-    [ColumnInfo(ColumnType.Double,Nullable = true)]
-    public double? BulkUnitPrice { get; set; }
-}
+    [TableInfo("product_product")]
+    public class Product : Item
+    {
+        [ColumnInfo(ColumnType.Double)]
+        public double UnitPrice { get; set; }
+
+        [ColumnInfo(ColumnType.Double, Nullable = true)]
+        public double? BulkUnitPrice { get; set; }
+    }
 }}}
 
 ===Service Class===
 {{{
-[TableInfo("product_service")]
-public class Service : Item
-{
-    [ColumnInfo(ColumnType.Double)]
-    public double HourlyRate { get; set; }
-}
+
+    [TableInfo("product_service")]
+    public class Service : Item
+    {
+        [ColumnInfo(ColumnType.Double)]
+        public double HourlyRate { get; set; }
+    }
 }}}
 
 ===Transaction Class===
 {{{
-[TableInfo("order_transaction")]
-public class Transaction : DefaultEntity
-{
-    [ColumnInfo(ColumnType.Integer,Key = true)]
-    public int TransactionId { get; set; }
-    [ColumnInfo(ColumnType.Varchar)]
-    public string Name { get; set; }
 
-    [ForeignKeyInfo("tx2item_tx", typeof(dbgatetestapp.dbgate.complexexample.entities.order.ItemTransaction), new string[] { "transactionId" },new string[] { "transactionId"}
-        , UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
-    public ICollection<dbgatetestapp.dbgate.complexexample.entities.order.ItemTransaction> ItemTransactions { get; set; }
-
-    public Transaction()
+    [TableInfo("order_transaction")]
+    public class Transaction : DefaultEntity
     {
-        ItemTransactions = new List<dbgatetestapp.dbgate.complexexample.entities.order.ItemTransaction>();
+        public Transaction()
+        {
+            ItemTransactions = new List<ItemTransaction>();
+        }
+
+        [ColumnInfo(ColumnType.Integer, Key = true)]
+        public int TransactionId { get; set; }
+
+        [ColumnInfo(ColumnType.Varchar)]
+        public string Name { get; set; }
+
+        [ForeignKeyInfo("tx2item_tx", typeof (ItemTransaction), new[] {"transactionId"}, new[] {"transactionId"}
+            , UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+        public ICollection<ItemTransaction> ItemTransactions { get; set; }
     }
-}
 }}}
 
 ===ItemTransaction Class===
 {{{
-[TableInfo("order_item_transaction")]
-public class ItemTransaction  : DefaultEntity
-{
-    [ColumnInfo(ColumnType.Integer,Key = true)]
-    public int TransactionId { get; set; }
-    [ColumnInfo(ColumnType.Integer,Key = true)]
-    public int IndexNo { get; set; }
-    [ColumnInfo(ColumnType.Integer)]
-    public int ItemId { get; set; }
 
-    [ForeignKeyInfo("item_tx2product", typeof (Product), new string[] {"itemId"}, new string[] {"itemId"}
-        , NonIdentifyingRelation = true, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
-    [ForeignKeyInfo("item_tx2service", typeof (Service), new string[] {"itemId"}, new string[] {"itemId"}
-        , NonIdentifyingRelation = true, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
-    public Item Item { get; set; }
-
-    [ForeignKeyInfo("item_tx2tx_rev", typeof (Transaction), new string[] {"transactionId"},new string[] {"transactionId"}
-        , ReverseRelation = true, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
-    public Transaction Transaction { get; set; }
-
-    [ForeignKeyInfo("item_tx2tx_chg", typeof(ItemTransactionCharge), new string[] { "transactionId", "indexNo" },
-        new string[] { "transactionId", "indexNo" }, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
-    public ICollection<ItemTransactionCharge> ItemTransactionCharges { get; set; }
-
-    public ItemTransaction(Transaction transaction)
+    [TableInfo("order_item_transaction")]
+    public class ItemTransaction : DefaultEntity
     {
-        this.Transaction = transaction;
-        ItemTransactionCharges = new List<ItemTransactionCharge>();
-    }
+        public ItemTransaction(Transaction transaction)
+        {
+            Transaction = transaction;
+            ItemTransactionCharges = new List<ItemTransactionCharge>();
+        }
 
-    public ItemTransaction()
-    {
-        ItemTransactionCharges = new List<ItemTransactionCharge>();
+        public ItemTransaction()
+        {
+            ItemTransactionCharges = new List<ItemTransactionCharge>();
+        }
+
+        [ColumnInfo(ColumnType.Integer, Key = true)]
+        public int TransactionId { get; set; }
+
+        [ColumnInfo(ColumnType.Integer, Key = true)]
+        public int IndexNo { get; set; }
+
+        [ColumnInfo(ColumnType.Integer)]
+        public int ItemId { get; set; }
+
+        [ForeignKeyInfo("item_tx2product", typeof (Product.Product), new[] {"itemId"}, new[] {"itemId"}
+            , NonIdentifyingRelation = true, UpdateRule = ReferentialRuleType.Restrict,
+            DeleteRule = ReferentialRuleType.Cascade)]
+        [ForeignKeyInfo("item_tx2service", typeof (Service), new[] {"itemId"}, new[] {"itemId"}
+            , NonIdentifyingRelation = true, UpdateRule = ReferentialRuleType.Restrict,
+            DeleteRule = ReferentialRuleType.Cascade)]
+        public Item Item { get; set; }
+
+        [ForeignKeyInfo("item_tx2tx_rev", typeof (Transaction), new[] {"transactionId"}, new[] {"transactionId"}
+            , ReverseRelation = true, UpdateRule = ReferentialRuleType.Restrict,
+            DeleteRule = ReferentialRuleType.Cascade)]
+        public Transaction Transaction { get; set; }
+
+        [ForeignKeyInfo("item_tx2tx_chg", typeof (ItemTransactionCharge), new[] {"transactionId", "indexNo"},
+            new[] {"transactionId", "indexNo"}, UpdateRule = ReferentialRuleType.Restrict,
+            DeleteRule = ReferentialRuleType.Cascade)]
+        public ICollection<ItemTransactionCharge> ItemTransactionCharges { get; set; }
     }
-}
 }}}
 
 ===ItemTransactionCharge Class===
 {{{
-[TableInfo("order_item_transaction_charge")]
-public class ItemTransactionCharge  : DefaultEntity
-{
-    [ColumnInfo(ColumnType.Integer, Key = true)]
-    public int TransactionId { get; set; }
-    [ColumnInfo(ColumnType.Integer, Key = true)]
-    public int IndexNo { get; set; }
-    [ColumnInfo(ColumnType.Integer, Key = true)]
-    public int ChargeIndex { get; set; }
-    [ColumnInfo(ColumnType.Varchar)]
-    public string ChargeCode { get; set; }
 
-    [ForeignKeyInfo("item_tx_charge2tx_rev", typeof (Transaction), new string[] {"transactionId"},new string[] {"transactionId"}
-        , ReverseRelation = true, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
-    public Transaction Transaction { get; set; }
-
-    [ForeignKeyInfo("item_tx_charge2tx_item_rev", typeof (dbgatetestapp.dbgate.complexexample.entities.order.ItemTransaction), new string[] {"transactionId","indexNo"},new string[] {"transactionId","indexNo"}
-        , ReverseRelation = true, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
-    public dbgatetestapp.dbgate.complexexample.entities.order.ItemTransaction ItemTransaction { get; set; }
-
-    public ItemTransactionCharge()
+    [TableInfo("order_item_transaction_charge")]
+    public class ItemTransactionCharge : DefaultEntity
     {
-    }
+        public ItemTransactionCharge()
+        {
+        }
 
-    public ItemTransactionCharge(dbgatetestapp.dbgate.complexexample.entities.order.ItemTransaction itemTransaction)
-    {
-        this.ItemTransaction = itemTransaction;
-        this.Transaction = itemTransaction.Transaction;
+        public ItemTransactionCharge(ItemTransaction itemTransaction)
+        {
+            ItemTransaction = itemTransaction;
+            Transaction = itemTransaction.Transaction;
+        }
+
+        [ColumnInfo(ColumnType.Integer, Key = true)]
+        public int TransactionId { get; set; }
+
+        [ColumnInfo(ColumnType.Integer, Key = true)]
+        public int IndexNo { get; set; }
+
+        [ColumnInfo(ColumnType.Integer, Key = true)]
+        public int ChargeIndex { get; set; }
+
+        [ColumnInfo(ColumnType.Varchar)]
+        public string ChargeCode { get; set; }
+
+        [ForeignKeyInfo("item_tx_charge2tx_rev", typeof (Transaction), new[] {"transactionId"}, new[] {"transactionId"}
+            , ReverseRelation = true, UpdateRule = ReferentialRuleType.Restrict,
+            DeleteRule = ReferentialRuleType.Cascade)]
+        public Transaction Transaction { get; set; }
+
+        [ForeignKeyInfo("item_tx_charge2tx_item_rev", typeof (ItemTransaction), new[] {"transactionId", "indexNo"},
+            new[] {"transactionId", "indexNo"}
+            , ReverseRelation = true, UpdateRule = ReferentialRuleType.Restrict,
+            DeleteRule = ReferentialRuleType.Cascade)]
+        public ItemTransaction ItemTransaction { get; set; }
     }
-}
 }}}
 
 ===Testing Class===
 get the source for ExampleBase from http://code.google.com/p/ndbgate/wiki/SimpleEntityExample
 
 {{{
-public class ComplexExample
-{
-    public const int ProductId = 43;
-    public const int ServiceId = 63;
-    public const int TransactionId = 1243;
 
-    public Product CreateDefaultProduct(IDbConnection con)
+    public class ComplexExample
     {
-        Product product = new Product();
-        product.ItemId = ProductId;
-        product.Name = "Product";
-        product.UnitPrice = 54;
-        IDbTransaction transaction = con.BeginTransaction();
-        product.Persist(con);
-        transaction.Commit();
-        return product;
-    }
+        public const int ProductId = 43;
+        public const int ServiceId = 63;
+        public const int TransactionId = 1243;
 
-    public Service CreateDefaultService(IDbConnection con)
-    {
-        Service service = new Service();
-        service.ItemId = ServiceId;
-        service.Name = "Service";
-        service.HourlyRate = 65;
-        IDbTransaction transaction = con.BeginTransaction();
-        service.Persist(con);
-        transaction.Commit();
-        return service;
-    }
-
-    public Transaction CreateDefaultTransaction(IDbConnection con, Product product, Service service)
-    {
-        Transaction transaction = new Transaction();
-        transaction.TransactionId = TransactionId;
-        transaction.Name = "TRS-0001";
-
-        ItemTransaction productTransaction = new ItemTransaction(transaction);
-        productTransaction.IndexNo = 0;
-        productTransaction.Item = product;
-        transaction.ItemTransactions.Add(productTransaction);
-
-        ItemTransactionCharge productTransactionCharge = new ItemTransactionCharge(productTransaction);
-        productTransactionCharge.ChargeCode = "Product-Sell-Code";
-        productTransaction.ItemTransactionCharges.Add(productTransactionCharge);
-
-        ItemTransaction serviceTransaction = new ItemTransaction(transaction);
-        serviceTransaction.IndexNo = 1;
-        serviceTransaction.Item = service;
-        transaction.ItemTransactions.Add(serviceTransaction);
-
-        ItemTransactionCharge serviceTransactionCharge = new ItemTransactionCharge(serviceTransaction);
-        serviceTransactionCharge.ChargeCode = "Service-Sell-Code";
-        serviceTransaction.ItemTransactionCharges.Add(serviceTransactionCharge);
-
-        IDbTransaction dbTransaction = con.BeginTransaction();
-        transaction.Persist(con);
-        dbTransaction.Commit();
-        return transaction;
-    }
-
-     public void Patch(IDbConnection con)
-    {
-        ICollection<Type> entityTypes = new List<Type>();
-        entityTypes.Add(typeof (Product));
-        entityTypes.Add(typeof (Service));
-        entityTypes.Add(typeof (Transaction));
-        entityTypes.Add(typeof (ItemTransaction));
-        entityTypes.Add(typeof (ItemTransactionCharge));
-        IDbTransaction transaction = con.BeginTransaction();
-        DbGate.ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(con, entityTypes, false);
-        transaction.Commit();
-    }
-
-    public void Persist(IDbConnection con, IServerDbClass entity)
-    {
-        IDbTransaction transaction = con.BeginTransaction();
-        entity.Persist(con);
-        transaction.Commit();
-    }
-
-    public Transaction Retrieve(IDbConnection con)
-    {
-        IDbCommand cmd = con.CreateCommand();
-        cmd.CommandText = "select * from order_transaction where transaction_id = ?";
-
-        IDbDataParameter parameter = cmd.CreateParameter();
-        cmd.Parameters.Add(parameter);
-        parameter.DbType = DbType.Int32;
-        parameter.Value = TransactionId;
-
-        Transaction entity = null;
-        IDataReader reader = cmd.ExecuteReader();
-        if (reader.Read())
+        public Product CreateDefaultProduct(ITransaction tx)
         {
-            entity = new Transaction();
-            entity.Retrieve(reader, con);
+            var product = new Product();
+            product.ItemId = ProductId;
+            product.Name = "Product";
+            product.UnitPrice = 54;
+            product.Persist(tx);
+            return product;
         }
-        DBMgtUtility.Close(reader);
-        DBMgtUtility.Close(cmd);
-        return entity;
-    }
 
-    public static void DoTest()
-    {
-        ComplexExample example = new ComplexExample();
-        IDbConnection con = ExampleBase.SetupDb();
-        example.Patch(con);
-
-        Product product = example.CreateDefaultProduct(con);
-        example.Persist(con,product);
-
-        Service service = example.CreateDefaultService(con);
-        example.Persist(con, service);
-
-        Transaction transaction = example.CreateDefaultTransaction(con,product,service);
-        example.Persist(con, transaction);
-
-        transaction = example.Retrieve(con);
-        Console.WriteLine("Transaction Name = " + transaction.Name);
-        foreach (ItemTransaction itemTransaction in transaction.ItemTransactions)
+        public Service CreateDefaultService(ITransaction tx)
         {
-            Console.WriteLine("Item Name = " + itemTransaction.Item.Name);
+            var service = new Service();
+            service.ItemId = ServiceId;
+            service.Name = "Service";
+            service.HourlyRate = 65;
+            service.Persist(tx);
+            return service;
         }
-        ExampleBase.CloseDb();
+
+        public Transaction CreateDefaultTransaction(ITransaction tx, Product product, Service service)
+        {
+            var transaction = new Transaction();
+            transaction.TransactionId = TransactionId;
+            transaction.Name = "TRS-0001";
+
+            var productTransaction = new ItemTransaction(transaction);
+            productTransaction.IndexNo = 0;
+            productTransaction.Item = product;
+            transaction.ItemTransactions.Add(productTransaction);
+
+            var productTransactionCharge = new ItemTransactionCharge(productTransaction);
+            productTransactionCharge.ChargeCode = "Product-Sell-Code";
+            productTransaction.ItemTransactionCharges.Add(productTransactionCharge);
+
+            var serviceTransaction = new ItemTransaction(transaction);
+            serviceTransaction.IndexNo = 1;
+            serviceTransaction.Item = service;
+            transaction.ItemTransactions.Add(serviceTransaction);
+
+            var serviceTransactionCharge = new ItemTransactionCharge(serviceTransaction);
+            serviceTransactionCharge.ChargeCode = "Service-Sell-Code";
+            serviceTransaction.ItemTransactionCharges.Add(serviceTransactionCharge);
+
+            transaction.Persist(tx);
+            return transaction;
+        }
+
+        public void Patch(ITransaction tx)
+        {
+            ICollection<Type> entityTypes = new List<Type>();
+            entityTypes.Add(typeof (Product));
+            entityTypes.Add(typeof (Service));
+            entityTypes.Add(typeof (Transaction));
+            entityTypes.Add(typeof (ItemTransaction));
+            entityTypes.Add(typeof (ItemTransactionCharge));
+
+            tx.DbGate.PatchDataBase(tx, entityTypes, false);
+        }
+
+        public void Persist(ITransaction tx, IEntity entity)
+        {
+            entity.Persist(tx);
+        }
+
+        public Transaction Retrieve(ITransaction tx)
+        {
+            IDbCommand cmd = tx.CreateCommand();
+            cmd.CommandText = "select * from order_transaction where transaction_id = ?";
+
+            IDbDataParameter parameter = cmd.CreateParameter();
+            cmd.Parameters.Add(parameter);
+            parameter.DbType = DbType.Int32;
+            parameter.Value = TransactionId;
+
+            Transaction entity = null;
+            IDataReader reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                entity = new Transaction();
+                entity.Retrieve(reader, tx);
+            }
+            DbMgtUtility.Close(reader);
+            DbMgtUtility.Close(cmd);
+            return entity;
+        }
+
+        public static void DoTest()
+        {
+            var example = new ComplexExample();
+            ITransaction tx = ExampleBase.SetupDb();
+            example.Patch(tx);
+
+            Product product = example.CreateDefaultProduct(tx);
+            example.Persist(tx, product);
+
+            Service service = example.CreateDefaultService(tx);
+            example.Persist(tx, service);
+
+            Transaction transaction = example.CreateDefaultTransaction(tx, product, service);
+            example.Persist(tx, transaction);
+
+            transaction = example.Retrieve(tx);
+            Console.WriteLine("Transaction Name = " + transaction.Name);
+            foreach (ItemTransaction itemTransaction in transaction.ItemTransactions)
+            {
+                Console.WriteLine("Item Name = " + itemTransaction.Item.Name);
+            }
+            ExampleBase.CloseDb();
+        }
     }
-}
 }}}

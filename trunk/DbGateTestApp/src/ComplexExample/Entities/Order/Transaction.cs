@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using DbGate;
+using DbGateTestApp.DocGenerate;
 
 namespace DbGateTestApp.ComplexExample.Entities.Order
 {
+    [WikiCodeBlock("complex_example_order_transaction")]
     [TableInfo("order_transaction")]
     public class Transaction : DefaultEntity
     {

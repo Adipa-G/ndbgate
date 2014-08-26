@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using DbGate;
 using DbGate.Utility;
+using DbGateTestApp.DocGenerate;
 using DbGateTestApp.One2ManyExample.Entities;
 
 namespace DbGateTestApp.One2ManyExample
 {
+    [WikiCodeBlock("one_2_many_example")]
     public class One2ManyExample
     {
         public const int Id = 43;

@@ -1,130 +1,134 @@
-#summary Example to do basic loading and saving using the library
-
 = Simple Example =
-Example is created using SQLLite as the database engine. This demonstrates
+Example is created using SQLite as the database engine. This demonstrates
 basic features like persisting, retrieval, change tracking
 
 = Details =
 ===Create the entity===
 {{{
-[TableInfo("sub_entity")]
-public class SubEntity : MiddleEntity
-{
-    [ColumnInfo(ColumnType.Varchar)]
-    public string SubName { get; set; }
 
-    public SubEntity()
+    [TableInfo("simple_entity")]
+    public class SimpleEntity : DefaultEntity
     {
+        [ColumnInfo(ColumnType.Integer, Key = true)]
+        public int Id { get; set; }
+
+        [ColumnInfo(ColumnType.Varchar)]
+        public string Name { get; set; }
     }
-}
 }}}
 
 ===Base class for examples===
 {{{
-public class ExampleBase
-{
-    public static IDbConnection SetupDb()
-    {
-        try
-        {
-            log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
 
-            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(),typeof(ExampleBase)).Log(typeof(ExampleBase),Level.Info,"Starting in-memory database for unit tests",null);
-            var dbConnector = new DbConnector("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DbConnector.DbSqllite);
-            return dbConnector.Connection;
-        }
-        catch (Exception ex)
+    public class ExampleBase
+    {
+        private static DefaultTransactionFactory _transactionFactory;
+
+        public static ITransaction SetupDb()
         {
-            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(ExampleBase)).Log(typeof(ExampleBase), Level.Fatal, "Exception during database startup.", ex);
-            return null;
+            try
+            {
+                if (_transactionFactory == null)
+                {
+                    log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
+
+
+                    LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(ExampleBase)).Log(typeof(ExampleBase), Level.Info, "Starting in-memory database for unit tests", null);
+                    _transactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
+                }
+                return _transactionFactory.CreateTransaction();
+            }
+            catch (Exception ex)
+            {
+                LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(ExampleBase)).Log(typeof(ExampleBase), Level.Fatal, "Exception during database startup.", ex);
+                return null;
+            }
+        }
+
+        
+        public static void CloseDb()
+        {
+            try
+            {
+                ITransaction connection = _transactionFactory.CreateTransaction();
+                connection.Close();
+
+                _transactionFactory = null;
+            }
+            catch (Exception ex)
+            {
+                LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(ExampleBase)).Log(typeof(ExampleBase), Level.Fatal, "Exception during database cleanup.", ex);
+            }
         }
     }
-
-
-    public static void CloseDb()
-    {
-        try
-        {
-            IDbConnection connection = DbConnector.GetSharedInstance().Connection;
-            connection.Close();
-        }
-        catch (Exception ex)
-        {
-            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(ExampleBase)).Log(typeof(ExampleBase), Level.Fatal, "Exception during database cleanup.", ex);
-        }
-    }
-}
 }}}
 
 ===Class to do the operation===
 {{{
-public class SimpleExample
-{
-    private const int Id = 43;
 
-    public SimpleEntity CreateEntity()
+    public class SimpleExample
     {
-        SimpleEntity entity = new SimpleEntity();
-        entity.Id = Id;
-        entity.Name = "Entity";
-        return entity;
+        private const int Id = 43;
+
+        public SimpleEntity CreateEntity()
+        {
+            SimpleEntity entity = new SimpleEntity();
+            entity.Id = Id;
+            entity.Name = "Entity";
+            return entity;
+        }
+
+        public void Patch(ITransaction tx) 
+        {
+            ICollection<Type> entityTypes = new List<Type>();
+            entityTypes.Add(typeof(SimpleEntity));
+            tx.DbGate.PatchDataBase(tx, entityTypes, false);
+        }
+
+        public void Persist(ITransaction tx,SimpleEntity entity)
+        {
+            entity.Persist(tx);
+        }
+
+        public SimpleEntity RetrieveWithQuery(ITransaction tx)
+        {
+            ISelectionQuery query = new SelectionQuery()
+                .From(QueryFrom.EntityType(typeof(SimpleEntity)))
+                .Select(QuerySelection.EntityType(typeof(SimpleEntity)));
+
+            var result = query.ToList(tx).FirstOrDefault();
+            if (result == null)
+                return null;
+
+            var retrieved = (SimpleEntity)result;
+            return retrieved;
+        }
+
+        public static void DoTest()
+        {
+            SimpleExample example = new SimpleExample();
+            ITransaction tx = ExampleBase.SetupDb();
+            example.Patch(tx);
+
+            SimpleEntity entity = example.CreateEntity();
+            example.Persist(tx, entity);
+
+            entity = example.RetrieveWithQuery(tx);
+            Console.WriteLine("Entity Name = " + entity.Name);
+
+            entity.Name = "Updated";
+            example.Persist(tx, entity);
+
+            entity = example.RetrieveWithQuery(tx);
+            Console.WriteLine("Entity Name = " + entity.Name);
+
+            entity.Status = EntityStatus.Deleted;
+            example.Persist(tx, entity);
+
+            entity = example.RetrieveWithQuery(tx);
+            Console.WriteLine("Entity = " + entity);
+
+            ExampleBase.CloseDb();
+        }
     }
-
-    public void Patch(IDbConnection con)
-    {
-        ICollection<Type> entityTypes = new List<Type>();
-        entityTypes.Add(typeof(SimpleEntity));
-        IDbTransaction transaction = con.BeginTransaction();
-        DbGate.ErManagement.ErMapper.DbGate.GetSharedInstance().PatchDataBase(con, entityTypes, false);
-        transaction.Commit();
-    }
-
-    public void Persist(IDbConnection con,SimpleEntity entity)
-    {
-        IDbTransaction transaction = con.BeginTransaction();
-        entity.Persist(con);
-        transaction.Commit();
-    }
-
-    public SimpleEntity RetrieveWithQuery(IDbConnection con)
-    {
-        ISelectionQuery query = new SelectionQuery()
-            .From(QueryFrom.EntityType(typeof(SimpleEntity)))
-            .Select(QuerySelection.EntityType(typeof(SimpleEntity)));
-
-        var result = query.ToList(con).FirstOrDefault();
-        if (result == null)
-            return null;
-
-        var retrieved = (SimpleEntity)result;
-        return retrieved;
-    }
-
-    public static void DoTest()
-    {
-        SimpleExample example = new SimpleExample();
-        IDbConnection con = ExampleBase.SetupDb();
-        example.Patch(con);
-
-        SimpleEntity entity = example.CreateEntity();
-        example.Persist(con, entity);
-
-        entity = example.RetrieveWithQuery(con);
-        Console.WriteLine("Entity Name = " + entity.Name);
-
-        entity.Name = "Updated";
-        example.Persist(con, entity);
-
-        entity = example.RetrieveWithQuery(con);
-        Console.WriteLine("Entity Name = " + entity.Name);
-
-        entity.Status = EntityStatus.Deleted;
-        example.Persist(con, entity);
-
-        entity = example.RetrieveWithQuery(con);
-        Console.WriteLine("Entity = " + entity);
-
-        ExampleBase.CloseDb();
-    }
-}
 }}}

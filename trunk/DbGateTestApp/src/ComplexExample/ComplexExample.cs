@@ -5,9 +5,11 @@ using DbGate;
 using DbGate.Utility;
 using DbGateTestApp.ComplexExample.Entities.Order;
 using DbGateTestApp.ComplexExample.Entities.Product;
+using DbGateTestApp.DocGenerate;
 
 namespace DbGateTestApp.ComplexExample
 {
+    [WikiCodeBlock("complex_example")]
     public class ComplexExample
     {
         public const int ProductId = 43;
