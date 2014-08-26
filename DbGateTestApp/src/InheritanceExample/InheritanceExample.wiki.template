@@ -21,7 +21,7 @@ This demonstrates inheritance capability of the library using 3 level inheritanc
 }}}
 
 ===Testing Class===
-get the source for ExampleBase from http://code.google.com/p/dbgate/wiki/SimpleEntityExample
+get the source for ExampleBase from http://code.google.com/p/ndbgate/wiki/SimpleEntityExample
 
 {{{
 <wiki_code_block>inheritance_example</wiki_code_block>
