@@ -8,14 +8,14 @@ namespace DbGate
         protected AbstractRelation(String attributeName, string relationshipName, Type relatedObjectType
                                    , RelationColumnMapping[] tableColumnMappings)
             : this(attributeName, relationshipName, relatedObjectType, tableColumnMappings, ReferentialRuleType.Restrict
-                   , ReferentialRuleType.Cascade, false, false, false)
+                   , ReferentialRuleType.Cascade, false, false, false,false)
         {
         }
 
         protected AbstractRelation(String attributeName, string relationshipName, Type relatedObjectType
                                    , RelationColumnMapping[] tableColumnMappings, ReferentialRuleType updateRule
                                    , ReferentialRuleType deleteRule, bool reverseRelationship
-                                   , bool nonIdentifyingRelation, bool lazy)
+                                   , bool nonIdentifyingRelation, bool lazy, bool nullable)
         {
             AttributeName = attributeName;
             RelationShipName = relationshipName;
@@ -26,6 +26,7 @@ namespace DbGate
             ReverseRelationship = reverseRelationship;
             NonIdentifyingRelation = nonIdentifyingRelation;
             Lazy = lazy;
+            Nullable = nullable;
         }
 
         #region IRelation Members
@@ -47,6 +48,8 @@ namespace DbGate
         public bool NonIdentifyingRelation { get; set; }
 
         public bool Lazy { get; set; }
+
+        public bool Nullable { get; set; }
 
         public IRelation Clone()
         {

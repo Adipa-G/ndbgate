@@ -210,7 +210,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
                 {
                     sb.Append(" AND ");
                 }
-                sb.Append( OperationUtils.FindColumnByAttribute(entityInfo.Columns,columnMapping.ToField).ColumnName);
+                sb.Append( entityInfo.FindColumnByAttribute(columnMapping.ToField).ColumnName);
                 sb.Append("= ?");
                 i++;
             }

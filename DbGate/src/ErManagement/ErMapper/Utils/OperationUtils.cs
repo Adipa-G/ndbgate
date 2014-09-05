@@ -125,10 +125,32 @@ namespace DbGate.ErManagement.ErMapper.Utils
                         {
                             continue;
                         }
-                        PropertyInfo getter = entityInfo.GetProperty(subLevelColumn.AttributeName);
-                        Object value = ReflectionUtils.GetValue(getter,entity);
+                        
+                        EntityRelationColumnInfo relationColumnInfo = entityInfo.FindRelationColumnInfo(subLevelColumn.AttributeName);
+                        if (relationColumnInfo != null)
+                        {
+                            ICollection<IEntity> relationEntities = GetRelationEntities(entity,relationColumnInfo.Relation);
+                            if (relationEntities.Count > 0)
+                            {
+                                foreach (IEntity relationEntity in relationEntities)
+                                {
+                                    IEntityFieldValueList keyValueList = ExtractEntityKeyValues(relationEntity);
+                                    EntityFieldValue fieldValue = keyValueList.GetFieldValue(relationColumnInfo.Mapping.ToField);
+                                    entityFieldValues.Add(new EntityFieldValue(fieldValue.Value,subLevelColumn));
+                                }
+                            }
+                            else
+                            {
+                                entityFieldValues.Add(new EntityFieldValue(null,subLevelColumn));
+                            }
+                        }
+                        else
+                        {
+                            PropertyInfo getter = entityInfo.GetProperty(subLevelColumn.AttributeName);
+                            Object value = ReflectionUtils.GetValue(getter, entity);
 
-                        entityFieldValues.Add(new EntityFieldValue(value,subLevelColumn));
+                            entityFieldValues.Add(new EntityFieldValue(value, subLevelColumn));
+                        }
                     }
                 }
                 entityInfo = entityInfo.SuperEntityInfo;
@@ -206,18 +228,6 @@ namespace DbGate.ErManagement.ErMapper.Utils
                 }
             }
             return true;
-        }
-
-        public static IColumn FindColumnByAttribute(IEnumerable<IColumn> columns,String attribute)
-        {
-            foreach (IColumn column in columns)
-            {
-                if (column.AttributeName.Equals(attribute,StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return column;
-                }
-            }
-            return null;
         }
 
         public static void IncrementVersion(ITypeFieldValueList fieldValues)

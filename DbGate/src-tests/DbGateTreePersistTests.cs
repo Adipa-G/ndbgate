@@ -169,6 +169,96 @@ namespace DbGate
         }
 
         [Test]
+        public void TreePersist_Insert_WithAnnotationsNullOneToOneChildren_ShouldEqualWhenLoaded()
+        {
+            try
+            {
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+
+                int id = 35;
+                ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_ANNOTATION);
+                rootEntity.One2OneEntity = null;
+                rootEntity.Persist(transaction);
+                transaction.Commit();
+
+                transaction = CreateTransaction(con);
+                ITreeTestRootEntity loadedEntity = new TreeTestRootEntityAnnotations();
+                LoadEntityWithId(transaction, loadedEntity, id);
+                con.Close();
+
+                bool compareResult = CompareEntities(rootEntity, loadedEntity);
+                Assert.IsTrue(compareResult);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(DbGateTreePersistTests)).Fatal("Exception during test", e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void TreePersist_Insert_WithFieldsNullOneToOneChildren_ShouldEqualWhenLoaded()
+        {
+            try
+            {
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+
+                int id = 35;
+                ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_FIELD);
+                rootEntity.One2OneEntity = null;
+                rootEntity.Persist(transaction);
+                transaction.Commit();
+
+                transaction = CreateTransaction(con);
+                ITreeTestRootEntity loadedEntity = new TreeTestRootEntityFields();
+                LoadEntityWithId(transaction, loadedEntity, id);
+                con.Close();
+
+                bool compareResult = CompareEntities(rootEntity, loadedEntity);
+                Assert.IsTrue(compareResult);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(DbGateTreePersistTests)).Fatal("Exception during test", e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
+        public void TreePersist_Insert_WithExtsNullOneToOneChildren_ShouldEqualWhenLoaded()
+        {
+            try
+            {
+                var con = SetupTables();
+                ITransaction transaction = CreateTransaction(con);
+
+                RegisterForExternal();
+
+                int id = 35;
+                ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_EXTERNAL);
+                rootEntity.One2OneEntity = null;
+                rootEntity.Persist(transaction);
+                transaction.Commit();
+
+                transaction = CreateTransaction(con);
+                ITreeTestRootEntity loadedEntity = new TreeTestRootEntityExt();
+                LoadEntityWithId(transaction, loadedEntity, id);
+                transaction.Commit();
+                con.Close();
+
+                bool compareResult = CompareEntities(rootEntity, loadedEntity);
+                Assert.IsTrue(compareResult);
+            }
+            catch (Exception e)
+            {
+                LogManager.GetLogger(typeof(DbGateTreePersistTests)).Fatal("Exception during test", e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Test]
         public void TreePersist_Update_WithAnnotationsDifferentTypeOfChildren_ShouldEqualWhenLoaded()
         {
             try

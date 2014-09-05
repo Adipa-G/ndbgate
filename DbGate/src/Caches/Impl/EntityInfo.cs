@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Reflection;
 using DbGate.ErManagement.DbAbstractionLayer;
 using DbGate.Exceptions.Common;
@@ -12,19 +14,25 @@ namespace DbGate.Caches.Impl
     {
         private readonly Type _entityType;
         private readonly IDictionary<string,PropertyInfo> _propertyMap;
-        private readonly ICollection<IColumn> _columns;
-        private readonly ICollection<IRelation> _relations;
+        private readonly List<IColumn> _columns;
+        private readonly List<IRelation> _relations;
         private readonly IDictionary<string,string> _queries;
-        private readonly ICollection<EntityInfo> _subEntityInfo;
+        private readonly List<EntityInfo> _subEntityInfo;
+        private readonly ICollection<EntityRelationColumnInfo> _relationColumnInfoList;
+
+
+        private bool _relationColumnsPopulated;
     
         public EntityInfo(Type entityType)
         {
+            _relationColumnsPopulated = false;
             _entityType = entityType;
             _columns = new List<IColumn>();
             _relations = new List<IRelation>();
             _propertyMap = new Dictionary<string, PropertyInfo>();
             _queries = new Dictionary<string, string>();
             _subEntityInfo = new List<EntityInfo>();
+            _relationColumnInfoList = new List<EntityRelationColumnInfo>();
         }
 
         public Type EntityType
@@ -38,22 +46,43 @@ namespace DbGate.Caches.Impl
 
         public ICollection<EntityInfo> SubEntityInfo
 	    {
-            get { return _subEntityInfo; }
+            get { return  _subEntityInfo.AsReadOnly(); }
 	    }
+
+        public void AddSubEntityInfo(EntityInfo subEntityInfo)
+        {
+            _subEntityInfo.Add(subEntityInfo);
+        }
 
         public ICollection<IColumn> Columns
         {
-            get { return _columns; }
+            get
+            {
+                PopulateRelationColumns();
+                return _columns.AsReadOnly();
+            }
         }
+
+        public EntityRelationColumnInfo FindRelationColumnInfo(string attributeName)
+        {
+            return
+                _relationColumnInfoList.FirstOrDefault(
+                    l => attributeName.Equals(l.Column.AttributeName, StringComparison.InvariantCultureIgnoreCase));
+        }
+	
+	    public IColumn FindColumnByAttribute(string attributeName)
+	    {
+	        return _columns.First(c => attributeName.Equals(c.AttributeName, StringComparison.InvariantCultureIgnoreCase));
+	    }
 
         public ICollection<IRelation> Relations
         {
-            get { return _relations; }
+            get { return _relations.AsReadOnly(); }
         }
 
         public IDictionary<string, string> Queries
         {
-            get { return _queries; }
+            get { return new ReadOnlyDictionary<string, string>(_queries); }
         }
 
         public ICollection<IColumn> GetKeys()
@@ -86,6 +115,77 @@ namespace DbGate.Caches.Impl
                 }
             }
         }
+
+        private void PopulateRelationColumns()
+	    {
+	        if (_relationColumnsPopulated)
+	            return;
+	
+
+	        foreach (IRelation relation in _relations)
+	        {
+	            bool found = HasManualRelationColumnsDefined(relation);
+	            if (!found)
+	            {
+	                CreateRelationColumns(relation);
+	            }
+	        }
+
+            _relationColumnsPopulated = true;
+	    }
+	
+	    private bool HasManualRelationColumnsDefined(IRelation relation)
+	    {
+	        bool found = false;
+	        foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
+	        {
+	            foreach (IColumn column in _columns)
+	            {
+	                if (column.AttributeName.Equals(mapping.FromField,StringComparison.InvariantCultureIgnoreCase))
+	                {
+	                    found = true;
+	                    break;
+	                }
+	            }
+	            if (found)
+	                break;
+	        }
+	        return found;
+	    }
+	
+	    private void CreateRelationColumns(IRelation relation)
+	    {
+	        EntityInfo relationInfo = CacheManager.GetEntityInfo(relation.RelatedObjectType);
+	        while (relationInfo != null)
+	        {
+	            ICollection<IColumn> relationKeys = relationInfo.GetKeys();
+	            foreach (IColumn relationKey in relationKeys)
+	            {
+	                RelationColumnMapping matchingMapping = null;
+	                foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
+	                {
+	                    if (mapping.ToField.Equals(relationKey.AttributeName,StringComparison.InvariantCultureIgnoreCase))
+	                    {
+	                        matchingMapping = mapping;
+	                        break;
+	                    }
+	                }
+	
+	                IColumn cloned = relationKey.Clone();
+	                cloned.Key =false;
+	                if (matchingMapping != null)
+	                {
+	                    cloned.AttributeName = matchingMapping.FromField;
+	                    cloned.ColumnName = AbstractColumn.PredictColumnName(matchingMapping.FromField);
+	                }
+	                cloned.Nullable = relation.Nullable;
+
+                    _columns.Add(cloned);
+	                _relationColumnInfoList.Add(new EntityRelationColumnInfo(cloned,relation,matchingMapping));
+	            }
+	            relationInfo = relationInfo.SuperEntityInfo;
+	        }
+	    }
     
         public string GetLoadQuery(IDbLayer dbLayer)
         {
@@ -93,6 +193,7 @@ namespace DbGate.Caches.Impl
             string query = GetQuery(queryId);
             if (query == null)
             {
+                PopulateRelationColumns();
                 query = dbLayer.DataManipulate().CreateLoadQuery(TableName,Columns);
                 SetQuery(queryId,query);
             }
@@ -110,6 +211,7 @@ namespace DbGate.Caches.Impl
             string query = GetQuery(queryId);
             if (query == null)
             {
+                PopulateRelationColumns();
                 query = dbLayer.DataManipulate().CreateInsertQuery(TableName,Columns);
                 SetQuery(queryId,query);
             }
@@ -127,6 +229,7 @@ namespace DbGate.Caches.Impl
             string query = GetQuery(queryId);
             if (query == null)
             {
+                PopulateRelationColumns();
                 query = dbLayer.DataManipulate().CreateUpdateQuery(TableName, Columns);
                 SetQuery(queryId,query);
             }
@@ -144,6 +247,7 @@ namespace DbGate.Caches.Impl
             string query = GetQuery(queryId);
             if (query == null)
             {
+                PopulateRelationColumns();
                 query = dbLayer.DataManipulate().CreateDeleteQuery(TableName, Columns);
                 SetQuery(queryId,query);
             }
@@ -181,7 +285,7 @@ namespace DbGate.Caches.Impl
         {
             lock (Queries)
             {
-                Queries[id] = query;
+                _queries[id] = query;
             }
         }
 

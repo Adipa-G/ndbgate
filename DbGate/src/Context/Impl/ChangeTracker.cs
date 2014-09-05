@@ -17,11 +17,6 @@ namespace DbGate.Context.Impl
 
         #region IChangeTracker Members
 
-        public IEnumerable<EntityFieldValue> Fields
-        {
-            get { return _fields; }
-        }
-
         public IEnumerable<ITypeFieldValueList> ChildEntityKeys
         {
             get { return _childEntityRelationKeys; }

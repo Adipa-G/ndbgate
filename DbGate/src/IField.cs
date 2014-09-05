@@ -1,4 +1,6 @@
-﻿namespace DbGate
+﻿using System;
+
+namespace DbGate
 {
     public interface IField
     {

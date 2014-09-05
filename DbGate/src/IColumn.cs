@@ -18,5 +18,7 @@
         bool ReadFromSequence { get; set; }
 
         ISequenceGenerator SequenceGenerator { get; set; }
+
+        IColumn Clone();
     }
 }

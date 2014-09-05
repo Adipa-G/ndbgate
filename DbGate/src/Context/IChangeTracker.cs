@@ -4,8 +4,6 @@ namespace DbGate.Context
 {
     public interface IChangeTracker
     {
-        IEnumerable<EntityFieldValue> Fields { get; }
-
         IEnumerable<ITypeFieldValueList> ChildEntityKeys { get; }
 
         bool Valid { get; }
