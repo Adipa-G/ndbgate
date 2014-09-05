@@ -97,8 +97,11 @@ namespace DbGate.ErManagement.ErMapper
 
             foreach (EntityFieldValue fieldValue in values.FieldValues)
             {
-                PropertyInfo setter = entityInfo.GetProperty(fieldValue.Column.AttributeName);
-                ReflectionUtils.SetValue(setter, roEntity, fieldValue.Value);
+                if (entityInfo.FindRelationColumnInfo(fieldValue.Column.AttributeName) == null)
+                {
+                    PropertyInfo setter = entityInfo.GetProperty(fieldValue.Column.AttributeName);
+                    ReflectionUtils.SetValue(setter, roEntity, fieldValue.Value);
+                }
             }
         }
 
@@ -197,29 +200,36 @@ namespace DbGate.ErManagement.ErMapper
                     logSb.Append(query);
                 }
 
-                ICollection<IColumn> dbColumns = entityInfo.Columns;
                 for (int i = 0; i < fields.Count; i++)
                 {
                     string field = fields[i];
-                    IColumn matchColumn = OperationUtils.FindColumnByAttribute(dbColumns, field);
+                    object fieldValue = null;
 
-                    if (matchColumn != null)
-                    {
+                    IColumn matchColumn = entityInfo.FindColumnByAttribute(field);
+                    EntityRelationColumnInfo entityRelationColumnInfo =
+                        entityInfo.FindRelationColumnInfo(matchColumn != null ? matchColumn.AttributeName : "");
+	                if (entityRelationColumnInfo != null)
+	                {
+	                    EntityFieldValue entityFieldValue =  entity.Context.ChangeTracker.GetFieldValue(matchColumn.AttributeName);
+	                    fieldValue = entityFieldValue.Value;
+	                }
+	                else if (matchColumn != null)
+	                {		                
                         PropertyInfo getter = entityInfo.GetProperty(matchColumn.AttributeName);
-                        Object fieldValue = ReflectionUtils.GetValue(getter, entity);
-
-                        if (showQuery)
-                        {
-                            logSb.Append(" ,").Append(matchColumn.ColumnName).Append("=").Append(fieldValue);
-                        }
-                        DbLayer.DataManipulate().SetToPreparedStatement(cmd, fieldValue, i + 1, matchColumn);
-                    }
+	                    fieldValue = ReflectionUtils.GetValue(getter, entity);
+	                }	
                     else
                     {
                         string message = String.Format("The field {0} does not have a matching field in the object {1}"
                             , field,entity.GetType().FullName);
                         throw new NoMatchingColumnFoundException(message);
                     }
+
+                    if (showQuery)
+                    {
+                        logSb.Append(" ,").Append(matchColumn.ColumnName).Append("=").Append(fieldValue);
+                    }
+                    DbLayer.DataManipulate().SetToPreparedStatement(cmd, fieldValue, i + 1, matchColumn);
                 }
 
                 if (showQuery)

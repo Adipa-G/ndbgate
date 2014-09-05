@@ -169,8 +169,8 @@ namespace DbGate.ErManagement.ErMapper
                 foreignKey.ToTable = relatedEntityInfo.TableName;
                 foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
                 {
-                    string fromCol = OperationUtils.FindColumnByAttribute(dbColumns, mapping.FromField).ColumnName;
-                    string toCol = OperationUtils.FindColumnByAttribute(relatedEntityInfo.Columns,mapping.ToField).ColumnName;
+                    string fromCol = entityInfo.FindColumnByAttribute(mapping.FromField).ColumnName;
+                    string toCol = relatedEntityInfo.FindColumnByAttribute(mapping.ToField).ColumnName;
                     foreignKey.ColumnMappings.Add(new MetaForeignKeyColumnMapping(fromCol,toCol));
                 }
                 foreignKey.DeleteRule = relation.DeleteRule;

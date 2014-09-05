@@ -107,7 +107,10 @@ namespace DbGate.ErManagement.ErMapper
                     {
                         foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
                         {
-                            SetParentRelationFieldsForNonIdentifyingRelations(entity,relation.RelatedObjectType, childObjects, mapping);
+                            if (entityInfo.FindRelationColumnInfo(mapping.FromField) == null)
+                            {
+                                SetParentRelationFieldsForNonIdentifyingRelations(entity, childObjects, mapping);
+                            }
                         }
                     }
                 }
@@ -370,7 +373,7 @@ namespace DbGate.ErManagement.ErMapper
             ICollection<IColumn> columns = entityInfo.Columns;
             foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
             {
-                IColumn matchColumn = OperationUtils.FindColumnByAttribute(columns, mapping.FromField);
+                IColumn matchColumn = entityInfo.FindColumnByAttribute(mapping.FromField);
                 EntityFieldValue fieldValue = valueTypeList.GetFieldValue(matchColumn.AttributeName);
 
                 if (fieldValue != null)
@@ -394,8 +397,7 @@ namespace DbGate.ErManagement.ErMapper
 
             while (entityInfo != null)
             {
-                ICollection<IColumn> subLevelColumns = entityInfo.Columns;
-                IColumn subLevelMatchedColumn = OperationUtils.FindColumnByAttribute(subLevelColumns, mapping.ToField);
+                IColumn subLevelMatchedColumn = entityInfo.FindColumnByAttribute(mapping.ToField);
 
                 if (subLevelMatchedColumn != null)
                 {
@@ -415,8 +417,8 @@ namespace DbGate.ErManagement.ErMapper
             }
         }
 
-        private static void SetParentRelationFieldsForNonIdentifyingRelations(IEntity parentEntity,Type childEntityType
-            , IEnumerable<IEntity> childObjects, RelationColumnMapping mapping)
+        private static void SetParentRelationFieldsForNonIdentifyingRelations(IEntity parentEntity
+            ,IEnumerable<IEntity> childObjects, RelationColumnMapping mapping)
         {
             IReadOnlyEntity firstObject = null;
             IEnumerator<IEntity> childEnumerator = childObjects.GetEnumerator();
@@ -435,8 +437,7 @@ namespace DbGate.ErManagement.ErMapper
             bool foundOnce = false;
             while (parentInfo != null)
             {
-                ICollection<IColumn> parentColumns = parentInfo.Columns;
-                IColumn parentMatchedColumn = OperationUtils.FindColumnByAttribute(parentColumns, mapping.FromField);
+                IColumn parentMatchedColumn = parentInfo.FindColumnByAttribute(mapping.FromField);
                 if (parentMatchedColumn != null)
                 {
                     foundOnce = true;
@@ -453,8 +454,7 @@ namespace DbGate.ErManagement.ErMapper
             foundOnce = false;
             while (childInfo != null)
             {
-                ICollection<IColumn> subLevelColumns = childInfo.Columns;
-                IColumn childMatchedColumn = OperationUtils.FindColumnByAttribute(subLevelColumns, mapping.ToField);
+                IColumn childMatchedColumn = childInfo.FindColumnByAttribute(mapping.ToField);
 
                 if (childMatchedColumn != null)
                 {

@@ -67,7 +67,7 @@ namespace DbGate.Caches.Impl
             {
                 EntityInfo immediateSuperEntityInfo = Cache[immediateSuper];
                 subEntityInfo.SuperEntityInfo = immediateSuperEntityInfo;
-                immediateSuperEntityInfo.SubEntityInfo.Add(subEntityInfo);
+                immediateSuperEntityInfo.AddSubEntityInfo(subEntityInfo);
             }
 
             lock (Cache)
@@ -113,7 +113,7 @@ namespace DbGate.Caches.Impl
                 {
                     EntityInfo superEntityInfo = Cache[regType];
                     subEntity.SuperEntityInfo = superEntityInfo;
-                    superEntityInfo.SubEntityInfo.Add(subEntity);
+                    superEntityInfo.AddSubEntityInfo(subEntity);
                     continue;
                 }
 
@@ -128,7 +128,7 @@ namespace DbGate.Caches.Impl
                     if (subEntity != null)
                     {
                         subEntity.SuperEntityInfo = entityInfo;
-                        entityInfo.SubEntityInfo.Add(subEntity);
+                        entityInfo.AddSubEntityInfo(subEntity);
                     }
                     entityInfoMap.Add(regType, entityInfo);
                     subEntity = entityInfo;
@@ -315,11 +315,11 @@ namespace DbGate.Caches.Impl
 
         private static IRelation CreateForeignKeyMapping(PropertyInfo propertyInfo, ForeignKeyInfo foreignKeyInfo)
         {
-            var objectMappings = new RelationColumnMapping[foreignKeyInfo.FromColumnMappings.Length];
-            string[] fromColumnMappings = foreignKeyInfo.FromColumnMappings;
-            string[] toColumnMappings = foreignKeyInfo.ToColumnMappings;
+            var objectMappings = new RelationColumnMapping[foreignKeyInfo.FromFieldMappings.Length];
+            string[] fromFieldMappings = foreignKeyInfo.FromFieldMappings;
+            string[] toFieldMappings = foreignKeyInfo.ToFieldMappings;
 
-            if (fromColumnMappings.Length != toColumnMappings.Length)
+            if (fromFieldMappings.Length != toFieldMappings.Length)
             {
                 LogManager.GetLogger(typeof (EntityInfoCache)).Fatal(
                     "incorrect relation definition, no of from columns should ne equal to no of to columns");
@@ -327,18 +327,18 @@ namespace DbGate.Caches.Impl
                     "incorrect relation definition, no of from columns should ne equal to no of to columns");
             }
 
-            for (int i = 0; i < fromColumnMappings.Length; i++)
+            for (int i = 0; i < fromFieldMappings.Length; i++)
             {
-                string fromMapping = fromColumnMappings[i];
-                string toMapping = toColumnMappings[i];
+                string fromMapping = fromFieldMappings[i];
+                string toMapping = toFieldMappings[i];
                 objectMappings[i] = new RelationColumnMapping(fromMapping, toMapping);
             }
 
             IRelation relation = new DefaultRelation(propertyInfo.Name, foreignKeyInfo.Name
-                                                         , foreignKeyInfo.RelatedOjectType, objectMappings
-                                                         , foreignKeyInfo.UpdateRule, foreignKeyInfo.DeleteRule
-                                                         , foreignKeyInfo.ReverseRelation
-                                                         , foreignKeyInfo.NonIdentifyingRelation, foreignKeyInfo.Lazy);
+                , foreignKeyInfo.RelatedOjectType, objectMappings
+                , foreignKeyInfo.UpdateRule, foreignKeyInfo.DeleteRule
+                , foreignKeyInfo.ReverseRelation
+                , foreignKeyInfo.NonIdentifyingRelation, foreignKeyInfo.Lazy, foreignKeyInfo.Nullable);
 
             return relation;
         }

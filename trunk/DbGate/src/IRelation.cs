@@ -21,6 +21,8 @@ namespace DbGate
 
         bool Lazy { get; set; }
 
+        bool Nullable { get; set; }
+
         IRelation Clone();
     }
 }

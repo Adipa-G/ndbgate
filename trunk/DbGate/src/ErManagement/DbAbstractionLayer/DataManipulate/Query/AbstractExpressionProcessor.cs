@@ -28,7 +28,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
             {
                 foreach (IColumn column in columns)
                 {
-                    if (column.AttributeName.Equals(field))
+                    if (column.AttributeName.Equals(field,StringComparison.InvariantCultureIgnoreCase))
                     {
                         return column;
                     }

@@ -67,7 +67,7 @@ namespace DbGate
 
         #endregion
 
-        private static string PredictColumnName(String attributeName)
+        public static string PredictColumnName(String attributeName)
         {
             bool previousCaps = false;
             var stringBuilder = new StringBuilder();
@@ -90,6 +90,11 @@ namespace DbGate
                 stringBuilder.Append(aChar);
             }
             return stringBuilder.ToString();
+        }
+
+        public IColumn Clone()
+        {
+            return (AbstractColumn)MemberwiseClone();
         }
     }
 }
