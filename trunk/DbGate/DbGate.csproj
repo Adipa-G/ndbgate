@@ -195,8 +195,8 @@
     <Compile Include="src\Caches\IEntityInfoCache.cs" />
     <Compile Include="src\Caches\Impl\EntityInfo.cs" />
     <Compile Include="src\Caches\Impl\EntityInfoCache.cs" />
-    <Compile Include="src\Context\IErSession.cs" />
-    <Compile Include="src\Context\Impl\ErSession.cs" />
+    <Compile Include="src\Context\IReferenceStore.cs" />
+    <Compile Include="src\Context\Impl\ReferenceStore.cs" />
     <Compile Include="src\ColumnInfo.cs" />
     <Compile Include="src\RelationColumnMapping.cs" />
     <Compile Include="src\TableInfo.cs" />
@@ -369,7 +369,6 @@
     <Compile Include="src\Context\Impl\EntityTypeFieldValueList.cs" />
     <Compile Include="src\Context\ITypeFieldValueList.cs" />
     <Compile Include="src\ErManagement\ErMapper\Utils\OperationUtils.cs" />
-    <Compile Include="src\ErManagement\ErMapper\Utils\SessionUtils.cs" />
     <Compile Include="src\ErManagement\ErMapper\Utils\MiscUtils.cs" />
     <Compile Include="src\ErManagement\ErMapper\PersistRetrievalLayer.cs" />
     <Compile Include="src\ErManagement\ErMapper\DataMigrationLayer.cs" />

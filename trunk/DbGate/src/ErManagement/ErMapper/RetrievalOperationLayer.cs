@@ -99,9 +99,8 @@ namespace DbGate.ErManagement.ErMapper
             }
             try
             {
-                SessionUtils.InitSession(roEntity);
                 LoadFromDb(roEntity, reader, tx);
-                SessionUtils.DestroySession(roEntity);
+                roEntity.Context.DestroyReferenceStore();
             }
             catch (Exception e)
             {
@@ -163,7 +162,7 @@ namespace DbGate.ErManagement.ErMapper
             IEntityContext entityContext = entity.Context;
             ITypeFieldValueList valueTypeList = ReadValues(type, reader);
             SetValues(entity, valueTypeList);
-            SessionUtils.AddToSession(entity, OperationUtils.ExtractEntityKeyValues(entity));
+            entity.Context.AddToCurrentObjectGraphIndex(entity);
 
             if (entityContext != null)
             {

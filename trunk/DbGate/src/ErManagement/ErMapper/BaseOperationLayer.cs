@@ -291,19 +291,18 @@ namespace DbGate.ErManagement.ErMapper
                         Object value = DbLayer.DataManipulate().ReadFromResultSet(reader, childKey);
                         childTypeKeyList.FieldValues.Add(new EntityFieldValue(value, childKey));
                     }
-                    if (SessionUtils.ExistsInSession(entity, childTypeKeyList))
+                    if (entity.Context.AlreadyInCurrentObjectGraph(childTypeKeyList))
                     {
-                        data.Add(SessionUtils.GetFromSession(entity, childTypeKeyList));
+                        data.Add(entity.Context.GetFromCurrentObjectGraph(childTypeKeyList));
                         continue;
                     }
 
                     IReadOnlyEntity rodbClass = (IReadOnlyEntity)Activator.CreateInstance(childType);
-                    SessionUtils.TransferSession(entity, rodbClass);
+                    rodbClass.Context.CopyReferenceStoreFrom(entity);
                     rodbClass.Retrieve(reader, tx);
                     data.Add(rodbClass);
 
-                    IEntityFieldValueList childEntityKeyList = OperationUtils.ExtractEntityKeyValues(rodbClass);
-                    SessionUtils.AddToSession(entity, childEntityKeyList);
+                    entity.Context.AddToCurrentObjectGraphIndex(rodbClass);
                 }
             }
             catch (Exception ex)
