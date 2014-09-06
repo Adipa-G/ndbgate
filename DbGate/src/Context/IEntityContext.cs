@@ -4,6 +4,16 @@ namespace DbGate.Context
     {
         IChangeTracker ChangeTracker { get; }
 
-        IErSession ErSession { get; set; }
+        IReferenceStore ReferenceStore { get; }
+
+        void DestroyReferenceStore();
+
+        void CopyReferenceStoreFrom(IReadOnlyEntity entity);
+	
+	    bool AlreadyInCurrentObjectGraph(ITypeFieldValueList keys);
+	
+	    IReadOnlyEntity GetFromCurrentObjectGraph(ITypeFieldValueList keys);
+
+        void AddToCurrentObjectGraphIndex(IReadOnlyEntity refEntity);
     }
 }

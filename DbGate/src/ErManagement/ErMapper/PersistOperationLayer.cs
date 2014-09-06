@@ -28,7 +28,6 @@ namespace DbGate.ErManagement.ErMapper
         {
             try
             {
-                SessionUtils.InitSession(entity);
                 TrackAndCommitChanges(entity, tx);
 
                 var entityInfoStack = new Stack<EntityInfo>();
@@ -45,7 +44,7 @@ namespace DbGate.ErManagement.ErMapper
                     SaveForType(entity, entityInfo.EntityType, tx);
                 }
                 entity.Status = EntityStatus.Unmodified;
-                SessionUtils.DestroySession(entity);
+                entity.Context.DestroyReferenceStore();
             }
             catch (Exception e)
             {
@@ -89,32 +88,7 @@ namespace DbGate.ErManagement.ErMapper
                 return;
             }
 
-            ICollection<IRelation> dbRelations = entityInfo.Relations;
-            foreach (IRelation relation in dbRelations)
-            {
-                if (relation.ReverseRelationship)
-                {
-                    continue;
-                }
-                if (IsProxyObject(entity, relation))
-                {
-                    continue;
-                }
-                ICollection<IEntity> childObjects = OperationUtils.GetRelationEntities(entity, relation);
-                if (childObjects != null)
-                {
-                    if (relation.NonIdentifyingRelation)
-                    {
-                        foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
-                        {
-                            if (entityInfo.FindRelationColumnInfo(mapping.FromField) == null)
-                            {
-                                SetParentRelationFieldsForNonIdentifyingRelations(entity, childObjects, mapping);
-                            }
-                        }
-                    }
-                }
-            }
+            ProcessNonIdentifyingRelations(entity, entityInfo);
 
             ITypeFieldValueList fieldValues = OperationUtils.ExtractEntityTypeFieldValues(entity, type);
             if (entity.Status == EntityStatus.Unmodified)
@@ -154,12 +128,19 @@ namespace DbGate.ErManagement.ErMapper
             {
                 entityContext.ChangeTracker.AddFields(fieldValues.FieldValues);
             }
-            SessionUtils.AddToSession(entity, OperationUtils.ExtractEntityKeyValues(entity));
+            entity.Context.AddToCurrentObjectGraphIndex(entity);
 
+            ProcessIdentifyingRelations(entity, type, tx, entityInfo, fieldValues);
+        }
+
+        private static void ProcessIdentifyingRelations(IEntity entity, Type type, ITransaction tx
+            , EntityInfo entityInfo,ITypeFieldValueList fieldValues)
+        {
+            ICollection<IRelation> dbRelations = entityInfo.Relations;
             foreach (IRelation relation in dbRelations)
             {
                 if (relation.ReverseRelationship
-                        || relation.NonIdentifyingRelation)
+                    || relation.NonIdentifyingRelation)
                 {
                     continue;
                 }
@@ -171,20 +152,49 @@ namespace DbGate.ErManagement.ErMapper
                 ICollection<IEntity> childObjects = OperationUtils.GetRelationEntities(entity, relation);
                 if (childObjects != null)
                 {
-
-                    SetRelationObjectKeyValues(fieldValues, type,relation.RelatedObjectType, childObjects, relation);
+                    SetRelationObjectKeyValues(fieldValues, type, relation.RelatedObjectType, childObjects, relation);
                     foreach (IEntity fieldObject in childObjects)
                     {
                         IEntityFieldValueList childEntityKeyList = OperationUtils.ExtractEntityKeyValues(fieldObject);
-                        if (SessionUtils.ExistsInSession(entity, childEntityKeyList))
+                        if (entity.Context.AlreadyInCurrentObjectGraph(childEntityKeyList))
                         {
                             continue;
                         }
-                        SessionUtils.TransferSession(entity, fieldObject);
+                        fieldObject.Context.CopyReferenceStoreFrom(entity);
                         if (fieldObject.Status != EntityStatus.Deleted) //deleted items are already deleted
                         {
                             fieldObject.Persist(tx);
-                            SessionUtils.AddToSession(entity, childEntityKeyList);
+                            entity.Context.AddToCurrentObjectGraphIndex(fieldObject);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static void ProcessNonIdentifyingRelations(IEntity entity, EntityInfo entityInfo)
+        {
+            ICollection<IRelation> dbRelations = entityInfo.Relations;
+            foreach (IRelation relation in dbRelations)
+            {
+                if (relation.ReverseRelationship)
+                {
+                    continue;
+                }
+                if (IsProxyObject(entity, relation))
+                {
+                    continue;
+                }
+                ICollection<IEntity> childObjects = OperationUtils.GetRelationEntities(entity, relation);
+                if (childObjects != null)
+                {
+                    if (relation.NonIdentifyingRelation)
+                    {
+                        foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
+                        {
+                            if (entityInfo.FindRelationColumnInfo(mapping.FromField) == null)
+                            {
+                                SetParentRelationFieldsForNonIdentifyingRelations(entity, childObjects, mapping);
+                            }
                         }
                     }
                 }
