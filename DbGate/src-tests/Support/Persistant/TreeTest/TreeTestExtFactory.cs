@@ -33,22 +33,22 @@ namespace DbGate.Support.Persistant.TreeTest
             return fields;
         }
 
-        public static string GetTableNames(Type type)
+        public static ITable GetTableInfo(Type type)
         {
-            string tableName = null;
+            ITable table = null;
             if (type == typeof (TreeTestRootEntityExt))
             {
-                tableName = "tree_test_root";
+                table = new DefaultTable("tree_test_root");
             }
             else if (type == typeof (TreeTestOne2ManyEntityExt))
             {
-                tableName = "tree_test_one2many";
+                table = new DefaultTable("tree_test_one2many");
             }
             else if (type == typeof (TreeTestOne2OneEntityExt))
             {
-                tableName = "tree_test_one2one";
+                table = new DefaultTable("tree_test_one2one");
             }
-            return tableName;
+            return table;
         }
     }
 }

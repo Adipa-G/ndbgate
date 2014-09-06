@@ -7,12 +7,12 @@ namespace DbGate.Support.Patch.PatchEmpty
     {
         public string SomeTextB { get; set; }
 
-        public override Dictionary<Type, string> TableNames
+        public override Dictionary<Type, ITable> TableInfo
         {
             get
             {
-                Dictionary<Type, string> map = base.TableNames;
-                map.Add(typeof (LeafEntitySubB), "leaf_entity_b");
+                Dictionary<Type, ITable> map = base.TableInfo;
+                map.Add(typeof (LeafEntitySubB), new DefaultTable("leaf_entity_b"));
                 return map;
             }
         }

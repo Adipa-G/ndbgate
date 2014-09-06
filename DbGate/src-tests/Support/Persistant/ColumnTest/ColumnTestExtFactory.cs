@@ -36,14 +36,14 @@ namespace DbGate.Support.Persistant.ColumnTest
             return dbColumns;
         }
 
-        public static string GetTableNames(Type type)
+        public static ITable GetTableInfo(Type type)
         {
-            string tableName = null;
+            ITable table = null;
             if (type == typeof (ColumnTestEntityExts))
             {
-                tableName = "column_test_entity";
+                table = new DefaultTable("column_test_entity");
             }
-            return tableName;
+            return table;
         }
     }
 }

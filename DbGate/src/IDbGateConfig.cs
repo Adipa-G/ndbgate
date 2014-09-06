@@ -2,16 +2,18 @@
 {
     public interface IDbGateConfig
     {
-        bool AutoTrackChanges { get; set; }
-
-        string LoggerName { get; set; }
-
         bool ShowQueries { get; set; }
-
-        bool CheckVersion { get; set; }
 
         bool EnableStatistics { get; set; }
 
-        bool UpdateChangedColumnsOnly { get; set; }
+        string LoggerName { get; set; }
+
+        DirtyCheckStrategy DirtyCheckStrategy { get; set; }
+        
+        VerifyOnWriteStrategy VerifyOnWriteStrategy { get; set; }
+
+        UpdateStrategy UpdateStrategy { get; set; }
+
+        FetchStrategy FetchStrategy { get; set; }
     }
 }

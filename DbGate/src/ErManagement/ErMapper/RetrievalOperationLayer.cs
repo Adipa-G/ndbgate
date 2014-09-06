@@ -114,7 +114,7 @@ namespace DbGate.ErManagement.ErMapper
             EntityInfo entityInfo = CacheManager.GetEntityInfo(roEntity);
             while (entityInfo != null)
             {
-                string tableName = entityInfo.TableName;
+                string tableName = entityInfo.TableInfo.TableName;
                 if (entityInfo.EntityType == roEntity.GetType() || tableName == null) //if i==0 that means it's base class and can use existing result set
                 {
                     LoadForType(roEntity, entityInfo.EntityType, reader, tx);
@@ -185,7 +185,7 @@ namespace DbGate.ErManagement.ErMapper
             PropertyInfo property = entityInfo.GetProperty(relation.AttributeName);
             Object value = ReflectionUtils.GetValue(property,parentRoEntity);
             
-            if (!lazy && relation.Lazy)
+            if (!lazy && relation.FetchStrategy == FetchStrategy.Lazy)
             {
                 CreateProxy(parentRoEntity, entityType, tx, relation, value, property);
                 return;

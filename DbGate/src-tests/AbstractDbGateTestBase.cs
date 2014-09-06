@@ -131,7 +131,7 @@ namespace DbGate
             EntityInfo entityInfo = CacheManager.GetEntityInfo(entityType);
             while (entityInfo != null)
             {
-                AddTableName(entityInfo.TableName,dbName);
+                AddTableName(entityInfo.TableInfo.TableName,dbName);
                 entityInfo = entityInfo.SuperEntityInfo;
             }
         }

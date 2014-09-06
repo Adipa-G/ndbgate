@@ -167,7 +167,12 @@
     <Compile Include="src-tests\Utility\StatusUtilityTests.cs" />
     <Compile Include="src-tests\Utility\Support\LeafEntity.cs" />
     <Compile Include="src-tests\Utility\Support\RootEntity.cs" />
+    <Compile Include="src\AbstractTable.cs" />
     <Compile Include="src\Caches\Impl\EntityRelationColumnInfo.cs" />
+    <Compile Include="src\DefaultTable.cs" />
+    <Compile Include="src\DirtyCheckStrategy.cs" />
+    <Compile Include="src\FetchStrategy.cs" />
+    <Compile Include="src\UpdateStrategy.cs" />
     <Compile Include="src\EntityStatus.cs" />
     <Compile Include="src\ColumnType.cs" />
     <Compile Include="src\DefaultTransactionFactory.cs" />
@@ -185,6 +190,7 @@
     <Compile Include="src\Exceptions\Common\TransactionRollbackFailedException.cs" />
     <Compile Include="src\Exceptions\Common\FieldValueExtractionException.cs" />
     <Compile Include="src\Exceptions\Common\InvalidDataTypeException.cs" />
+    <Compile Include="src\ITable.cs" />
     <Compile Include="src\ITransaction.cs" />
     <Compile Include="src\ITransactionFactory.cs" />
     <Compile Include="src\Utility\DbMgtUtility.cs" />
@@ -349,6 +355,7 @@
     <Compile Include="src\QueryOrderBy.cs" />
     <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Selection\AbstractTypeSelection.cs" />
     <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\From\AbstractTypeFrom.cs" />
+    <Compile Include="src\VerifyOnWriteStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="log4net.config">
@@ -387,10 +394,10 @@
     <Compile Include="src\Exceptions\Retrival\NoSetterFoundToSetChildObjectListException.cs" />
     <Compile Include="src\Exceptions\SequenceGeneratorInitializationException.cs" />
     <Compile Include="src\Exceptions\DBPatchingException.cs" />
-    <Compile Include="src-tests\Support\Persistant\ChangeTracker\ChangeTrackerTestOne2ManyEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\ChangeTracker\ChangeTrackerTestOne2OneEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\ChangeTracker\ChangeTrackerTestRootEntity.cs" />
-    <Compile Include="src-tests\DbGateChangeTrackerTest.cs" />
+    <Compile Include="src-tests\Support\Persistant\DirtyCheck\DirtyCheckTestOne2ManyEntity.cs" />
+    <Compile Include="src-tests\Support\Persistant\DirtyCheck\DirtyCheckTestOne2OneEntity.cs" />
+    <Compile Include="src-tests\Support\Persistant\DirtyCheck\DirtyCheckTestRootEntity.cs" />
+    <Compile Include="src-tests\DbGateDirtyCheckTest.cs" />
     <Compile Include="src-tests\Support\Persistant\Constraint\ConstraintTestDeleteCascadeRootEntity.cs" />
     <Compile Include="src-tests\Support\Persistant\Constraint\ConstraintTestDeleteRestrictRootEntity.cs" />
     <Compile Include="src-tests\Support\Persistant\Constraint\ConstraintTestOne2ManyEntity.cs" />

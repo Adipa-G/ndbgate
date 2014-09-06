@@ -27,7 +27,7 @@ namespace DbGate
 
         public bool NonIdentifyingRelation { get; set; }
 
-        public bool Lazy { get; set; }
+        public FetchStrategy FetchStrategy { get; set; }
 
         public bool Nullable { get; set; }
     }

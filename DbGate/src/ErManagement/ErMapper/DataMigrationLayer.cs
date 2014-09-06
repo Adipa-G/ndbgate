@@ -148,7 +148,7 @@ namespace DbGate.ErManagement.ErMapper
         {
             MetaTable table = new MetaTable();
             EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
-            table.Name = entityInfo.TableName;
+            table.Name = entityInfo.TableInfo.TableName;
 
             foreach (IColumn dbColumn in dbColumns)
             {
@@ -166,7 +166,7 @@ namespace DbGate.ErManagement.ErMapper
 
                 MetaForeignKey foreignKey = new MetaForeignKey();
                 foreignKey.Name = relation.RelationShipName;
-                foreignKey.ToTable = relatedEntityInfo.TableName;
+                foreignKey.ToTable = relatedEntityInfo.TableInfo.TableName;
                 foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
                 {
                     string fromCol = entityInfo.FindColumnByAttribute(mapping.FromField).ColumnName;

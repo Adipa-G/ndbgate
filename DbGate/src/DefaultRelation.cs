@@ -13,9 +13,9 @@ namespace DbGate
         public DefaultRelation(string attributeName, string relationshipName, Type relatedObjectType
                                , RelationColumnMapping[] tableColumnMappings, ReferentialRuleType updateRule,
                                ReferentialRuleType deleteRule, bool reverseRelationship, bool nonIdentifyingRelation,
-                               bool lazy,bool nullable)
+                               FetchStrategy fetchStrategy, bool nullable)
             : base(attributeName, relationshipName, relatedObjectType, tableColumnMappings,
-                   updateRule, deleteRule, reverseRelationship, nonIdentifyingRelation, lazy,nullable)
+                   updateRule, deleteRule, reverseRelationship, nonIdentifyingRelation, fetchStrategy, nullable)
         {
         }
     }

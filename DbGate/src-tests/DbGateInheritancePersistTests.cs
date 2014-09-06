@@ -28,6 +28,8 @@ namespace DbGate
         {
             BeginInit(DBName);
             TransactionFactory.DbGate.ClearCache();
+            TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
+            TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.DoNotVerify;
         }
 
         [TearDown]
@@ -90,15 +92,15 @@ namespace DbGate
         private void RegisterForExternal()
         {
             Type objType = typeof (InheritanceTestSuperEntityExt);
-            TransactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
+            TransactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableInfo(objType),
                                                       InheritanceTestExtFactory.GetFieldInfo(objType));
 
             objType = typeof (InheritanceTestSubEntityAExt);
-            TransactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
+            TransactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableInfo(objType),
                                                       InheritanceTestExtFactory.GetFieldInfo(objType));
 
             objType = typeof (InheritanceTestSubEntityBExt);
-            TransactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableNames(objType),
+            TransactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableInfo(objType),
                                                       InheritanceTestExtFactory.GetFieldInfo(objType));
         }
 

@@ -24,6 +24,8 @@ namespace DbGate
         {
             BeginInit(DBName);
             TransactionFactory.DbGate.ClearCache();
+            TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
+            TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.DoNotVerify;
         }
 
         [TearDown]
@@ -102,7 +104,7 @@ namespace DbGate
                 ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
@@ -197,7 +199,7 @@ namespace DbGate
                 ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
  
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
@@ -299,7 +301,7 @@ namespace DbGate
                  ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof (ColumnTestEntityExts);
-                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
@@ -414,7 +416,7 @@ namespace DbGate
                  ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
@@ -529,7 +531,7 @@ namespace DbGate
                  ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
@@ -644,7 +646,7 @@ namespace DbGate
                  ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
@@ -758,7 +760,7 @@ namespace DbGate
                 ITransaction transaction = CreateTransaction(connection);
 
                 Type type = typeof(ColumnTestEntityExts);
-                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableNames(type),
+                TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);

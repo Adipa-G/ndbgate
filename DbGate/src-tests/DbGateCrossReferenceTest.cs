@@ -25,6 +25,8 @@ namespace DbGate
         {
             BeginInit(DBName);
             TransactionFactory.DbGate.ClearCache();
+            TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
+            TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.DoNotVerify;
         }
 
         [TearDown]
@@ -64,7 +66,6 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
                 IDbConnection connection = SetupTables();
                 
                 ITransaction transaction = CreateTransaction(connection);
@@ -103,8 +104,6 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
-            
                 IDbConnection connection = SetupTables();
                 ITransaction transaction = CreateTransaction(connection);
 

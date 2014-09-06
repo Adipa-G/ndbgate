@@ -5,12 +5,12 @@ namespace DbGate.Support.Persistant.TreeTest
 {
     public class TreeTestOne2ManyEntityFields : AbstractManagedEntity, ITreeTestOne2ManyEntity
     {
-        public override Dictionary<Type, string> TableNames
+        public override Dictionary<Type, ITable> TableInfo
         {
             get
             {
-                var map = new Dictionary<Type, string>();
-                map.Add(typeof (TreeTestOne2ManyEntityFields), "tree_test_one2many");
+                var map = new Dictionary<Type, ITable>();
+                map.Add(typeof (TreeTestOne2ManyEntityFields), new DefaultTable("tree_test_one2many"));
                 return map;
             }
         }

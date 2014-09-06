@@ -28,9 +28,9 @@ namespace DbGate.Caches
             _entityInfoCache.Register(entityType);
         }
 
-        public static void Register(Type entityType, String tableName, ICollection<IField> fields)
+        public static void Register(Type entityType, ITable table, ICollection<IField> fields)
         {
-            _entityInfoCache.Register(entityType, tableName, fields);
+            _entityInfoCache.Register(entityType, table, fields);
         }
 
         public static void Clear()

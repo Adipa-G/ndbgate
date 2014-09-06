@@ -20,7 +20,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.From
         public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
         {
             EntityInfo entityInfo = CacheManager.GetEntityInfo(EntityType);
-            string sql = entityInfo.TableName;
+            string sql = entityInfo.TableInfo.TableName;
 
             if (!string.IsNullOrEmpty(Alias))
             {

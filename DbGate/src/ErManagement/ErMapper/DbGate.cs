@@ -12,7 +12,6 @@ namespace DbGate.ErManagement.ErMapper
     {
         private const string DefaultLoggerName = "ER-LAYER";
 
-        private static IDbGate _dbGate;
         private readonly IDbGateConfig _config;
         private readonly DataMigrationLayer _dataMigrationLayer;
         private readonly IPersistRetrievalLayer _persistRetrievalLayer;
@@ -57,9 +56,9 @@ namespace DbGate.ErManagement.ErMapper
             _persistRetrievalLayer.ClearCache();
         }
 
-        public void RegisterEntity(Type entityType, string tableName, ICollection<IField> fields)
+        public void RegisterEntity(Type entityType, ITable table, ICollection<IField> fields)
         {
-            _persistRetrievalLayer.RegisterEntity(entityType, tableName, fields);
+            _persistRetrievalLayer.RegisterEntity(entityType, table, fields);
         }
 
         public IDbGateConfig Config
@@ -76,7 +75,7 @@ namespace DbGate.ErManagement.ErMapper
 
         private void InitializeDefaults()
         {
-            _config.AutoTrackChanges = true;
+            _config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
             _config.LoggerName = DefaultLoggerName;
         }
     }

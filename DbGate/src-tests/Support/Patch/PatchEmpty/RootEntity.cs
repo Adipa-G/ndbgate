@@ -34,12 +34,12 @@ namespace DbGate.Support.Patch.PatchEmpty
         [ForeignKeyInfo("fk_root2leafb", typeof (LeafEntitySubB), new[] {"idcol"}, new[] {"idcol"})]
         public ICollection<LeafEntity> LeafEntities { get; set; }
 
-        public override Dictionary<Type, String> TableNames
+        public override Dictionary<Type, ITable> TableInfo
         {
             get
             {
-                var map = new Dictionary<Type, String>();
-                map.Add(typeof (RootEntity), "root_entity");
+                var map = new Dictionary<Type, ITable>();
+                map.Add(typeof (RootEntity), new DefaultTable("root_entity"));
                 return map;
             }
         }

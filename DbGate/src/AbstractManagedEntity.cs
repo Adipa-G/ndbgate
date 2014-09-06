@@ -10,6 +10,6 @@ namespace DbGate
             Status = EntityStatus.New;
         }
 
-        public abstract Dictionary<Type, string> TableNames { get; }
+        public abstract Dictionary<Type, ITable> TableInfo { get; }
     }
 }

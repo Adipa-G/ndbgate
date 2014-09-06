@@ -20,12 +20,12 @@ namespace DbGate.Support.Persistant.TreeTest
             }
         }
 
-        public override Dictionary<Type, string> TableNames
+        public override Dictionary<Type, ITable> TableInfo
         {
             get
             {
-                var map = new Dictionary<Type, string>();
-                map.Add(typeof (TreeTestOne2OneEntityFields), "tree_test_one2one");
+                var map = new Dictionary<Type, ITable>();
+                map.Add(typeof (TreeTestOne2OneEntityFields), new DefaultTable("tree_test_one2one"));
                 return map;
             }
         }

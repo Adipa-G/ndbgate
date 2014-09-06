@@ -55,18 +55,20 @@ namespace DbGate.ErManagement.ErMapper
 
         private void TrackAndCommitChanges(IEntity entity, ITransaction tx)
         {
+            var entityInfo = CacheManager.GetEntityInfo(entity);
             IEntityContext entityContext = entity.Context;
             IEnumerable<ITypeFieldValueList> originalChildren;
 
-            if (entityContext != null)
+            if (entityInfo.TableInfo.DirtyCheckStrategy == DirtyCheckStrategy.Automatic)
             {
-                if (Config.AutoTrackChanges)
+                if (CheckForModification(entity, tx, entityContext))
                 {
-                    if (CheckForModification(entity,tx, entityContext))
-                    {
-                        MiscUtils.Modify(entity);
-                    }
+                    MiscUtils.Modify(entity);
                 }
+            }
+
+            if (entityContext.ChangeTracker.Valid)
+            {
                 originalChildren = entityContext.ChangeTracker.ChildEntityKeys;
             }
             else
@@ -101,7 +103,7 @@ namespace DbGate.ErManagement.ErMapper
             }
             else if (entity.Status == EntityStatus.Modified)
             {
-                if (Config.CheckVersion)
+                if (entityInfo.TableInfo.VerifyOnWriteStrategy == VerifyOnWriteStrategy.Verify)
                 {
                     if (!VersionValidated(entity, type, tx))
                     {
@@ -260,7 +262,7 @@ namespace DbGate.ErManagement.ErMapper
             string query;
             
 
-            if (Config.UpdateChangedColumnsOnly)
+            if (entityInfo.TableInfo.UpdateStrategy == UpdateStrategy.ChangedColumns)
             {
                 values = GetModifiedFieldValues(entity, type);
                 if (values.Count == 0)
@@ -276,7 +278,7 @@ namespace DbGate.ErManagement.ErMapper
                 {
                     keysAndModified.Add(fieldValue.Column);
                 }
-                query = DbLayer.DataManipulate().CreateUpdateQuery(entityInfo.TableName, keysAndModified);
+                query = DbLayer.DataManipulate().CreateUpdateQuery(entityInfo.TableInfo.TableName, keysAndModified);
             }
             else
             {
@@ -632,7 +634,7 @@ namespace DbGate.ErManagement.ErMapper
                 }
             }
 
-            if (Config.UpdateChangedColumnsOnly)
+            if (entityInfo.TableInfo.UpdateStrategy == UpdateStrategy.ChangedColumns)
 		 	{
 		 	    ICollection<EntityFieldValue> modified = GetModifiedFieldValues(entity, type);
 		 	    typeColumns = new List<IColumn>();

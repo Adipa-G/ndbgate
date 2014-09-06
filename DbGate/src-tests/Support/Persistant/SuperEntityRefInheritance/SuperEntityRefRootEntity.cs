@@ -18,12 +18,12 @@ namespace DbGate.Support.Persistant.SuperEntityRefInheritance
 
         [ForeignKeyInfo("fk_root2one2manyent", typeof(SuperEntityRefOne2ManyEntity), new[] { "idCol" }
             , new[] {"idCol"}, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade,
-            Lazy = false)]
+            FetchStrategy = FetchStrategy.Eager)]
         public virtual ICollection<SuperEntityRefOne2ManyEntity> One2ManyEntities { get; set; }
 
         [ForeignKeyInfo("fk_root2one2oneent", typeof(SuperEntityRefOne2OneEntity), new[] { "idCol" }
             , new[] {"idCol"}, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade,
-            Lazy = false)]
+            FetchStrategy = FetchStrategy.Eager)]
         public virtual SuperEntityRefOne2OneEntity One2OneEntity { get; set; }
     }
 }

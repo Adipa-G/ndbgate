@@ -6,9 +6,12 @@ namespace DbGate.ErManagement.ErMapper
         {
             AutoTrackChanges = true;
             ShowQueries = true;
-            CheckVersion = true;
             EnableStatistics = false;
-            UpdateChangedColumnsOnly = true;
+
+            DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
+            VerifyOnWriteStrategy = VerifyOnWriteStrategy.Verify;
+            UpdateStrategy = UpdateStrategy.ChangedColumns;
+            FetchStrategy = FetchStrategy.Eager;
         }
 
         #region IDbGateConfig Members
@@ -19,11 +22,15 @@ namespace DbGate.ErManagement.ErMapper
 
         public bool ShowQueries { get; set; }
 
-        public bool CheckVersion { get; set; }
-
         public bool EnableStatistics { get; set; }
 
-        public bool UpdateChangedColumnsOnly { get; set; }
+        public DirtyCheckStrategy DirtyCheckStrategy { get; set; }
+
+        public VerifyOnWriteStrategy VerifyOnWriteStrategy { get; set; }
+
+        public UpdateStrategy UpdateStrategy { get; set; }
+
+        public FetchStrategy FetchStrategy { get; set; }
 
         #endregion
     }

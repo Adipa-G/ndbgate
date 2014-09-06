@@ -5,6 +5,6 @@ namespace DbGate
 {
     public interface IManagedEntity : IManagedReadOnlyEntity, IEntity
     {
-        Dictionary<Type, string> TableNames { get; }
+        Dictionary<Type, ITable> TableInfo { get; }
     }
 }

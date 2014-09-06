@@ -26,7 +26,9 @@ namespace DbGate
         {
             BeginInit(DBName);
             TransactionFactory.DbGate.ClearCache();
-
+            TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
+            TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.DoNotVerify;
+            
             ICollection<Type> types = new List<Type>();
             types.Add(typeof(LeafEntitySubA));
             types.Add(typeof(LeafEntitySubB));
