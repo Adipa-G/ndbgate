@@ -14,6 +14,6 @@ namespace DbGate
 
         void ClearCache();
 
-        void RegisterEntity(Type entityType, String tableName, ICollection<IField> fields);
+        void RegisterEntity(Type entityType, ITable table, ICollection<IField> fields);
     }
 }

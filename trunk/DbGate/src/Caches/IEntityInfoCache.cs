@@ -10,7 +10,7 @@ namespace DbGate.Caches
 
         EntityInfo GetEntityInfo(IReadOnlyClientEntity entity);
 
-        void Register(Type entityType, String tableName, ICollection<IField> fields);
+        void Register(Type entityType, ITable table, ICollection<IField> fields);
 
         void Register(Type entityType);
 

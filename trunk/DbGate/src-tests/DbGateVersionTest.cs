@@ -26,6 +26,9 @@ namespace DbGate
         {
             BeginInit(DBName);
             TransactionFactory.DbGate.ClearCache();
+            TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
+            TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.Verify;
+            TransactionFactory.DbGate.Config.UpdateStrategy = UpdateStrategy.AllColumns;
         }
 
         [TearDown]
@@ -154,7 +157,7 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.UpdateChangedColumnsOnly = true;
+                TransactionFactory.DbGate.Config.UpdateStrategy = UpdateStrategy.ChangedColumns;
                 var con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
 

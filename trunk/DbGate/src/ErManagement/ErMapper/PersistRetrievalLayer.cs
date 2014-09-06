@@ -37,9 +37,9 @@ namespace DbGate.ErManagement.ErMapper
             CacheManager.Clear();
         }
 
-        public void RegisterEntity(Type entityType, string tableName, ICollection<IField> fields)
+        public void RegisterEntity(Type entityType, ITable table, ICollection<IField> fields)
         {
-            CacheManager.Register(entityType,tableName,fields);
+            CacheManager.Register(entityType, table, fields);
         }
     }
 }

@@ -18,12 +18,12 @@ namespace DbGate.Support.Persistant.Lazy
 
         [ForeignKeyInfo("fk_root2one2manyent", typeof (LazyTestOne2ManyEntity), new[] {"idCol"}
             , new[] {"idCol"}, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade,
-            Lazy = true)]
+            FetchStrategy = FetchStrategy.Lazy)]
         public virtual ICollection<LazyTestOne2ManyEntity> One2ManyEntities { get; set; }
 
         [ForeignKeyInfo("fk_root2one2oneent", typeof (LazyTestOne2OneEntity), new[] {"idCol"}
             , new[] {"idCol"}, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade,
-            Lazy = true)]
+            FetchStrategy = FetchStrategy.Lazy)]
         public virtual LazyTestOne2OneEntity One2OneEntity { get; set; }
     }
 }

@@ -321,7 +321,7 @@ namespace DbGate.ErManagement.ErMapper
 
         protected static bool IsProxyObject(IEntity entity, IRelation relation)
         {
-            if (relation.Lazy)
+            if (relation.FetchStrategy == FetchStrategy.Lazy)
             {
                 EntityInfo entityInfo = CacheManager.GetEntityInfo(entity);
                 PropertyInfo property = entityInfo.GetProperty(relation.AttributeName);

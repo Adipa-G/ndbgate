@@ -5,12 +5,12 @@ namespace DbGate.Support.Persistant.InheritanceTest
 {
     public class InheritanceTestSubEntityBFields : InheritanceTestSuperEntityFields, IInheritanceTestSubEntityB
     {
-        public override Dictionary<Type, string> TableNames
+        public override Dictionary<Type, ITable> TableInfo
         {
             get
             {
-                Dictionary<Type, String> map = base.TableNames;
-                map.Add(typeof (InheritanceTestSubEntityBFields), "inheritance_test_subb");
+                Dictionary<Type, ITable> map = base.TableInfo;
+                map.Add(typeof (InheritanceTestSubEntityBFields), new DefaultTable("inheritance_test_subb"));
                 return map;
             }
         }

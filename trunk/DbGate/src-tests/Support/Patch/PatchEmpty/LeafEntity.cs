@@ -9,12 +9,12 @@ namespace DbGate.Support.Patch.PatchEmpty
         public int IndexNo { get; set; }
         public string SomeText { get; set; }
 
-        public override Dictionary<Type, string> TableNames
+        public override Dictionary<Type, ITable> TableInfo
         {
             get
             {
-                var map = new Dictionary<Type, String>();
-                map.Add(typeof (LeafEntity), "leaf_entity");
+                var map = new Dictionary<Type, ITable>();
+                map.Add(typeof (LeafEntity), new DefaultTable("leaf_entity"));
                 return map;
             }
         }

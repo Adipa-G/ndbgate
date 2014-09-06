@@ -5,12 +5,12 @@ namespace DbGate.Support.Persistant.ColumnTest
 {
     public class ColumnTestEntityFields : AbstractManagedEntity, IColumnTestEntity
     {
-        public override Dictionary<Type, String> TableNames
+        public override Dictionary<Type, ITable> TableInfo
         {
             get
             {
-                var map = new Dictionary<Type, String>();
-                map.Add(typeof (ColumnTestEntityFields), "column_test_entity");
+                var map = new Dictionary<Type, ITable>();
+                map.Add(typeof (ColumnTestEntityFields), new DefaultTable("column_test_entity"));
                 return map;
             }
         }

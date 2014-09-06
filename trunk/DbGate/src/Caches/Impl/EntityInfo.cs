@@ -40,7 +40,7 @@ namespace DbGate.Caches.Impl
             get { return _entityType; }
         }
 
-        public string TableName { get; set; }
+        public ITable TableInfo { get; set; }
 
         public EntityInfo SuperEntityInfo { get; set; }
 
@@ -194,13 +194,13 @@ namespace DbGate.Caches.Impl
             if (query == null)
             {
                 PopulateRelationColumns();
-                query = dbLayer.DataManipulate().CreateLoadQuery(TableName,Columns);
+                query = dbLayer.DataManipulate().CreateLoadQuery(TableInfo.TableName,Columns);
                 SetQuery(queryId,query);
             }
             if (query == null)
             {
                 throw new QueryBuildingException(String.Format("Load Query building failed for table {0} class {1}",
-                                                               TableName, EntityType.FullName));
+                                                               TableInfo, EntityType.FullName));
             }
             return query;
         }
@@ -212,13 +212,13 @@ namespace DbGate.Caches.Impl
             if (query == null)
             {
                 PopulateRelationColumns();
-                query = dbLayer.DataManipulate().CreateInsertQuery(TableName,Columns);
+                query = dbLayer.DataManipulate().CreateInsertQuery(TableInfo.TableName,Columns);
                 SetQuery(queryId,query);
             }
             if (query == null)
             {
                 throw new QueryBuildingException(String.Format("Insert Query building failed for table {0} class {1}",
-                                                               TableName, EntityType.FullName));
+                                                               TableInfo, EntityType.FullName));
             }
             return query;
         }
@@ -230,13 +230,13 @@ namespace DbGate.Caches.Impl
             if (query == null)
             {
                 PopulateRelationColumns();
-                query = dbLayer.DataManipulate().CreateUpdateQuery(TableName, Columns);
+                query = dbLayer.DataManipulate().CreateUpdateQuery(TableInfo.TableName, Columns);
                 SetQuery(queryId,query);
             }
             if (query == null)
             {
                 throw new QueryBuildingException(String.Format("Update Query building failed for table {0} class {1}",
-                                                               TableName, EntityType.FullName));
+                                                               TableInfo, EntityType.FullName));
             }
             return query;
         }
@@ -248,12 +248,12 @@ namespace DbGate.Caches.Impl
             if (query == null)
             {
                 PopulateRelationColumns();
-                query = dbLayer.DataManipulate().CreateDeleteQuery(TableName, Columns);
+                query = dbLayer.DataManipulate().CreateDeleteQuery(TableInfo.TableName, Columns);
                 SetQuery(queryId,query);
             }
             if (query == null)
             {
-                throw new QueryBuildingException(String.Format("Delete Query building failed for table {0} class {1}",TableName,EntityType.FullName));
+                throw new QueryBuildingException(String.Format("Delete Query building failed for table {0} class {1}",TableInfo,EntityType.FullName));
             }
             return query;
         }
@@ -269,7 +269,7 @@ namespace DbGate.Caches.Impl
             }
             if (query == null)
             {
-                throw new QueryBuildingException(String.Format("Child loading Query building failed for table {0} class {1} child object type {2}",TableName,EntityType.FullName,relation.RelatedObjectType.FullName));
+                throw new QueryBuildingException(String.Format("Child loading Query building failed for table {0} class {1} child object type {2}",TableInfo,EntityType.FullName,relation.RelatedObjectType.FullName));
             }
             return query;
         }

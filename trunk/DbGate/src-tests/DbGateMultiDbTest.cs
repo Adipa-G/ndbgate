@@ -29,7 +29,10 @@ namespace DbGate
             BeginInit(DB2Name);
             
             TransactionFactoryDb1.DbGate.ClearCache();
+            TransactionFactoryDb1.DbGate.Config.UpdateStrategy = UpdateStrategy.AllColumns;
+
             TransactionFactory.DbGate.ClearCache();
+            TransactionFactory.DbGate.Config.UpdateStrategy = UpdateStrategy.AllColumns;
         }
 
         [TearDown]

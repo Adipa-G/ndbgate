@@ -29,6 +29,8 @@ namespace DbGate
         {
             BeginInit(DBName);
             TransactionFactory.DbGate.ClearCache();
+            TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.DoNotVerify;
+            TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
         }
 
         [TearDown]

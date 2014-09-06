@@ -1,7 +1,7 @@
-namespace DbGate.Support.Persistant.ChangeTracker
+namespace DbGate.Support.Persistant.DirtyCheck
 {
-    [TableInfo("change_tracker_test_one2many")]
-    public class ChangeTrackerTestOne2ManyEntity : DefaultEntity
+    [TableInfo("dirty_check_test_one2many")]
+    public class DirtyCheckTestOne2ManyEntity : DefaultEntity
     {
         [ColumnInfo((ColumnType.Integer), Key = true)]
         public int IdCol { get; set; }

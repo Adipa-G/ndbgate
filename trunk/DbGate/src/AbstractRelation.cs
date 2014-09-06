@@ -8,14 +8,14 @@ namespace DbGate
         protected AbstractRelation(String attributeName, string relationshipName, Type relatedObjectType
                                    , RelationColumnMapping[] tableColumnMappings)
             : this(attributeName, relationshipName, relatedObjectType, tableColumnMappings, ReferentialRuleType.Restrict
-                   , ReferentialRuleType.Cascade, false, false, false,false)
+                   , ReferentialRuleType.Cascade, false, false, DbGate.FetchStrategy.Default,false)
         {
         }
 
         protected AbstractRelation(String attributeName, string relationshipName, Type relatedObjectType
                                    , RelationColumnMapping[] tableColumnMappings, ReferentialRuleType updateRule
                                    , ReferentialRuleType deleteRule, bool reverseRelationship
-                                   , bool nonIdentifyingRelation, bool lazy, bool nullable)
+                                   , bool nonIdentifyingRelation, FetchStrategy fetchStrategy, bool nullable)
         {
             AttributeName = attributeName;
             RelationShipName = relationshipName;
@@ -25,7 +25,7 @@ namespace DbGate
             DeleteRule = deleteRule;
             ReverseRelationship = reverseRelationship;
             NonIdentifyingRelation = nonIdentifyingRelation;
-            Lazy = lazy;
+            FetchStrategy = fetchStrategy;
             Nullable = nullable;
         }
 
@@ -47,7 +47,7 @@ namespace DbGate
 
         public bool NonIdentifyingRelation { get; set; }
 
-        public bool Lazy { get; set; }
+        public FetchStrategy FetchStrategy { get; set; }
 
         public bool Nullable { get; set; }
 

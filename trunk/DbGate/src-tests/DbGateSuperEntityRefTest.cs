@@ -26,6 +26,7 @@ namespace DbGate
         {
             BeginInit(DBName);
             TransactionFactory.DbGate.ClearCache();
+            TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
         }
 
         [TearDown]
@@ -91,8 +92,6 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
-                
                 var con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
                 
@@ -120,8 +119,6 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
-                
                 var con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
 
@@ -149,8 +146,6 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
-                
                 var con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
 
@@ -178,8 +173,6 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
-                
                 var con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
 
@@ -207,8 +200,6 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
-                
                 var con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
 
@@ -236,8 +227,6 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
-                
                 var con = SetupTables();
                 ITransaction transaction = CreateTransaction(con);
                 
@@ -303,6 +292,8 @@ namespace DbGate
             {
                 Assert.AreEqual(one2OneEntity.GetType(),loadedOne2OneEntity.GetType());
                 Assert.AreEqual(one2OneEntity.Name,loadedOne2OneEntity.Name);
+
+                loadedOne2OneEntity = loadedRootEntity.One2OneEntity; //in case of lazy loading
                 if (one2OneEntity.GetType() == typeof(SuperEntityRefOne2OneEntityA))
                 {
                     SuperEntityRefOne2OneEntityA one2OneEntityA = (SuperEntityRefOne2OneEntityA) one2OneEntity;

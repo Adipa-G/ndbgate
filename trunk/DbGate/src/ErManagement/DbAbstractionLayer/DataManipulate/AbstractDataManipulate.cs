@@ -196,7 +196,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 
             var sb = new StringBuilder();
             sb.Append("SELECT * FROM ");
-            sb.Append(entityInfo.TableName);
+            sb.Append(entityInfo.TableInfo.TableName);
             sb.Append(" WHERE ");
 
             IEnumerator<RelationColumnMapping> enumerator = relation.TableColumnMappings.GetEnumerator();

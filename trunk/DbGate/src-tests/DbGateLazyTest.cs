@@ -13,7 +13,7 @@ namespace DbGate
 {
     public class DbGateLazyTest : AbstractDbGateTestBase
     {
-        private const string DBName = "unit-testing-lazy";
+        private const string DBName = "unit-testing-fetchstrategy";
 
         [TestFixtureSetUp]
         public static void Before()
@@ -26,6 +26,7 @@ namespace DbGate
         {
             BeginInit(DBName);
             TransactionFactory.DbGate.ClearCache();
+            TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
         }
 
         [TearDown]

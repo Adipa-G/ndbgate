@@ -29,6 +29,8 @@ namespace DbGate
         {
             BeginInit(DBName);
             TransactionFactory.DbGate.ClearCache();
+            TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
+            TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.DoNotVerify;
         }
 
         [TearDown]
@@ -42,17 +44,17 @@ namespace DbGate
         {
             Type objType = typeof (TreeTestRootEntityExt);
             TransactionFactory.DbGate.RegisterEntity(objType,
-                                                      TreeTestExtFactory.GetTableNames(objType),
+                                                      TreeTestExtFactory.GetTableInfo(objType),
                                                       TreeTestExtFactory.GetFieldInfo(objType));
 
             objType = typeof (TreeTestOne2ManyEntityExt);
             TransactionFactory.DbGate.RegisterEntity(objType,
-                                                      TreeTestExtFactory.GetTableNames(objType),
+                                                      TreeTestExtFactory.GetTableInfo(objType),
                                                       TreeTestExtFactory.GetFieldInfo(objType));
 
             objType = typeof (TreeTestOne2OneEntityExt);
             TransactionFactory.DbGate.RegisterEntity(objType,
-                                                      TreeTestExtFactory.GetTableNames(objType),
+                                                      TreeTestExtFactory.GetTableInfo(objType),
                                                       TreeTestExtFactory.GetFieldInfo(objType));
         }
 

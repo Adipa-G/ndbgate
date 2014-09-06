@@ -5,22 +5,22 @@ using System.Data;
 using System.IO;
 using System.Reflection;
 using DbGate.Context;
-using DbGate.Support.Persistant.ChangeTracker;
 using DbGate.DbUtility;
 using DbGate.ErManagement.ErMapper;
+using DbGate.Support.Persistant.DirtyCheck;
 using log4net;
 using NUnit.Framework;
 
 namespace DbGate
 {
-    public class DbGateChangeTrackerTest : AbstractDbGateTestBase
+    public class DbGateDirtyCheckTest : AbstractDbGateTestBase
     {
-        private const string DBName = "unit-testing-change-tracker";
+        private const string DBName = "unit-testing-dirty-check";
 
         [TestFixtureSetUp]
         public static void Before()
         {
-            TestClass = typeof(DbGateChangeTrackerTest);
+            TestClass = typeof(DbGateDirtyCheckTest);
         }
 
         [SetUp]
@@ -39,20 +39,20 @@ namespace DbGate
         
         private IDbConnection SetupTables()
         {
-            string sql = "Create table change_tracker_test_root (\n" +
+            string sql = "Create table dirty_check_test_root (\n" +
                              "\tid_col Int NOT NULL,\n" +
                              "\tname Varchar(20) NOT NULL,\n" +
                              " Primary Key (id_col))";
             CreateTableFromSql(sql,DBName);
-            
-            sql = "Create table change_tracker_test_one2many (\n" +
+
+            sql = "Create table dirty_check_test_one2many (\n" +
                       "\tid_col Int NOT NULL,\n" +
                       "\tindex_no Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col,index_no))";
             CreateTableFromSql(sql, DBName);
-            
-            sql = "Create table change_tracker_test_one2one (\n" +
+
+            sql = "Create table dirty_check_test_one2one (\n" +
                       "\tid_col Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col))";
@@ -67,19 +67,19 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
+                TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
                 IDbConnection connection = SetupTables();
                 
                 ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
-                ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity loadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction, loadedEntity, id);
                 transaction.Commit();
 
@@ -89,7 +89,7 @@ namespace DbGate
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity reloadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity reloadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction, reloadedEntity, id);
                 transaction.Commit();
                 connection.Close();
@@ -98,7 +98,7 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateChangeTrackerTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
                 Assert.Fail(e.Message);
             }
         }
@@ -108,19 +108,19 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
+                TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
                 IDbConnection connection = SetupTables();
 
                 ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
-                ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity loadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction, loadedEntity, id);
                 transaction.Commit();
 
@@ -136,7 +136,7 @@ namespace DbGate
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity reloadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity reloadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction, reloadedEntity, id);
                 transaction.Commit();
                 connection.Close();
@@ -145,7 +145,7 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateChangeTrackerTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -155,19 +155,19 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = false;
+                TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
                 IDbConnection connection = SetupTables();
                 
                 ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
-                ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity loadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction,loadedEntity,id);
                 transaction.Commit();
 
@@ -177,7 +177,7 @@ namespace DbGate
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity reloadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity reloadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction,reloadedEntity,id);
                 transaction.Commit();
                 connection.Close();
@@ -186,7 +186,7 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateChangeTrackerTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
                 Assert.Fail(e.Message);
             }
         }
@@ -196,21 +196,21 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
+                TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
                 IDbConnection connection = SetupTables();
                 
                 ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
-                ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.One2OneEntity =new ChangeTrackerTestOne2OneEntity();
+                entity.One2OneEntity =new DirtyCheckTestOne2OneEntity();
                 entity.One2OneEntity.Name = "Child-Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity loadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2OneEntity = null;
                 loadedEntity.Persist(transaction);
@@ -225,7 +225,7 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateChangeTrackerTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
                 Assert.Fail(e.Message);
             }
         }
@@ -235,21 +235,21 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = false;
+                TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
                 IDbConnection connection = SetupTables();
                 
                 ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
-                ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.One2OneEntity =new ChangeTrackerTestOne2OneEntity();
+                entity.One2OneEntity =new DirtyCheckTestOne2OneEntity();
                 entity.One2OneEntity.Name = "Child-Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity loadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2OneEntity = null;
                 loadedEntity.Persist(transaction);
@@ -264,7 +264,7 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateChangeTrackerTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
                 Assert.Fail(e.Message);
             }
         }
@@ -274,28 +274,28 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
+                TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
                 IDbConnection connection = SetupTables();
                 
                 ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
-                ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.One2OneEntity =new ChangeTrackerTestOne2OneEntity();
+                entity.One2OneEntity =new DirtyCheckTestOne2OneEntity();
                 entity.One2OneEntity.Name = "Child-Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity loadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2OneEntity.Name = "Child-Upd-Name";
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity reLoadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity reLoadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction,reLoadedEntity,id);
                 transaction.Commit();
                 connection.Close();
@@ -304,7 +304,7 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateChangeTrackerTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
                 Assert.Fail(e.Message);
             }
         }
@@ -314,28 +314,28 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = false;
+                TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
                 IDbConnection connection = SetupTables();
                 
                 ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
-                ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.One2OneEntity =new ChangeTrackerTestOne2OneEntity();
+                entity.One2OneEntity =new DirtyCheckTestOne2OneEntity();
                 entity.One2OneEntity.Name = "Child-Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity loadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2OneEntity.Name = "Child-Upd-Name";
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity reLoadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity reLoadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction,reLoadedEntity,id);
                 transaction.Commit();
                 connection.Close();
@@ -344,7 +344,7 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateChangeTrackerTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
                 Assert.Fail(e.Message);
             }
         }
@@ -354,16 +354,16 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
+                TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
                 IDbConnection connection = SetupTables();
                 
                 ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
-                ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
 
-                ChangeTrackerTestOne2ManyEntity one2ManyEntity = new ChangeTrackerTestOne2ManyEntity();
+                DirtyCheckTestOne2ManyEntity one2ManyEntity = new DirtyCheckTestOne2ManyEntity();
                 one2ManyEntity.IdCol = id;
                 one2ManyEntity.IndexNo = 1;
                 one2ManyEntity.Name = "Child-Org-Name";
@@ -372,7 +372,7 @@ namespace DbGate
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity loadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2ManyEntities.Clear();
                 loadedEntity.Persist(transaction);
@@ -387,7 +387,7 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateChangeTrackerTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
                 Assert.Fail(e.Message);
             }
         }
@@ -397,16 +397,16 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = false;
+                TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
                 IDbConnection connection = SetupTables();
                 
                 ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
-                ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
 
-                ChangeTrackerTestOne2ManyEntity one2ManyEntity = new ChangeTrackerTestOne2ManyEntity();
+                DirtyCheckTestOne2ManyEntity one2ManyEntity = new DirtyCheckTestOne2ManyEntity();
                 one2ManyEntity.IdCol = id;
                 one2ManyEntity.IndexNo = 1;
                 one2ManyEntity.Name = "Child-Org-Name";
@@ -415,7 +415,7 @@ namespace DbGate
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity loadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2ManyEntities.Clear();
                 loadedEntity.Persist(transaction);
@@ -430,7 +430,7 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateChangeTrackerTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
                 Assert.Fail(e.Message);
             }
         }
@@ -440,16 +440,16 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = true;
+                TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
                 IDbConnection connection = SetupTables();
                 
                 ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
-                ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
 
-                ChangeTrackerTestOne2ManyEntity one2ManyEntity = new ChangeTrackerTestOne2ManyEntity();
+                DirtyCheckTestOne2ManyEntity one2ManyEntity = new DirtyCheckTestOne2ManyEntity();
                 one2ManyEntity.IdCol = id;
                 one2ManyEntity.IndexNo = 1;
                 one2ManyEntity.Name = "Child-Org-Name";
@@ -458,21 +458,21 @@ namespace DbGate
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity loadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction,loadedEntity,id);
-                IEnumerator<ChangeTrackerTestOne2ManyEntity> enumerator = loadedEntity.One2ManyEntities.GetEnumerator();
+                IEnumerator<DirtyCheckTestOne2ManyEntity> enumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
-                ChangeTrackerTestOne2ManyEntity loadedChild = enumerator.Current;
+                DirtyCheckTestOne2ManyEntity loadedChild = enumerator.Current;
                 loadedChild.Name = "Child-Upd-Name";
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity reloadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity reloadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction,reloadedEntity,id);
                 enumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
-                ChangeTrackerTestOne2ManyEntity reLoadedChild = enumerator.Current;
+                DirtyCheckTestOne2ManyEntity reLoadedChild = enumerator.Current;
                 transaction.Commit();
                 connection.Close();
 
@@ -480,7 +480,7 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateChangeTrackerTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
                 Assert.Fail(e.Message);
             }
         }
@@ -490,16 +490,16 @@ namespace DbGate
         {
             try
             {
-                TransactionFactory.DbGate.Config.AutoTrackChanges = false;
+                TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
                 IDbConnection connection = SetupTables();
                 
                 ITransaction transaction = CreateTransaction(connection);
                 int id = 45;
-                ChangeTrackerTestRootEntity entity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
 
-                ChangeTrackerTestOne2ManyEntity one2ManyEntity = new ChangeTrackerTestOne2ManyEntity();
+                DirtyCheckTestOne2ManyEntity one2ManyEntity = new DirtyCheckTestOne2ManyEntity();
                 one2ManyEntity.IdCol = id;
                 one2ManyEntity.IndexNo = 1;
                 one2ManyEntity.Name = "Child-Org-Name";
@@ -508,21 +508,21 @@ namespace DbGate
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity loadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity loadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction,loadedEntity,id);
-                IEnumerator<ChangeTrackerTestOne2ManyEntity> enumerator = loadedEntity.One2ManyEntities.GetEnumerator();
+                IEnumerator<DirtyCheckTestOne2ManyEntity> enumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
-                ChangeTrackerTestOne2ManyEntity loadedChild = enumerator.Current;
+                DirtyCheckTestOne2ManyEntity loadedChild = enumerator.Current;
                 loadedChild.Name = "Child-Upd-Name";
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                ChangeTrackerTestRootEntity reloadedEntity = new ChangeTrackerTestRootEntity();
+                DirtyCheckTestRootEntity reloadedEntity = new DirtyCheckTestRootEntity();
                 LoadEntityWithId(transaction,reloadedEntity,id);
                 enumerator = reloadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
-                ChangeTrackerTestOne2ManyEntity reLoadedChild = enumerator.Current;
+                DirtyCheckTestOne2ManyEntity reLoadedChild = enumerator.Current;
                 transaction.Commit();
                 connection.Close();
 
@@ -530,17 +530,17 @@ namespace DbGate
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateChangeTrackerTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
                 Assert.Fail(e.Message);
             }
         }
 
-        private bool LoadEntityWithId(ITransaction transaction, ChangeTrackerTestRootEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, DirtyCheckTestRootEntity loadEntity,int id)
         {
             bool loaded = false;
 
             IDbCommand cmd = transaction.CreateCommand();
-            cmd.CommandText = "select * from change_tracker_test_root where id_col = ?";
+            cmd.CommandText = "select * from dirty_check_test_root where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
@@ -563,7 +563,7 @@ namespace DbGate
             bool exists = false;
 
             IDbCommand cmd = transaction.CreateCommand();
-            cmd.CommandText = "select * from change_tracker_test_one2one where id_col = ?";
+            cmd.CommandText = "select * from dirty_check_test_one2one where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
@@ -583,7 +583,7 @@ namespace DbGate
             bool exists = false;
 
             IDbCommand cmd = transaction.CreateCommand();
-            cmd.CommandText = "select * from change_tracker_test_one2many where id_col = ?";
+            cmd.CommandText = "select * from dirty_check_test_one2many where id_col = ?";
 
             IDbDataParameter parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);

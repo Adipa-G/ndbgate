@@ -33,22 +33,22 @@ namespace DbGate.Support.Persistant.InheritanceTest
             return fields;
         }
 
-        public static string GetTableNames(Type type)
+        public static ITable GetTableInfo(Type type)
         {
-            string tableName = null;
+            ITable table = null;
             if (type == typeof (InheritanceTestSuperEntityExt))
             {
-                tableName = "inheritance_test_super";
+                table = new DefaultTable("inheritance_test_super");
             }
             else if (type == typeof (InheritanceTestSubEntityAExt))
             {
-                tableName = "inheritance_test_suba";
+                table = new DefaultTable("inheritance_test_suba");
             }
             else if (type == typeof (InheritanceTestSubEntityBExt))
             {
-                tableName = "inheritance_test_subb";
+                table = new DefaultTable("inheritance_test_subb");
             }
-            return tableName;
+            return table;
         }
     }
 }

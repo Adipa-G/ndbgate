@@ -51,7 +51,7 @@ namespace DbGate.Caches.Impl
             return Cache[entityType];
         }
 
-        public void Register(Type subType, string tableName, ICollection<IField> fields)
+        public void Register(Type subType, ITable table, ICollection<IField> fields)
         {
             Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(subType,
                                                                                      new Type[]
@@ -60,7 +60,7 @@ namespace DbGate.Caches.Impl
 
             var subEntityInfo = new EntityInfo(subType);
             subEntityInfo.SetFields(fields);
-            subEntityInfo.TableName = tableName;
+            subEntityInfo.TableInfo = table;
 
             if (immediateSuper != null
                 && Cache.ContainsKey(immediateSuper))
@@ -117,14 +117,14 @@ namespace DbGate.Caches.Impl
                     continue;
                 }
 
-                String tableName = GetTableName(regType, subType);
+                ITable tableInfo = GetTableInfo(regType, subType);
                 ICollection<IField> fields = GetAllFields(regType, subType);
 
-                if (tableName != null || fields.Count > 0)
+                if (tableInfo != null || fields.Count > 0)
                 {
                     var entityInfo = new EntityInfo(regType);
                     entityInfo.SetFields(fields);
-                    entityInfo.TableName = tableName;
+                    entityInfo.TableInfo = tableInfo;
                     if (subEntity != null)
                     {
                         subEntity.SuperEntityInfo = entityInfo;
@@ -137,10 +137,10 @@ namespace DbGate.Caches.Impl
             return entityInfoMap;
         }
 
-        private static String GetTableName(Type regType, Type subType)
+        private ITable GetTableInfo(Type regType, Type subType)
         {
-            String tableName = GetTableNameIfManagedClass(regType, subType);
-            if (tableName == null)
+            ITable table = GetTableInfoIfManagedClass(regType, subType);
+            if (table == null)
             {
                 object[] annotations = regType.GetCustomAttributes(false);
                 foreach (object annotation in annotations)
@@ -148,22 +148,37 @@ namespace DbGate.Caches.Impl
                     if (annotation is TableInfo)
                     {
                         var tableInfo = (TableInfo) annotation;
-                        tableName = tableInfo.TableName;
-                        break;
+                        TableInfo annotatedTableInfo = (TableInfo) annotation;
+                        table = new DefaultTable(annotatedTableInfo.TableName
+                            ,annotatedTableInfo.UpdateStrategy
+                            ,annotatedTableInfo.VerifyOnWriteStrategy
+                            ,annotatedTableInfo.DirtyCheckStrategy);
                     }
                 }
+
+                if (table != null)
+	            {
+                    if (table.DirtyCheckStrategy == DirtyCheckStrategy.Default)
+	                    table.DirtyCheckStrategy = _config.DirtyCheckStrategy;
+	
+	                if (table.UpdateStrategy == UpdateStrategy.Default)
+	                    table.UpdateStrategy = _config.UpdateStrategy;
+
+	                if (table.VerifyOnWriteStrategy == VerifyOnWriteStrategy.Default)
+	                    table.VerifyOnWriteStrategy = _config.VerifyOnWriteStrategy;
+	            }
             }
-            return tableName;
+            return table;
         }
 
-        private static string GetTableNameIfManagedClass(Type regType, Type subType)
+        private static ITable GetTableInfoIfManagedClass(Type regType, Type subType)
         {
             if (ReflectionUtils.IsImplementInterface(regType, typeof (IManagedEntity)))
             {
                 try
                 {
                     var managedDBClass = (IManagedEntity) Activator.CreateInstance(subType);
-                    return managedDBClass.TableNames.ContainsKey(regType) ? managedDBClass.TableNames[regType] : null;
+                    return managedDBClass.TableInfo.ContainsKey(regType) ? managedDBClass.TableInfo[regType] : null;
                 }
                 catch (Exception e)
                 {
@@ -174,7 +189,7 @@ namespace DbGate.Caches.Impl
             return null;
         }
 
-        private static ICollection<IField> GetAllFields(Type regType, Type subType)
+        private ICollection<IField> GetAllFields(Type regType, Type subType)
         {
             List<IField> fields = GetFieldsIfManagedClass(regType, subType);
             Type[] superTypes = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(regType,
@@ -186,6 +201,17 @@ namespace DbGate.Caches.Impl
                 Type superType = superTypes[i];
                 fields.AddRange(GetAllFields(superType, i > 0));
             }
+
+            foreach (IField field in fields)
+	        {
+	            if (field is IRelation)
+	            {
+	                IRelation relation = (IRelation) field;
+	
+	                if (relation.FetchStrategy == FetchStrategy.Default)
+	                    relation.FetchStrategy = _config.FetchStrategy;
+	            }
+	        }
 
             return fields;
         }
@@ -338,7 +364,7 @@ namespace DbGate.Caches.Impl
                 , foreignKeyInfo.RelatedOjectType, objectMappings
                 , foreignKeyInfo.UpdateRule, foreignKeyInfo.DeleteRule
                 , foreignKeyInfo.ReverseRelation
-                , foreignKeyInfo.NonIdentifyingRelation, foreignKeyInfo.Lazy, foreignKeyInfo.Nullable);
+                , foreignKeyInfo.NonIdentifyingRelation, foreignKeyInfo.FetchStrategy, foreignKeyInfo.Nullable);
 
             return relation;
         }
