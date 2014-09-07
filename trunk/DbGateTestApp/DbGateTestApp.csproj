@@ -16,7 +16,7 @@
     <NoStdLib>False</NoStdLib>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -27,6 +27,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -47,8 +49,9 @@
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\lib\log4net\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -67,44 +70,45 @@
     <Content Include="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Compile Include="src\ComplexExample\Entities\Order\ItemTransaction.cs" />
-    <Compile Include="src\ComplexExample\Entities\Order\ItemTransactionCharge.cs" />
-    <Compile Include="src\ComplexExample\Entities\Order\Transaction.cs" />
-    <Compile Include="src\ComplexExample\Entities\Product\Item.cs" />
-    <Compile Include="src\ComplexExample\Entities\Product\Product.cs" />
-    <Compile Include="src\ComplexExample\Entities\Product\Service.cs" />
-    <Compile Include="src\DocGenerate\CodeReader.cs" />
-    <Compile Include="src\DocGenerate\Integrator.cs" />
-    <Compile Include="src\DocGenerate\TempleateProcessor.cs" />
-    <Compile Include="src\DocGenerate\WikiCodeBlockInfo.cs" />
-    <Compile Include="src\DocGenerate\WikiCodeBlock.cs" />
-    <Compile Include="src\ExampleBase.cs" />
-    <Compile Include="src\MainProgram.cs" />
-    <Compile Include="src\SimpleExample\Entities\SimpleEntity.cs" />
-    <Compile Include="src\SimpleExample\SimpleExample.cs" />
-    <Compile Include="src\InheritanceExample\Entities\MiddleEntity.cs" />
-    <Compile Include="src\InheritanceExample\Entities\BottomEntity.cs" />
-    <Compile Include="src\InheritanceExample\Entities\TopEntity.cs" />
-    <Compile Include="src\InheritanceExample\InheritanceExample.cs" />
-    <Compile Include="src\One2OneExample\Entities\One2OneChildEntity.cs" />
-    <Compile Include="src\One2OneExample\Entities\One2OneChildEntityA.cs" />
-    <Compile Include="src\One2OneExample\Entities\One2OneChildEntityB.cs" />
-    <Compile Include="src\One2OneExample\Entities\One2OneParentEntity.cs" />
-    <Compile Include="src\One2OneExample\One2OneExample.cs" />
-    <Compile Include="src\One2ManyExample\Entities\One2ManyChildEntity.cs" />
-    <Compile Include="src\One2ManyExample\Entities\One2ManyChildEntityA.cs" />
-    <Compile Include="src\One2ManyExample\Entities\One2ManyChildEntityB.cs" />
-    <Compile Include="src\One2ManyExample\Entities\One2ManyParentEntity.cs" />
-    <Compile Include="src\One2ManyExample\One2ManyExample.cs" />
-    <Compile Include="src\ComplexExample\ComplexExample.cs" />
+    <Compile Include="ComplexExample\Entities\Order\ItemTransaction.cs" />
+    <Compile Include="ComplexExample\Entities\Order\ItemTransactionCharge.cs" />
+    <Compile Include="ComplexExample\Entities\Order\Transaction.cs" />
+    <Compile Include="ComplexExample\Entities\Product\Item.cs" />
+    <Compile Include="ComplexExample\Entities\Product\Product.cs" />
+    <Compile Include="ComplexExample\Entities\Product\Service.cs" />
+    <Compile Include="DocGenerate\CodeReader.cs" />
+    <Compile Include="DocGenerate\Integrator.cs" />
+    <Compile Include="DocGenerate\TempleateProcessor.cs" />
+    <Compile Include="DocGenerate\WikiCodeBlockInfo.cs" />
+    <Compile Include="DocGenerate\WikiCodeBlock.cs" />
+    <Compile Include="ExampleBase.cs" />
+    <Compile Include="MainProgram.cs" />
+    <Compile Include="SimpleExample\Entities\SimpleEntity.cs" />
+    <Compile Include="SimpleExample\SimpleExample.cs" />
+    <Compile Include="InheritanceExample\Entities\MiddleEntity.cs" />
+    <Compile Include="InheritanceExample\Entities\BottomEntity.cs" />
+    <Compile Include="InheritanceExample\Entities\TopEntity.cs" />
+    <Compile Include="InheritanceExample\InheritanceExample.cs" />
+    <Compile Include="One2OneExample\Entities\One2OneChildEntity.cs" />
+    <Compile Include="One2OneExample\Entities\One2OneChildEntityA.cs" />
+    <Compile Include="One2OneExample\Entities\One2OneChildEntityB.cs" />
+    <Compile Include="One2OneExample\Entities\One2OneParentEntity.cs" />
+    <Compile Include="One2OneExample\One2OneExample.cs" />
+    <Compile Include="One2ManyExample\Entities\One2ManyChildEntity.cs" />
+    <Compile Include="One2ManyExample\Entities\One2ManyChildEntityA.cs" />
+    <Compile Include="One2ManyExample\Entities\One2ManyChildEntityB.cs" />
+    <Compile Include="One2ManyExample\Entities\One2ManyParentEntity.cs" />
+    <Compile Include="One2ManyExample\One2ManyExample.cs" />
+    <Compile Include="ComplexExample\ComplexExample.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="src\ComplexExample\FeatureIntegrationExample.wiki.template" />
-    <None Include="src\InheritanceExample\InheritanceExample.wiki.template" />
-    <None Include="src\One2ManyExample\One2ManyExample.wiki.template" />
-    <None Include="src\One2OneExample\One2OneExample.wiki.template" />
-    <None Include="src\SimpleExample\SimpleEntityExample.wiki.template" />
+    <None Include="ComplexExample\FeatureIntegrationExample.wiki.template" />
+    <None Include="InheritanceExample\InheritanceExample.wiki.template" />
+    <None Include="One2ManyExample\One2ManyExample.wiki.template" />
+    <None Include="One2OneExample\One2OneExample.wiki.template" />
+    <None Include="packages.config" />
+    <None Include="SimpleExample\SimpleEntityExample.wiki.template" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DbGate\DbGate.csproj">

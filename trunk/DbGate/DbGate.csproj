@@ -35,7 +35,7 @@
     <NoStdLib>False</NoStdLib>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -47,6 +47,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -68,8 +69,13 @@
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core">
-      <HintPath>..\lib\castle.core.3.0.0\net35\Castle.Core.dll</HintPath>
+    <Reference Include="Castle.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Castle.Core.3.3.0\lib\net45\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -79,349 +85,240 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="log4net">
-      <HintPath>..\lib\log4net\log4net.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\lib\nunit\framework\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.mocks">
-      <HintPath>..\lib\nunit\framework\nunit.mocks.dll</HintPath>
-    </Reference>
-    <Reference Include="pnunit.framework">
-      <HintPath>..\lib\nunit\framework\pnunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data.SQLite">
-      <HintPath>..\lib\sqllite\x86\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.92.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\SqlLite\x86\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src-tests\AbstractDbGateTestBase.cs" />
-    <Compile Include="src-tests\DbGateNonIdentifyingRelationWithoutColumnTests.cs" />
-    <Compile Include="src-tests\DbGateMultiDbTest.cs" />
-    <Compile Include="src-tests\DbGateSuperEntityRefTest.cs" />
-    <Compile Include="src-tests\DbUtility\DbUtilsTests.cs" />
-    <Compile Include="src-tests\DbGateQueryBasicTest.cs" />
-    <Compile Include="src-tests\DbGateLazyTest.cs" />
-    <Compile Include="src-tests\DbGatePatchTableDifferenceDbTests.cs" />
-    <Compile Include="src-tests\DbGateColumnPersistTests.cs" />
-    <Compile Include="src-tests\DbGateInheritancePersistTests.cs" />
-    <Compile Include="src-tests\DbGatePatchEmptyDbTests.cs" />
-    <Compile Include="src-tests\DbGateTreePersistTests.cs" />
-    <Compile Include="src-tests\Support\Patch\PatchEmpty\LeafEntity.cs" />
-    <Compile Include="src-tests\Support\Patch\PatchEmpty\LeafEntitySubA.cs" />
-    <Compile Include="src-tests\Support\Patch\PatchEmpty\LeafEntitySubB.cs" />
-    <Compile Include="src-tests\Support\Patch\PatchEmpty\RootEntity.cs" />
-    <Compile Include="src-tests\Support\Patch\PatchTableDifferences\ThreeColumnTypeDifferentEntity.cs" />
-    <Compile Include="src-tests\Support\Patch\PatchTableDifferences\ThreeColumnEntity.cs" />
-    <Compile Include="src-tests\Support\Patch\PatchTableDifferences\FourColumnEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\ColumnTest\ColumnTestEntityAnnotations.cs" />
-    <Compile Include="src-tests\Support\Persistant\ColumnTest\ColumnTestEntityExts.cs" />
-    <Compile Include="src-tests\Support\Persistant\ColumnTest\ColumnTestEntityFields.cs" />
-    <Compile Include="src-tests\Support\Persistant\ColumnTest\ColumnTestExtFactory.cs" />
-    <Compile Include="src-tests\Support\Persistant\ColumnTest\IColumnTestEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\ColumnTest\PrimaryKeyGenerator.cs" />
-    <Compile Include="src-tests\Support\Persistant\Lazy\LazyTestOne2ManyEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\Lazy\LazyTestOne2OneEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\Lazy\LazyTestRootEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\InheritanceTest\IInheritanceTestSubEntityA.cs" />
-    <Compile Include="src-tests\Support\Persistant\InheritanceTest\IInheritanceTestSubEntityB.cs" />
-    <Compile Include="src-tests\Support\Persistant\InheritanceTest\IInheritanceTestSuperEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\InheritanceTest\InheritanceTestExtFactory.cs" />
-    <Compile Include="src-tests\Support\Persistant\InheritanceTest\InheritanceTestSubEntityAAnnotations.cs" />
-    <Compile Include="src-tests\Support\Persistant\InheritanceTest\InheritanceTestSubEntityAExt.cs" />
-    <Compile Include="src-tests\Support\Persistant\InheritanceTest\InheritanceTestSubEntityAFields.cs" />
-    <Compile Include="src-tests\Support\Persistant\InheritanceTest\InheritanceTestSubEntityBAnnotations.cs" />
-    <Compile Include="src-tests\Support\Persistant\InheritanceTest\InheritanceTestSubEntityBExt.cs" />
-    <Compile Include="src-tests\Support\Persistant\InheritanceTest\InheritanceTestSubEntityBFields.cs" />
-    <Compile Include="src-tests\Support\Persistant\InheritanceTest\InheritanceTestSuperEntityAnnotations.cs" />
-    <Compile Include="src-tests\Support\Persistant\InheritanceTest\InheritanceTestSuperEntityExt.cs" />
-    <Compile Include="src-tests\Support\Persistant\InheritanceTest\InheritanceTestSuperEntityFields.cs" />
-    <Compile Include="src-tests\Support\Persistant\MultiDb\MultiDbEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\NonIdentifyingRelationWithoutColumn\Currency.cs" />
-    <Compile Include="src-tests\Support\Persistant\NonIdentifyingRelationWithoutColumn\Product.cs" />
-    <Compile Include="src-tests\Support\Persistant\SuperEntityRefInheritance\SuperEntityRefRootEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\SuperEntityRefInheritance\SuperEntityRefOne2OneEntityB.cs" />
-    <Compile Include="src-tests\Support\Persistant\SuperEntityRefInheritance\SuperEntityRefOne2OneEntityA.cs" />
-    <Compile Include="src-tests\Support\Persistant\SuperEntityRefInheritance\SuperEntityRefOne2OneEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\SuperEntityRefInheritance\SuperEntityRefOne2ManyEntityB.cs" />
-    <Compile Include="src-tests\Support\Persistant\SuperEntityRefInheritance\SuperEntityRefOne2ManyEntityA.cs" />
-    <Compile Include="src-tests\Support\Persistant\SuperEntityRefInheritance\SuperEntityRefOne2ManyEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\TreeTest\ITreeTestOne2ManyEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\TreeTest\ITreeTestOne2OneEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\TreeTest\ITreeTestRootEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\TreeTest\TreeTestExtFactory.cs" />
-    <Compile Include="src-tests\Support\Persistant\TreeTest\TreeTestOne2ManyEntityAnnotations.cs" />
-    <Compile Include="src-tests\Support\Persistant\TreeTest\TreeTestOne2ManyEntityExt.cs" />
-    <Compile Include="src-tests\Support\Persistant\TreeTest\TreeTestOne2ManyEntityFields.cs" />
-    <Compile Include="src-tests\Support\Persistant\TreeTest\TreeTestOne2OneEntityAnnotations.cs" />
-    <Compile Include="src-tests\Support\Persistant\TreeTest\TreeTestOne2OneEntityExt.cs" />
-    <Compile Include="src-tests\Support\Persistant\TreeTest\TreeTestOne2OneEntityFields.cs" />
-    <Compile Include="src-tests\Support\Persistant\TreeTest\TreeTestRootEntityAnnotations.cs" />
-    <Compile Include="src-tests\Support\Persistant\TreeTest\TreeTestRootEntityExt.cs" />
-    <Compile Include="src-tests\Support\Persistant\TreeTest\TreeTestRootEntityFields.cs" />
-    <Compile Include="src-tests\Support\Query\Basic\QueryBasicJoinEntity.cs" />
-    <Compile Include="src-tests\Support\Query\Basic\QueryBasicEntity.cs" />
-    <Compile Include="src-tests\Utility\StatusUtilityTests.cs" />
-    <Compile Include="src-tests\Utility\Support\LeafEntity.cs" />
-    <Compile Include="src-tests\Utility\Support\RootEntity.cs" />
-    <Compile Include="src\AbstractTable.cs" />
-    <Compile Include="src\Caches\Impl\EntityRelationColumnInfo.cs" />
-    <Compile Include="src\DefaultTable.cs" />
-    <Compile Include="src\DirtyCheckStrategy.cs" />
-    <Compile Include="src\FetchStrategy.cs" />
-    <Compile Include="src\UpdateStrategy.cs" />
-    <Compile Include="src\EntityStatus.cs" />
-    <Compile Include="src\ColumnType.cs" />
-    <Compile Include="src\DefaultTransactionFactory.cs" />
-    <Compile Include="src\ErManagement\ErMapper\Transaction.cs" />
-    <Compile Include="src\ErManagement\Query\IQueryCondition.cs" />
-    <Compile Include="src\ErManagement\Query\IQueryFrom.cs" />
-    <Compile Include="src\ErManagement\Query\IQueryGroup.cs" />
-    <Compile Include="src\ErManagement\Query\IQueryGroupCondition.cs" />
-    <Compile Include="src\ErManagement\Query\IQueryJoin.cs" />
-    <Compile Include="src\ErManagement\Query\IQueryOrderBy.cs" />
-    <Compile Include="src\ErManagement\Query\IQuerySelection.cs" />
-    <Compile Include="src\Exceptions\Common\TransactionCloseFailedException.cs" />
-    <Compile Include="src\Exceptions\Common\TransactionCommitFailedException.cs" />
-    <Compile Include="src\Exceptions\Common\TransactionCreationFailedException.cs" />
-    <Compile Include="src\Exceptions\Common\TransactionRollbackFailedException.cs" />
-    <Compile Include="src\Exceptions\Common\FieldValueExtractionException.cs" />
-    <Compile Include="src\Exceptions\Common\InvalidDataTypeException.cs" />
-    <Compile Include="src\ITable.cs" />
-    <Compile Include="src\ITransaction.cs" />
-    <Compile Include="src\ITransactionFactory.cs" />
-    <Compile Include="src\Utility\DbMgtUtility.cs" />
-    <Compile Include="src\AbstractColumn.cs" />
-    <Compile Include="src\AbstractRelation.cs" />
-    <Compile Include="src\AbstractManagedEntity.cs" />
-    <Compile Include="src\AbstractManagedReadOnlyEntity.cs" />
-    <Compile Include="src\Caches\IEntityInfoCache.cs" />
-    <Compile Include="src\Caches\Impl\EntityInfo.cs" />
-    <Compile Include="src\Caches\Impl\EntityInfoCache.cs" />
-    <Compile Include="src\Context\IReferenceStore.cs" />
-    <Compile Include="src\Context\Impl\ReferenceStore.cs" />
-    <Compile Include="src\ColumnInfo.cs" />
-    <Compile Include="src\RelationColumnMapping.cs" />
-    <Compile Include="src\TableInfo.cs" />
-    <Compile Include="src\DefaultColumn.cs" />
-    <Compile Include="src\DefaultRelation.cs" />
-    <Compile Include="src\DefaultEntity.cs" />
-    <Compile Include="src\DefaultReadOnlyEntity.cs" />
-    <Compile Include="src\Exceptions\Common\EntityInstantiationException.cs" />
-    <Compile Include="src\Exceptions\Common\StatementExecutionException.cs" />
-    <Compile Include="src\Exceptions\Common\MethodInvocationException.cs" />
-    <Compile Include="src\Exceptions\Common\ReadFromResultSetException.cs" />
-    <Compile Include="src\Exceptions\Common\CommandCreationException.cs" />
-    <Compile Include="src\Exceptions\Common\PropertyNotFoundException.cs" />
-    <Compile Include="src\Exceptions\ExpressionParsingException.cs" />
-    <Compile Include="src\Exceptions\Common\EntityRegistrationException.cs" />
-    <Compile Include="src\Exceptions\IncorrectFieldDefinitionException.cs" />
-    <Compile Include="src\ForeignKeyColumnMapping.cs" />
-    <Compile Include="src\ForeignKeyInfo.cs" />
-    <Compile Include="src\IColumn.cs" />
-    <Compile Include="src\IRelation.cs" />
-    <Compile Include="src\IPersistRetrievalLayer.cs" />
-    <Compile Include="src\IDbGate.cs" />
-    <Compile Include="src\IDbGateConfig.cs" />
-    <Compile Include="src\IDbGateStatistics.cs" />
-    <Compile Include="src\IField.cs" />
-    <Compile Include="src\IManagedEntity.cs" />
-    <Compile Include="src\IManagedReadOnlyEntity.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\AbstractDbLayer.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\AccessDbLayer.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\AbstractDataManipulate.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\IDataManipulate.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\QueryExecInfo.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\AbstractExpressionProcessor.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Condition\AbstractExpressionCondition.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\From\AbstractSubQueryFrom.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\From\AbstractUnionFrom.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\GroupCondition\AbstractExpressionGroupCondition.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Group\AbstractExpressionGroup.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Join\AbstractTypeJoin.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\OrderBy\AbstractExpressionOrderBy.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\QueryBuildInfo.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Selection\AbstractExpressionSelection.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DefaultDbLayer.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\IDbLayer.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\LayerFactory.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\AbstractMetaManipulate.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\Compare\AbstractMetaComparisonGroup.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\Compare\CompareUtility.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\Compare\IMetaComparisonGroup.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\Compare\MetaComparisonColumnGroup.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\Compare\MetaComparisonForeignKeyGroup.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\Compare\MetaComparisonPrimaryKeyGroup.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\Compare\MetaComparisonTableGroup.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\AbstractMetaItem.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\IMetaItem.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\MetaColumn.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\MetaForeignKey.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\MetaForeignKeyColumnMapping.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\MetaItemType.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\MetaPrimaryKey.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\MetaTable.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\IMetaManipulate.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\Mappings\ColumnTypeMapItem.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\Mappings\ReferentialRuleTypeMapItem.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\Support\MetaQueryHolder.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MySqlDbLayer.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\SqlLiteDbLayer.cs" />
-    <Compile Include="src\ErManagement\ErMapper\BaseOperationLayer.cs" />
-    <Compile Include="src\ErManagement\ErMapper\DbGateStatistics.cs" />
-    <Compile Include="src\ErManagement\ErMapper\Utils\ReflectionUtils.cs" />
-    <Compile Include="src\ISequenceGenerator.cs" />
-    <Compile Include="src\ISession.cs" />
-    <Compile Include="src\ErManagement\Lazy\ChildLoadInterceptor.cs" />
-    <Compile Include="src\IQuery.cs" />
-    <Compile Include="src\ISelectionQuery.cs" />
-    <Compile Include="src\QueryJoinType.cs" />
-    <Compile Include="src\QueryOrderType.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\BaseExpr.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\ConditionExpr.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\GroupConditionExpr.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\OrderByExpr.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\GroupExpr.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\JoinExpr.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\Segments\BaseSegment.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\Segments\CompareSegment.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\Segments\CompareSegmentMode.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\Segments\FieldSegment.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\Segments\GroupFunctionSegment.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\Segments\GroupFunctionSegmentMode.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\Segments\ISegment.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\Segments\MergeSegment.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\Segments\MergeSegmentMode.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\Segments\QuerySegment.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\Segments\SegmentType.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\Segments\ValueSegment.cs" />
-    <Compile Include="src\ErManagement\Query\Expr\SelectExpr.cs" />
-    <Compile Include="src\QuerySelection.cs" />
-    <Compile Include="src\QueryJoin.cs" />
-    <Compile Include="src\QueryGroupCondition.cs" />
-    <Compile Include="src\QueryGroup.cs" />
-    <Compile Include="src\QueryFrom.cs" />
-    <Compile Include="src\ErManagement\Query\Query.cs" />
-    <Compile Include="src\QueryCondition.cs" />
-    <Compile Include="src\ErManagement\Query\QueryStructure.cs" />
-    <Compile Include="src\ErManagement\Query\SelectionQuery.cs" />
-    <Compile Include="src\ReferentialRuleType.cs" />
-    <Compile Include="src\ErManagement\Session\Session.cs" />
-    <Compile Include="src\ErManagement\Session\SessionConfig.cs" />
-    <Compile Include="src\GsInfo.cs" />
-    <Compile Include="src\IClientEntity.cs" />
-    <Compile Include="src\IReadOnlyClientEntity.cs" />
-    <Compile Include="src\IEntity.cs" />
-    <Compile Include="src\IReadOnlyEntity.cs" />
-    <Compile Include="src\Utility\StatusManager.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\DbDm\AccessDm\AccessDataManipulate.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\DbMm\DefaultMm\DefaultMetaManipulate.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\DbDm\DefaultDm\DefaultDataManipulate.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\DbMm\SqlLiteMm\SqlLiteMetaManipulate.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\MetaManipulate\DbMm\MySqlMm\MySqlMetaManipulate.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\QueryExecParam.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Condition\AbstractConditionFactory.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Condition\AbstractSqlQueryCondition.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Condition\IAbstractCondition.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\From\AbstractFromFactory.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\From\AbstractSqlQueryFrom.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\From\IAbstractFrom.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Group\AbstractGroupFactory.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Group\AbstractSqlQueryGroup.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Group\IAbstractGroup.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Selection\AbstractSelectionFactory.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Selection\AbstractSqlQuerySelection.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Selection\IAbstractSelection.cs" />
-    <Compile Include="src-tests\Support\Query\Basic\QueryBasicDetailsEntity.cs" />
-    <Compile Include="src\ErManagement\Query\QueryConditionExpressionType.cs" />
-    <Compile Include="src\ErManagement\Query\QueryFromExpressionType.cs" />
-    <Compile Include="src\ErManagement\Query\QuerySelectionExpressionType.cs" />
-    <Compile Include="src\ErManagement\Query\QueryGroupConditionExpressionType.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\GroupCondition\AbstractGroupConditionFactory.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\GroupCondition\IAbstractGroupCondition.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\GroupCondition\AbstractSqlQueryGroupCondition.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Join\AbstractJoinFactory.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Join\IAbstractJoin.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Join\AbstractSqlQueryJoin.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\OrderBy\AbstractOrderByFactory.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\OrderBy\IAbstractOrderBy.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\OrderBy\AbstractSqlQueryOrderBy.cs" />
-    <Compile Include="src\ErManagement\Query\QueryJoinExpressionType.cs" />
-    <Compile Include="src\ErManagement\Query\QueryOrderByExpressionType.cs" />
-    <Compile Include="src\ErManagement\Query\QueryGroupExpressionType.cs" />
-    <Compile Include="src\QueryOrderBy.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\Selection\AbstractTypeSelection.cs" />
-    <Compile Include="src\ErManagement\DbAbstractionLayer\DataManipulate\Query\From\AbstractTypeFrom.cs" />
-    <Compile Include="src\VerifyOnWriteStrategy.cs" />
+    <Compile Include="AbstractTable.cs" />
+    <Compile Include="Caches\Impl\EntityRelationColumnInfo.cs" />
+    <Compile Include="DefaultTable.cs" />
+    <Compile Include="DirtyCheckStrategy.cs" />
+    <Compile Include="FetchStrategy.cs" />
+    <Compile Include="UpdateStrategy.cs" />
+    <Compile Include="EntityStatus.cs" />
+    <Compile Include="ColumnType.cs" />
+    <Compile Include="DefaultTransactionFactory.cs" />
+    <Compile Include="ErManagement\ErMapper\Transaction.cs" />
+    <Compile Include="ErManagement\Query\IQueryCondition.cs" />
+    <Compile Include="ErManagement\Query\IQueryFrom.cs" />
+    <Compile Include="ErManagement\Query\IQueryGroup.cs" />
+    <Compile Include="ErManagement\Query\IQueryGroupCondition.cs" />
+    <Compile Include="ErManagement\Query\IQueryJoin.cs" />
+    <Compile Include="ErManagement\Query\IQueryOrderBy.cs" />
+    <Compile Include="ErManagement\Query\IQuerySelection.cs" />
+    <Compile Include="Exceptions\Common\TransactionCloseFailedException.cs" />
+    <Compile Include="Exceptions\Common\TransactionCommitFailedException.cs" />
+    <Compile Include="Exceptions\Common\TransactionCreationFailedException.cs" />
+    <Compile Include="Exceptions\Common\TransactionRollbackFailedException.cs" />
+    <Compile Include="Exceptions\Common\FieldValueExtractionException.cs" />
+    <Compile Include="Exceptions\Common\InvalidDataTypeException.cs" />
+    <Compile Include="ITable.cs" />
+    <Compile Include="ITransaction.cs" />
+    <Compile Include="ITransactionFactory.cs" />
+    <Compile Include="Utility\DbMgtUtility.cs" />
+    <Compile Include="AbstractColumn.cs" />
+    <Compile Include="AbstractRelation.cs" />
+    <Compile Include="AbstractManagedEntity.cs" />
+    <Compile Include="AbstractManagedReadOnlyEntity.cs" />
+    <Compile Include="Caches\IEntityInfoCache.cs" />
+    <Compile Include="Caches\Impl\EntityInfo.cs" />
+    <Compile Include="Caches\Impl\EntityInfoCache.cs" />
+    <Compile Include="Context\IReferenceStore.cs" />
+    <Compile Include="Context\Impl\ReferenceStore.cs" />
+    <Compile Include="ColumnInfo.cs" />
+    <Compile Include="RelationColumnMapping.cs" />
+    <Compile Include="TableInfo.cs" />
+    <Compile Include="DefaultColumn.cs" />
+    <Compile Include="DefaultRelation.cs" />
+    <Compile Include="DefaultEntity.cs" />
+    <Compile Include="DefaultReadOnlyEntity.cs" />
+    <Compile Include="Exceptions\Common\EntityInstantiationException.cs" />
+    <Compile Include="Exceptions\Common\StatementExecutionException.cs" />
+    <Compile Include="Exceptions\Common\MethodInvocationException.cs" />
+    <Compile Include="Exceptions\Common\ReadFromResultSetException.cs" />
+    <Compile Include="Exceptions\Common\CommandCreationException.cs" />
+    <Compile Include="Exceptions\Common\PropertyNotFoundException.cs" />
+    <Compile Include="Exceptions\ExpressionParsingException.cs" />
+    <Compile Include="Exceptions\Common\EntityRegistrationException.cs" />
+    <Compile Include="Exceptions\IncorrectFieldDefinitionException.cs" />
+    <Compile Include="ForeignKeyColumnMapping.cs" />
+    <Compile Include="ForeignKeyInfo.cs" />
+    <Compile Include="IColumn.cs" />
+    <Compile Include="IRelation.cs" />
+    <Compile Include="IPersistRetrievalLayer.cs" />
+    <Compile Include="IDbGate.cs" />
+    <Compile Include="IDbGateConfig.cs" />
+    <Compile Include="IDbGateStatistics.cs" />
+    <Compile Include="IField.cs" />
+    <Compile Include="IManagedEntity.cs" />
+    <Compile Include="IManagedReadOnlyEntity.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\AbstractDbLayer.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\AccessDbLayer.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\AbstractDataManipulate.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\IDataManipulate.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\QueryExecInfo.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\AbstractExpressionProcessor.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Condition\AbstractExpressionCondition.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\From\AbstractSubQueryFrom.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\From\AbstractUnionFrom.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\GroupCondition\AbstractExpressionGroupCondition.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Group\AbstractExpressionGroup.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Join\AbstractTypeJoin.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\OrderBy\AbstractExpressionOrderBy.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\QueryBuildInfo.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Selection\AbstractExpressionSelection.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DefaultDbLayer.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\IDbLayer.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\LayerFactory.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\AbstractMetaManipulate.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\Compare\AbstractMetaComparisonGroup.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\Compare\CompareUtility.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\Compare\IMetaComparisonGroup.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\Compare\MetaComparisonColumnGroup.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\Compare\MetaComparisonForeignKeyGroup.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\Compare\MetaComparisonPrimaryKeyGroup.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\Compare\MetaComparisonTableGroup.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\AbstractMetaItem.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\IMetaItem.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\MetaColumn.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\MetaForeignKey.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\MetaForeignKeyColumnMapping.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\MetaItemType.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\MetaPrimaryKey.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\DataStructures\MetaTable.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\IMetaManipulate.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\Mappings\ColumnTypeMapItem.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\Mappings\ReferentialRuleTypeMapItem.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\Support\MetaQueryHolder.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MySqlDbLayer.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\SqlLiteDbLayer.cs" />
+    <Compile Include="ErManagement\ErMapper\BaseOperationLayer.cs" />
+    <Compile Include="ErManagement\ErMapper\DbGateStatistics.cs" />
+    <Compile Include="ErManagement\ErMapper\Utils\ReflectionUtils.cs" />
+    <Compile Include="ISequenceGenerator.cs" />
+    <Compile Include="ISession.cs" />
+    <Compile Include="ErManagement\Lazy\ChildLoadInterceptor.cs" />
+    <Compile Include="IQuery.cs" />
+    <Compile Include="ISelectionQuery.cs" />
+    <Compile Include="QueryJoinType.cs" />
+    <Compile Include="QueryOrderType.cs" />
+    <Compile Include="ErManagement\Query\Expr\BaseExpr.cs" />
+    <Compile Include="ErManagement\Query\Expr\ConditionExpr.cs" />
+    <Compile Include="ErManagement\Query\Expr\GroupConditionExpr.cs" />
+    <Compile Include="ErManagement\Query\Expr\OrderByExpr.cs" />
+    <Compile Include="ErManagement\Query\Expr\GroupExpr.cs" />
+    <Compile Include="ErManagement\Query\Expr\JoinExpr.cs" />
+    <Compile Include="ErManagement\Query\Expr\Segments\BaseSegment.cs" />
+    <Compile Include="ErManagement\Query\Expr\Segments\CompareSegment.cs" />
+    <Compile Include="ErManagement\Query\Expr\Segments\CompareSegmentMode.cs" />
+    <Compile Include="ErManagement\Query\Expr\Segments\FieldSegment.cs" />
+    <Compile Include="ErManagement\Query\Expr\Segments\GroupFunctionSegment.cs" />
+    <Compile Include="ErManagement\Query\Expr\Segments\GroupFunctionSegmentMode.cs" />
+    <Compile Include="ErManagement\Query\Expr\Segments\ISegment.cs" />
+    <Compile Include="ErManagement\Query\Expr\Segments\MergeSegment.cs" />
+    <Compile Include="ErManagement\Query\Expr\Segments\MergeSegmentMode.cs" />
+    <Compile Include="ErManagement\Query\Expr\Segments\QuerySegment.cs" />
+    <Compile Include="ErManagement\Query\Expr\Segments\SegmentType.cs" />
+    <Compile Include="ErManagement\Query\Expr\Segments\ValueSegment.cs" />
+    <Compile Include="ErManagement\Query\Expr\SelectExpr.cs" />
+    <Compile Include="QuerySelection.cs" />
+    <Compile Include="QueryJoin.cs" />
+    <Compile Include="QueryGroupCondition.cs" />
+    <Compile Include="QueryGroup.cs" />
+    <Compile Include="QueryFrom.cs" />
+    <Compile Include="ErManagement\Query\Query.cs" />
+    <Compile Include="QueryCondition.cs" />
+    <Compile Include="ErManagement\Query\QueryStructure.cs" />
+    <Compile Include="ErManagement\Query\SelectionQuery.cs" />
+    <Compile Include="ReferentialRuleType.cs" />
+    <Compile Include="ErManagement\Session\Session.cs" />
+    <Compile Include="ErManagement\Session\SessionConfig.cs" />
+    <Compile Include="GsInfo.cs" />
+    <Compile Include="IClientEntity.cs" />
+    <Compile Include="IReadOnlyClientEntity.cs" />
+    <Compile Include="IEntity.cs" />
+    <Compile Include="IReadOnlyEntity.cs" />
+    <Compile Include="Utility\StatusManager.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\DbDm\AccessDm\AccessDataManipulate.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\DbMm\DefaultMm\DefaultMetaManipulate.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\DbDm\DefaultDm\DefaultDataManipulate.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\DbMm\SqlLiteMm\SqlLiteMetaManipulate.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\MetaManipulate\DbMm\MySqlMm\MySqlMetaManipulate.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\QueryExecParam.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Condition\AbstractConditionFactory.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Condition\AbstractSqlQueryCondition.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Condition\IAbstractCondition.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\From\AbstractFromFactory.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\From\AbstractSqlQueryFrom.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\From\IAbstractFrom.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Group\AbstractGroupFactory.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Group\AbstractSqlQueryGroup.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Group\IAbstractGroup.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Selection\AbstractSelectionFactory.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Selection\AbstractSqlQuerySelection.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Selection\IAbstractSelection.cs" />
+    <Compile Include="ErManagement\Query\QueryConditionExpressionType.cs" />
+    <Compile Include="ErManagement\Query\QueryFromExpressionType.cs" />
+    <Compile Include="ErManagement\Query\QuerySelectionExpressionType.cs" />
+    <Compile Include="ErManagement\Query\QueryGroupConditionExpressionType.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\GroupCondition\AbstractGroupConditionFactory.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\GroupCondition\IAbstractGroupCondition.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\GroupCondition\AbstractSqlQueryGroupCondition.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Join\AbstractJoinFactory.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Join\IAbstractJoin.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Join\AbstractSqlQueryJoin.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\OrderBy\AbstractOrderByFactory.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\OrderBy\IAbstractOrderBy.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\OrderBy\AbstractSqlQueryOrderBy.cs" />
+    <Compile Include="ErManagement\Query\QueryJoinExpressionType.cs" />
+    <Compile Include="ErManagement\Query\QueryOrderByExpressionType.cs" />
+    <Compile Include="ErManagement\Query\QueryGroupExpressionType.cs" />
+    <Compile Include="QueryOrderBy.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\Selection\AbstractTypeSelection.cs" />
+    <Compile Include="ErManagement\DbAbstractionLayer\DataManipulate\Query\From\AbstractTypeFrom.cs" />
+    <Compile Include="VerifyOnWriteStrategy.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="log4net.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Compile Include="src\DbGateException.cs" />
-    <Compile Include="src\Caches\CacheManager.cs" />
-    <Compile Include="src\Exceptions\Query\QueryBuildingException.cs" />
-    <Compile Include="src\Context\EntityFieldValue.cs" />
-    <Compile Include="src\Context\IChangeTracker.cs" />
-    <Compile Include="src\Context\IEntityContext.cs" />
-    <Compile Include="src\Context\IEntityFieldValueList.cs" />
-    <Compile Include="src\Context\IFieldValueList.cs" />
-    <Compile Include="src\Context\Impl\ChangeTracker.cs" />
-    <Compile Include="src\Context\Impl\EntityContext.cs" />
-    <Compile Include="src\Context\Impl\EntityFieldValueList.cs" />
-    <Compile Include="src\Context\Impl\EntityRelationFieldValueList.cs" />
-    <Compile Include="src\Context\Impl\EntityTypeFieldValueList.cs" />
-    <Compile Include="src\Context\ITypeFieldValueList.cs" />
-    <Compile Include="src\ErManagement\ErMapper\Utils\OperationUtils.cs" />
-    <Compile Include="src\ErManagement\ErMapper\Utils\MiscUtils.cs" />
-    <Compile Include="src\ErManagement\ErMapper\PersistRetrievalLayer.cs" />
-    <Compile Include="src\ErManagement\ErMapper\DataMigrationLayer.cs" />
-    <Compile Include="src\Exceptions\Migration\MetaDataException.cs" />
-    <Compile Include="src\ErManagement\ErMapper\DbGateConfig.cs" />
-    <Compile Include="src\ErManagement\ErMapper\DbGate.cs" />
-    <Compile Include="src\ErManagement\ErMapper\PersistOperationLayer.cs" />
-    <Compile Include="src\Exceptions\PersistException.cs" />
-    <Compile Include="src\Exceptions\Persist\DataUpdatedFromAnotherSourceException.cs" />
-    <Compile Include="src\Exceptions\Persist\IncorrectStatusException.cs" />
-    <Compile Include="src\Exceptions\Common\NoMatchingColumnFoundException.cs" />
-    <Compile Include="src\Exceptions\Persist\IntegrityConstraintViolationException.cs" />
-    <Compile Include="src\ErManagement\ErMapper\RetrievalOperationLayer.cs" />
-    <Compile Include="src\Exceptions\RetrievalException.cs" />
-    <Compile Include="src\Exceptions\Retrival\NoMatchingRecordFoundForSuperClassException.cs" />
-    <Compile Include="src\Exceptions\Retrival\NoSetterFoundToSetChildObjectListException.cs" />
-    <Compile Include="src\Exceptions\SequenceGeneratorInitializationException.cs" />
-    <Compile Include="src\Exceptions\DBPatchingException.cs" />
-    <Compile Include="src-tests\Support\Persistant\DirtyCheck\DirtyCheckTestOne2ManyEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\DirtyCheck\DirtyCheckTestOne2OneEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\DirtyCheck\DirtyCheckTestRootEntity.cs" />
-    <Compile Include="src-tests\DbGateDirtyCheckTest.cs" />
-    <Compile Include="src-tests\Support\Persistant\Constraint\ConstraintTestDeleteCascadeRootEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\Constraint\ConstraintTestDeleteRestrictRootEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\Constraint\ConstraintTestOne2ManyEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\Constraint\ConstraintTestOne2OneEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\Constraint\ConstraintTestReverseRootEntity.cs" />
-    <Compile Include="src-tests\DbGateConstraintValidationTest.cs" />
-    <Compile Include="src-tests\Support\Persistant\Version\VersionColumnTestOne2ManyEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\Version\VersionColumnTestOne2OneEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\Version\VersionColumnTestRootEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\Version\VersionGeneralTestOne2ManyEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\Version\VersionGeneralTestOne2OneEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\Version\VersionGeneralTestRootEntity.cs" />
-    <Compile Include="src-tests\DbGateVersionTest.cs" />
-    <Compile Include="src-tests\Support\Persistant\CrossReference\CrossReferenceTestOne2ManyEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\CrossReference\CrossReferenceTestOne2OneEntity.cs" />
-    <Compile Include="src-tests\Support\Persistant\CrossReference\CrossReferenceTestRootEntity.cs" />
-    <Compile Include="src-tests\DbGateCrossReferenceTest.cs" />
-    <Compile Include="src-tests\Support\Persistant\FeatureIntegration\Product\Item.cs" />
-    <Compile Include="src-tests\Support\Persistant\FeatureIntegration\Product\Product.cs" />
-    <Compile Include="src-tests\Support\Persistant\FeatureIntegration\Product\Service.cs" />
-    <Compile Include="src-tests\Support\Persistant\FeatureIntegration\Order\ItemTransaction.cs" />
-    <Compile Include="src-tests\Support\Persistant\FeatureIntegration\Order\ItemTransactionCharge.cs" />
-    <Compile Include="src-tests\Support\Persistant\FeatureIntegration\Order\Transaction.cs" />
-    <Compile Include="src-tests\DbGateFeatureIntegrationTest.cs" />
+    <Compile Include="DbGateException.cs" />
+    <Compile Include="Caches\CacheManager.cs" />
+    <Compile Include="Exceptions\Query\QueryBuildingException.cs" />
+    <Compile Include="Context\EntityFieldValue.cs" />
+    <Compile Include="Context\IChangeTracker.cs" />
+    <Compile Include="Context\IEntityContext.cs" />
+    <Compile Include="Context\IEntityFieldValueList.cs" />
+    <Compile Include="Context\IFieldValueList.cs" />
+    <Compile Include="Context\Impl\ChangeTracker.cs" />
+    <Compile Include="Context\Impl\EntityContext.cs" />
+    <Compile Include="Context\Impl\EntityFieldValueList.cs" />
+    <Compile Include="Context\Impl\EntityRelationFieldValueList.cs" />
+    <Compile Include="Context\Impl\EntityTypeFieldValueList.cs" />
+    <Compile Include="Context\ITypeFieldValueList.cs" />
+    <Compile Include="ErManagement\ErMapper\Utils\OperationUtils.cs" />
+    <Compile Include="ErManagement\ErMapper\Utils\MiscUtils.cs" />
+    <Compile Include="ErManagement\ErMapper\PersistRetrievalLayer.cs" />
+    <Compile Include="ErManagement\ErMapper\DataMigrationLayer.cs" />
+    <Compile Include="Exceptions\Migration\MetaDataException.cs" />
+    <Compile Include="ErManagement\ErMapper\DbGateConfig.cs" />
+    <Compile Include="ErManagement\ErMapper\DbGate.cs" />
+    <Compile Include="ErManagement\ErMapper\PersistOperationLayer.cs" />
+    <Compile Include="Exceptions\PersistException.cs" />
+    <Compile Include="Exceptions\Persist\DataUpdatedFromAnotherSourceException.cs" />
+    <Compile Include="Exceptions\Persist\IncorrectStatusException.cs" />
+    <Compile Include="Exceptions\Common\NoMatchingColumnFoundException.cs" />
+    <Compile Include="Exceptions\Persist\IntegrityConstraintViolationException.cs" />
+    <Compile Include="ErManagement\ErMapper\RetrievalOperationLayer.cs" />
+    <Compile Include="Exceptions\RetrievalException.cs" />
+    <Compile Include="Exceptions\Retrival\NoMatchingRecordFoundForSuperClassException.cs" />
+    <Compile Include="Exceptions\Retrival\NoSetterFoundToSetChildObjectListException.cs" />
+    <Compile Include="Exceptions\SequenceGeneratorInitializationException.cs" />
+    <Compile Include="Exceptions\DBPatchingException.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -440,7 +337,9 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
