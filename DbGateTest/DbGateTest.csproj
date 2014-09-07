@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{ED4DEB9D-6C66-4794-A049-921DB7594D3A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DbGate</RootNamespace>
+    <AssemblyName>DbGateTest</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Castle.Core">
+      <HintPath>..\packages\Castle.Core.3.3.0\lib\net45\Castle.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.3\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AbstractDbGateTestBase.cs" />
+    <Compile Include="Exception\DbGateExceptionTest.cs" />
+    <Compile Include="Exception\Support\EntityWithAllWrong.cs" />
+    <Compile Include="Patch\DbGatePatchEmptyDbTests.cs" />
+    <Compile Include="Patch\DbGatePatchTableDifferenceDbTests.cs" />
+    <Compile Include="Patch\Support\PatchEmpty\LeafEntity.cs" />
+    <Compile Include="Patch\Support\PatchEmpty\LeafEntitySubA.cs" />
+    <Compile Include="Patch\Support\PatchEmpty\LeafEntitySubB.cs" />
+    <Compile Include="Patch\Support\PatchEmpty\RootEntity.cs" />
+    <Compile Include="Patch\Support\PatchTableDifferences\FourColumnEntity.cs" />
+    <Compile Include="Patch\Support\PatchTableDifferences\ThreeColumnEntity.cs" />
+    <Compile Include="Patch\Support\PatchTableDifferences\ThreeColumnTypeDifferentEntity.cs" />
+    <Compile Include="Persist\DbGateColumnPersistTests.cs" />
+    <Compile Include="Persist\DbGateConstraintValidationTest.cs" />
+    <Compile Include="Persist\DbGateCrossReferenceTest.cs" />
+    <Compile Include="Persist\DbGateDirtyCheckTest.cs" />
+    <Compile Include="Persist\DbGateFeatureIntegrationTest.cs" />
+    <Compile Include="Persist\DbGateInheritancePersistTests.cs" />
+    <Compile Include="Persist\DbGateLazyTest.cs" />
+    <Compile Include="Persist\DbGateMultiDbTest.cs" />
+    <Compile Include="Persist\DbGateNonIdentifyingRelationWithoutColumnTests.cs" />
+    <Compile Include="Persist\DbGateSuperEntityRefTest.cs" />
+    <Compile Include="Persist\DbGateTreePersistTests.cs" />
+    <Compile Include="Persist\DbGateVersionTest.cs" />
+    <Compile Include="Persist\Support\ColumnTest\ColumnTestEntityAnnotations.cs" />
+    <Compile Include="Persist\Support\ColumnTest\ColumnTestEntityExts.cs" />
+    <Compile Include="Persist\Support\ColumnTest\ColumnTestEntityFields.cs" />
+    <Compile Include="Persist\Support\ColumnTest\ColumnTestExtFactory.cs" />
+    <Compile Include="Persist\Support\ColumnTest\IColumnTestEntity.cs" />
+    <Compile Include="Persist\Support\ColumnTest\PrimaryKeyGenerator.cs" />
+    <Compile Include="Persist\Support\Constraint\ConstraintTestDeleteCascadeRootEntity.cs" />
+    <Compile Include="Persist\Support\Constraint\ConstraintTestDeleteRestrictRootEntity.cs" />
+    <Compile Include="Persist\Support\Constraint\ConstraintTestOne2ManyEntity.cs" />
+    <Compile Include="Persist\Support\Constraint\ConstraintTestOne2OneEntity.cs" />
+    <Compile Include="Persist\Support\Constraint\ConstraintTestReverseRootEntity.cs" />
+    <Compile Include="Persist\Support\CrossReference\CrossReferenceTestOne2ManyEntity.cs" />
+    <Compile Include="Persist\Support\CrossReference\CrossReferenceTestOne2OneEntity.cs" />
+    <Compile Include="Persist\Support\CrossReference\CrossReferenceTestRootEntity.cs" />
+    <Compile Include="Persist\Support\DirtyCheck\DirtyCheckTestOne2ManyEntity.cs" />
+    <Compile Include="Persist\Support\DirtyCheck\DirtyCheckTestOne2OneEntity.cs" />
+    <Compile Include="Persist\Support\DirtyCheck\DirtyCheckTestRootEntity.cs" />
+    <Compile Include="Persist\Support\FeatureIntegration\Order\ItemTransaction.cs" />
+    <Compile Include="Persist\Support\FeatureIntegration\Order\ItemTransactionCharge.cs" />
+    <Compile Include="Persist\Support\FeatureIntegration\Order\Transaction.cs" />
+    <Compile Include="Persist\Support\FeatureIntegration\Product\Item.cs" />
+    <Compile Include="Persist\Support\FeatureIntegration\Product\Product.cs" />
+    <Compile Include="Persist\Support\FeatureIntegration\Product\Service.cs" />
+    <Compile Include="Persist\Support\InheritanceTest\IInheritanceTestSubEntityA.cs" />
+    <Compile Include="Persist\Support\InheritanceTest\IInheritanceTestSubEntityB.cs" />
+    <Compile Include="Persist\Support\InheritanceTest\IInheritanceTestSuperEntity.cs" />
+    <Compile Include="Persist\Support\InheritanceTest\InheritanceTestExtFactory.cs" />
+    <Compile Include="Persist\Support\InheritanceTest\InheritanceTestSubEntityAAnnotations.cs" />
+    <Compile Include="Persist\Support\InheritanceTest\InheritanceTestSubEntityAExt.cs" />
+    <Compile Include="Persist\Support\InheritanceTest\InheritanceTestSubEntityAFields.cs" />
+    <Compile Include="Persist\Support\InheritanceTest\InheritanceTestSubEntityBAnnotations.cs" />
+    <Compile Include="Persist\Support\InheritanceTest\InheritanceTestSubEntityBExt.cs" />
+    <Compile Include="Persist\Support\InheritanceTest\InheritanceTestSubEntityBFields.cs" />
+    <Compile Include="Persist\Support\InheritanceTest\InheritanceTestSuperEntityAnnotations.cs" />
+    <Compile Include="Persist\Support\InheritanceTest\InheritanceTestSuperEntityExt.cs" />
+    <Compile Include="Persist\Support\InheritanceTest\InheritanceTestSuperEntityFields.cs" />
+    <Compile Include="Persist\Support\Lazy\LazyTestOne2ManyEntity.cs" />
+    <Compile Include="Persist\Support\Lazy\LazyTestOne2OneEntity.cs" />
+    <Compile Include="Persist\Support\Lazy\LazyTestRootEntity.cs" />
+    <Compile Include="Persist\Support\MultiDb\MultiDbEntity.cs" />
+    <Compile Include="Persist\Support\NonIdentifyingRelationWithoutColumn\Currency.cs" />
+    <Compile Include="Persist\Support\NonIdentifyingRelationWithoutColumn\Product.cs" />
+    <Compile Include="Persist\Support\SuperEntityRefInheritance\SuperEntityRefOne2ManyEntity.cs" />
+    <Compile Include="Persist\Support\SuperEntityRefInheritance\SuperEntityRefOne2ManyEntityA.cs" />
+    <Compile Include="Persist\Support\SuperEntityRefInheritance\SuperEntityRefOne2ManyEntityB.cs" />
+    <Compile Include="Persist\Support\SuperEntityRefInheritance\SuperEntityRefOne2OneEntity.cs" />
+    <Compile Include="Persist\Support\SuperEntityRefInheritance\SuperEntityRefOne2OneEntityA.cs" />
+    <Compile Include="Persist\Support\SuperEntityRefInheritance\SuperEntityRefOne2OneEntityB.cs" />
+    <Compile Include="Persist\Support\SuperEntityRefInheritance\SuperEntityRefRootEntity.cs" />
+    <Compile Include="Persist\Support\TreeTest\ITreeTestOne2ManyEntity.cs" />
+    <Compile Include="Persist\Support\TreeTest\ITreeTestOne2OneEntity.cs" />
+    <Compile Include="Persist\Support\TreeTest\ITreeTestRootEntity.cs" />
+    <Compile Include="Persist\Support\TreeTest\TreeTestExtFactory.cs" />
+    <Compile Include="Persist\Support\TreeTest\TreeTestOne2ManyEntityAnnotations.cs" />
+    <Compile Include="Persist\Support\TreeTest\TreeTestOne2ManyEntityExt.cs" />
+    <Compile Include="Persist\Support\TreeTest\TreeTestOne2ManyEntityFields.cs" />
+    <Compile Include="Persist\Support\TreeTest\TreeTestOne2OneEntityAnnotations.cs" />
+    <Compile Include="Persist\Support\TreeTest\TreeTestOne2OneEntityExt.cs" />
+    <Compile Include="Persist\Support\TreeTest\TreeTestOne2OneEntityFields.cs" />
+    <Compile Include="Persist\Support\TreeTest\TreeTestRootEntityAnnotations.cs" />
+    <Compile Include="Persist\Support\TreeTest\TreeTestRootEntityExt.cs" />
+    <Compile Include="Persist\Support\TreeTest\TreeTestRootEntityFields.cs" />
+    <Compile Include="Persist\Support\Version\VersionColumnTestOne2ManyEntity.cs" />
+    <Compile Include="Persist\Support\Version\VersionColumnTestOne2OneEntity.cs" />
+    <Compile Include="Persist\Support\Version\VersionColumnTestRootEntity.cs" />
+    <Compile Include="Persist\Support\Version\VersionGeneralTestOne2ManyEntity.cs" />
+    <Compile Include="Persist\Support\Version\VersionGeneralTestOne2OneEntity.cs" />
+    <Compile Include="Persist\Support\Version\VersionGeneralTestRootEntity.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query\DbGateQueryBasicTest.cs" />
+    <Compile Include="Query\Support\BasicTest\QueryBasicDetailsEntity.cs" />
+    <Compile Include="Query\Support\BasicTest\QueryBasicEntity.cs" />
+    <Compile Include="Query\Support\BasicTest\QueryBasicJoinEntity.cs" />
+    <Compile Include="Utility\DbUtilsTest.cs" />
+    <Compile Include="Utility\StatusUtilityTest.cs" />
+    <Compile Include="Utility\Support\LeafEntity.cs" />
+    <Compile Include="Utility\Support\RootEntity.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DbGate\DbGate.csproj">
+      <Project>{13eb1070-fc28-4ef6-ab4a-e5333eaae331}</Project>
+      <Name>DbGate</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
