@@ -7,24 +7,28 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbGate", "DbGate\DbGate.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbGateTest", "DbGateTest\DbGateTest.csproj", "{ED4DEB9D-6C66-4794-A049-921DB7594D3A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DbGateNugetPublish", "DbGateNugetPublish\DbGateNugetPublish.csproj", "{0451BAEF-DF2E-4B98-8644-94EE9415E389}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3B458BCC-EC93-4F3D-AB40-B33F14323728}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3B458BCC-EC93-4F3D-AB40-B33F14323728}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3B458BCC-EC93-4F3D-AB40-B33F14323728}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3B458BCC-EC93-4F3D-AB40-B33F14323728}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B458BCC-EC93-4F3D-AB40-B33F14323728}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{3B458BCC-EC93-4F3D-AB40-B33F14323728}.Debug|Any CPU.Build.0 = Debug|x86
+		{3B458BCC-EC93-4F3D-AB40-B33F14323728}.Release|Any CPU.ActiveCfg = Release|x86
+		{3B458BCC-EC93-4F3D-AB40-B33F14323728}.Release|Any CPU.Build.0 = Release|x86
 		{13EB1070-FC28-4EF6-AB4A-E5333EAAE331}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{13EB1070-FC28-4EF6-AB4A-E5333EAAE331}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13EB1070-FC28-4EF6-AB4A-E5333EAAE331}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13EB1070-FC28-4EF6-AB4A-E5333EAAE331}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ED4DEB9D-6C66-4794-A049-921DB7594D3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED4DEB9D-6C66-4794-A049-921DB7594D3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED4DEB9D-6C66-4794-A049-921DB7594D3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED4DEB9D-6C66-4794-A049-921DB7594D3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED4DEB9D-6C66-4794-A049-921DB7594D3A}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{ED4DEB9D-6C66-4794-A049-921DB7594D3A}.Debug|Any CPU.Build.0 = Debug|x86
+		{ED4DEB9D-6C66-4794-A049-921DB7594D3A}.Release|Any CPU.ActiveCfg = Release|x86
+		{ED4DEB9D-6C66-4794-A049-921DB7594D3A}.Release|Any CPU.Build.0 = Release|x86
+		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
