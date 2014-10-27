@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>NDbGate</id>
+    <version>1.0.0</version>
+    <title>NDbGate</title>
+    <authors>adipa gunasekara</authors>
+    <owners></owners>
+    <description>
+      NDbGate is an object relational mapping framework. What it differs from other ORM frameworks is that it gives the complete control over how the persistence/retrieval takes place at entity level. This is achieved by means of overriding/implementing methods provided in the base entity classes.
+    </description>
+    <releaseNotes>
+    </releaseNotes>
+    <summary>
+      NDbGate is an object relational mapping framework.
+    </summary>
+    <language>en-US</language>
+    <projectUrl>https://code.google.com/p/ndbgate/</projectUrl>
+    <iconUrl>https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>http://www.gnu.org/licenses/gpl.html</licenseUrl>
+    <copyright>Copyright  2014 Adipa Gunasekara</copyright>
+    <dependencies>
+        <group targetFramework="net45">
+          <dependency id="Castle.Core" version="3.3.0" />
+          <dependency id="log4net" version="2.0.3" />
+        </group>
+    </dependencies>
+    <references></references>
+    <tags></tags>
+  </metadata>
+  <files>
+    <file src="bin\release\DbGate.dll" target="lib" />
+    <file src="tools\" target="tools" />
+  </files>
+</package>
