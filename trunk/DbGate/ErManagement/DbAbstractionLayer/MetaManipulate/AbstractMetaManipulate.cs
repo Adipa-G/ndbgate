@@ -51,7 +51,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
 
         protected abstract string CreateCreateForeginKeyQuery(MetaComparisonTableGroup tableGroup, MetaComparisonForeignKeyGroup foreignKeyGroup);
 
-        protected abstract string CreateDropForeginKeyQuery(MetaComparisonTableGroup tableGroup, MetaComparisonForeignKeyGroup foreignKeyGroup);
+        protected abstract string CreateDropForeignKeyQuery(MetaComparisonTableGroup tableGroup, MetaComparisonForeignKeyGroup foreignKeyGroup);
 
         public void Initialize(ITransaction tx)
         {
@@ -92,7 +92,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
             }  
         }
 
-        protected void FillReferentialRuleMappings(ITransaction tx)
+        protected virtual void FillReferentialRuleMappings(ITransaction tx)
         {
             ReferentialRuleTypeMapItems.Add(new ReferentialRuleTypeMapItem(ReferentialRuleType.Cascade,"0"));
             ReferentialRuleTypeMapItems.Add(new ReferentialRuleTypeMapItem(ReferentialRuleType.Restrict,"1"));
@@ -269,7 +269,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
                     if (tableGroup.ShouldDeleteFromDb()
                             || foreignKeyGroup.ShouldAlterInDb())
                     {
-                        string query = CreateDropForeginKeyQuery(tableGroup,foreignKeyGroup);
+                        string query = CreateDropForeignKeyQuery(tableGroup,foreignKeyGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
                             holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_FOREIGN_KEY,

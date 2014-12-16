@@ -455,17 +455,17 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
             return sb.ToString();
         }
 
-        protected override string CreateDropForeginKeyQuery(MetaComparisonTableGroup tableGroup,
+        protected override string CreateDropForeignKeyQuery(MetaComparisonTableGroup tableGroup,
                                                             MetaComparisonForeignKeyGroup foreignKeyGroup)
         {
-            var requiredTable = (MetaTable) tableGroup.ExistingItem;
-            var metaForeignKey = (MetaForeignKey) foreignKeyGroup.ExistingItem;
+            var requiredTable = (MetaTable) tableGroup.RequiredItem;
+            var metaForeignKey = (MetaForeignKey) foreignKeyGroup.RequiredItem;
 
             var sb = new StringBuilder();
             sb.Append("ALTER TABLE ");
             sb.Append(requiredTable.Name);
             sb.Append(" DROP CONSTRAINT ");
-            sb.Append(metaForeignKey.Name);
+            sb.Append(metaForeignKey.ToTable);
             return sb.ToString();
         }
     }
