@@ -30,22 +30,22 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Support
 
         #region IComparable<MetaQueryHolder> Members
 
+        
         public int CompareTo(MetaQueryHolder metaQueryHolder)
         {
-            if (QueryType != metaQueryHolder.QueryType)
+            if (metaQueryHolder == null)
+                return 1;
+            if (ItemType != metaQueryHolder.ItemType)
             {
-                return QueryType.CompareTo(metaQueryHolder.QueryType);
+                return ItemType.CompareTo(metaQueryHolder.ItemType);
             }
             else
             {
+                if (QueryType == OPERATION_TYPE_ADD)
+                    return 1;
                 if (QueryType == OPERATION_TYPE_DELETE)
-                {
-                    return -1*ItemType.CompareTo(metaQueryHolder.ItemType);
-                }
-                else
-                {
-                    return ItemType.CompareTo(metaQueryHolder.ItemType);
-                }
+                    return -1;
+                return 0;
             }
         }
 
