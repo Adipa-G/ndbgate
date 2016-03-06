@@ -135,7 +135,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlLiteMm
             return null;
         }
 
-        protected override string CreateDropForeginKeyQuery(MetaComparisonTableGroup tableGroup,
+        protected override string CreateDropForeignKeyQuery(MetaComparisonTableGroup tableGroup,
                                                             MetaComparisonForeignKeyGroup foreignKeyGroup)
         {
             return null;

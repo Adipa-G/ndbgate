@@ -67,7 +67,7 @@ namespace DbGateTestApp.DocGenerate
 	  	 	        break;
 	  	 	    }
 	  	 	}
-	  	 	return block.ToString();
+	  	 	return block.ToString().Replace("\r\n","\r\n\t");
 	  	}
     }
 }

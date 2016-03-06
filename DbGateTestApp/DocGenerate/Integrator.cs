@@ -10,7 +10,7 @@ namespace DbGateTestApp.DocGenerate
     public class Integrator
     {
         public const string WikiTemplateExtension = "wiki.template";
-        public const string WikiExtension = "wiki";
+        public const string WikiExtension = "md";
 	  	public const string CsharpSourceExtension = "cs";
 	  	
 	  	public static void DoProcess(String srcRoot,String srcOut)

@@ -7,7 +7,7 @@ namespace DbGateTestApp
     {
         public static void Main(string[] args)
         {
-            Integrator.DoProcess(@"Y:\dev\dotnet\community\ndbgate\trunk\DbGateTestApp", @"Y:\dev\dotnet\community\ndbgate\trunk\DbGateTestApp\wikigen");
+            Integrator.DoProcess(@"Y:\dev\community\github\ndbgate\DbGateTestApp", @"Y:\dev\community\github\ndbgate\DbGateTestApp\wikigen");
 
             SimpleExample.SimpleExample.DoTest();
             InheritanceExample.InheritanceExample.DoTest();
