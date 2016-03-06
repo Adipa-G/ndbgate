@@ -80,3 +80,6 @@ Strong queries have support for many complex scenarios like sub queries, unions 
 	ICollection entities = query.ToList(tx);
 
 More examples can be found in the wiki. Also there is a sample project using the library available in the sources named DbGateTestApp.
+
+###License
+GNU GPL V3
