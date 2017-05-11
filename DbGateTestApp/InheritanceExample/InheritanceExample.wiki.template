@@ -1,21 +1,21 @@
-﻿#Introduction#
+﻿# Introduction#
 
 This demonstrates inheritance capability of the library using 3 level inheritance structure.
 
-#Details#
-###Top class###
+# Details#
+### Top class###
 
-<wiki_code_block>inheritance_example_top_entity</wiki_code_block>
+	<wiki_code_block>inheritance_example_top_entity</wiki_code_block>
 
-###Middle Class###
+### Middle Class###
 
-<wiki_code_block>inheritance_example_middle_entity</wiki_code_block>
+	<wiki_code_block>inheritance_example_middle_entity</wiki_code_block>
 
-###Bottom Class###
+### Bottom Class###
 
-<wiki_code_block>inheritance_example_bottom_entity</wiki_code_block>
+	<wiki_code_block>inheritance_example_bottom_entity</wiki_code_block>
 
-###Testing Class###
+### Testing Class###
 get the source for ExampleBase from https://github.com/Adipa-G/ndbgate/wiki/SimpleEntityExample
 
-<wiki_code_block>inheritance_example</wiki_code_block>
+	<wiki_code_block>inheritance_example</wiki_code_block>

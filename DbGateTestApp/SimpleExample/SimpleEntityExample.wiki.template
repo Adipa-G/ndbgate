@@ -1,16 +1,16 @@
-﻿#Simple Example#
+﻿# Simple Example#
 Example is created using SQLite as the database engine. This demonstrates
 basic features like persisting, retrieval, change tracking
 
-#Details#
-###Create the entity###
+## Details ##
+### Create the entity###
 
 	<wiki_code_block>simple_example_simple_entity</wiki_code_block>
 
-###Base class for examples###
+### Base class for examples###
 
 	<wiki_code_block>example_base</wiki_code_block>
 
-###Class to do the operation###
+### Class to do the operation###
 	
 	<wiki_code_block>simple_example</wiki_code_block>
