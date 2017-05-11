@@ -1,33 +1,33 @@
-﻿# Introduction#
+﻿# Introduction
 
 This demonstrates no of features working together, with reverse relationships and non-identifying relationships.
 
-# Details#
-### Item class###
+# Details
+### Item class
 
-<wiki_code_block>complex_example_product_item</wiki_code_block>
+	<wiki_code_block>complex_example_product_item</wiki_code_block>
 
-### Product Class###
+### Product Class
 
-<wiki_code_block>complex_example_product_product</wiki_code_block>
+	<wiki_code_block>complex_example_product_product</wiki_code_block>
 
-### Service Class###
+### Service Class
 
-<wiki_code_block>complex_example_product_service</wiki_code_block>
+	<wiki_code_block>complex_example_product_service</wiki_code_block>
 
-### Transaction Class###
+### Transaction Class
 
-<wiki_code_block>complex_example_order_transaction</wiki_code_block>
+	<wiki_code_block>complex_example_order_transaction</wiki_code_block>
 
-### ItemTransaction Class###
+### ItemTransaction Class
 
-<wiki_code_block>complex_example_order_item_transaction</wiki_code_block>
+	<wiki_code_block>complex_example_order_item_transaction</wiki_code_block>
 
-### ItemTransactionCharge Class###
+### ItemTransactionCharge Class
 
-<wiki_code_block>complex_example_order_item_transaction_charge</wiki_code_block>
+	<wiki_code_block>complex_example_order_item_transaction_charge</wiki_code_block>
 
-### Testing Class###
+### Testing Class
 get the source for ExampleBase from https://github.com/Adipa-G/ndbgate/wiki/SimpleEntityExample
 
-<wiki_code_block>complex_example</wiki_code_block>
+	<wiki_code_block>complex_example</wiki_code_block>

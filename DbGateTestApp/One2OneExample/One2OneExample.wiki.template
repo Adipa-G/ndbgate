@@ -1,27 +1,27 @@
 ﻿# summary One to One relationship example
 
-## Introduction ##
+## Introduction
 
 This demonstrates one to one relationship capability of the library using 2 types of different child objects.
 
-## Details ##
-### Parent class ###
+## Details 
+### Parent class
 
 	<wiki_code_block>one_2_one_example_parent_entity</wiki_code_block>
 
-### Child Base Class###
+### Child Base Class
 
 	<wiki_code_block>one_2_one_example_child_entity</wiki_code_block>
 
-### Child Sub Class 1###
+### Child Sub Class 1
 
 	<wiki_code_block>one_2_one_example_child_entity_a</wiki_code_block>
 
-### Child Sub Class 2###
+### Child Sub Class 2
 
 	<wiki_code_block>one_2_one_example_child_entity_b</wiki_code_block>
 
-### Testing Class###
+### Testing Class
 get the source for ExampleBase from https://github.com/Adipa-G/ndbgate/wiki/SimpleEntityExample
 
 	<wiki_code_block>one_2_one_example</wiki_code_block>
