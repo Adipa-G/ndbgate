@@ -4,6 +4,7 @@ In short ndbgate is an object relational mapping framework. What it differs from
 Also it can be configured to be smart, where it can handle core functions of a modern ORM like data integrity checks/change tracking. 
  
 ### Features
+* .Net Standard 2.0
 * Core relationships (One to One, One to Many, Inheritance)
 * Change tracking
 * Data verification on persisting

@@ -8,6 +8,7 @@
     <Authors>Adipa Gunasekara</Authors>
     <Version>1.1.0</Version>
     <FileVersion>1.1.0.0</FileVersion>
+    <Description>DbGate ORM</Description>
   </PropertyGroup>
 
   <ItemGroup>

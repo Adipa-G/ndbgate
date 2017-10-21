@@ -9,6 +9,7 @@
     <Company>Adipa Gunasekara</Company>
     <Copyright>Adipa Gunasekara 2017</Copyright>
     <Version>1.1.0</Version>
+    <Description>Unit tests for DbGate</Description>
   </PropertyGroup>
 
   <ItemGroup>

@@ -85,8 +85,12 @@ namespace DbGate.Persist
                     if (orgItemTransaction.IndexNo == loadedItemTransaction.IndexNo)
                     {
                         foundItem = true;
-                        Assert.AreEqual(orgItemTransaction.Item.Name, loadedItemTransaction.Item.Name);
-                        Assert.AreEqual(orgItemTransaction.Item.ItemId, loadedItemTransaction.Item.ItemId);
+                        var originalItem = orgItemTransaction.Item;
+                        var loadedItem = loadedItemTransaction.Item;
+
+                        Assert.AreEqual(originalItem.GetType(), loadedItem.GetType());
+                        Assert.AreEqual(originalItem.Name, loadedItem.Name);
+                        Assert.AreEqual(originalItem.ItemId, loadedItem.ItemId);
                         Assert.AreSame(loadedItemTransaction.Transaction, loadedTransaction);
 
                         foreach (ItemTransactionCharge orgTransactionCharge in orgItemTransaction.ItemTransactionCharges

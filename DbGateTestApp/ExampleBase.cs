@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using DbGate;
 using DbGateTestApp.DocGenerate;
+using log4net;
 using log4net.Core;
 
 namespace DbGateTestApp
@@ -19,10 +20,10 @@ namespace DbGateTestApp
             {
                 if (_transactionFactory == null)
                 {
-                    log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
+                    var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+                    log4net.Config.XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
-
-                    LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(ExampleBase)).Log(typeof(ExampleBase), Level.Info, "Starting in-memory database for unit tests", null);
+                    LogManager.GetLogger(typeof(ExampleBase)).Info("Starting in-memory database for unit tests");
                     _transactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
                 }
                 return _transactionFactory.CreateTransaction();

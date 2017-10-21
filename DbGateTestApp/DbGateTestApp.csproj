@@ -3,15 +3,28 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2</TargetFramework>
     <ApplicationIcon />
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <StartupObject />
+    <Version>1.1.0</Version>
+    <Authors>Adipa Gunasekara</Authors>
+    <Company>Adipa Gunasekara</Company>
+    <Product>DbGate</Product>
+    <Description>Test appication for DbGate</Description>
+    <Copyright>Adipa Gunasekara 2017</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DbGate\DbGate.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
