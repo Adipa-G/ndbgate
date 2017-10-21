@@ -6,11 +6,12 @@ using NUnit.Framework;
 
 namespace DbGate.Persist
 {
+    [TestFixture]
     public class DbGateCrossReferenceTest : AbstractDbGateTestBase
     {
         private const string DBName = "unit-testing-cross-reference";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGateCrossReferenceTest);

@@ -68,7 +68,7 @@ namespace DbGate.ErManagement.ErMapper
             }
             if (showQuery)
             {
-                LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
+                Logger.GetLogger(Config.LoggerName).Debug(logSb.ToString());
             }
             if (Config.EnableStatistics)
             {
@@ -234,7 +234,7 @@ namespace DbGate.ErManagement.ErMapper
 
                 if (showQuery)
                 {
-                    LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
+                    Logger.GetLogger(Config.LoggerName).Debug(logSb.ToString());
                 }
                 if (Config.EnableStatistics)
                 {

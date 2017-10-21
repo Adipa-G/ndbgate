@@ -8,11 +8,12 @@ using NUnit.Framework;
 
 namespace DbGate.Patch
 {
+    [TestFixture]
     public class DbGatePatchEmptyDbTests : AbstractDbGateTestBase
     {
         private const string DBName = "unit-testing-metadata-empty";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGatePatchEmptyDbTests);
@@ -72,7 +73,6 @@ namespace DbGate.Patch
 
 
         [Test]
-        [ExpectedException(typeof(PersistException))]
         public void PatchEmpty_PatchDataBase_WithEmptyDb_ShouldCreatePrimaryKeys_ShouldNotAbleToPutDuplicateData()
         {
             ITransaction transaction = CreateTransaction();
@@ -81,21 +81,13 @@ namespace DbGate.Patch
             RootEntity entity = CreateRootEntityWithoutNullValues(id);
             entity.LeafEntities.Add(CreateLeafEntityA(id, 1));
             entity.LeafEntities.Add(CreateLeafEntityB(id, 1));
-            entity.Persist(transaction);
+            Assert.Throws<PersistException>(() => entity.Persist(transaction));
 
             transaction.Commit();
             transaction.Close();
-
-            transaction = CreateTransaction();
-            RootEntity loadedEntity = LoadRootEntityWithId(transaction, id);
-            transaction.Commit();
-            transaction.Close();
-
-            AssertTwoRootEntitiesEquals(entity, loadedEntity);
         }
 
         [Test]
-        [ExpectedException(typeof(PersistException))]
         public void PatchEmpty_PatchDataBase_WithEmptyDb_ShouldCreateForeignKeys_ShouldNotAbleToInconsistantData()
         {
             ITransaction transaction = CreateTransaction();
@@ -104,16 +96,10 @@ namespace DbGate.Patch
             RootEntity entity = CreateRootEntityWithoutNullValues(id);
             entity.LeafEntities.Add(CreateLeafEntityA(id + 1, 1));
             entity.LeafEntities.Add(CreateLeafEntityB(id, 1));
-            entity.Persist(transaction);
+            Assert.Throws<PersistException>(() => entity.Persist(transaction));
 
             transaction.Commit();
             transaction.Close();
-
-            transaction = CreateTransaction();
-            RootEntity loadedEntity = LoadRootEntityWithId(transaction, id);
-            transaction.Commit();
-
-            AssertTwoRootEntitiesEquals(entity, loadedEntity);
         }
 
         [Test]

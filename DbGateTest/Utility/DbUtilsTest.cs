@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Reflection;
 using log4net;
 using log4net.Config;
 using NUnit.Framework;
@@ -10,12 +11,14 @@ namespace DbGate.Utility
     {
         #region Setup/Teardown
         private static ITransactionFactory _transactionFactory;
-        [TestFixtureSetUp]
+
+        [OneTimeSetUp]
         public static void Before()
         {
             try
             {
-                XmlConfigurator.Configure();
+                var repository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+                XmlConfigurator.Configure(repository);
 
                 LogManager.GetLogger(typeof(DbUtilsTests)).Info("Starting in-memory database for unit tests");
                 _transactionFactory = new DefaultTransactionFactory(
@@ -80,7 +83,7 @@ namespace DbGate.Utility
 
         
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void After()
         {
             try

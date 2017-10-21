@@ -7,11 +7,12 @@ using NUnit.Framework;
 
 namespace DbGate.Patch
 {
+    [TestFixture]
     public class DbGatePatchTableDifferenceDbTests : AbstractDbGateTestBase
     {
         private const string DBName = "unit-testing-metadata-table-difference";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGatePatchTableDifferenceDbTests);

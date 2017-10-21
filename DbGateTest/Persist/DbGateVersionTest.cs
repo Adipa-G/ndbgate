@@ -7,11 +7,12 @@ using NUnit.Framework;
 
 namespace DbGate.Persist
 {
+    [TestFixture]
     public class DbGateVersionTest : AbstractDbGateTestBase
     {
         private const string DBName = "unit-testing-version";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGateVersionTest);
@@ -117,7 +118,6 @@ namespace DbGate.Persist
         }
 
         [Test]
-        [ExpectedException(typeof(PersistException))]
         public void Version_PersistWithTwoChanges_WithoutUpdateChangedColumnsOnly_ShouldThrowException()
         {
             var con = SetupTables();
@@ -144,8 +144,7 @@ namespace DbGate.Persist
             transaction.Commit();
 
             loadedEntityB.Version = loadedEntityB.Version + 1;
-            loadedEntityB.Persist(transaction);
-            transaction.Commit();
+            Assert.Throws<PersistException>(() => loadedEntityB.Persist(transaction));
         }
 
         [Test]
@@ -189,7 +188,6 @@ namespace DbGate.Persist
         }
 
         [Test]
-        [ExpectedException(typeof(PersistException))]
         public void Version_RootUpdateFromAnotherTransaction_WithVersionColumnEntity_ShouldThrowException()
         {
             var con = SetupTables();
@@ -220,13 +218,12 @@ namespace DbGate.Persist
 
             transaction = CreateTransaction(con);
             entity.Name ="New Name2";;
-            entity.Persist(transaction);
+            Assert.Throws<PersistException>(() => entity.Persist(transaction));
             transaction.Commit();
             con.Close();
         }
 
         [Test]
-        [ExpectedException(typeof(PersistException))]
         public void Version_RootUpdateFromAnotherTransaction_WithOutVersionColumnEntity_ShouldThrowException()
         {
             var con = SetupTables();
@@ -257,13 +254,12 @@ namespace DbGate.Persist
 
             transaction = CreateTransaction(con);
             entity.Name ="New Name2";;
-            entity.Persist(transaction);
+            Assert.Throws<PersistException>(() => entity.Persist(transaction));
             transaction.Commit();
             con.Close();
         }
 
         [Test]
-        [ExpectedException(typeof(PersistException))]
         public void Version_One2oneChildUpdateFromAnotherTransaction_WithVersionColumnEntity_ShouldThrowException()
         {
             var con = SetupTables();
@@ -297,13 +293,12 @@ namespace DbGate.Persist
 
             transaction = CreateTransaction(con);
             entity.One2OneEntity.Name ="Modified2 One2One";
-            entity.Persist(transaction);
+            Assert.Throws<PersistException>(() => entity.Persist(transaction));
             transaction.Commit();
             con.Close();
         }
 
         [Test]
-        [ExpectedException(typeof(PersistException))]
         public void Version_One2oneChildUpdateFromAnotherTransaction_WithoutVersionColumnEntity_ShouldThrowException()
         {
             var con = SetupTables();
@@ -337,13 +332,12 @@ namespace DbGate.Persist
 
             transaction = CreateTransaction(con);
             entity.One2OneEntity.Name = "Modified2 One2One";
-            entity.Persist(transaction);
+            Assert.Throws<PersistException>(() => entity.Persist(transaction));
             transaction.Commit();
             con.Close();
         }
 
         [Test]
-        [ExpectedException(typeof(PersistException))]
         public void Version_One2manyChildUpdateFromAnotherTransaction_WithVersionColumnEntity_ShouldThrowException()
         {
             var con = SetupTables();
@@ -384,13 +378,12 @@ namespace DbGate.Persist
             orgEnumerator.MoveNext();
             VersionColumnTestOne2ManyEntity orgOne2ManyEntity = orgEnumerator.Current;
             orgOne2ManyEntity.Name = "Modified2 One2Many";
-            entity.Persist(transaction);
+            Assert.Throws<PersistException>(() => entity.Persist(transaction));
             transaction.Commit();
             con.Close();
         }
 
         [Test]
-        [ExpectedException(typeof(PersistException))]
         public void Version_One2manyChildUpdateFromAnotherTransaction_WithoutVersionColumnEntity_ShouldThrowException()
         {
             var con = SetupTables();
@@ -432,7 +425,7 @@ namespace DbGate.Persist
             orgEnumerator.MoveNext();
             VersionGeneralTestOne2ManyEntity orgOne2ManyEntity = orgEnumerator.Current;
             orgOne2ManyEntity.Name = "Modified2 One2Many";
-            entity.Persist(transaction);
+            Assert.Throws<PersistException>(() => entity.Persist(transaction));
             transaction.Commit();
             con.Close();
         }

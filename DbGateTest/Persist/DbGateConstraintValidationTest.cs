@@ -7,11 +7,12 @@ using NUnit.Framework;
 
 namespace DbGate.Persist
 {
+    [TestFixture]
     public class DbGateConstraintValidationTest : AbstractDbGateTestBase
     {
         private const string DBName = "unit-testing-constraint";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGateConstraintValidationTest);
@@ -242,7 +243,6 @@ namespace DbGate.Persist
         }
 
         [Test]
-        [ExpectedException(typeof(PersistException))]
         public void ConstraintValidation_DeleteRootWithOneToOneChild_WithRestrictConstraint_ShouldThrowException()
         {
             IDbConnection connection = SetupTables();
@@ -266,13 +266,12 @@ namespace DbGate.Persist
             ConstraintTestDeleteRestrictRootEntity loadedEntity = new ConstraintTestDeleteRestrictRootEntity();
             LoadEntityWithId(transaction,loadedEntity,id);
             loadedEntity.Status = EntityStatus.Deleted;
-            loadedEntity.Persist(transaction);
+            Assert.Throws<PersistException>(() => loadedEntity.Persist(transaction));
             transaction.Commit();
             connection.Close();
         }
     
         [Test]
-        [ExpectedException(typeof(PersistException))]
         public void ConstraintValidation_DeleteRootWithOneToManyChild_WithRestrictConstraint_ShouldThrowException()
         {
             IDbConnection connection = SetupTables();
@@ -296,7 +295,7 @@ namespace DbGate.Persist
             ConstraintTestDeleteRestrictRootEntity loadedEntity = new ConstraintTestDeleteRestrictRootEntity();
             LoadEntityWithId(transaction,loadedEntity,id);
             loadedEntity.Status = EntityStatus.Deleted;
-            loadedEntity.Persist(transaction);
+            Assert.Throws<PersistException>(() => loadedEntity.Persist(transaction));
             transaction.Commit();
             connection.Close();
         }

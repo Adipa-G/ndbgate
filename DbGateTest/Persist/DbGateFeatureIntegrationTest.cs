@@ -7,11 +7,12 @@ using NUnit.Framework;
 
 namespace DbGate.Persist
 {
+    [TestFixture]
     public class DbGateFeatureIntegrationTest : AbstractDbGateTestBase
     {
         private const string DBName = "testing-feature_integreation";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGateFeatureIntegrationTest);

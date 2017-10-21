@@ -48,7 +48,7 @@ namespace DbGate.ErManagement.ErMapper
 					{
 						logSb.Append (" ,").Append ("Param").Append (param.Index).Append ("=").Append (param.Value);
 					}
-					LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
+					Logger.GetLogger(Config.LoggerName).Debug(logSb.ToString());
 				}
 		
 				rs = DbLayer.DataManipulate().CreateResultSet(tx, execInfo);
@@ -81,7 +81,7 @@ namespace DbGate.ErManagement.ErMapper
 			} 
 			catch (Exception e) 
 			{
-				LogManager.GetLogger(Config.LoggerName).Error(e.Message, e);
+				Logger.GetLogger(Config.LoggerName).Error(e.Message, e);
 				throw new RetrievalException (e.Message, e);
 			} 
 			finally 
@@ -104,7 +104,7 @@ namespace DbGate.ErManagement.ErMapper
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(Config.LoggerName).Fatal(e.Message, e);
+                Logger.GetLogger( Config.LoggerName).Fatal(e.Message, e);
                 throw new RetrievalException(e.Message, e);
             }
         }
@@ -245,7 +245,7 @@ namespace DbGate.ErManagement.ErMapper
                     else
                     {
                         string message = singleRoDbClass.GetType().FullName + " is not matching the getter " + property.Name;
-                        LogManager.GetLogger(Config.LoggerName).Fatal(message);
+                        Logger.GetLogger( Config.LoggerName).Fatal(message);
                         throw new NoSetterFoundToSetChildObjectListException(message);
                     }
                 }

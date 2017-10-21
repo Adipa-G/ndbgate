@@ -7,11 +7,12 @@ using NUnit.Framework;
 
 namespace DbGate.Persist
 {
+    [TestFixture]
     public class DbGateColumnPersistTests :  AbstractDbGateTestBase
     {
         private const string DBName = "unit-testing-column-persist";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGateColumnPersistTests);

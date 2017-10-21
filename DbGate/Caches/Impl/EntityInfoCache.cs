@@ -35,7 +35,7 @@ namespace DbGate.Caches.Impl
             }
             catch (Exception ex)
             {
-                LogManager.GetLogger(_config.LoggerName).Fatal(ex.Message, ex);
+                Logger.GetLogger(_config.LoggerName).Fatal(ex.Message, ex);
             }
             return Cache[entityType];
         }

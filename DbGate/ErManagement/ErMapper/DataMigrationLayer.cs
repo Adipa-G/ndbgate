@@ -80,7 +80,7 @@ namespace DbGate.ErManagement.ErMapper
                     if (holder.QueryString == null)
                         continue;
 
-                    LogManager.GetLogger(_config.LoggerName).Debug(holder.QueryString);
+                    Logger.GetLogger( _config.LoggerName).Debug(holder.QueryString);
 
                     IDbCommand cmd = tx.CreateCommand();
                     cmd.CommandText = holder.QueryString;
@@ -92,7 +92,7 @@ namespace DbGate.ErManagement.ErMapper
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(_config.LoggerName).Fatal(e.Message,e);
+                Logger.GetLogger( _config.LoggerName).Fatal(e.Message,e);
                 throw new MetaDataException(e.Message,e);
             }
         }
@@ -131,14 +131,14 @@ namespace DbGate.ErManagement.ErMapper
 
                 foreach (IRelation relation in dbRelations)
                 {
-                    if (!relation.ReverseRelationship
-                        && !relation.NonIdentifyingRelation)
+                    if (relation.ReverseRelationship
+                        || relation.NonIdentifyingRelation)
                     {
                         filteredRelations.Add(relation);
                     }
                 }
                 
-                retItems.Add(CreateTable(entityInfo.EntityType,dbColumns,dbRelations));
+                retItems.Add(CreateTable(entityInfo.EntityType,dbColumns, filteredRelations));
                 entityInfo = entityInfo.SuperEntityInfo;
             }
             return retItems;

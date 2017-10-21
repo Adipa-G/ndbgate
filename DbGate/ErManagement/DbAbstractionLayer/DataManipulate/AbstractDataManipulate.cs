@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.OleDb;
 using System.Text;
 using DbGate.Caches;
 using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query;
@@ -265,11 +264,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 		{
 			var parameter = cmd.CreateParameter ();
 			parameter.Direction = ParameterDirection.Input;
-			parameter.Value = obj;
-			if (parameter is OleDbParameter) 
-			{
-				((OleDbParameter)parameter).IsNullable = true;
-			}
+			parameter.Value = obj ?? DBNull.Value;
+            
 			cmd.Parameters.Add(parameter);
 		    parameter.DbType = ColumnTypeMapping.GetSqlType(columnType);
         }

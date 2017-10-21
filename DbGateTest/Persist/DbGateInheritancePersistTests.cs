@@ -6,6 +6,7 @@ using NUnit.Framework;
 
 namespace DbGate.Persist
 {
+    [TestFixture]
     public class DbGateInheritancePersistTests : AbstractDbGateTestBase
     {
         public const int TYPE_ANNOTATION = 1;
@@ -14,7 +15,7 @@ namespace DbGate.Persist
 
         private const string DBName = "unit-testing-inheritance-persist";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGateInheritancePersistTests);

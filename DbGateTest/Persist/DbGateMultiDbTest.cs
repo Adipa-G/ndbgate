@@ -4,6 +4,7 @@ using NUnit.Framework;
 
 namespace DbGate.Persist
 {
+    [TestFixture]
     public class DbGateMultiDbTest : AbstractDbGateTestBase
     {
         private const string DB1Name = "unit-testing-multi-db-1";
@@ -12,7 +13,7 @@ namespace DbGate.Persist
         protected static ITransactionFactory TransactionFactoryDb1;
         protected static IDbConnection ConnectionDb1;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGateMultiDbTest);

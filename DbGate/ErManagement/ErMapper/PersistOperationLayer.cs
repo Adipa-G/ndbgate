@@ -48,7 +48,7 @@ namespace DbGate.ErManagement.ErMapper
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(Config.LoggerName).Fatal(e.Message, e);
+                Logger.GetLogger(Config.LoggerName).Fatal(e.Message, e);
                 throw new PersistException(e.Message, e);
             }
         }
@@ -243,7 +243,7 @@ namespace DbGate.ErManagement.ErMapper
             }
             if (showQuery)
             {
-                LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
+                Logger.GetLogger(Config.LoggerName).Debug(logSb.ToString());
             }
             if (Config.EnableStatistics)
             {
@@ -324,7 +324,7 @@ namespace DbGate.ErManagement.ErMapper
             }
             if (showQuery)
             {
-                LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
+                Logger.GetLogger(Config.LoggerName).Debug(logSb.ToString());
             }
             if (Config.EnableStatistics)
             {
@@ -368,7 +368,7 @@ namespace DbGate.ErManagement.ErMapper
             }
             if (showQuery)
             {
-                LogManager.GetLogger(Config.LoggerName).Info(logSb.ToString());
+                Logger.GetLogger(Config.LoggerName).Debug(logSb.ToString());
             }
             if (Config.EnableStatistics)
             {

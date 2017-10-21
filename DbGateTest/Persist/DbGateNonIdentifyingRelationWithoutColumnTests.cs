@@ -8,11 +8,12 @@ using NUnit.Framework;
 
 namespace DbGate.Persist
 {
+    [TestFixture]
     public class DbGateNonIdentifyingRelationWithoutColumnTests : AbstractDbGateTestBase
     {
         private const string DBName = "testing-non-identifying-relatin-without-column";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGateFeatureIntegrationTest);

@@ -7,11 +7,12 @@ using NUnit.Framework;
 
 namespace DbGate.Persist
 {
+    [TestFixture]
     public class DbGateLazyTest : AbstractDbGateTestBase
     {
         private const string DBName = "unit-testing-fetchstrategy";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGateLazyTest);

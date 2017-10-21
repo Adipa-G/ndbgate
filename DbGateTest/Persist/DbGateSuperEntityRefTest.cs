@@ -6,11 +6,12 @@ using NUnit.Framework;
 
 namespace DbGate.Persist
 {
+    [TestFixture]
     public class DbGateSuperEntityRefTest : AbstractDbGateTestBase
     {
         private const string DBName = "unit-testing-super_entity_ref_test";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGateSuperEntityRefTest);

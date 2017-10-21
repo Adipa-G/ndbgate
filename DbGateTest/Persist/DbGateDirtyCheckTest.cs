@@ -9,11 +9,12 @@ using NUnit.Framework;
 
 namespace DbGate.Persist
 {
+    [TestFixture]
     public class DbGateDirtyCheckTest : AbstractDbGateTestBase
     {
         private const string DBName = "unit-testing-dirty-check";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGateDirtyCheckTest);

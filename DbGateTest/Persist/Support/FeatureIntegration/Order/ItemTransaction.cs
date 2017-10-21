@@ -26,10 +26,7 @@ namespace DbGate.Persist.Support.FeatureIntegration.Order
         [ColumnInfo(ColumnType.Integer)]
         public int ItemId { get; set; }
 
-        [ForeignKeyInfo("item_tx2product", typeof (Product.Product), new[] {"itemId"}, new[] {"itemId"}
-            , NonIdentifyingRelation = true, UpdateRule = ReferentialRuleType.Restrict,
-            DeleteRule = ReferentialRuleType.Cascade)]
-        [ForeignKeyInfo("item_tx2service", typeof (Service), new[] {"itemId"}, new[] {"itemId"}
+        [ForeignKeyInfo("item_tx2item", typeof (Item), new[] {"itemId"}, new[] {"itemId"}
             , NonIdentifyingRelation = true, UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public Item Item { get; set; }

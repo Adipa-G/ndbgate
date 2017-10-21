@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Xml;
 using DbGate.Caches;
 using DbGate.Caches.Impl;
 using DbGate.ErManagement.ErMapper;
@@ -30,7 +32,8 @@ namespace DbGate
             {
                 if (TransactionFactory == null)
                 {
-                    log4net.Config.XmlConfigurator.Configure(new FileInfo("log4net.config"));
+                    var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+                    log4net.Config.XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
                     LogManager.GetLogger(TestClass).Info("Starting in-memory database for unit tests");
                     TransactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);

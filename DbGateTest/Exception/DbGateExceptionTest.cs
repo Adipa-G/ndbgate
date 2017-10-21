@@ -9,11 +9,12 @@ using NUnit.Framework;
 
 namespace DbGate.Exception
 {
+    [TestFixture]
     public class DbGateExceptionTest : AbstractDbGateTestBase
     {
         private const string DBName = "unit-testing-exceptions";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGateExceptionTest);

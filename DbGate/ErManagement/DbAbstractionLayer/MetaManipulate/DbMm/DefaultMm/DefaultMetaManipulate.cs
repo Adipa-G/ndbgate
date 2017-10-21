@@ -25,7 +25,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
                 DataTable dbTableTable = dbConnection.GetSchema("Tables");
                 if (dbTableTable == null)
                 {
-                    LogManager.GetLogger(Config.LoggerName).Fatal("Unable to read the list of tables");
+                    Logger.GetLogger(Config.LoggerName).Fatal("Unable to read the list of tables");
                     return null;
                 }
                 foreach (DataRow tableRow in dbTableTable.Rows)
@@ -37,7 +37,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(Config.LoggerName).Fatal(
+                Logger.GetLogger(Config.LoggerName).Fatal(
                     "Exception occured while trying to read table information", e);
                 throw new DBPatchingException(e.Message, e);
             }
@@ -52,7 +52,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
                 DataTable columnTable = dbConnection.GetSchema("Columns", new[] {null, null, table.Name, null});
                 if (columnTable == null)
                 {
-                    LogManager.GetLogger(Config.LoggerName).Fatal(
+                    Logger.GetLogger(Config.LoggerName).Fatal(
                         string.Format("Unable to read the list of columns in table {0}", table.Name));
                     return;
                 }
@@ -68,7 +68,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(Config.LoggerName).Fatal(
+                Logger.GetLogger(Config.LoggerName).Fatal(
                     string.Format("Exception occured while trying to read column information in table {0}", table.Name),
                     e);
                 throw new DBPatchingException(e.Message, e);
@@ -84,7 +84,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
                 DataTable pkTable = dbConnection.GetSchema("Primary_Keys", new[] {null, null, table.Name, null});
                 if (pkTable == null)
                 {
-                    LogManager.GetLogger(Config.LoggerName).Fatal(
+                    Logger.GetLogger(Config.LoggerName).Fatal(
                         string.Format("Unable to read the primary key in table {0}", table.Name));
                     return;
                 }
@@ -110,7 +110,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(Config.LoggerName).Fatal(
+                Logger.GetLogger(Config.LoggerName).Fatal(
                     string.Format("Exception occured while trying to read primary key in table {0}", table.Name), e);
                 throw new DBPatchingException(e.Message, e);
             }
@@ -129,7 +129,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
                 DataTable fkTable = dbConnection.GetSchema("Foreign_Keys", new[] {null, null, table.Name, null});
                 if (fkTable == null)
                 {
-                    LogManager.GetLogger(Config.LoggerName).Fatal(
+                    Logger.GetLogger(Config.LoggerName).Fatal(
                         string.Format("Unable to read the list of foregin keys in table {0}", table.Name));
                     return;
                 }
@@ -181,7 +181,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(Config.LoggerName).Fatal(
+                Logger.GetLogger(Config.LoggerName).Fatal(
                     string.Format("Exception occured while trying to read foreign key information in table {0}",
                                   table.Name), e);
                 throw new DBPatchingException(e.Message, e);

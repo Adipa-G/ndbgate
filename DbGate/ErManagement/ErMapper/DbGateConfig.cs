@@ -20,6 +20,8 @@ namespace DbGate.ErManagement.ErMapper
 
         public string LoggerName { get; set; }
 
+        public string LoggerRepository { get; set; }
+
         public bool ShowQueries { get; set; }
 
         public bool EnableStatistics { get; set; }

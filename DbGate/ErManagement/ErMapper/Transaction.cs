@@ -95,7 +95,7 @@ namespace DbGate.ErManagement.ErMapper
 	        try
 	        {
 	            _factory = null;
-                Connection.Close();
+	            Connection?.Close();
 	        }
 	        catch (Exception e)
 	        {

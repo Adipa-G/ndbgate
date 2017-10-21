@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.OleDb;
+using System.Data.SqlClient;
+using System.Data.SqlClient;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Mappings;
@@ -63,13 +64,13 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
         {
             try
             {
-                if (tx.Connection is OleDbConnection)
+                if (tx.Connection is SqlConnection)
                 {
-                    OleDbConnection oleDbConnection = (OleDbConnection) tx.Connection;
-                    DataTable typeTable = oleDbConnection.GetOleDbSchemaTable(OleDbSchemaGuid.Provider_Types, null);
+                    SqlConnection oleDbConnection = (SqlConnection) tx.Connection;
+                    DataTable typeTable = oleDbConnection.GetSchema();
                     if (typeTable == null)
                     {
-                        LogManager.GetLogger(Config.LoggerName).Fatal("Unable to read the list of types");                        
+                        Logger.GetLogger(Config.LoggerName).Fatal("Unable to read the list of types");                        
                         return;
                     }
                     foreach (DataRow dataRow in typeTable.Rows)
@@ -82,12 +83,12 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
                 }
                 else
                 {
-                    LogManager.GetLogger(Config.LoggerName).Fatal("The connection is not oledb type, cannot read type info");
+                    Logger.GetLogger(Config.LoggerName).Fatal("The connection is not oledb type, cannot read type info");
                 }
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(Config.LoggerName).Fatal("Exception occured while trying to read type information", e);
+                Logger.GetLogger(Config.LoggerName).Fatal("Exception occured while trying to read type information", e);
                 throw new DBPatchingException(e.Message, e);
             }  
         }

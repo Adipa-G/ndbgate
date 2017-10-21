@@ -10,6 +10,7 @@ using NUnit.Framework;
 
 namespace DbGate.Query
 {
+    [TestFixture]
     public class DbGateQueryBasicTest : AbstractDbGateTestBase
     {
         private ICollection<QueryBasicEntity> _basicEntities;
@@ -20,7 +21,7 @@ namespace DbGate.Query
 
         private const string DBName = "init-testing-query-basic";
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void Before()
         {
             TestClass = typeof(DbGateQueryBasicTest);
