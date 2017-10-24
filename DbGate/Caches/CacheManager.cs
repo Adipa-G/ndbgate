@@ -23,6 +23,11 @@ namespace DbGate.Caches
             return _entityInfoCache.GetEntityInfo(entity);
         }
 
+        public static IList<IRelation> GetReversedRelationships(Type entityType)
+        {
+            return _entityInfoCache.GetReversedRelationships(entityType);
+        }
+
         public static void Register(Type entityType)
         {
             _entityInfoCache.Register(entityType);

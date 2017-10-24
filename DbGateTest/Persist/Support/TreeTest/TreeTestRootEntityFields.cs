@@ -24,12 +24,18 @@ namespace DbGate.Persist.Support.TreeTest
 
                 dbColumns.Add(new DefaultColumn("IdCol", true, false, ColumnType.Integer));
                 dbColumns.Add(new DefaultColumn("Name", ColumnType.Varchar));
-                dbColumns.Add(new DefaultRelation("One2ManyEntities", "fk_root2one2manyent",
-                                                  typeof (TreeTestOne2ManyEntityFields)
-                                                  , new[] {new RelationColumnMapping("idCol", "idCol")}));
-                dbColumns.Add(new DefaultRelation("One2OneEntity", "fk_root2one2oneent",
-                                                  typeof (TreeTestOne2OneEntityFields)
-                                                  , new[] {new RelationColumnMapping("idCol", "idCol")}));
+
+                dbColumns.Add(new DefaultRelation("One2ManyEntities",
+                    "fk_root2one2manyent",
+                    typeof(TreeTestRootEntityFields),
+                    typeof (TreeTestOne2ManyEntityFields),
+                    new[] {new RelationColumnMapping("idCol", "idCol")}));
+
+                dbColumns.Add(new DefaultRelation("One2OneEntity",
+                    "fk_root2one2oneent",
+                    typeof(TreeTestOne2ManyEntityFields),
+                    typeof (TreeTestOne2OneEntityFields),
+                    new[] {new RelationColumnMapping("idCol", "idCol")}));
 
                 map.Add(typeof (TreeTestRootEntityFields), dbColumns);
                 return map;

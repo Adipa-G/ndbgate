@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Data.SQLite;
 using System.IO;
 using System.Reflection;
 using DbGate;
@@ -24,7 +25,10 @@ namespace DbGateTestApp
                     log4net.Config.XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
                     LogManager.GetLogger(typeof(ExampleBase)).Info("Starting in-memory database for unit tests");
-                    _transactionFactory = new DefaultTransactionFactory("Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON", DefaultTransactionFactory.DbSqllite);
+                    _transactionFactory = new DefaultTransactionFactory(
+                        () => new SQLiteConnection(
+                            "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON"),
+                        DefaultTransactionFactory.DbSqllite);
                 }
                 return _transactionFactory.CreateTransaction();
             }

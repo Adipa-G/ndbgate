@@ -10,6 +10,8 @@ namespace DbGate.Caches
 
         EntityInfo GetEntityInfo(IReadOnlyClientEntity entity);
 
+        IList<IRelation> GetReversedRelationships(Type entityType);
+
         void Register(Type entityType, ITable table, ICollection<IField> fields);
 
         void Register(Type entityType);

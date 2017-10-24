@@ -129,7 +129,7 @@ namespace DbGate.Persist
         }
 
         [Test]
-        public void ColumnPersist_Insert_WithAnnotationsDifferentTypesWithoutNull_ShouldEqualWhenLoaded()
+        public void ColumnPersist_Insert_WithAttributesDifferentTypesWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -137,14 +137,14 @@ namespace DbGate.Persist
                 ITransaction transaction = CreateTransaction(connection);
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
-                IColumnTestEntity entity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity entity = new ColumnTestEntityAttribute();
                 
                 CreateEntityWithNonNullValues(entity);
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity loadedEntity = new ColumnTestEntityAttribute();
                 LoadEntityWithId(transaction,loadedEntity,id);
                 transaction.Commit();
                 connection.Close();
@@ -225,7 +225,7 @@ namespace DbGate.Persist
         }
 
         [Test]
-        public void ColumnPersist_Insert_WithAnnotationsDifferentTypesWithNull_ShouldEqualWhenLoaded()
+        public void ColumnPersist_Insert_WithAttributesDifferentTypesWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -233,14 +233,14 @@ namespace DbGate.Persist
                 ITransaction transaction = CreateTransaction(connection);
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
-                IColumnTestEntity entity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity entity = new ColumnTestEntityAttribute();
                 CreateEntityWithNullValues(entity);
 
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity loadedEntity = new ColumnTestEntityAttribute();
                 LoadEntityWithId(transaction,loadedEntity,id);
                 transaction.Commit();
                 connection.Close();
@@ -333,7 +333,7 @@ namespace DbGate.Persist
         }
 
         [Test]
-        public void ColumnPersist_Update_WithAnnotationsDifferentTypesStartWithoutNullEndWithoutNull_ShouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithAttributesDifferentTypesStartWithoutNullEndWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -341,13 +341,13 @@ namespace DbGate.Persist
                 ITransaction transaction = CreateTransaction(connection);
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
-                IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity newEntity = new ColumnTestEntityAttribute();
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity loadedEntity = new ColumnTestEntityAttribute();
                 LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNonNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
@@ -355,7 +355,7 @@ namespace DbGate.Persist
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                IColumnTestEntity reLoadedEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity reLoadedEntity = new ColumnTestEntityAttribute();
                 LoadEntityWithId(transaction,reLoadedEntity,id);
                 transaction.Commit();
                 connection.Close();
@@ -448,7 +448,7 @@ namespace DbGate.Persist
         }
 
         [Test]
-        public void ColumnPersist_Update_WithAnnotationsDifferentTypesStartWithoutNullEndWithNull_ShouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithAttributesDifferentTypesStartWithoutNullEndWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -456,13 +456,13 @@ namespace DbGate.Persist
                  ITransaction transaction = CreateTransaction(connection);
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
-                IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity newEntity = new ColumnTestEntityAttribute();
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity loadedEntity = new ColumnTestEntityAttribute();
                 LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
@@ -470,7 +470,7 @@ namespace DbGate.Persist
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                IColumnTestEntity reLoadedEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity reLoadedEntity = new ColumnTestEntityAttribute();
                 LoadEntityWithId(transaction,reLoadedEntity,id);
                 transaction.Commit();
                 connection.Close();
@@ -563,7 +563,7 @@ namespace DbGate.Persist
         }
 
         [Test]
-        public void ColumnPersist_Update_WithAnnotationsDifferentTypesStartWithNullEndWithoutNull_ShouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithAttributesDifferentTypesStartWithNullEndWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -571,13 +571,13 @@ namespace DbGate.Persist
                  ITransaction transaction = CreateTransaction(connection);
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
-                IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity newEntity = new ColumnTestEntityAttribute();
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity loadedEntity = new ColumnTestEntityAttribute();
                 LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNonNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
@@ -585,7 +585,7 @@ namespace DbGate.Persist
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                IColumnTestEntity reLoadedEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity reLoadedEntity = new ColumnTestEntityAttribute();
                 LoadEntityWithId(transaction,reLoadedEntity,id);
                 transaction.Commit();
                 connection.Close();
@@ -678,7 +678,7 @@ namespace DbGate.Persist
         }
 
         [Test]
-        public void ColumnPersist_Update_WithAnnotationsDifferentTypesStartWithNullEndWithNull_ShouldEqualWhenLoaded()
+        public void ColumnPersist_Update_WithAttributesDifferentTypesStartWithNullEndWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -686,13 +686,13 @@ namespace DbGate.Persist
                 ITransaction transaction = CreateTransaction(connection);
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
-                IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity newEntity = new ColumnTestEntityAttribute();
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity loadedEntity = new ColumnTestEntityAttribute();
                 LoadEntityWithId(transaction,loadedEntity,id);
                 UpdateEntityWithNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
@@ -700,7 +700,7 @@ namespace DbGate.Persist
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                IColumnTestEntity reLoadedEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity reLoadedEntity = new ColumnTestEntityAttribute();
                 LoadEntityWithId(transaction,reLoadedEntity,id);
                 transaction.Commit();
                 connection.Close();
@@ -791,7 +791,7 @@ namespace DbGate.Persist
         }
 
         [Test]
-        public void ColumnPersist_Delete_WithAnnotationsDifferentTypesStartWithNullEndWithNull_ShouldDelete()
+        public void ColumnPersist_Delete_WithAttributesDifferentTypesStartWithNullEndWithNull_ShouldDelete()
         {
             try
             {
@@ -799,20 +799,20 @@ namespace DbGate.Persist
                 ITransaction transaction = CreateTransaction(connection);
 
                 int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
-                IColumnTestEntity newEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity newEntity = new ColumnTestEntityAttribute();
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                IColumnTestEntity loadedEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity loadedEntity = new ColumnTestEntityAttribute();
                 LoadEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                IColumnTestEntity reLoadedEntity = new ColumnTestEntityAnnotations();
+                IColumnTestEntity reLoadedEntity = new ColumnTestEntityAttribute();
                 bool  loaded = LoadEntityWithId(transaction,reLoadedEntity,id);
                 transaction.Commit();
                 connection.Close();

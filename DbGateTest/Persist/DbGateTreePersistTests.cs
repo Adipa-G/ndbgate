@@ -10,7 +10,7 @@ namespace DbGate.Persist
     [TestFixture]
     public class DbGateTreePersistTests : AbstractDbGateTestBase
     {
-        public const int TYPE_ANNOTATION = 1;
+        public const int TYPE_ATTRIBUTE = 1;
         public const int TYPE_FIELD = 2;
         public const int TYPE_EXTERNAL = 3;
 
@@ -82,7 +82,7 @@ namespace DbGate.Persist
         }
 
         [Test]
-        public void TreePersist_Insert_WithAnnotationsDifferentTypeOfChildren_ShouldEqualWhenLoaded()
+        public void TreePersist_Insert_WithAttributesDifferentTypeOfChildren_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -90,12 +90,12 @@ namespace DbGate.Persist
                 ITransaction transaction = CreateTransaction(con);
                 
                 int id = 35;
-                ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_ANNOTATION);
+                ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_ATTRIBUTE);
                 rootEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(con);
-                ITreeTestRootEntity loadedEntity = new TreeTestRootEntityAnnotations();
+                ITreeTestRootEntity loadedEntity = new TreeTestRootEntityAttributes();
                 LoadEntityWithId(transaction, loadedEntity, id);
                 con.Close();
 
@@ -169,7 +169,7 @@ namespace DbGate.Persist
         }
 
         [Test]
-        public void TreePersist_Insert_WithAnnotationsNullOneToOneChildren_ShouldEqualWhenLoaded()
+        public void TreePersist_Insert_WithAttributesNullOneToOneChildren_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -177,13 +177,13 @@ namespace DbGate.Persist
                 ITransaction transaction = CreateTransaction(con);
 
                 int id = 35;
-                ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_ANNOTATION);
+                ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_ATTRIBUTE);
                 rootEntity.One2OneEntity = null;
                 rootEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(con);
-                ITreeTestRootEntity loadedEntity = new TreeTestRootEntityAnnotations();
+                ITreeTestRootEntity loadedEntity = new TreeTestRootEntityAttributes();
                 LoadEntityWithId(transaction, loadedEntity, id);
                 con.Close();
 
@@ -259,7 +259,7 @@ namespace DbGate.Persist
         }
 
         [Test]
-        public void TreePersist_Update_WithAnnotationsDifferentTypeOfChildren_ShouldEqualWhenLoaded()
+        public void TreePersist_Update_WithAttributesDifferentTypeOfChildren_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -267,12 +267,12 @@ namespace DbGate.Persist
                 ITransaction transaction = CreateTransaction(con);
                
                 int id = 35;
-                ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_ANNOTATION);
+                ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_ATTRIBUTE);
                 rootEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(con);
-                ITreeTestRootEntity loadedEntity = new TreeTestRootEntityAnnotations();
+                ITreeTestRootEntity loadedEntity = new TreeTestRootEntityAttributes();
                 LoadEntityWithId(transaction, loadedEntity, id);
 
                 loadedEntity.Name = "changed-name";
@@ -289,7 +289,7 @@ namespace DbGate.Persist
 
                 loadedEntity.Persist(transaction);
 
-                ITreeTestRootEntity reLoadedEntity = new TreeTestRootEntityAnnotations();
+                ITreeTestRootEntity reLoadedEntity = new TreeTestRootEntityAttributes();
                 LoadEntityWithId(transaction, reLoadedEntity, id);
                 con.Close();
 
@@ -396,7 +396,7 @@ namespace DbGate.Persist
         }
 
         [Test]
-        public void TreePersist_Delete_WithAnnotationsDifferentTypeOfChildren_ShouldEqualWhenLoaded()
+        public void TreePersist_Delete_WithAttributesDifferentTypeOfChildren_ShouldEqualWhenLoaded()
         {
             try
             {
@@ -404,12 +404,12 @@ namespace DbGate.Persist
                 ITransaction transaction = CreateTransaction(con);
 
                 int id = 35;
-                ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_ANNOTATION);
+                ITreeTestRootEntity rootEntity = CreateFullObjectTree(id, TYPE_ATTRIBUTE);
                 rootEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(con);
-                ITreeTestRootEntity loadedEntity = new TreeTestRootEntityAnnotations();
+                ITreeTestRootEntity loadedEntity = new TreeTestRootEntityAttributes();
                 LoadEntityWithId(transaction, loadedEntity, id);
 
                 loadedEntity.Name = "changed-name";
@@ -417,7 +417,7 @@ namespace DbGate.Persist
 
                 loadedEntity.Persist(transaction);
 
-                ITreeTestRootEntity reLoadedEntity = new TreeTestRootEntityAnnotations();
+                ITreeTestRootEntity reLoadedEntity = new TreeTestRootEntityAttributes();
                 bool loaded = LoadEntityWithId(transaction, reLoadedEntity, id);
                 bool existsOne2one = ExistsOne2ManyChild(transaction, id);
                 bool existsOne2many = ExistsOne2ManyChild(transaction, id);
@@ -559,8 +559,8 @@ namespace DbGate.Persist
         private ITreeTestRootEntity CreateFullObjectTree(int id, int type)
         {
             ITreeTestRootEntity entity = null;
-            entity = (type == TYPE_ANNOTATION)
-                         ? new TreeTestRootEntityAnnotations()
+            entity = (type == TYPE_ATTRIBUTE)
+                         ? new TreeTestRootEntityAttributes()
                          : (type == TYPE_FIELD)
                                ? (ITreeTestRootEntity) new TreeTestRootEntityFields()
                                : new TreeTestRootEntityExt();
@@ -568,8 +568,8 @@ namespace DbGate.Persist
             entity.Name = "root";
 
             ITreeTestOne2OneEntity one2OneEntity = null;
-            one2OneEntity = (type == TYPE_ANNOTATION)
-                                ? new TreeTestOne2OneEntityAnnotations()
+            one2OneEntity = (type == TYPE_ATTRIBUTE)
+                                ? new TreeTestOne2OneEntityAttributes()
                                 : (type == TYPE_FIELD)
                                       ? (ITreeTestOne2OneEntity) new TreeTestOne2OneEntityFields()
                                       : new TreeTestOne2OneEntityExt();
@@ -578,8 +578,8 @@ namespace DbGate.Persist
             entity.One2OneEntity = one2OneEntity;
 
             ITreeTestOne2ManyEntity one2ManyEntity = null;
-            one2ManyEntity = (type == TYPE_ANNOTATION)
-                                 ? new TreeTestOne2ManyEntityAnnotations()
+            one2ManyEntity = (type == TYPE_ATTRIBUTE)
+                                 ? new TreeTestOne2ManyEntityAttributes()
                                  : (type == TYPE_FIELD)
                                        ? (ITreeTestOne2ManyEntity) new TreeTestOne2ManyEntityFields()
                                        : new TreeTestOne2ManyEntityExt();

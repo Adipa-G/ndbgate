@@ -5,20 +5,40 @@ namespace DbGate
 {
     public abstract class AbstractRelation : IRelation
     {
-        protected AbstractRelation(String attributeName, string relationshipName, Type relatedObjectType
-                                   , RelationColumnMapping[] tableColumnMappings)
-            : this(attributeName, relationshipName, relatedObjectType, tableColumnMappings, ReferentialRuleType.Restrict
-                   , ReferentialRuleType.Cascade, false, false, DbGate.FetchStrategy.Default,false)
+        protected AbstractRelation(String attributeName,
+            string relationshipName,
+            Type sourceObjectType,
+            Type relatedObjectType,
+            RelationColumnMapping[] tableColumnMappings)
+            : this(attributeName,
+                  relationshipName,
+                  sourceObjectType,
+                  relatedObjectType,
+                  tableColumnMappings,
+                  ReferentialRuleType.Restrict,
+                  ReferentialRuleType.Cascade,
+                  false,
+                  false,
+                  FetchStrategy.Default,
+                  false)
         {
         }
 
-        protected AbstractRelation(String attributeName, string relationshipName, Type relatedObjectType
-                                   , RelationColumnMapping[] tableColumnMappings, ReferentialRuleType updateRule
-                                   , ReferentialRuleType deleteRule, bool reverseRelationship
-                                   , bool nonIdentifyingRelation, FetchStrategy fetchStrategy, bool nullable)
+        protected AbstractRelation(String attributeName,
+            string relationshipName,
+            Type sourceObjectType,
+            Type relatedObjectType,
+            RelationColumnMapping[] tableColumnMappings,
+            ReferentialRuleType updateRule,
+            ReferentialRuleType deleteRule,
+            bool reverseRelationship,
+            bool nonIdentifyingRelation,
+            FetchStrategy fetchStrategy,
+            bool nullable)
         {
             AttributeName = attributeName;
             RelationShipName = relationshipName;
+            SourceObjectType = sourceObjectType;
             RelatedObjectType = relatedObjectType;
             TableColumnMappings = tableColumnMappings;
             UpdateRule = updateRule;
@@ -34,6 +54,8 @@ namespace DbGate
         public string AttributeName { get; set; }
 
         public string RelationShipName { get; set; }
+
+        public Type SourceObjectType { get; set; }
 
         public Type RelatedObjectType { get; set; }
 
@@ -55,7 +77,6 @@ namespace DbGate
         {
             return (AbstractRelation)MemberwiseClone();
         }
-
         #endregion
     }
 }

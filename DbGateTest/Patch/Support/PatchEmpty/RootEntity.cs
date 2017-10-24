@@ -30,8 +30,9 @@ namespace DbGate.Patch.Support.PatchEmpty
         public string VarcharNotNull { get; set; }
         public string VarcharNull { get; set; }
 
-        [ForeignKeyInfo("fk_root2leafa", typeof (LeafEntitySubA), new[] {"idcol"}, new[] {"idcol"})]
-        [ForeignKeyInfo("fk_root2leafb", typeof (LeafEntitySubB), new[] {"idcol"}, new[] {"idcol"})]
+        [ForeignKeyInfo("fk_root2leaf",
+            typeof (LeafEntity),
+            new[] {"idcol"}, new[] {"idcol"})]
         public ICollection<LeafEntity> LeafEntities { get; set; }
 
         public override Dictionary<Type, ITable> TableInfo

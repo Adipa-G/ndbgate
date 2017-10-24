@@ -1,7 +1,10 @@
 ﻿using System.Data;
+using System.Data.SQLite;
+using System.IO;
 using System.Reflection;
 using log4net;
 using log4net.Config;
+using log4net.Core;
 using NUnit.Framework;
 
 namespace DbGate.Utility
@@ -9,97 +12,30 @@ namespace DbGate.Utility
     [TestFixture]
     public class DbUtilsTests
     {
-        #region Setup/Teardown
         private static ITransactionFactory _transactionFactory;
 
-        [OneTimeSetUp]
-        public static void Before()
+        private static ITransaction SetupDb()
         {
             try
             {
-                var repository = LogManager.GetRepository(Assembly.GetEntryAssembly());
-                XmlConfigurator.Configure(repository);
+                if (_transactionFactory == null)
+                {
+                    var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
+                    log4net.Config.XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
-                LogManager.GetLogger(typeof(DbUtilsTests)).Info("Starting in-memory database for unit tests");
-                _transactionFactory = new DefaultTransactionFactory(
-                    "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1", DefaultTransactionFactory.DbSqllite);
-
-                var transaction = _transactionFactory.CreateTransaction();
-
-                IDbCommand command = transaction.CreateCommand();
-                command.CommandText = "CREATE TABLE ROOT_ENTITY (ID INT PRIMARY KEY,NAME VARCHAR(12))";
-                command.ExecuteNonQuery();
-
-                transaction.Commit();
-                transaction.Close();
+                    LogManager.GetLogger(typeof(DbUtilsTests)).Info("Starting in-memory database for unit tests");
+                    _transactionFactory = new DefaultTransactionFactory(
+                        () => new SQLiteConnection(
+                            "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON"),
+                        DefaultTransactionFactory.DbSqllite);
+                }
+                return _transactionFactory.CreateTransaction();
             }
             catch (System.Exception ex)
             {
-                LogManager.GetLogger(typeof(DbUtilsTests)).Fatal("Exception during database startup.", ex);
-            }
-        }
-
-        [SetUp]
-        public void BeforeEach()
-        {
-            try
-            {
-                var transaction = _transactionFactory.CreateTransaction();
-
-                IDbCommand command = transaction.CreateCommand();
-                command.CommandText = "INSERT INTO ROOT_ENTITY VALUES (10,'TEN'),(20,'TWENTY'),(30,'THIRTY')";
-                command.ExecuteNonQuery();
-
-                transaction.Commit();
-                transaction.Close();
-            }
-            catch (System.Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbUtilsTests)).Fatal("Exception during test initialization.", ex);
-            }
-        }
-
-        [TearDown]
-        public void AfterEach()
-        {
-            try
-            {
-                var transaction = _transactionFactory.CreateTransaction();
-
-                IDbCommand command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM ROOT_ENTITY";
-                command.ExecuteNonQuery();
-
-                transaction.Commit();
-                transaction.Close();
-            }
-            catch (System.Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbUtilsTests)).Fatal("Exception during test cleanup.", ex);
-            }
-        }
-
-        #endregion
-
-        
-
-        [OneTimeTearDown]
-        public static void After()
-        {
-            try
-            {
-                var transaction = _transactionFactory.CreateTransaction();
-
-                IDbCommand command = transaction.CreateCommand();
-                command.CommandText = "DELETE FROM ROOT_ENTITY";
-                command.ExecuteNonQuery();
-
-                transaction.Commit();
-                transaction.Close();
-            }
-            catch (System.Exception ex)
-            {
-                LogManager.GetLogger(typeof (DbUtilsTests)).Fatal("Exception during test cleanup.", ex);
+                LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(DbUtilsTests)).Log(typeof(DbUtilsTests),
+                    Level.Fatal, "Exception during database startup.", ex);
+                return null;
             }
         }
 
@@ -108,7 +44,7 @@ namespace DbGate.Utility
         {
             try
             {
-                var transaction = _transactionFactory.CreateTransaction();
+                var transaction = SetupDb();
                 IDbConnection connection = transaction.Connection;
                 Assert.IsTrue(connection.State != ConnectionState.Closed);
                 transaction.Close();

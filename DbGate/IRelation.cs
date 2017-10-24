@@ -7,6 +7,8 @@ namespace DbGate
     {
         string RelationShipName { get; set; }
 
+        Type SourceObjectType { get; set; }
+
         Type RelatedObjectType { get; set; }
 
         ICollection<RelationColumnMapping> TableColumnMappings { get; set; }

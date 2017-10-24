@@ -13,11 +13,18 @@ namespace DbGate.Persist.Support.TreeTest
             {
                 fields.Add(new DefaultColumn("IdCol", true, false, ColumnType.Integer));
                 fields.Add(new DefaultColumn("Name", ColumnType.Varchar));
-                fields.Add(new DefaultRelation("One2ManyEntities", "fk_root2one2manyent",
-                                               typeof (TreeTestOne2ManyEntityExt)
-                                               , new[] {new RelationColumnMapping("IdCol", "idCol")}));
-                fields.Add(new DefaultRelation("One2OneEntity", "fk_root2one2oneent", typeof (TreeTestOne2OneEntityExt)
-                                               , new[] {new RelationColumnMapping("IdCol", "idCol")}));
+
+                fields.Add(new DefaultRelation("One2ManyEntities",
+                    "fk_root2one2manyent",
+                    typeof(TreeTestRootEntityExt),
+                    typeof (TreeTestOne2ManyEntityExt),
+                    new[] {new RelationColumnMapping("IdCol", "idCol")}));
+
+                fields.Add(new DefaultRelation("One2OneEntity",
+                    "fk_root2one2oneent",
+                    typeof(TreeTestRootEntityExt),
+                    typeof (TreeTestOne2OneEntityExt),
+                    new[] {new RelationColumnMapping("IdCol", "idCol")}));
             }
             else if (type == typeof (TreeTestOne2ManyEntityExt))
             {

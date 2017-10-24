@@ -9,7 +9,7 @@ namespace DbGate.Persist
     [TestFixture]
     public class DbGateInheritancePersistTests : AbstractDbGateTestBase
     {
-        public const int TYPE_ANNOTATION = 1;
+        public const int TYPE_ATTRIBUTE = 1;
         public const int TYPE_FIELD = 2;
         public const int TYPE_EXTERNAL = 3;
 
@@ -107,7 +107,7 @@ namespace DbGate.Persist
         {
             try
             {
-                var types = new[] {TYPE_ANNOTATION, TYPE_EXTERNAL, TYPE_FIELD};
+                var types = new[] {TYPE_ATTRIBUTE, TYPE_EXTERNAL, TYPE_FIELD};
                 var idAs = new[] {35, 45, 55};
                 var idBs = new[] {36, 46, 56};
 
@@ -121,9 +121,9 @@ namespace DbGate.Persist
 
                     switch (type)
                     {
-                        case TYPE_ANNOTATION:
+                        case TYPE_ATTRIBUTE:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
-                                "Inheritance_Insert_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With annotations");
+                                "Inheritance_Insert_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With attributes");
                             break;
                         case TYPE_EXTERNAL:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
@@ -176,7 +176,7 @@ namespace DbGate.Persist
         {
             try
             {
-                var types = new[] {TYPE_ANNOTATION, TYPE_EXTERNAL, TYPE_FIELD};
+                var types = new[] {TYPE_ATTRIBUTE, TYPE_EXTERNAL, TYPE_FIELD};
                 var idAs = new[] {35, 45, 55};
                 var idBs = new[] {36, 46, 56};
 
@@ -190,9 +190,9 @@ namespace DbGate.Persist
 
                     switch (type)
                     {
-                        case TYPE_ANNOTATION:
+                        case TYPE_ATTRIBUTE:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
-                                "Inheritance_Update_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With annotations");
+                                "Inheritance_Update_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With attributes");
                             break;
                         case TYPE_EXTERNAL:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
@@ -263,7 +263,7 @@ namespace DbGate.Persist
         {
             try
             {
-                var types = new[] {TYPE_ANNOTATION, TYPE_EXTERNAL, TYPE_FIELD};
+                var types = new[] {TYPE_ATTRIBUTE, TYPE_EXTERNAL, TYPE_FIELD};
                 var idAs = new[] {35, 45, 55};
                 var idBs = new[] {36, 46, 56};
 
@@ -277,9 +277,9 @@ namespace DbGate.Persist
 
                     switch (type)
                     {
-                        case TYPE_ANNOTATION:
+                        case TYPE_ATTRIBUTE:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
-                                "Inheritance_Delete_WithAllModesWithBothSubClasses_ShouldDelete With annotations");
+                                "Inheritance_Delete_WithAllModesWithBothSubClasses_ShouldDelete With attributes");
                             break;
                         case TYPE_EXTERNAL:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
@@ -459,8 +459,8 @@ namespace DbGate.Persist
         private IInheritanceTestSubEntityA CreateObjectWithDataTypeA(int id, int type)
         {
             IInheritanceTestSubEntityA entity = null;
-            entity = (type == TYPE_ANNOTATION)
-                         ? new InheritanceTestSubEntityAAnnotations()
+            entity = (type == TYPE_ATTRIBUTE)
+                         ? new InheritanceTestSubEntityAAttribute()
                          : (type == TYPE_FIELD)
                                ? (IInheritanceTestSubEntityA) new InheritanceTestSubEntityAFields()
                                : new InheritanceTestSubEntityAExt();
@@ -474,8 +474,8 @@ namespace DbGate.Persist
         private IInheritanceTestSubEntityB CreateObjectWithDataTypeB(int id, int type)
         {
             IInheritanceTestSubEntityB entity = null;
-            entity = (type == TYPE_ANNOTATION)
-                         ? new InheritanceTestSubEntityBAnnotations()
+            entity = (type == TYPE_ATTRIBUTE)
+                         ? new InheritanceTestSubEntityBAttributes()
                          : (type == TYPE_FIELD)
                                ? (IInheritanceTestSubEntityB) new InheritanceTestSubEntityBFields()
                                : new InheritanceTestSubEntityBExt();
@@ -489,8 +489,8 @@ namespace DbGate.Persist
         private IInheritanceTestSubEntityA CreateObjectEmptyTypeA(int type)
         {
             IInheritanceTestSubEntityA entity = null;
-            entity = (type == TYPE_ANNOTATION)
-                         ? new InheritanceTestSubEntityAAnnotations()
+            entity = (type == TYPE_ATTRIBUTE)
+                         ? new InheritanceTestSubEntityAAttribute()
                          : (type == TYPE_FIELD)
                                ? (IInheritanceTestSubEntityA) new InheritanceTestSubEntityAFields()
                                : new InheritanceTestSubEntityAExt();
@@ -500,8 +500,8 @@ namespace DbGate.Persist
         private IInheritanceTestSubEntityB CreateObjectEmptyTypeB(int type)
         {
             IInheritanceTestSubEntityB entity = null;
-            entity = (type == TYPE_ANNOTATION)
-                         ? new InheritanceTestSubEntityBAnnotations()
+            entity = (type == TYPE_ATTRIBUTE)
+                         ? new InheritanceTestSubEntityBAttributes()
                          : (type == TYPE_FIELD)
                                ? (IInheritanceTestSubEntityB) new InheritanceTestSubEntityBFields()
                                : new InheritanceTestSubEntityBExt();

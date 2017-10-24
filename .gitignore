@@ -1,3 +1,4 @@
 **/bin/**/*.*
 **/obj/**/*.*
 DbGateTestApp/wikigen/*.*
+DbGateTestApp/logs/*

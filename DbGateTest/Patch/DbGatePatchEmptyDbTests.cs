@@ -94,9 +94,13 @@ namespace DbGate.Patch
 
             int id = 38;
             RootEntity entity = CreateRootEntityWithoutNullValues(id);
-            entity.LeafEntities.Add(CreateLeafEntityA(id + 1, 1));
-            entity.LeafEntities.Add(CreateLeafEntityB(id, 1));
-            Assert.Throws<PersistException>(() => entity.Persist(transaction));
+            entity.Persist(transaction);
+
+            var leafEntityA = CreateLeafEntityA(id, 1);
+            leafEntityA.Persist(transaction);
+
+            var leafEntityB = CreateLeafEntityA(id + 1, 1);
+            Assert.Throws<PersistException>(() => leafEntityB.Persist(transaction));
 
             transaction.Commit();
             transaction.Close();

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using DbGate.Caches;
 using DbGate.Caches.Impl;
 using DbGate.ErManagement.DbAbstractionLayer;
@@ -135,6 +136,21 @@ namespace DbGate.ErManagement.ErMapper
                         || relation.NonIdentifyingRelation)
                     {
                         filteredRelations.Add(relation);
+                    }
+                }
+
+                var oneSideReverse = CacheManager.GetReversedRelationships(subType);
+                foreach (var relation in oneSideReverse)
+                {
+                    if (filteredRelations.All(r => r.RelationShipName != relation.RelationShipName))
+                    {
+                        var reversed = relation.Clone();
+                        reversed.RelatedObjectType = relation.SourceObjectType;
+
+                        var orgMappings = reversed.TableColumnMappings.ToList();
+                        reversed.TableColumnMappings = orgMappings
+                            .Select(m => new RelationColumnMapping(m.ToField, m.FromField)).ToList();
+                        filteredRelations.Add(reversed);
                     }
                 }
                 

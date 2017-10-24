@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Data.SqlClient;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Mappings;
@@ -66,8 +65,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
             {
                 if (tx.Connection is SqlConnection)
                 {
-                    SqlConnection oleDbConnection = (SqlConnection) tx.Connection;
-                    DataTable typeTable = oleDbConnection.GetSchema();
+                    SqlConnection sqlConnection = (SqlConnection) tx.Connection;
+                    DataTable typeTable = sqlConnection.GetSchema();
                     if (typeTable == null)
                     {
                         Logger.GetLogger(Config.LoggerName).Fatal("Unable to read the list of types");                        

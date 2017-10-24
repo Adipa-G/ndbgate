@@ -26,18 +26,29 @@ namespace DbGate.Persist.Support.FeatureIntegration.Order
         [ColumnInfo(ColumnType.Integer)]
         public int ItemId { get; set; }
 
-        [ForeignKeyInfo("item_tx2item", typeof (Item), new[] {"itemId"}, new[] {"itemId"}
-            , NonIdentifyingRelation = true, UpdateRule = ReferentialRuleType.Restrict,
+        [ForeignKeyInfo("item_tx2item",
+            typeof (Item),
+            new[] {"itemId"},
+            new[] {"itemId"},
+            NonIdentifyingRelation = true,
+            UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public Item Item { get; set; }
 
-        [ForeignKeyInfo("item_tx2tx_rev", typeof (Transaction), new[] {"transactionId"}, new[] {"transactionId"}
-            , ReverseRelation = true, UpdateRule = ReferentialRuleType.Restrict,
+        [ForeignKeyInfo("item_tx2tx_rev",
+            typeof (Transaction),
+            new[] {"transactionId"},
+            new[] {"transactionId"},
+            ReverseRelation = true,
+            UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public Transaction Transaction { get; set; }
 
-        [ForeignKeyInfo("item_tx2tx_chg", typeof (ItemTransactionCharge), new[] {"transactionId", "indexNo"},
-            new[] {"transactionId", "indexNo"}, UpdateRule = ReferentialRuleType.Restrict,
+        [ForeignKeyInfo("item_tx2tx_chg",
+            typeof (ItemTransactionCharge),
+            new[] {"transactionId", "indexNo"},
+            new[] {"transactionId", "indexNo"},
+            UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public ICollection<ItemTransactionCharge> ItemTransactionCharges { get; set; }
     }

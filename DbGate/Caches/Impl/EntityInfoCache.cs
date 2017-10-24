@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using DbGate.ErManagement.ErMapper.Utils;
 using DbGate.Exceptions;
@@ -38,6 +39,19 @@ namespace DbGate.Caches.Impl
                 Logger.GetLogger(_config.LoggerName).Fatal(ex.Message, ex);
             }
             return Cache[entityType];
+        }
+        
+        public IList<IRelation> GetReversedRelationships(Type entityType)
+        {
+            Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(entityType,
+                new Type[]
+                    {typeof (IReadOnlyEntity)});
+
+            return Cache.SelectMany(c => c.Value.Relations)
+                .Where(r => !r.ReverseRelationship &&
+                    !r.NonIdentifyingRelation &&
+                    typeList.Contains(r.RelatedObjectType))
+                .Select(r => r).ToList();
         }
 
         public void Register(Type type, ITable table, ICollection<IField> fields)
@@ -131,13 +145,13 @@ namespace DbGate.Caches.Impl
             ITable table = GetTableInfoIfManagedClass(regType, subType);
             if (table == null)
             {
-                object[] annotations = regType.GetCustomAttributes(false);
-                foreach (object annotation in annotations)
+                object[] attributes = regType.GetCustomAttributes(false);
+                foreach (object attribute in attributes)
                 {
-                    if (annotation is TableInfo)
+                    if (attribute is TableInfo)
                     {
-                        var tableInfo = (TableInfo) annotation;
-                        TableInfo annotatedTableInfo = (TableInfo) annotation;
+                        var tableInfo = (TableInfo) attribute;
+                        TableInfo annotatedTableInfo = (TableInfo) attribute;
                         table = new DefaultTable(annotatedTableInfo.TableName
                             ,annotatedTableInfo.UpdateStrategy
                             ,annotatedTableInfo.VerifyOnWriteStrategy
@@ -270,12 +284,12 @@ namespace DbGate.Caches.Impl
                     continue;
                 }
 
-                object[] annotations = propertyInfo.GetCustomAttributes(false);
-                foreach (object annotation in annotations)
+                object[] attributes = propertyInfo.GetCustomAttributes(false);
+                foreach (object attribute in attributes)
                 {
-                    if (annotation is ColumnInfo)
+                    if (attribute is ColumnInfo)
                     {
-                        var dbColumnInfo = (ColumnInfo) annotation;
+                        var dbColumnInfo = (ColumnInfo) attribute;
                         if (superClass && !dbColumnInfo.SubClassCommonColumn)
                         {
                             continue;
@@ -289,10 +303,14 @@ namespace DbGate.Caches.Impl
                         {
                             continue;
                         }
-                        if (annotation is ForeignKeyInfo)
+                        if (attribute is ForeignKeyInfo)
                         {
-                            var foreignKeyInfo = (ForeignKeyInfo) annotation;
-                            IRelation relation = CreateForeignKeyMapping(propertyInfo, foreignKeyInfo);
+                            var foreignKeyInfo = (ForeignKeyInfo) attribute;
+
+                            var relation = CreateForeignKeyMapping(entityType,
+                                propertyInfo,
+                                foreignKeyInfo);
+
                             fields.Add(relation);
                         }
                     }
@@ -329,15 +347,23 @@ namespace DbGate.Caches.Impl
             return column;
         }
 
-        private static IRelation CreateForeignKeyMapping(PropertyInfo propertyInfo, ForeignKeyInfo foreignKeyInfo)
+        private static IRelation CreateForeignKeyMapping(Type entityType,
+            PropertyInfo propertyInfo,
+            ForeignKeyInfo foreignKeyInfo)
         {
             var objectMappings = CreateForeignKeyColumnMappings(foreignKeyInfo);
 
-            IRelation relation = new DefaultRelation(propertyInfo.Name, foreignKeyInfo.Name
-                , foreignKeyInfo.RelatedOjectType, objectMappings
-                , foreignKeyInfo.UpdateRule, foreignKeyInfo.DeleteRule
-                , foreignKeyInfo.ReverseRelation
-                , foreignKeyInfo.NonIdentifyingRelation, foreignKeyInfo.FetchStrategy, foreignKeyInfo.Nullable);
+            IRelation relation = new DefaultRelation(propertyInfo.Name,
+                foreignKeyInfo.Name,
+                entityType,
+                foreignKeyInfo.RelatedOjectType,
+                objectMappings,
+                foreignKeyInfo.UpdateRule,
+                foreignKeyInfo.DeleteRule,
+                foreignKeyInfo.ReverseRelation,
+                foreignKeyInfo.NonIdentifyingRelation,
+                foreignKeyInfo.FetchStrategy,
+                foreignKeyInfo.Nullable);
 
             return relation;
         }

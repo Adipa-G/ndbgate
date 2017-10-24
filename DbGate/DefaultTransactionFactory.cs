@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Data.SQLite;
 using DbGate.ErManagement.ErMapper;
 using DbGate.Exceptions.Common;
 using log4net;
@@ -20,16 +19,18 @@ namespace DbGate
         public const int DbSqllite = 4;
         public const int DbDerby = 5;
         public const int DbMysql = 6;
+        public const int DbSqlServer = 7;
 
         private readonly IDbGate _dbGate;
         private readonly int _dbType;
-        private readonly string _connectionString;
+        private readonly Func<IDbConnection> _connectionFactory;
 
-        public DefaultTransactionFactory(String connectionString, int dbType)
+        public DefaultTransactionFactory(Func<IDbConnection> connectionFactory,
+            int dbType)
         {
-            _connectionString = connectionString;
             _dbType = dbType;
             _dbGate = new ErManagement.ErMapper.DbGate(_dbType);
+            _connectionFactory = connectionFactory;
         }
 
         public ITransaction CreateTransaction()
@@ -38,24 +39,13 @@ namespace DbGate
             IDbTransaction tx = null;
             try
             {
-                if (_dbType == DbSqllite)
-                {
-                    //for windows
-                    conn = new SQLiteConnection(_connectionString);
-                    //for linux
-                    //conn = new SqliteConnection(_connectionString);
-                }
-                else
-                {
-                    conn = new SqlConnection(_connectionString);
-                }
+                conn = _connectionFactory.Invoke();
                 conn.Open();
                 tx = conn.BeginTransaction();
             }
             catch (Exception ex)
             {
-                throw new TransactionCreationFailedException(
-                    String.Format("Failed to create a transaction for connection string {0}", _connectionString), ex);
+                throw new TransactionCreationFailedException("Failed to create a transaction ", ex);
             }
             return new Transaction(this,tx);
         }
