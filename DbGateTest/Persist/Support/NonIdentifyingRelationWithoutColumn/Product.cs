@@ -13,9 +13,14 @@ namespace DbGate.Persist.Support.NonIdentifyingRelationWithoutColumn
         [ColumnInfo(ColumnType.Double)]
         public virtual double Price { get; set; }
 
-        [ForeignKeyInfo("product2currency", typeof(Currency), new[] { "productCurrencyId" }
-            , new[] {"CurrencyId"}, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade,
-            NonIdentifyingRelation = true,Nullable = true)]
+        [ForeignKeyInfo("product2currency",
+            typeof(Currency),
+            new[] { "productCurrencyId" },
+            new[] {"CurrencyId"},
+            UpdateRule = ReferentialRuleType.Restrict,
+            DeleteRule = ReferentialRuleType.Cascade,
+            NonIdentifyingRelation = true,
+            Nullable = true)]
         public virtual Currency Currency { get; set; }
     }
 }

@@ -16,12 +16,20 @@ namespace DbGate.Persist.Support.Constraint
         [ColumnInfo(ColumnType.Varchar)]
         public string Name { get; set; }
 
-        [ForeignKeyInfo("fk_root2one2manyent", typeof (ConstraintTestOne2ManyEntity), new[] {"idCol"}
-            , new[] {"idCol"}, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+        [ForeignKeyInfo("fk_root2one2manyent",
+            typeof (ConstraintTestOne2ManyEntity), 
+            new[] {"idCol"},
+            new[] {"idCol"},
+            UpdateRule = ReferentialRuleType.Restrict, 
+            DeleteRule = ReferentialRuleType.Cascade)]
         public ICollection<ConstraintTestOne2ManyEntity> One2ManyEntities { get; set; }
 
-        [ForeignKeyInfo("fk_root2one2oneent", typeof (ConstraintTestOne2OneEntity), new[] {"idCol"}
-            , new[] {"idCol"}, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+        [ForeignKeyInfo("fk_root2one2oneent",
+            typeof (ConstraintTestOne2OneEntity),
+            new[] {"idCol"},
+            new[] {"idCol"},
+            UpdateRule = ReferentialRuleType.Restrict,
+            DeleteRule = ReferentialRuleType.Cascade)]
         public ConstraintTestOne2OneEntity One2OneEntity { get; set; }
     }
 }

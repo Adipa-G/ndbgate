@@ -32,7 +32,8 @@ namespace DbGate.Patch.Support.PatchEmpty
 
         [ForeignKeyInfo("fk_root2leaf",
             typeof (LeafEntity),
-            new[] {"idcol"}, new[] {"idcol"})]
+            new[] {"idcol"}, 
+            new[] {"idcol"})]
         public ICollection<LeafEntity> LeafEntities { get; set; }
 
         public override Dictionary<Type, ITable> TableInfo

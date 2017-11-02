@@ -132,8 +132,7 @@ namespace DbGate.ErManagement.ErMapper
 
                 foreach (IRelation relation in dbRelations)
                 {
-                    if (relation.ReverseRelationship
-                        || relation.NonIdentifyingRelation)
+                    if (relation.NonIdentifyingRelation)
                     {
                         filteredRelations.Add(relation);
                     }

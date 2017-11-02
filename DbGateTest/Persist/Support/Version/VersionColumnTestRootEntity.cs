@@ -19,12 +19,20 @@ namespace DbGate.Persist.Support.Version
         [ColumnInfo(ColumnType.Varchar)]
         public string Name { get; set; }
 
-        [ForeignKeyInfo("fk_root2one2manyent", typeof (VersionColumnTestOne2ManyEntity), new[] {"idCol"}
-            , new[] {"idCol"}, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+        [ForeignKeyInfo("fk_root2one2manyent",
+            typeof (VersionColumnTestOne2ManyEntity),
+            new[] {"idCol"},
+            new[] {"idCol"},
+            UpdateRule = ReferentialRuleType.Restrict,
+            DeleteRule = ReferentialRuleType.Cascade)]
         public ICollection<VersionColumnTestOne2ManyEntity> One2ManyEntities { get; set; }
 
-        [ForeignKeyInfo("fk_root2one2oneent", typeof (VersionColumnTestOne2OneEntity), new[] {"idCol"}
-            , new[] {"idCol"}, UpdateRule = ReferentialRuleType.Restrict, DeleteRule = ReferentialRuleType.Cascade)]
+        [ForeignKeyInfo("fk_root2one2oneent",
+            typeof (VersionColumnTestOne2OneEntity),
+            new[] {"idCol"},
+            new[] {"idCol"},
+            UpdateRule = ReferentialRuleType.Restrict,
+            DeleteRule = ReferentialRuleType.Cascade)]
         public VersionColumnTestOne2OneEntity One2OneEntity { get; set; }
     }
 }

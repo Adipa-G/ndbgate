@@ -125,7 +125,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
 
             try
             {
-                var dbConnection = (DbConnection) tx;
+                var dbConnection = (DbConnection) tx.Connection;
                 DataTable fkTable = dbConnection.GetSchema("Foreign_Keys", new[] {null, null, table.Name, null});
                 if (fkTable == null)
                 {
@@ -409,7 +409,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
 
             var sb = new StringBuilder();
             sb.Append("ALTER TABLE ");
-            sb.Append(metaForeignKey.ToTable);
+            sb.Append(requiredTable.Name);
             sb.Append(" ADD CONSTRAINT ");
             sb.Append(metaForeignKey.Name);
             sb.Append(" FOREIGN KEY ");
@@ -426,13 +426,13 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
                 {
                     sb.Append(" , ");
                 }
-                sb.Append(mapping.ToColumn);
+                sb.Append(mapping.FromColumn);
                 i++;
             }
             sb.Append(" ) ");
 
             sb.Append(" REFERENCES ");
-            sb.Append(requiredTable.Name);
+            sb.Append(metaForeignKey.ToTable);
 
             sb.Append(" ( ");
             enumerator = metaForeignKey.ColumnMappings.GetEnumerator();
@@ -445,7 +445,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
                 {
                     sb.Append(" , ");
                 }
-                sb.Append(mapping.FromColumn);
+                sb.Append(mapping.ToColumn);
                 i++;
             }
             sb.Append(" ) ");

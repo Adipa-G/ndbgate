@@ -9,8 +9,10 @@ namespace DbGate.Query.Support.BasicTest
         [ColumnInfo(ColumnType.Varchar)]
         public string Name { get; set; }
 
-        [ForeignKeyInfo("fk_basic2join", typeof (QueryBasicJoinEntity), new[] {"IdCol", "Name"}, new[] {"IdCol", "Name"}
-            )]
+        [ForeignKeyInfo("fk_basic2join",
+            typeof (QueryBasicJoinEntity),
+            new[] {"IdCol", "Name"},
+            new[] {"IdCol", "Name"})]
         public QueryBasicJoinEntity JoinEntity { get; set; }
     }
 }

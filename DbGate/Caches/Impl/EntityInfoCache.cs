@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -11,7 +12,7 @@ namespace DbGate.Caches.Impl
 {
     public class EntityInfoCache : IEntityInfoCache
     {
-        private static readonly Dictionary<Type, EntityInfo> Cache = new Dictionary<Type, EntityInfo>();
+        private static readonly ConcurrentDictionary<Type, EntityInfo> Cache = new ConcurrentDictionary<Type, EntityInfo>();
         private IDbGateConfig _config;
 
         public EntityInfoCache(IDbGateConfig config)
@@ -31,7 +32,13 @@ namespace DbGate.Caches.Impl
             {
                 if (!Cache.ContainsKey(entityType))
                 {
-                    Register(entityType);
+                    lock (Cache)
+                    {
+                        if (!Cache.ContainsKey(entityType))
+                        {
+                            Register(entityType);
+                        }
+                    }
                 }
             }
             catch (Exception ex)
@@ -73,10 +80,7 @@ namespace DbGate.Caches.Impl
                 immediateSuperEntityInfo.AddSubEntityInfo(subEntityInfo);
             }
 
-            lock (Cache)
-            {
-                Cache.Add(type, subEntityInfo);
-            }
+            Cache.TryAdd(type, subEntityInfo);
         }
 
         public void Register(Type entityType)
@@ -86,12 +90,9 @@ namespace DbGate.Caches.Impl
                 return;
             }
             var extracted = ExtractTableAndFieldInfo(entityType);
-            lock (Cache)
+            foreach (Type regType in extracted.Keys)
             {
-                foreach (Type regType in extracted.Keys)
-                {
-                    Cache.Add(regType, extracted[regType]);
-                }
+                Cache.TryAdd(regType, extracted[regType]);
             }
         }
 

@@ -12,9 +12,13 @@ namespace DbGate.Persist.Support.CrossReference
         [ColumnInfo((ColumnType.Varchar))]
         public string Name { get; set; }
 
-        [ForeignKeyInfo("fk_one2oneent2root", typeof (CrossReferenceTestRootEntity), new[] {"idCol"}
-            , new[] {"idCol"}, ReverseRelation = true, UpdateRule = ReferentialRuleType.Restrict
-            , DeleteRule = ReferentialRuleType.Cascade)]
+        [ForeignKeyInfo("fk_one2oneent2root",
+            typeof (CrossReferenceTestRootEntity),
+            new[] {"idCol"},
+            new[] {"idCol"},
+            ReverseRelation = true,
+            UpdateRule = ReferentialRuleType.Restrict,
+            DeleteRule = ReferentialRuleType.Cascade)]
         public CrossReferenceTestRootEntity RootEntity { get; set; }
     }
 }

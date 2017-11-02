@@ -12,6 +12,8 @@
                     return new MySqlDbLayer(config);
                 case DefaultTransactionFactory.DbSqllite:
                     return new SqlLiteDbLayer(config);
+                case DefaultTransactionFactory.DbSqlServer:
+                    return new SqlServerDbLayer(config);
                 default:
                     return new DefaultDbLayer(config);
             }

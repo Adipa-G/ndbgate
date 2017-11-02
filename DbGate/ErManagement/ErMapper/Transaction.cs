@@ -17,12 +17,14 @@ namespace DbGate.ErManagement.ErMapper
 	    private IDbGate _dbGate;
 	    private ITransactionFactory _factory;
 	    private IDbTransaction _transaction;
+        private IDbConnection _connection;
 	
 	    public Transaction(ITransactionFactory factory, IDbTransaction transaction)
 	    {
 	        this._transactionId = Guid.NewGuid();
 	        this._factory = factory;
 	        this._transaction = transaction;
+	        this._connection = transaction.Connection;
 	        this._dbGate = factory.DbGate;
 	    }
 	
@@ -38,7 +40,7 @@ namespace DbGate.ErManagement.ErMapper
 	
 	    public IDbConnection Connection
 	    {
-	         get { return _transaction.Connection; }
+	         get { return _connection; }
 	    }
 	
 	    public IDbGate DbGate
@@ -95,7 +97,8 @@ namespace DbGate.ErManagement.ErMapper
 	        try
 	        {
 	            _factory = null;
-	            Connection?.Close();
+	            _connection?.Close();
+	            _connection?.Dispose();
 	        }
 	        catch (Exception e)
 	        {
@@ -106,7 +109,7 @@ namespace DbGate.ErManagement.ErMapper
 
         public IDbCommand CreateCommand()
         {
-            var cmd = Connection.CreateCommand();
+            var cmd = _connection.CreateCommand();
             cmd.Transaction = _transaction;
             return cmd;
         }

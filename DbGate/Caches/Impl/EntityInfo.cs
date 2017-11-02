@@ -297,26 +297,35 @@ namespace DbGate.Caches.Impl
         public PropertyInfo GetProperty(string propertyName)
         {
             string cacheKey = "prop_" + propertyName;
+
             if (_propertyMap.ContainsKey(cacheKey))
             {
                 return _propertyMap[cacheKey];
             }
 
-            try
+            lock (_propertyMap)
             {
-                PropertyInfo propertyInfo = EntityType.GetProperty(propertyName);
-                if (propertyInfo == null)
-                    throw CreatePropertyNotFoundException(propertyName);
-
-                lock (_propertyMap)
+                if (_propertyMap.ContainsKey(cacheKey))
                 {
-                    _propertyMap.Add(cacheKey, propertyInfo);
+                    return _propertyMap[cacheKey];
                 }
-                return propertyInfo;
-            }
-            catch (Exception)
-            {
-                throw CreatePropertyNotFoundException(propertyName);
+
+                try
+                {
+                    PropertyInfo propertyInfo = EntityType.GetProperty(propertyName);
+                    if (propertyInfo == null)
+                        throw CreatePropertyNotFoundException(propertyName);
+
+                    lock (_propertyMap)
+                    {
+                        _propertyMap.Add(cacheKey, propertyInfo);
+                    }
+                    return propertyInfo;
+                }
+                catch (Exception)
+                {
+                    throw CreatePropertyNotFoundException(propertyName);
+                }
             }
         }
 

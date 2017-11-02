@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbGateTest", "DbGateTest\Db
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DbGateTestApp", "DbGateTestApp\DbGateTestApp.csproj", "{B7297670-930E-4C1D-B8C0-30B702A91E16}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerformanceTest", "PerformanceTest\PerformanceTest.csproj", "{60C5EC77-7C2E-4A5C-ADA0-6B88DABD6F38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{B7297670-930E-4C1D-B8C0-30B702A91E16}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7297670-930E-4C1D-B8C0-30B702A91E16}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7297670-930E-4C1D-B8C0-30B702A91E16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60C5EC77-7C2E-4A5C-ADA0-6B88DABD6F38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60C5EC77-7C2E-4A5C-ADA0-6B88DABD6F38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60C5EC77-7C2E-4A5C-ADA0-6B88DABD6F38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60C5EC77-7C2E-4A5C-ADA0-6B88DABD6F38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

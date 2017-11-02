@@ -17,11 +17,11 @@ using System.Linq;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 {
-    public class AbstractDataManipulate : IDataManipulate
+    public abstract class AbstractDataManipulate : IDataManipulate
     {
     	private IDbLayer _dbLayer;
     	
-        public AbstractDataManipulate(IDbLayer dbLayer)
+        protected AbstractDataManipulate(IDbLayer dbLayer)
         {
         	_dbLayer = dbLayer;
         	initialize();
@@ -37,6 +37,11 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 			QueryJoin.Factory = new AbstractJoinFactory();
 			QueryOrderBy.Factory = new AbstractOrderByFactory();
 	 	}
+
+        protected virtual string FixUpQuery(string query)
+        {
+            return query;
+        }
 
         #region IDataManipulate Members
 
@@ -68,7 +73,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
                 sb.Append("= ?");
             }
 
-            return sb.ToString();
+            return FixUpQuery(sb.ToString());
         }
 
         public string CreateInsertQuery(string tableName, ICollection<IColumn> dbColumns)
@@ -107,7 +112,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
             } 
             sb.Append(" )");
 
-            return sb.ToString();
+            return FixUpQuery(sb.ToString());
         }
 
         public string CreateUpdateQuery(string tableName, ICollection<IColumn> dbColumns)
@@ -155,7 +160,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
                 sb.Append("= ?");
             }
 
-            return sb.ToString();
+            return FixUpQuery(sb.ToString());
         }
 
         public string CreateDeleteQuery(string tableName, ICollection<IColumn> dbColumns)
@@ -186,7 +191,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
                 sb.Append("= ?");
             }
 
-            return sb.ToString();
+            return FixUpQuery(sb.ToString());
         }
 
         public string CreateRelatedObjectsLoadQuery(IRelation relation)
@@ -214,7 +219,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
                 i++;
             }
 
-            return sb.ToString();
+            return FixUpQuery(sb.ToString());
         }
 
         public virtual object ReadFromResultSet(IDataReader reader, IColumn column)
@@ -260,7 +265,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 			SetToPreparedStatement(cmd,obj,parameterIndex,column.Nullable,column.ColumnType);
         }
 
-		protected void SetToPreparedStatement (IDbCommand cmd, object obj, int parameterIndex, bool nullable, ColumnType columnType)
+		protected virtual void SetToPreparedStatement (IDbCommand cmd, object obj, int parameterIndex, bool nullable, ColumnType columnType)
 		{
 			var parameter = cmd.CreateParameter ();
 			parameter.Direction = ParameterDirection.Input;
