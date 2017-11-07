@@ -31,7 +31,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("FLOAT", ColumnType.Float, "0"));
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("CHAR", ColumnType.Char, "' '"));
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("DATE", ColumnType.Date, "1981/10/12"));
-            ColumnTypeMapItems.Add(new ColumnTypeMapItem("DECIMAL", ColumnType.Double, "0"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("FLOAT", ColumnType.Double, "0"));
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("BIGINT", ColumnType.Long, "0"));
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("TIMESTAMP", ColumnType.Timestamp, "1981/10/12"));
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("VARCHAR", ColumnType.Varchar, "''"));

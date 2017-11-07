@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using DbGate;
+using DbGate.ErManagement.Query;
 using log4net;
 using log4net.Core;
 using PerformanceTest.NDbGate.Entities.Order;
@@ -15,24 +18,25 @@ namespace PerformanceTest.NDbGate
 {
     public class NDbGatePerformanceCounter
     {
-        private int _perThread = 100;
-        private DefaultTransactionFactory _transactionFactory;
-        
-        public NDbGatePerformanceCounter()
+        private readonly int perThread;
+        private readonly DefaultTransactionFactory transactionFactory;
+
+        public NDbGatePerformanceCounter(string connectionString,int perThread)
         {
+            this.perThread = perThread;
+
             try
             {
-                if (_transactionFactory == null)
+                if (transactionFactory == null)
                 {
                     var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
                     log4net.Config.XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
                     LogManager.GetLogger(typeof(NDbGatePerformanceCounter)).Info("Connecting to sql server for performance testing");
-                    _transactionFactory = new DefaultTransactionFactory(() => new SqlConnection(
-                        "Data Source=localhost;Integrated Security=SSPI;Initial Catalog=DbGate"),
+                    transactionFactory = new DefaultTransactionFactory(() => new SqlConnection(connectionString),
                         DefaultTransactionFactory.DbSqlServer);
 
-                    var tx = _transactionFactory.CreateTransaction();
+                    var tx = transactionFactory.CreateTransaction();
 
                     ICollection<Type> entityTypes = new List<Type>();
                     entityTypes.Add(typeof(Product));
@@ -72,8 +76,23 @@ namespace PerformanceTest.NDbGate
 
         private void DoInThread(int seed)
         {
-            var items = new Factory().Generate(seed,_perThread, 10);
-            var tx = _transactionFactory.CreateTransaction();
+            var factory = new Factory();
+
+            var items = factory.Generate(seed, perThread, 10);
+            InsertTest(items);
+            //QueryTest(items);
+
+            factory.Update(items);
+            UpdateTest(items);
+            DeleteTest(items);
+        }
+
+        private void InsertTest(IList<IEntity> items)
+        {
+            var sw = new Stopwatch();
+            
+            sw.Start();
+            var tx = transactionFactory.CreateTransaction();
             for (int i = 0; i < items.Count; i++)
             {
                 items[i].Persist(tx);
@@ -81,11 +100,95 @@ namespace PerformanceTest.NDbGate
                 {
                     tx.Commit();
                     tx.Close();
-                    tx = _transactionFactory.CreateTransaction();
+                    tx = transactionFactory.CreateTransaction();
                 }
             }
             tx.Commit();
             tx.Close();
+            sw.Stop();
+
+            var speed = items.Count * 1000 / sw.ElapsedMilliseconds;
+
+            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(NDbGatePerformanceCounter))
+                .Log(typeof(NDbGatePerformanceCounter), Level.Warn, $"NDBGate Thread Insert speed  {speed} entities/second", null);
+        }
+
+        private void UpdateTest(IList<IEntity> items)
+        {
+            var sw = new Stopwatch();
+
+            sw.Start();
+            var tx = transactionFactory.CreateTransaction();
+            for (int i = 0; i < items.Count; i++)
+            {
+                items[i].Status = EntityStatus.Modified;
+                items[i].Persist(tx);
+                if (i % 100 == 0)
+                {
+                    tx.Commit();
+                    tx.Close();
+                    tx = transactionFactory.CreateTransaction();
+                }
+            }
+            tx.Commit();
+            tx.Close();
+            sw.Stop();
+
+            var speed = items.Count * 1000 / sw.ElapsedMilliseconds;
+
+            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(NDbGatePerformanceCounter))
+                .Log(typeof(NDbGatePerformanceCounter), Level.Warn, $"NDBGate Thread Update speed  {speed} entities/second", null);
+        }
+
+        private void QueryTest(IList<IEntity> items)
+        {
+            var sw = new Stopwatch();
+
+            sw.Start();
+            for (int i = 0; i < items.Count; i++)
+            {
+                var item = items[i];
+
+                var tx = transactionFactory.CreateTransaction();
+                var loaded = new SelectionQuery()
+                    .From(QueryFrom.EntityType(item.GetType()))
+                    .Select(QuerySelection.EntityType(item.GetType()))
+                    .ToList(tx).FirstOrDefault();
+                tx.Close();
+            }
+            sw.Stop();
+
+            var speed = items.Count * 1000 / sw.ElapsedMilliseconds;
+
+            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(NDbGatePerformanceCounter))
+                .Log(typeof(NDbGatePerformanceCounter), Level.Warn, $"NDBGate Thread Update speed  {speed} entities/second", null);
+        }
+
+        private void DeleteTest(IList<IEntity> items)
+        {
+            var sw = new Stopwatch();
+
+            sw.Start();
+            var tx = transactionFactory.CreateTransaction();
+            for (int i = 0; i < items.Count; i++)
+            {
+                items[i].Status = EntityStatus.Deleted;
+                items[i].Persist(tx);
+                if (i % 100 == 0 || (i > 0 && items[i].GetType() != items[i -1].GetType()))
+                {
+                    tx.Commit();
+                    tx.Close();
+                    tx = transactionFactory.CreateTransaction();
+                }
+            }
+            tx.Commit();
+            tx.Close();
+            sw.Stop();
+
+            var speed = items.Count * 1000 / sw.ElapsedMilliseconds;
+
+            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(NDbGatePerformanceCounter))
+                .Log(typeof(NDbGatePerformanceCounter), Level.Warn, $"NDBGate Thread Delete speed  {speed} entities/second", null);
         }
     }
 }

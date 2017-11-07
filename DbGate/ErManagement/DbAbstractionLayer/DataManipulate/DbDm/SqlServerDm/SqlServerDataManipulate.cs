@@ -14,7 +14,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.DbDm.SqlServerDm
         protected override string FixUpQuery(string query)
         {
             var sb = new StringBuilder();
-            var tokens = query.Split(new []{'?'},StringSplitOptions.RemoveEmptyEntries);
+            var tokens = query.Split('?');
 
             for (var i = 0; i < tokens.Length; i++)
             {
