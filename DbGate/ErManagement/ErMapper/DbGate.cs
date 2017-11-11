@@ -27,6 +27,7 @@ namespace DbGate.ErManagement.ErMapper
             CacheManager.Init(_config);
             _persistRetrievalLayer = new PersistRetrievalLayer(dbLayer, _statistics, _config);
             _dataMigrationLayer = new DataMigrationLayer(dbLayer, _statistics, _config);
+            dbLayer.DataManipulate();
         }
 
         #region IDbGate Members

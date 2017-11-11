@@ -24,10 +24,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
         protected AbstractDataManipulate(IDbLayer dbLayer)
         {
         	_dbLayer = dbLayer;
-        	initialize();
+        	Initialize();
 		}
 	
-		protected void initialize()
+		protected void Initialize()
 		{
 			QuerySelection.Factory = new AbstractSelectionFactory();
 			QueryFrom.Factory = new AbstractFromFactory();
@@ -287,7 +287,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 
             foreach (QueryExecParam param in sortedParams)
             {
-				SetToPreparedStatement(cmd,param.Value,param.Index,param.Value == null,param.Type);
+				SetToPreparedStatement(cmd,param.Value,param.Index + 1,param.Value == null,param.Type);
             }
             return cmd.ExecuteReader();
         }
@@ -308,7 +308,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 			AddPagingClause(sb,buildInfo,structure);
             ProcessSelection(sb, buildInfo, structure);
 
-            buildInfo.ExecInfo.Sql = sb.ToString();
+            buildInfo.ExecInfo.Sql = FixUpQuery(sb.ToString());
             return buildInfo;
         }
 

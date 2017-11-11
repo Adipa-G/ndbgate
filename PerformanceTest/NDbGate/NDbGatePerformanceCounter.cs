@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading;
 using DbGate;
 using DbGate.ErManagement.Query;
+using DbGate.ErManagement.Query.Expr;
 using log4net;
 using log4net.Core;
 using PerformanceTest.NDbGate.Entities.Order;
@@ -79,11 +80,14 @@ namespace PerformanceTest.NDbGate
             var factory = new Factory();
 
             var items = factory.Generate(seed, perThread, 10);
+
             InsertTest(items);
-            //QueryTest(items);
+
+            items = QueryTest(items);
 
             factory.Update(items);
             UpdateTest(items);
+
             DeleteTest(items);
         }
 
@@ -140,28 +144,64 @@ namespace PerformanceTest.NDbGate
                 .Log(typeof(NDbGatePerformanceCounter), Level.Warn, $"NDBGate Thread Update speed  {speed} entities/second", null);
         }
 
-        private void QueryTest(IList<IEntity> items)
+        private IList<IEntity> QueryTest(IList<IEntity> items)
         {
-            var sw = new Stopwatch();
+            var newList = new List<IEntity>();
 
+            var sw = new Stopwatch();
             sw.Start();
+            var tx = transactionFactory.CreateTransaction();
             for (int i = 0; i < items.Count; i++)
             {
                 var item = items[i];
+                var itemType = item.GetType();
 
-                var tx = transactionFactory.CreateTransaction();
-                var loaded = new SelectionQuery()
-                    .From(QueryFrom.EntityType(item.GetType()))
-                    .Select(QuerySelection.EntityType(item.GetType()))
-                    .ToList(tx).FirstOrDefault();
-                tx.Close();
+                if (itemType == typeof(Transaction))
+                {
+                    var trns = (Transaction)item;
+                    var loaded = new SelectionQuery()
+                        .From(QueryFrom.EntityType(item.GetType()))
+                        .Select(QuerySelection.EntityType(item.GetType()))
+                        .Where(QueryCondition.Expression(ConditionExpr.Build().Field(itemType, "TransactionId").Eq().Value(trns.TransactionId)))
+                        .ToList(tx).FirstOrDefault();
+                    newList.Add((IEntity)loaded);
+                }
+                else if (itemType == typeof(Service))
+                {
+                    var svc = (Service)item;
+                    var loaded = new SelectionQuery()
+                        .From(QueryFrom.EntityType(item.GetType()))
+                        .Select(QuerySelection.EntityType(item.GetType()))
+                        .Where(QueryCondition.Expression(ConditionExpr.Build().Field(itemType, "ItemId").Eq().Value(svc.ItemId)))
+                        .ToList(tx).FirstOrDefault();
+                    newList.Add((IEntity)loaded);
+                }
+                else if (itemType == typeof(Product))
+                {
+                    var product = (Product)item;
+                    var loaded = new SelectionQuery()
+                        .From(QueryFrom.EntityType(item.GetType()))
+                        .Select(QuerySelection.EntityType(item.GetType()))
+                        .Where(QueryCondition.Expression(ConditionExpr.Build().Field(itemType, "ItemId").Eq().Value(product.ItemId)))
+                        .ToList(tx).FirstOrDefault();
+                    newList.Add((IEntity)loaded);
+                }
+               
+                if (i % 100 == 0)
+                {
+                    tx.Close();
+                    tx = transactionFactory.CreateTransaction();
+                }
             }
+            tx.Commit();
+            tx.Close();
             sw.Stop();
 
             var speed = items.Count * 1000 / sw.ElapsedMilliseconds;
 
             LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(NDbGatePerformanceCounter))
-                .Log(typeof(NDbGatePerformanceCounter), Level.Warn, $"NDBGate Thread Update speed  {speed} entities/second", null);
+                .Log(typeof(NDbGatePerformanceCounter), Level.Warn, $"NDBGate Thread Query speed  {speed} entities/second", null);
+            return newList;
         }
 
         private void DeleteTest(IList<IEntity> items)

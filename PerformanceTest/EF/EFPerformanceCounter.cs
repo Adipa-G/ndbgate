@@ -64,7 +64,11 @@ namespace PerformanceTest.EF
             var items = factory.Generate(seed, perThread, 10);
 
             InsertTest(items);
+
+            items = QueryTest(items);
+
             items = UpdateTest(items);
+
             DeleteTest(items);
         }
 
@@ -89,7 +93,7 @@ namespace PerformanceTest.EF
 
                 ctx.Set(item.GetType()).Add(item);
 
-                if (i % 100 == 0 || (i > 0 && items[i].GetType() != items[i - 1].GetType()))
+                if (i % 100 == 0 || (i < items.Count - 1 && items[i].GetType() != items[i + 1].GetType()))
                 {
                     ctx.SaveChanges();
                     ctx.Dispose();
@@ -107,6 +111,56 @@ namespace PerformanceTest.EF
                 .Log(typeof(EFPerformanceCounter), Level.Warn, $"EF Thread Insert speed  {speed} entities/second", null);
         }
 
+        private IList<object> QueryTest(IList<object> items)
+        {
+            var newList = new List<object>();
+            var sw = new Stopwatch();
+
+            sw.Start();
+            var ctx = new TestDbContext(connectionString);
+            for (int i = 0; i < items.Count; i++)
+            {
+                var item = items[i];
+                var itemType = item.GetType();
+
+                if (itemType == typeof(Transaction))
+                {
+                    var tx = (Transaction)item;
+                    var loaded = ctx.Set<Transaction>()
+                        .Include(r => r.ItemTransactions.Select(itx => itx.ItemTransactionCharges))
+                        .Single(t => t.TransactionId == tx.TransactionId);
+                    newList.Add(loaded);
+                }
+                else if (itemType == typeof(Service))
+                {
+                    var svc = (Service)item;
+                    var loaded = ctx.Set<Service>().Single(t => t.ItemId == svc.ItemId);
+                    newList.Add(loaded);
+                }
+                else if (itemType == typeof(Product))
+                {
+                    var product = (Product)item;
+                    var loaded = ctx.Set<Product>().Single(t => t.ItemId == product.ItemId);
+                    newList.Add(loaded);
+                }
+
+                if (i % 100 == 0)
+                {
+                    ctx.Dispose();
+                    ctx = new TestDbContext(connectionString);
+                }
+            }
+            ctx.SaveChanges();
+            ctx.Dispose();
+            sw.Stop();
+
+            var speed = items.Count * 1000 / sw.ElapsedMilliseconds;
+
+            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(EFPerformanceCounter))
+                .Log(typeof(EFPerformanceCounter), Level.Warn, $"EF Thread Query speed  {speed} entities/second", null);
+            return newList;
+        }
+
         private IList<object> UpdateTest(IList<object> items)
         {
             var newList = new List<object>();
@@ -117,8 +171,8 @@ namespace PerformanceTest.EF
             for (int i = 0; i < items.Count; i++)
             {
                 var item = items[i];
-
                 var itemType = item.GetType();
+
                 if (itemType == typeof(Transaction))
                 {
                     var tx = (Transaction)item;
