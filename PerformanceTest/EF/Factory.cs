@@ -16,8 +16,8 @@ namespace PerformanceTest.EF
             var productIds = new List<int>();
             var serviceIds = new List<int>();
 
-            var productOrCount = txCount * productsOrServicesPerTx;
-            for (int i = 0; i < productOrCount; i++)
+            var productOrServiceCount = txCount * productsOrServicesPerTx;
+            for (int i = 0; i < productOrServiceCount; i++)
             {
                 var product = new Product();
                 product.ItemId = seed + 2 * i;
@@ -29,7 +29,7 @@ namespace PerformanceTest.EF
                 list.Add(product);
             }
 
-            for (int i = 0; i < productOrCount; i++)
+            for (int i = 0; i < productOrServiceCount; i++)
             {
                 var service = new Service();
                 service.ItemId = seed + 2 * i + 1;
