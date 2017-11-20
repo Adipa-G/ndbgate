@@ -6,7 +6,6 @@ NDbGate is a high performance ORM. The framework provides granular level control
 	
 	public abstract class Item
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ItemId { get; set; }
 
         public string Name { get; set; }
@@ -67,13 +66,17 @@ Inserting/ Quering/ Updating/ Deleting 5000 `Transaction` entities using EF (6.2
 
 #### Results (entities per second)
 
-				EF			NDbGate
-			
-Insertion 		457			2100
-Querying	   1300			1200
-Update			778			1100
-Delete			900			1100
+##### EF (6.2)			
+	Insertion :	457			
+	Querying :  1300			
+	Update : 778			
+	Delete	: 900			
 
+#### NDbGate
+	Insertion :	2100
+	Querying :	1200
+	Update : 1100
+	Delete : 1100
 
 ### Features
 * .Net Standard 2.0
