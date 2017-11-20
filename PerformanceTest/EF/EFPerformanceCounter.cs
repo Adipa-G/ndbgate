@@ -61,7 +61,7 @@ namespace PerformanceTest.EF
 
         private void DoInThread(int seed)
         {
-            var items = factory.Generate(seed, perThread, 10);
+            var items = factory.Generate(seed, perThread, 2);
 
             InsertTest(items);
 

@@ -79,7 +79,7 @@ namespace PerformanceTest.NDbGate
         {
             var factory = new Factory();
 
-            var items = factory.Generate(seed, perThread, 10);
+            var items = factory.Generate(seed, perThread, 2);
 
             InsertTest(items);
 
@@ -210,11 +210,11 @@ namespace PerformanceTest.NDbGate
 
             sw.Start();
             var tx = transactionFactory.CreateTransaction();
-            for (int i = 0; i < items.Count; i++)
+            for (int i = items.Count - 1; i >= 0 ; i--)
             {
                 items[i].Status = EntityStatus.Deleted;
                 items[i].Persist(tx);
-                if (i % 100 == 0 || (i > 0 && items[i].GetType() != items[i -1].GetType()))
+                if (i % 100== 0 || (i > 0 && items[i].GetType() != items[i -1].GetType()))
                 {
                     tx.Commit();
                     tx.Close();

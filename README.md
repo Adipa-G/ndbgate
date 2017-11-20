@@ -1,8 +1,80 @@
 # Introduction
-In short ndbgate is an object relational mapping framework. What it differs from other ORM frameworks is that it gives the complete control over how the persistence/retrieval takes place at entity level. This is achieved by means of overriding/implementing methods provided in the base entity classes. 
+NDbGate is a high performance ORM. The framework provides granular level control over persistence/retrieval.
 
-Also it can be configured to be smart, where it can handle core functions of a modern ORM like data integrity checks/change tracking. 
- 
+### Performance
+#### Test entities
+	
+	public abstract class Item
+    {
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public int ItemId { get; set; }
+
+        public string Name { get; set; }
+    }
+	
+	public class Product : Item
+    {
+        public double UnitPrice { get; set; }
+
+        public double? BulkUnitPrice { get; set; }
+    }
+	
+	public class Service : Item
+    {
+        public double HourlyRate { get; set; }
+    }
+	
+	public class Transaction
+    {
+        public int TransactionId { get; set; }
+
+        public string Name { get; set; }
+
+        public ICollection<ItemTransaction> ItemTransactions { get; set; }
+    }
+	
+	public class ItemTransaction
+    {
+        public int TransactionId { get; set; }
+
+        public int IndexNo { get; set; }
+
+        public Item Item { get; set; }
+
+        public Transaction Transaction { get; set; }
+
+        public ICollection<ItemTransactionCharge> ItemTransactionCharges { get; set; }
+    }
+	
+	public class ItemTransactionCharge
+    {
+        public int TransactionId { get; set; }
+
+        public int IndexNo { get; set; }
+
+        public int ChargeIndex { get; set; }
+
+        public string ChargeCode { get; set; }
+
+        public Transaction Transaction { get; set; }
+
+        public ItemTransaction ItemTransaction { get; set; }
+    }
+	
+#### Test
+
+Inserting/ Quering/ Updating/ Deleting 5000 `Transaction` entities using EF (6.2) and NDbGate. Test project is in the Repo.
+
+#### Results (entities per second)
+
+				EF			NDbGate
+			
+Insertion 		457			2100
+Querying	   1300			1200
+Update			778			1100
+Delete			900			1100
+
+
 ### Features
 * .Net Standard 2.0
 * Core relationships (One to One, One to Many, Inheritance)
