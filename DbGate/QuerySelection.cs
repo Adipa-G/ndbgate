@@ -1,5 +1,7 @@
 using System;
+using System.Linq.Expressions;
 using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection;
+using DbGate.ErManagement.ErMapper.Utils;
 using DbGate.ErManagement.Query;
 using DbGate.ErManagement.Query.Expr;
 
@@ -27,6 +29,14 @@ namespace DbGate
             var querySelection =
                 (AbstractTypeSelection) _factory.CreateSelection(QuerySelectionExpressionType.EntityType);
             querySelection.EntityType = type;
+            return querySelection;
+        }
+
+        public static IQuerySelection EntityType<T>()
+        {
+            var querySelection =
+                (AbstractTypeSelection)_factory.CreateSelection(QuerySelectionExpressionType.EntityType);
+            querySelection.EntityType = typeof(T);
             return querySelection;
         }
 
@@ -61,9 +71,28 @@ namespace DbGate
             return Expression(SelectExpr.Build().Field(entityType, field, alias));
         }
 
+        public static IQuerySelection Field<T>(Expression<Func<T, object>> prop)
+        {
+            var entityType = typeof(T);
+            var fieldName = ReflectionUtils.GetPropertyNameFromExpression(prop);
+            return Expression(SelectExpr.Build().Field(entityType, fieldName));
+        }
+
+        public static IQuerySelection Field<T>(Expression<Func<T, object>> prop, String alias)
+        {
+            var entityType = typeof(T);
+            var fieldName = ReflectionUtils.GetPropertyNameFromExpression(prop);
+            return Expression(SelectExpr.Build().Field(entityType, fieldName, alias));
+        }
+
         public static IQuerySelection Sum(Type entityType, String field, String alias)
         {
             return Expression(SelectExpr.Build().Field(entityType, field, alias).Sum());
+        }
+
+        public static IQuerySelection Sum<T>(Expression<Func<T, object>> prop, String alias)
+        {
+            return Expression(SelectExpr.Build().Field(prop, alias).Sum());
         }
 
         public static IQuerySelection Count(Type entityType, String field, String alias)
@@ -71,9 +100,19 @@ namespace DbGate
             return Expression(SelectExpr.Build().Field(entityType, field, alias).Count());
         }
 
+        public static IQuerySelection Count<T>(Expression<Func<T, object>> prop, String alias)
+        {
+            return Expression(SelectExpr.Build().Field(prop, alias).Count());
+        }
+
         public static IQuerySelection CustFunction(String sqlFunction, Type entityType, String field, String alias)
         {
             return Expression(SelectExpr.Build().Field(entityType, field, alias).CustFunc(sqlFunction));
+        }
+
+        public static IQuerySelection CustFunction<T>(String sqlFunction, Expression<Func<T, object>> prop, String alias)
+        {
+            return Expression(SelectExpr.Build().Field(prop, alias).CustFunc(sqlFunction));
         }
     }
 }

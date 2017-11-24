@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 
 namespace DbGate.ErManagement.Query.Expr
 {
@@ -9,6 +10,12 @@ namespace DbGate.ErManagement.Query.Expr
             return BaseField(entityType, field);
         }
 
+        public GroupExpr Field<T>(Expression<Func<T, object>> prop)
+        {
+            return BaseField(prop);
+        }
+
+        
         public static GroupExpr Build()
         {
             return new GroupExpr();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reflection;
 using DbGate.Exceptions.Common;
 
@@ -134,6 +135,24 @@ namespace DbGate.ErManagement.ErMapper.Utils
                 string message = string.Format("Exception while trying to extract field value of {0} of entity {1}",field,target.GetType().FullName);
                 throw new FieldValueExtractionException(message,ex);
             }
+        }
+
+        public static string GetPropertyNameFromExpression<T>(Expression<Func<T, object>> prop)
+        {
+            var lambda = prop as LambdaExpression;
+            MemberExpression memberExpression;
+            if (lambda.Body is UnaryExpression)
+            {
+                var unaryExpression = lambda.Body as UnaryExpression;
+                memberExpression = unaryExpression.Operand as MemberExpression;
+            }
+            else
+            {
+                memberExpression = lambda.Body as MemberExpression;
+            }
+
+            var fieldName = memberExpression.Member.Name;
+            return fieldName;
         }
     }
 }

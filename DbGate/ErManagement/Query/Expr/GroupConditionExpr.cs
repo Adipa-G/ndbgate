@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 
 namespace DbGate.ErManagement.Query.Expr
 {
@@ -17,6 +18,16 @@ namespace DbGate.ErManagement.Query.Expr
         public GroupConditionExpr Field(Type entityType, string typeAlias, string field)
         {
             return BaseField(entityType, typeAlias, field, null);
+        }
+
+        public GroupConditionExpr Field<T>(Expression<Func<T, object>> prop)
+        {
+            return BaseField(prop);
+        }
+
+        public GroupConditionExpr Field<T>(Expression<Func<T, object>> prop, string typeAlias)
+        {
+            return BaseField(prop, typeAlias, null);
         }
 
         public GroupConditionExpr Value(ColumnType type, object value)

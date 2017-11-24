@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq.Expressions;
+using DbGate.ErManagement.ErMapper.Utils;
 using DbGate.ErManagement.Query.Expr.Segments;
 
 namespace DbGate.ErManagement.Query.Expr
@@ -34,6 +36,30 @@ namespace DbGate.ErManagement.Query.Expr
         protected T BaseField(Type entityType, string typeAlias, string field, string alias)
         {
             var segment = new FieldSegment(entityType,typeAlias,field,alias);
+            return AddSegment(segment);
+        }
+
+        protected T BaseField<TU>(Expression<Func<TU, object>> prop)
+        {
+            var entityType = typeof(TU);
+            var fieldName = ReflectionUtils.GetPropertyNameFromExpression(prop);
+            var segment = new FieldSegment(entityType, fieldName);
+            return AddSegment(segment);
+        }
+
+        protected T BaseField<TU>(Expression<Func<TU, object>> prop, string alias)
+        {
+            var entityType = typeof(TU);
+            var fieldName = ReflectionUtils.GetPropertyNameFromExpression(prop);
+            var segment = new FieldSegment(entityType, fieldName, alias);
+            return AddSegment(segment);
+        }
+
+        protected T BaseField<TU>(Expression<Func<TU, object>> prop, string typeAlias, string alias)
+        {
+            var entityType = typeof(TU);
+            var fieldName = ReflectionUtils.GetPropertyNameFromExpression(prop);
+            var segment = new FieldSegment(entityType,typeAlias, fieldName, alias);
             return AddSegment(segment);
         }
 

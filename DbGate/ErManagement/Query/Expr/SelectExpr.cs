@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 
 namespace DbGate.ErManagement.Query.Expr
 {
@@ -42,6 +43,16 @@ namespace DbGate.ErManagement.Query.Expr
         public SelectExpr Field(Type entityType, string field, string alias)
         {
             return BaseField(entityType, field, alias);
+        }
+
+        public SelectExpr Field<T>(Expression<Func<T, object>> prop)
+        {
+            return BaseField(prop);
+        }
+
+        public SelectExpr Field<T>(Expression<Func<T, object>> prop, string alias)
+        {
+            return BaseField(prop, alias);
         }
 
         public static SelectExpr Build()

@@ -38,6 +38,24 @@ namespace DbGate
             return typeFrom;
         }
 
+        public static IQueryFrom EntityType<T>()
+        {
+            var typeFrom = (AbstractTypeFrom)_factory.CreateFrom(QueryFromExpressionType.EntityType);
+            typeFrom.EntityType = typeof(T);
+            return typeFrom;
+        }
+
+        public static IQueryFrom EntityType<T>(String alias)
+        {
+            var typeFrom = (AbstractTypeFrom)_factory.CreateFrom(QueryFromExpressionType.EntityType);
+            typeFrom.EntityType = typeof(T);
+            if (!string.IsNullOrEmpty(alias))
+            {
+                typeFrom.Alias = alias;
+            }
+            return typeFrom;
+        }
+
         public static IQueryFrom Query(ISelectionQuery query)
         {
             return Query(query, null);
