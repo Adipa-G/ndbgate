@@ -1,83 +1,6 @@
 # Introduction
 NDbGate is a high performance ORM. The framework provides granular level control over persistence/retrieval.
 
-### Performance
-#### Test entities
-	
-	public abstract class Item
-    {
-        public int ItemId { get; set; }
-
-        public string Name { get; set; }
-    }
-	
-	public class Product : Item
-    {
-        public double UnitPrice { get; set; }
-
-        public double? BulkUnitPrice { get; set; }
-    }
-	
-	public class Service : Item
-    {
-        public double HourlyRate { get; set; }
-    }
-	
-	public class Transaction
-    {
-        public int TransactionId { get; set; }
-
-        public string Name { get; set; }
-
-        public ICollection<ItemTransaction> ItemTransactions { get; set; }
-    }
-	
-	public class ItemTransaction
-    {
-        public int TransactionId { get; set; }
-
-        public int IndexNo { get; set; }
-
-        public Item Item { get; set; }
-
-        public Transaction Transaction { get; set; }
-
-        public ICollection<ItemTransactionCharge> ItemTransactionCharges { get; set; }
-    }
-	
-	public class ItemTransactionCharge
-    {
-        public int TransactionId { get; set; }
-
-        public int IndexNo { get; set; }
-
-        public int ChargeIndex { get; set; }
-
-        public string ChargeCode { get; set; }
-
-        public Transaction Transaction { get; set; }
-
-        public ItemTransaction ItemTransaction { get; set; }
-    }
-	
-#### Test
-
-Inserting/ Quering/ Updating/ Deleting 5000 `Transaction` entities using EF (6.2) and NDbGate. Test project is in the Repo.
-
-#### Results (entities per second)
-
-##### EF (6.2)			
-	Insertion :	457			
-	Querying :  1300			
-	Update : 778			
-	Delete	: 900			
-
-#### NDbGate
-	Insertion :	2100
-	Querying :	1200
-	Update : 1100
-	Delete : 1100
-
 ### Features
 * .Net Standard 2.0
 * Core relationships (One to One, One to Many, Inheritance)
@@ -156,6 +79,83 @@ Strong queries have support for many complex scenarios like sub queries, unions 
 	ICollection entities = query.ToList(tx);
 
 More examples can be found in the wiki. Also there is a sample project using the library available in the sources named DbGateTestApp.
+
+### Performance
+#### Test entities
+	
+	public abstract class Item
+    {
+        public int ItemId { get; set; }
+
+        public string Name { get; set; }
+    }
+	
+	public class Product : Item
+    {
+        public double UnitPrice { get; set; }
+
+        public double? BulkUnitPrice { get; set; }
+    }
+	
+	public class Service : Item
+    {
+        public double HourlyRate { get; set; }
+    }
+	
+	public class Transaction
+    {
+        public int TransactionId { get; set; }
+
+        public string Name { get; set; }
+
+        public ICollection<ItemTransaction> ItemTransactions { get; set; }
+    }
+	
+	public class ItemTransaction
+    {
+        public int TransactionId { get; set; }
+
+        public int IndexNo { get; set; }
+
+        public Item Item { get; set; }
+
+        public Transaction Transaction { get; set; }
+
+        public ICollection<ItemTransactionCharge> ItemTransactionCharges { get; set; }
+    }
+	
+	public class ItemTransactionCharge
+    {
+        public int TransactionId { get; set; }
+
+        public int IndexNo { get; set; }
+
+        public int ChargeIndex { get; set; }
+
+        public string ChargeCode { get; set; }
+
+        public Transaction Transaction { get; set; }
+
+        public ItemTransaction ItemTransaction { get; set; }
+    }
+	
+#### Test
+
+Inserting/ Quering/ Updating/ Deleting 5000 `Transaction` entities using EF (6.2) and NDbGate. Test project is in the Repo.
+
+#### Results (entities per second)
+
+##### EF (6.2)			
+	Insertion :	457			
+	Querying :  1300			
+	Update : 778			
+	Delete	: 900			
+
+#### NDbGate
+	Insertion :	2100
+	Querying :	1200
+	Update : 1100
+	Delete : 1100
 
 ### License
 GNU GPL V3

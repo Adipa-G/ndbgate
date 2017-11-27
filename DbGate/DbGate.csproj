@@ -6,7 +6,7 @@
     <Copyright>Adipa Gunasekara 2017</Copyright>
     <Product>NDbGate</Product>
     <Authors>Adipa Gunasekara</Authors>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <FileVersion>1.1.0.0</FileVersion>
     <Description>NDbGate is an object relational mapping framework. What it differs from other ORM frameworks is that it gives the complete control over how the persistence/retrieval takes place at entity level. This is achieved by means of overriding/implementing methods provided in the base entity classes.</Description>
     <PackageProjectUrl>https://github.com/Adipa-G/ndbgate/</PackageProjectUrl>
