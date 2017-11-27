@@ -1,5 +1,7 @@
 using System;
+using System.Linq.Expressions;
 using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Group;
+using DbGate.ErManagement.ErMapper.Utils;
 using DbGate.ErManagement.Query;
 using DbGate.ErManagement.Query.Expr;
 
@@ -21,6 +23,12 @@ namespace DbGate
             return queryGroup;
         }
 
+        public static IQueryGroup Field<T>(Expression<Func<T, object>> prop)
+        {
+            var fieldName = ReflectionUtils.GetPropertyNameFromExpression(prop);
+            return Field(typeof(T), fieldName);
+        }
+        
         public static IQueryGroup Field(Type entityType, string field)
         {
             var expressionGroup = (AbstractExpressionGroup) _factory.CreateGroup(QueryGroupExpressionType.Expression);

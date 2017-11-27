@@ -1,5 +1,7 @@
 using System;
+using System.Linq.Expressions;
 using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.OrderBy;
+using DbGate.ErManagement.ErMapper.Utils;
 using DbGate.ErManagement.Query;
 using DbGate.ErManagement.Query.Expr;
 
@@ -19,6 +21,17 @@ namespace DbGate
             var queryOrderBy = (AbstractSqlQueryOrderBy) _factory.CreateOrderBy(QueryOrderByExpressionType.RawSql);
             queryOrderBy.Sql = sql;
             return queryOrderBy;
+        }
+
+        public static IQueryOrderBy Field<T>(Expression<Func<T, object>> prop)
+        {
+            return Field(prop, QueryOrderType.Ascend);
+        }
+
+        public static IQueryOrderBy Field<T>(Expression<Func<T, object>> prop, QueryOrderType orderType)
+        {
+            var fieldName = ReflectionUtils.GetPropertyNameFromExpression(prop);
+            return Field(typeof(T), fieldName,orderType);
         }
 
         public static IQueryOrderBy Field(Type type, string field)

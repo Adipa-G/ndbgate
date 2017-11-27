@@ -21,6 +21,41 @@ namespace DbGate
             return queryJoin;
         }
 
+        public static IQueryJoin EntityType<T,TU>()
+        {
+            return EntityType(typeof(T), typeof(TU), null, null, null);
+        }
+
+        public static IQueryJoin EntityType<T, TU>(QueryJoinType joinType)
+        {
+            return EntityType(typeof(T), typeof(TU), null, joinType, null);
+        }
+
+        public static IQueryJoin EntityType<T, TU>(String alias)
+        {
+            return EntityType(typeof(T), typeof(TU), null, null, alias);
+        }
+
+        public static IQueryJoin EntityType<T, TU>( String alias, QueryJoinType joinType)
+        {
+            return EntityType(typeof(T), typeof(TU), null, joinType, alias);
+        }
+
+        public static IQueryJoin EntityType<T, TU>(JoinExpr expr)
+        {
+            return EntityType(typeof(T), typeof(TU), expr, null, null);
+        }
+
+        public static IQueryJoin EntityType<T, TU>(JoinExpr expr, String alias)
+        {
+            return EntityType(typeof(T), typeof(TU), expr, null, alias);
+        }
+
+        public static IQueryJoin EntityType<T, TU>(JoinExpr expr, QueryJoinType? joinType, string alias)
+        {
+            return EntityType(typeof(T), typeof(TU), expr, joinType, alias);
+        }
+
         public static IQueryJoin EntityType(Type from, Type to)
         {
             return EntityType(from, to, null, null, null);
