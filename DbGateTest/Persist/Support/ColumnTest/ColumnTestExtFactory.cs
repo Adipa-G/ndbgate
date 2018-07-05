@@ -31,6 +31,8 @@ namespace DbGate.Persist.Support.ColumnTest
                 dbColumns.Add(new DefaultColumn("TimestampNull", ColumnType.Timestamp, true));
                 dbColumns.Add(new DefaultColumn("VarcharNotNull", ColumnType.Varchar));
                 dbColumns.Add(new DefaultColumn("VarcharNull", ColumnType.Varchar, true));
+                dbColumns.Add(new DefaultColumn("GuidNotNull", ColumnType.Guid));
+                dbColumns.Add(new DefaultColumn("GuidNull", ColumnType.Guid, true));
             }
 
             return dbColumns;

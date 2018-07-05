@@ -41,5 +41,9 @@ namespace DbGate.Persist.Support.ColumnTest
         string VarcharNotNull { get; set; }
 
         string VarcharNull { get; set; }
+
+        Guid GuidNotNull { get; set; }
+
+        Guid? GuidNull { get; set; }
     }
 }

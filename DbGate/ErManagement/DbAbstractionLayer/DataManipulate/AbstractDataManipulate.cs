@@ -255,6 +255,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
                     return reader.GetDateTime(ordinal);
                 case ColumnType.Varchar:
                     return reader.GetString(ordinal);
+                case ColumnType.Guid:
+                    return reader.GetGuid(ordinal);
                 default:
                     return null;
             }

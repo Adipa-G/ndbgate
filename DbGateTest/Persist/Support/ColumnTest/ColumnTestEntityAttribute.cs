@@ -64,6 +64,12 @@ namespace DbGate.Persist.Support.ColumnTest
         [ColumnInfo((ColumnType.Varchar), Nullable = true)]
         public string VarcharNull { get; set; }
 
+        [ColumnInfo(ColumnType.Guid)]
+        public Guid GuidNotNull { get; set; }
+
+        [ColumnInfo((ColumnType.Guid), Nullable = true)]
+        public Guid? GuidNull { get; set; }
+
         #endregion
     }
 }

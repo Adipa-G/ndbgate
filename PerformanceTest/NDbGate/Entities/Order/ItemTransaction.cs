@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using DbGate;
 using PerformanceTest.NDbGate.Entities.Product;
@@ -18,8 +19,8 @@ namespace PerformanceTest.NDbGate.Entities.Order
             ItemTransactionCharges = new List<ItemTransactionCharge>();
         }
 
-        [ColumnInfo(ColumnType.Integer, Key = true)]
-        public int TransactionId { get; set; }
+        [ColumnInfo(ColumnType.Guid, Key = true)]
+        public Guid TransactionId { get; set; }
 
         [ColumnInfo(ColumnType.Integer, Key = true)]
         public int IndexNo { get; set; }

@@ -1,3 +1,4 @@
+using System;
 using DbGate;
 
 namespace PerformanceTest.NDbGate.Entities.Order
@@ -15,8 +16,8 @@ namespace PerformanceTest.NDbGate.Entities.Order
             Transaction = itemTransaction.Transaction;
         }
 
-        [ColumnInfo(ColumnType.Integer, Key = true)]
-        public int TransactionId { get; set; }
+        [ColumnInfo(ColumnType.Guid, Key = true)]
+        public Guid TransactionId { get; set; }
 
         [ColumnInfo(ColumnType.Integer, Key = true)]
         public int IndexNo { get; set; }

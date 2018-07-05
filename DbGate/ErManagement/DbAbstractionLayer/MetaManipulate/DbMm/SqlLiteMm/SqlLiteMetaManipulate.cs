@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Text;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures;
@@ -24,6 +25,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlLiteMm
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("BIGINT", ColumnType.Long, "0"));
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("TIMESTAMP", ColumnType.Timestamp, "1981/10/12"));
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("VARCHAR", ColumnType.Varchar, "''"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("VARCHAR", ColumnType.Guid, Guid.Empty.ToString()));
         }
 
         protected override void ExtractPrimaryKeyData(ITransaction tx, MetaTable table)

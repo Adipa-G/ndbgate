@@ -1,8 +1,10 @@
-﻿namespace PerformanceTest.EF.Entities.Order
+﻿using System;
+
+namespace PerformanceTest.EF.Entities.Order
 {
     public class ItemTransactionCharge
     {
-        public int TransactionId { get; set; }
+        public Guid TransactionId { get; set; }
 
         public int IndexNo { get; set; }
 

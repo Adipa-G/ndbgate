@@ -56,6 +56,8 @@ namespace DbGate.Persist
                         "\ttimestamp_null Timestamp,\n" +
                         "\tvarchar_not_null Varchar(20) NOT NULL,\n" +
                         "\tvarchar_null Varchar(20),\n" +
+                         "\tguid_not_null Varchar(36) NOT NULL,\n" +
+                         "\tguid_null Varchar(36),\n" +
                         " Primary Key (id_col))";
             
             CreateTableFromSql(sql,DBName);
@@ -869,6 +871,8 @@ namespace DbGate.Persist
             entity.TimestampNull=DateTime.Now;
             entity.VarcharNotNull="notNull";
             entity.VarcharNull="null";
+            entity.GuidNotNull = Guid.NewGuid();
+            entity.GuidNull = Guid.NewGuid();
         }
 
         private void CreateEntityWithNullValues(IColumnTestEntity entity)
@@ -891,6 +895,8 @@ namespace DbGate.Persist
             entity.TimestampNull=null;
             entity.VarcharNotNull="notNull";
             entity.VarcharNull=null;
+            entity.GuidNotNull = Guid.NewGuid();
+            entity.GuidNull = null;
         }
 
         private void UpdateEntityWithNonNullValues(IColumnTestEntity entity)
@@ -913,6 +919,8 @@ namespace DbGate.Persist
             entity.TimestampNull = DateTime.Now;
             entity.VarcharNotNull="notNull string";
             entity.VarcharNull="null string";
+            entity.GuidNotNull = Guid.NewGuid();
+            entity.GuidNull = Guid.NewGuid();
         }
 
         private void UpdateEntityWithNullValues(IColumnTestEntity entity)
@@ -935,6 +943,8 @@ namespace DbGate.Persist
             entity.TimestampNull=null;
             entity.VarcharNotNull="notNull string";
             entity.VarcharNull=null;
+            entity.GuidNotNull = Guid.NewGuid();
+            entity.GuidNull = null;
         }
 
         private void AssertTwoEntitiesEquals(IColumnTestEntity entityA, IColumnTestEntity entityB)
@@ -957,6 +967,8 @@ namespace DbGate.Persist
             Assert.AreEqual(entityA.TimestampNull,entityB.TimestampNull);
             Assert.AreEqual(entityA.VarcharNotNull,entityB.VarcharNotNull);
             Assert.AreEqual(entityA.VarcharNull,entityB.VarcharNull);
+            Assert.AreEqual(entityA.GuidNotNull,entityB.GuidNotNull);
+            Assert.AreEqual(entityA.GuidNull,entityB.GuidNull);
         }
     }
 }

@@ -29,6 +29,8 @@ namespace DbGate.Patch.Support.PatchEmpty
         public DateTime? TimestampNull { get; set; }
         public string VarcharNotNull { get; set; }
         public string VarcharNull { get; set; }
+        public Guid GuidNotNull { get; set; }
+        public Guid? GuidNull { get; set; }
 
         [ForeignKeyInfo("fk_root2leaf",
             typeof (LeafEntity),
@@ -72,6 +74,8 @@ namespace DbGate.Patch.Support.PatchEmpty
                 dbColumns.Add(new DefaultColumn("TimestampNull", ColumnType.Timestamp, true));
                 dbColumns.Add(new DefaultColumn("VarcharNotNull", ColumnType.Varchar));
                 dbColumns.Add(new DefaultColumn("VarcharNull", ColumnType.Varchar, true));
+                dbColumns.Add(new DefaultColumn("GuidNotNull", ColumnType.Guid));
+                dbColumns.Add(new DefaultColumn("GuidNull", ColumnType.Guid, true));
 
                 map.Add(typeof (RootEntity), dbColumns);
                 return map;

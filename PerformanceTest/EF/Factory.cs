@@ -44,7 +44,7 @@ namespace PerformanceTest.EF
             {
                 var transaction = new Transaction();
                 transaction.ItemTransactions = new List<ItemTransaction>();
-                transaction.TransactionId = seed + i;
+                transaction.TransactionId = Guid.NewGuid();
                 transaction.Name = $"TRS-000{i}";
 
                 int productsCount = random.Next(1, productsOrServicesPerTx);

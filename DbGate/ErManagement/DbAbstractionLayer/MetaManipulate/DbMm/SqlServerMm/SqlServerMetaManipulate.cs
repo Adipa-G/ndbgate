@@ -36,6 +36,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("TIMESTAMP", ColumnType.Timestamp, "1981/10/12"));
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("VARCHAR", ColumnType.Varchar, "''"));
             ColumnTypeMapItems.Add(new ColumnTypeMapItem("NVARCHAR", ColumnType.Varchar, "''"));
+            ColumnTypeMapItems.Add(new ColumnTypeMapItem("UNIQUEIDENTIFIER", ColumnType.Guid, Guid.Empty.ToString()));
         }
 
         protected override ICollection<MetaTable> ExtractTableData(ITransaction tx)

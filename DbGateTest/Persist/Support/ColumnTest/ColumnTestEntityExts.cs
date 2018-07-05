@@ -34,6 +34,8 @@ namespace DbGate.Persist.Support.ColumnTest
         public DateTime? TimestampNull { get; set; }
         public string VarcharNotNull { get; set; }
         public string VarcharNull { get; set; }
+        public Guid GuidNotNull { get; set; }
+        public Guid? GuidNull { get; set; }
 
         public void Persist(ITransaction tx)
         {

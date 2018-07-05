@@ -44,7 +44,7 @@ namespace PerformanceTest.NDbGate
             for (int i = 0; i < txCount; i++)
             {
                 var transaction = new Transaction();
-                transaction.TransactionId = seed + i;
+                transaction.TransactionId = Guid.NewGuid();
                 transaction.Name = $"TRS-000{i}";
 
                 int productsCount = random.Next(1, productsOrServicesPerTx);

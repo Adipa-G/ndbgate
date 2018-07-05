@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using PerformanceTest.EF.Entities.Product;
 
 namespace PerformanceTest.EF.Entities.Order
 {
     public class ItemTransaction
     {
-        public int TransactionId { get; set; }
+        public Guid TransactionId { get; set; }
 
         public int IndexNo { get; set; }
 

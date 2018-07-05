@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Mappings
 {
@@ -75,8 +76,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Mappings
                     DefaultNonNullValue = "0";
                     break;
                 case DbType.Guid:
-                    ColumnType = ColumnType.Varchar;
-                    DefaultNonNullValue = "''";
+                    ColumnType = ColumnType.Guid;
+                    DefaultNonNullValue = Guid.Empty.ToString();
                     break;
                 case DbType.Int16:
                     ColumnType = ColumnType.Integer;

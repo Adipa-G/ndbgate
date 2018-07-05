@@ -42,6 +42,8 @@ namespace DbGate.Persist.Support.ColumnTest
                 dbColumns.Add(new DefaultColumn("TimestampNull", ColumnType.Timestamp, true));
                 dbColumns.Add(new DefaultColumn("VarcharNotNull", ColumnType.Varchar));
                 dbColumns.Add(new DefaultColumn("VarcharNull", ColumnType.Varchar, true));
+                dbColumns.Add(new DefaultColumn("GuidNotNull", ColumnType.Guid));
+                dbColumns.Add(new DefaultColumn("GuidNull", ColumnType.Guid, true));
 
                 map.Add(typeof (ColumnTestEntityFields), dbColumns);
                 return map;
@@ -69,6 +71,8 @@ namespace DbGate.Persist.Support.ColumnTest
         public DateTime? TimestampNull { get; set; }
         public string VarcharNotNull { get; set; }
         public string VarcharNull { get; set; }
+        public Guid GuidNotNull { get; set; }
+        public Guid? GuidNull { get; set; }
 
         #endregion
     }
