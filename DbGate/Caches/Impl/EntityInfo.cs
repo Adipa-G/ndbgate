@@ -316,10 +316,7 @@ namespace DbGate.Caches.Impl
                     if (propertyInfo == null)
                         throw CreatePropertyNotFoundException(propertyName);
 
-                    lock (_propertyMap)
-                    {
-                        _propertyMap.Add(cacheKey, propertyInfo);
-                    }
+                    _propertyMap.Add(cacheKey, propertyInfo);
                     return propertyInfo;
                 }
                 catch (Exception)
