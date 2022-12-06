@@ -16,7 +16,14 @@ jobs:
       - name: Build 
         run: dotnet build
       - name: Test 
-        run: dotnet test
+        run: dotnet test --logger trx --results-directory "TestResults"
+      - name: Upload dotnet test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: dotnet-results
+          path: TestResults
+        if: ${{ always() }}
+        
       - run: echo "🍏 This job's status is ${{ job.status }}."
   publish-to-nuget:
     runs-on: ubuntu-latest
