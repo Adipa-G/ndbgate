@@ -10,7 +10,7 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '3.1.x'
+          dotnet-version: '7.0.x'
       - name: Install dependencies
         run: dotnet restore
       - name: Build 
@@ -28,15 +28,15 @@ jobs:
       - name: Setup dotnet
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '3.1.x'
+          dotnet-version: '7.0.x'
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_TOKEN}}
       - name: Install dependencies
         run: dotnet restore
       - name: Build Release Config
-        run: dotnet build --configuration Release ./Dbgate/DbGate.csproj
+        run: dotnet build --configuration Release Dbgate/DbGate.csproj
       - name: Create the package
-        run: dotnet build --configuration Release ./Dbgate/DbGate.csproj
+        run: dotnet build --configuration Release Dbgate/DbGate.csproj
       - name: Publish the package to GPR
-        run: dotnet nuget push ./Dbgate/bin/Release/*.nupkg
+        run: dotnet nuget push Dbgate/bin/Release/*.nupkg
       - run: echo "🍏 This job's status is ${{ job.status }}."
