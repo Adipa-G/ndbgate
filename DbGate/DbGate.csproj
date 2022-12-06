@@ -14,6 +14,8 @@
     <PackageIconUrl>https://ssl.gstatic.com/codesite/ph/images/defaultlogo.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Adipa-G/ndbgate/</RepositoryUrl>
     <PackageId>NDbGate</PackageId>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +27,17 @@
 
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -19,7 +19,7 @@ jobs:
         run: dotnet test
       - run: echo "🍏 This job's status is ${{ job.status }}."
   publish-to-nuget:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: build-and-test-solution
     if: github.ref == 'refs/heads/master'
     steps:
