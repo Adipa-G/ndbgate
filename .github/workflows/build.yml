@@ -12,7 +12,7 @@ jobs:
         with:
           dotnet-version: '7.0.x'
       - name: Install dependencies
-        run: dotnet restore DBgate
+        run: dotnet restore Dbgate/DbGate.csproj
       - name: Build 
         run: dotnet build
       - name: Test 
@@ -36,7 +36,7 @@ jobs:
       - name: Build Release Config
         run: dotnet build --configuration Release ndbgate/Dbgate/DbGate.csproj
       - name: Create the package
-        run: dotnet build --configuration Release ndbgate/Dbgate/DbGate.csproj
+        run: dotnet pack --configuration Release ndbgate/Dbgate/DbGate.csproj
       - name: Publish the package to GPR
         run: dotnet nuget push Dbgate/bin/Release/*.nupkg
       - run: echo "🍏 This job's status is ${{ job.status }}."
