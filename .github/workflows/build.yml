@@ -13,4 +13,8 @@ jobs:
           dotnet-version: '3.1.x'
       - name: Install dependencies
         run: dotnet restore
+      - name: Build 
+        run: dotnet build
+      - name: Test 
+        run: dotnet test
       - run: echo "🍏 This job's status is ${{ job.status }}."
