@@ -17,7 +17,6 @@ jobs:
         run: dotnet build
       - name: Test 
         run: dotnet test
-        run: dotnet nuget push ./Dbgate/bin/Release/*.nupkg
       - run: echo "🍏 This job's status is ${{ job.status }}."
   publish-to-nuget:
     runs-on: ubuntu-latest
