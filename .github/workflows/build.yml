@@ -39,6 +39,12 @@ jobs:
         run: dotnet pack --configuration Release
       - name: Publish the package to Nuget
         run: |
-          cd DbGate\bin\Release
+          ls
+          cd DbGate
+          ls
+          cd bin
+          ls
+          cd release
+          ls
           dotnet nuget push *.nupkg -k ${{ secrets.NUGET_TOKEN }} -s https://api.nuget.org/v3/index.json
       - run: echo "🍏 This job's status is ${{ job.status }}."
