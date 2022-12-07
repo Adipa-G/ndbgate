@@ -11,56 +11,56 @@ namespace DbGate.ErManagement.Lazy
 {
     public class ChildLoadInterceptor : IInterceptor
     {
-        private readonly Type _applicableParentType;
-        private readonly RetrievalOperationLayer _dataRetrievalOperationLayer;
-        private readonly IReadOnlyEntity _parentRoEntity;
-        private readonly IRelation _relation;
-        private readonly ITransactionFactory _transactionFactory;
-        private ITransaction _transaction;
+        private readonly Type applicableParentType;
+        private readonly RetrievalOperationLayer dataRetrievalOperationLayer;
+        private readonly IReadOnlyEntity parentRoEntity;
+        private readonly IRelation relation;
+        private readonly ITransactionFactory transactionFactory;
+        private ITransaction transaction;
 
-        private bool _intercepted;
+        private bool intercepted;
 
         public ChildLoadInterceptor(RetrievalOperationLayer dataRetrievalOperationLayer, IReadOnlyEntity parentRoEntity
                                     , Type applicableParentType, ITransaction transaction, IRelation relation)
         {
-            _dataRetrievalOperationLayer = dataRetrievalOperationLayer;
-            _parentRoEntity = parentRoEntity;
-            _applicableParentType = applicableParentType;
-            _transaction = transaction;
-            _transactionFactory = transaction.Factory;
-            _relation = relation;
+            this.dataRetrievalOperationLayer = dataRetrievalOperationLayer;
+            this.parentRoEntity = parentRoEntity;
+            this.applicableParentType = applicableParentType;
+            this.transaction = transaction;
+            transactionFactory = transaction.Factory;
+            this.relation = relation;
         }
 
         #region IInterceptor Members
 
         public void Intercept(IInvocation invocation)
         {
-            if (!_intercepted)
+            if (!intercepted)
             {
-                _intercepted = true;
-                bool newTransaction = false;
+                intercepted = true;
+                var newTransaction = false;
                 try
                 {
-                    if (_transaction.Closed)
+                    if (transaction.Closed)
                     {
-                        _transaction = _transactionFactory.CreateTransaction();
+                        transaction = transactionFactory.CreateTransaction();
                         newTransaction = true;
                     }
-                    _dataRetrievalOperationLayer.LoadChildrenFromRelation(_parentRoEntity, _applicableParentType,
-                                                                          _transaction, _relation, true);
+                    dataRetrievalOperationLayer.LoadChildrenFromRelation(parentRoEntity, applicableParentType,
+                                                                          transaction, relation, true);
                 }
                 finally
                 {
                     if (newTransaction)
                     {
-                        DbMgtUtility.Close(_transaction);
-                        _transaction = null;
+                        DbMgtUtility.Close(transaction);
+                        transaction = null;
                     }
                 }
 
-                EntityInfo entityInfo = CacheManager.GetEntityInfo(_parentRoEntity);
-                PropertyInfo property = entityInfo.GetProperty(_relation.AttributeName);
-                Object objectToInvoke = property.GetValue(_parentRoEntity, new object[] {});
+                var entityInfo = CacheManager.GetEntityInfo(parentRoEntity);
+                var property = entityInfo.GetProperty(relation.AttributeName);
+                var objectToInvoke = property.GetValue(parentRoEntity, new object[] {});
 
                 invocation.ReturnValue = invocation.Method.Invoke(objectToInvoke, new object[] {});
             }

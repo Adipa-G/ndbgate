@@ -27,10 +27,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures
 
             var that = (MetaForeignKey) o;
 
-            bool foundMatch = false;
-            foreach (MetaForeignKeyColumnMapping thisMapping in ColumnMappings)
+            var foundMatch = false;
+            foreach (var thisMapping in ColumnMappings)
             {
-                foreach (MetaForeignKeyColumnMapping thatMapping in that.ColumnMappings)
+                foreach (var thatMapping in that.ColumnMappings)
                 {
                     if (thisMapping.Equals(thatMapping))
                     {

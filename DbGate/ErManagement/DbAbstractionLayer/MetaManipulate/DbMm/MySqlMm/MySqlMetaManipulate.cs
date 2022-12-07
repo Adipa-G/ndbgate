@@ -48,7 +48,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.MySqlMm
             sb.Append(" DEFAULT ");
             if (!metaColumn.Null)
             {
-                String defaultValue = GetDefaultValueForType(metaColumn.ColumnType);
+                var defaultValue = GetDefaultValueForType(metaColumn.ColumnType);
                 if (defaultValue != null)
                 {
                     sb.Append(defaultValue);
@@ -105,10 +105,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.MySqlMm
                 {
                     return false;
                 }
-                foreach (string columnA in primaryKeyA.ColumnNames)
+                foreach (var columnA in primaryKeyA.ColumnNames)
                 {
-                    bool found = false;
-                    foreach (string columnB in primaryKeyB.ColumnNames)
+                    var found = false;
+                    foreach (var columnB in primaryKeyB.ColumnNames)
                     {
                         if (columnA.Equals(columnB, StringComparison.OrdinalIgnoreCase))
                         {

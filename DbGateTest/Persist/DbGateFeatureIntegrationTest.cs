@@ -1,65 +1,57 @@
+using System;
 using System.Data;
 using DbGate.Persist.Support.FeatureIntegration.Order;
 using DbGate.Persist.Support.FeatureIntegration.Product;
 using DbGate.Utility;
 using log4net;
-using NUnit.Framework;
+using Xunit;
 
 namespace DbGate.Persist
 {
-    [TestFixture]
-    public class DbGateFeatureIntegrationTest : AbstractDbGateTestBase
+    [Collection("Sequential")]
+    public class DbGateFeatureIntegrationTest : AbstractDbGateTestBase, IDisposable
     {
-        private const string DBName = "testing-feature_integreation";
+        private const string DbName = "testing-feature_integreation";
 
-        [OneTimeSetUp]
-        public static void Before()
+        public DbGateFeatureIntegrationTest()
         {
             TestClass = typeof(DbGateFeatureIntegrationTest);
+            BeginInit(DbName);
         }
-
-        [SetUp]
-        public void BeforeEach()
+        public void Dispose()
         {
-            BeginInit(DBName);
-            TransactionFactory.DbGate.ClearCache();
-        }
-
-        [TearDown]
-        public void AfterEach()
-        {
-            CleanupDb(DBName);
-            FinalizeDb(DBName);
+            CleanupDb(DbName);
+            FinalizeDb(DbName);
         }
  
         private IDbConnection SetupTables()
         {
-            RegisterClassForDbPatching(typeof (ItemTransaction),DBName);
-            RegisterClassForDbPatching(typeof(ItemTransactionCharge), DBName);
-            RegisterClassForDbPatching(typeof(Transaction), DBName);
-            RegisterClassForDbPatching(typeof(Product), DBName);
-            RegisterClassForDbPatching(typeof(Service), DBName);
-            EndInit(DBName);
+            RegisterClassForDbPatching(typeof (ItemTransaction),DbName);
+            RegisterClassForDbPatching(typeof(ItemTransactionCharge), DbName);
+            RegisterClassForDbPatching(typeof(Transaction), DbName);
+            RegisterClassForDbPatching(typeof(Product), DbName);
+            RegisterClassForDbPatching(typeof(Service), DbName);
+            EndInit(DbName);
 
             return Connection;
         }
 
-        [Test]
+        [Fact]
         public void FeatureIntegration_PersistAndRetrieve_WithComplexStructure_RetrievedShouldBeSameAsPersisted()
         {
             try
             {
-                int transId = 35;
-                int productId = 135;
-                int serviceId = 235;
+                var transId = 35;
+                var productId = 135;
+                var serviceId = 235;
 
-                IDbConnection connection = SetupTables();
+                var connection = SetupTables();
                 
-                Product product = CreateDefaultProduct(connection, productId);
-                Service service = CreateDefaultService(connection, serviceId);
-                Transaction transaction = CreateDefaultTransaction(connection, transId, product, service);
+                var product = CreateDefaultProduct(connection, productId);
+                var service = CreateDefaultService(connection, serviceId);
+                var transaction = CreateDefaultTransaction(connection, transId, product, service);
 
-                ITransaction tx = CreateTransaction(connection);
+                var tx = CreateTransaction(connection);
                 var loadedTransaction = new Transaction();
                 LoadWithId(tx, loadedTransaction, transId);
                 tx.Commit();
@@ -76,11 +68,11 @@ namespace DbGate.Persist
 
         private void VerifyEquals(Transaction transaction, Transaction loadedTransaction)
         {
-            Assert.AreEqual(loadedTransaction.Name, transaction.Name);
-            foreach (ItemTransaction orgItemTransaction in transaction.ItemTransactions)
+            Assert.Equal(loadedTransaction.Name, transaction.Name);
+            foreach (var orgItemTransaction in transaction.ItemTransactions)
             {
-                bool foundItem = false;
-                foreach (ItemTransaction loadedItemTransaction in loadedTransaction.ItemTransactions)
+                var foundItem = false;
+                foreach (var loadedItemTransaction in loadedTransaction.ItemTransactions)
                 {
                     if (orgItemTransaction.IndexNo == loadedItemTransaction.IndexNo)
                     {
@@ -88,51 +80,51 @@ namespace DbGate.Persist
                         var originalItem = orgItemTransaction.Item;
                         var loadedItem = loadedItemTransaction.Item;
 
-                        Assert.AreEqual(originalItem.GetType(), loadedItem.GetType());
-                        Assert.AreEqual(originalItem.Name, loadedItem.Name);
-                        Assert.AreEqual(originalItem.ItemId, loadedItem.ItemId);
-                        Assert.AreSame(loadedItemTransaction.Transaction, loadedTransaction);
+                        Assert.Equal(originalItem.GetType(), loadedItem.GetType());
+                        Assert.Equal(originalItem.Name, loadedItem.Name);
+                        Assert.Equal(originalItem.ItemId, loadedItem.ItemId);
+                        Assert.Same(loadedItemTransaction.Transaction, loadedTransaction);
 
-                        foreach (ItemTransactionCharge orgTransactionCharge in orgItemTransaction.ItemTransactionCharges
+                        foreach (var orgTransactionCharge in orgItemTransaction.ItemTransactionCharges
                             )
                         {
-                            bool foundCharge = false;
+                            var foundCharge = false;
                             foreach (
-                                ItemTransactionCharge loadedTransactionCharge in
+                                var loadedTransactionCharge in
                                     loadedItemTransaction.ItemTransactionCharges)
                             {
                                 if (orgTransactionCharge.IndexNo == loadedTransactionCharge.IndexNo
                                     && orgTransactionCharge.ChargeIndex == loadedTransactionCharge.ChargeIndex)
                                 {
                                     foundCharge = true;
-                                    Assert.AreEqual(orgTransactionCharge.ChargeCode, loadedTransactionCharge.ChargeCode);
-                                    Assert.AreSame(loadedTransactionCharge.Transaction, loadedTransaction);
-                                    Assert.AreSame(loadedTransactionCharge.ItemTransaction, loadedItemTransaction);
+                                    Assert.Equal(orgTransactionCharge.ChargeCode, loadedTransactionCharge.ChargeCode);
+                                    Assert.Same(loadedTransactionCharge.Transaction, loadedTransaction);
+                                    Assert.Same(loadedTransactionCharge.ItemTransaction, loadedItemTransaction);
                                 }
                             }
-                            Assert.IsTrue(foundCharge, "Item transaction charge not found");
+                            Assert.True(foundCharge, "Item transaction charge not found");
                         }
                     }
                 }
-                Assert.IsTrue(foundItem, "Item transaction not found");
+                Assert.True(foundItem, "Item transaction not found");
             }
-            Assert.AreEqual(loadedTransaction.Name, transaction.Name);
+            Assert.Equal(loadedTransaction.Name, transaction.Name);
         }
 
         private bool LoadWithId(ITransaction transaction, Transaction loadEntity, int id)
         {
-            bool loaded = false;
+            var loaded = false;
 
-            IDbCommand cmd = transaction.CreateCommand();
+            var cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from order_transaction where transaction_id = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Direction = ParameterDirection.Input;
             parameter.Value = id;
 
-            IDataReader dataReader = cmd.ExecuteReader();
+            var dataReader = cmd.ExecuteReader();
             if (dataReader.Read())
             {
                 loadEntity.Retrieve(dataReader, transaction);
@@ -148,7 +140,7 @@ namespace DbGate.Persist
             product.ItemId = productId;
             product.Name = "Product";
             product.UnitPrice = 54;
-            ITransaction transaction = CreateTransaction(con);
+            var transaction = CreateTransaction(con);
             product.Persist(transaction);
             transaction.Commit();
             return product;
@@ -160,7 +152,7 @@ namespace DbGate.Persist
             service.ItemId = serviceId;
             service.Name = "Service";
             service.HourlyRate = 65;
-            ITransaction transaction = CreateTransaction(con);
+            var transaction = CreateTransaction(con);
             service.Persist(transaction);
             transaction.Commit();
             return service;
@@ -191,7 +183,7 @@ namespace DbGate.Persist
             serviceTransactionCharge.ChargeCode = "Service-Sell-Code";
             serviceTransaction.ItemTransactionCharges.Add(serviceTransactionCharge);
 
-            ITransaction tx = CreateTransaction(con);
+            var tx = CreateTransaction(con);
             transaction.Persist(tx);
             tx.Commit();
             return transaction;

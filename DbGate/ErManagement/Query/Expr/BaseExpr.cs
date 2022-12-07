@@ -180,7 +180,7 @@ namespace DbGate.ErManagement.Query.Expr
             }
 
             mergeSegment = new MergeSegment(MergeSegmentMode.ParaAnd);
-            foreach (T expression in expressions)
+            foreach (var expression in expressions)
             {
                 mergeSegment.AddSub(expression.RootSegment);
             }
@@ -197,7 +197,7 @@ namespace DbGate.ErManagement.Query.Expr
             }
 
             mergeSegment = new MergeSegment(MergeSegmentMode.ParaOr);
-            foreach (T expression in expressions)
+            foreach (var expression in expressions)
             {
                 mergeSegment.AddSub(expression.RootSegment);
             }

@@ -1,48 +1,40 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using DbGate.Exceptions;
 using DbGate.Persist.Support.Version;
 using log4net;
-using NUnit.Framework;
+using Xunit;
 
 namespace DbGate.Persist
 {
-    [TestFixture]
-    public class DbGateVersionTest : AbstractDbGateTestBase
+    [Collection("Sequential")]
+    public class DbGateVersionTest : AbstractDbGateTestBase, IDisposable
     {
-        private const string DBName = "unit-testing-version";
-
-        [OneTimeSetUp]
-        public static void Before()
+        private const string DbName = "unit-testing-version";
+        public DbGateVersionTest()
         {
             TestClass = typeof(DbGateVersionTest);
-        }
-
-        [SetUp]
-        public void BeforeEach()
-        {
-            BeginInit(DBName);
+            BeginInit(DbName);
             TransactionFactory.DbGate.ClearCache();
             TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
             TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.Verify;
             TransactionFactory.DbGate.Config.UpdateStrategy = UpdateStrategy.AllColumns;
         }
-
-        [TearDown]
-        public void AfterEach()
+        public void Dispose()
         {
-            CleanupDb(DBName);
-            FinalizeDb(DBName);
+            CleanupDb(DbName);
+            FinalizeDb(DbName);
         }
-        
+       
         private IDbConnection SetupTables()
         {
-            string sql = "Create table version_test_root (\n" +
-                         "\tid_col Int NOT NULL,\n" +
-                         "\tname Varchar(20) NOT NULL,\n" +
-                         "\tversion Int NOT NULL,\n" +
-                         " Primary Key (id_col))";
-            CreateTableFromSql(sql,DBName);
+            var sql = "Create table version_test_root (\n" +
+                      "\tid_col Int NOT NULL,\n" +
+                      "\tname Varchar(20) NOT NULL,\n" +
+                      "\tversion Int NOT NULL,\n" +
+                      " Primary Key (id_col))";
+            CreateTableFromSql(sql,DbName);
 
             sql = "Create table version_test_one2many (\n" +
                   "\tid_col Int NOT NULL,\n" +
@@ -50,29 +42,29 @@ namespace DbGate.Persist
                   "\tname Varchar(20) NOT NULL,\n" +
                   "\tversion Int NOT NULL,\n" +
                   " Primary Key (id_col,index_no))";
-            CreateTableFromSql(sql, DBName);
+            CreateTableFromSql(sql, DbName);
 
             sql = "Create table version_test_one2one (\n" +
                   "\tid_col Int NOT NULL,\n" +
                   "\tname Varchar(20) NOT NULL,\n" +
                   "\tversion Int NOT NULL,\n" +
                   " Primary Key (id_col))";
-            CreateTableFromSql(sql, DBName);
+            CreateTableFromSql(sql, DbName);
 
-            EndInit(DBName);
+            EndInit(DbName);
             return Connection;
         }
 
-        [Test]
+        [Fact]
         public void Version_PersistTwice_WithVersionColumnEntity_ShouldNotThrowException()
         {
             try
             {
                 var con = SetupTables();
-                ITransaction transaction = CreateTransaction(con);
+                var transaction = CreateTransaction(con);
 
-                int id = 35;
-                VersionColumnTestRootEntity entity = new VersionColumnTestRootEntity();
+                var id = 35;
+                var entity = new VersionColumnTestRootEntity();
                 entity.IdCol =id;
                 entity.Name = "Org-Name";
                 entity.Persist(transaction);
@@ -90,16 +82,16 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void Version_PersistTwice_WithoutVersionColumnEntity_ShouldNotThrowException()
         {
             try
             {
                 var con = SetupTables();
-                ITransaction transaction = CreateTransaction(con);
+                var transaction = CreateTransaction(con);
 
-                int id = 45;
-                VersionGeneralTestRootEntity entity = new VersionGeneralTestRootEntity();
+                var id = 45;
+                var entity = new VersionGeneralTestRootEntity();
                 entity.IdCol =id;
                 entity.Name = "Org-Name";
                 entity.Persist(transaction);
@@ -117,14 +109,14 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void Version_PersistWithTwoChanges_WithoutUpdateChangedColumnsOnly_ShouldThrowException()
         {
             var con = SetupTables();
-            ITransaction transaction = CreateTransaction(con);
+            var transaction = CreateTransaction(con);
 
-            int id = 45;
-            VersionGeneralTestRootEntity entity = new VersionGeneralTestRootEntity();
+            var id = 45;
+            var entity = new VersionGeneralTestRootEntity();
             entity.IdCol = id;
             entity.Name = "Org-Name";
             entity.Version = 1;
@@ -132,8 +124,8 @@ namespace DbGate.Persist
             transaction.Commit();
             
             transaction = CreateTransaction(con);
-            VersionGeneralTestRootEntity loadedEntityA = new VersionGeneralTestRootEntity();
-            VersionGeneralTestRootEntity loadedEntityB = new VersionGeneralTestRootEntity();
+            var loadedEntityA = new VersionGeneralTestRootEntity();
+            var loadedEntityB = new VersionGeneralTestRootEntity();
             LoadWithoutVersionColumnEntityWithId(transaction,loadedEntityA, entity.IdCol);
             LoadWithoutVersionColumnEntityWithId(transaction,loadedEntityB, entity.IdCol);
             transaction.Commit();
@@ -147,17 +139,17 @@ namespace DbGate.Persist
             Assert.Throws<PersistException>(() => loadedEntityB.Persist(transaction));
         }
 
-        [Test]
+        [Fact]
         public void Version_PersistWithTwoChanges_WithUpdateChangedColumnsOnly_ShouldNotThrowException()
         {
             try
             {
                 TransactionFactory.DbGate.Config.UpdateStrategy = UpdateStrategy.ChangedColumns;
                 var con = SetupTables();
-                ITransaction transaction = CreateTransaction(con);
+                var transaction = CreateTransaction(con);
 
-                int id = 45;
-                VersionGeneralTestRootEntity entity = new VersionGeneralTestRootEntity();
+                var id = 45;
+                var entity = new VersionGeneralTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
                 entity.Version = 1;
@@ -165,8 +157,8 @@ namespace DbGate.Persist
                 transaction.Commit();
 
                 transaction = CreateTransaction(con);
-                VersionGeneralTestRootEntity loadedEntityA = new VersionGeneralTestRootEntity();
-                VersionGeneralTestRootEntity loadedEntityB = new VersionGeneralTestRootEntity();
+                var loadedEntityA = new VersionGeneralTestRootEntity();
+                var loadedEntityB = new VersionGeneralTestRootEntity();
                 LoadWithoutVersionColumnEntityWithId(transaction, loadedEntityA, entity.IdCol);
                 LoadWithoutVersionColumnEntityWithId(transaction, loadedEntityB, entity.IdCol);
                 transaction.Commit();
@@ -187,16 +179,16 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void Version_RootUpdateFromAnotherTransaction_WithVersionColumnEntity_ShouldThrowException()
         {
             var con = SetupTables();
-            ITransaction transaction = CreateTransaction(con);
+            var transaction = CreateTransaction(con);
             VersionColumnTestRootEntity entity = null;
 
             try
             {
-                int id = 55;
+                var id = 55;
                 entity = new VersionColumnTestRootEntity();
                 entity.IdCol =id;
                 entity.Name = "Org-Name";
@@ -204,7 +196,7 @@ namespace DbGate.Persist
                 transaction.Commit();
 
                 transaction = CreateTransaction(con);
-                VersionColumnTestRootEntity loadedEntity = new VersionColumnTestRootEntity();
+                var loadedEntity = new VersionColumnTestRootEntity();
                 LoadWithVersionColumnEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.Name ="New Name";
                 loadedEntity.Persist(transaction);
@@ -223,16 +215,16 @@ namespace DbGate.Persist
             con.Close();
         }
 
-        [Test]
+        [Fact]
         public void Version_RootUpdateFromAnotherTransaction_WithOutVersionColumnEntity_ShouldThrowException()
         {
             var con = SetupTables();
-            ITransaction transaction = CreateTransaction(con);
+            var transaction = CreateTransaction(con);
             VersionGeneralTestRootEntity entity = null;
 
             try
             {
-                int id = 65;
+                var id = 65;
                 entity = new VersionGeneralTestRootEntity();
                 entity.IdCol =id;
                 entity.Name = "Org-Name";
@@ -240,7 +232,7 @@ namespace DbGate.Persist
                 transaction.Commit();
 
                 transaction = CreateTransaction(con);
-                VersionGeneralTestRootEntity loadedEntity = new VersionGeneralTestRootEntity();
+                var loadedEntity = new VersionGeneralTestRootEntity();
                 LoadWithoutVersionColumnEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.Name ="New Name";
                 loadedEntity.Persist(transaction);
@@ -259,27 +251,27 @@ namespace DbGate.Persist
             con.Close();
         }
 
-        [Test]
+        [Fact]
         public void Version_One2oneChildUpdateFromAnotherTransaction_WithVersionColumnEntity_ShouldThrowException()
         {
             var con = SetupTables();
-            ITransaction transaction = CreateTransaction(con);
+            var transaction = CreateTransaction(con);
             VersionColumnTestRootEntity entity = null;
 
             try
             {
-                int id = 55;
+                var id = 55;
                 entity = new VersionColumnTestRootEntity();
                 entity.IdCol =id;
                 entity.Name = "Org-Name";
-                VersionColumnTestOne2OneEntity one2OneEntity = new VersionColumnTestOne2OneEntity();
+                var one2OneEntity = new VersionColumnTestOne2OneEntity();
                 one2OneEntity.Name ="One2One";
                 entity.One2OneEntity =one2OneEntity;
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(con);
-                VersionColumnTestRootEntity loadedEntity = new VersionColumnTestRootEntity();
+                var loadedEntity = new VersionColumnTestRootEntity();
                 LoadWithVersionColumnEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2OneEntity.Name ="Modified One2One";
                 loadedEntity.Persist(transaction);
@@ -298,27 +290,27 @@ namespace DbGate.Persist
             con.Close();
         }
 
-        [Test]
+        [Fact]
         public void Version_One2oneChildUpdateFromAnotherTransaction_WithoutVersionColumnEntity_ShouldThrowException()
         {
             var con = SetupTables();
-            ITransaction transaction = CreateTransaction(con);
+            var transaction = CreateTransaction(con);
             VersionGeneralTestRootEntity entity = null;
 
             try
             {
-                int id = 55;
+                var id = 55;
                 entity = new VersionGeneralTestRootEntity();
                 entity.IdCol =id;
                 entity.Name = "Org-Name";
-                VersionGeneralTestOne2OneEntity one2OneEntity = new VersionGeneralTestOne2OneEntity();
+                var one2OneEntity = new VersionGeneralTestOne2OneEntity();
                 one2OneEntity.Name ="One2One";
                 entity.One2OneEntity = one2OneEntity;
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(con);
-                VersionGeneralTestRootEntity loadedEntity = new VersionGeneralTestRootEntity();
+                var loadedEntity = new VersionGeneralTestRootEntity();
                 LoadWithoutVersionColumnEntityWithId(transaction,loadedEntity,id);
                 loadedEntity.One2OneEntity.Name ="Modified One2One";
                 loadedEntity.Persist(transaction);
@@ -337,20 +329,20 @@ namespace DbGate.Persist
             con.Close();
         }
 
-        [Test]
+        [Fact]
         public void Version_One2manyChildUpdateFromAnotherTransaction_WithVersionColumnEntity_ShouldThrowException()
         {
             var con = SetupTables();
-            ITransaction transaction = CreateTransaction(con);
+            var transaction = CreateTransaction(con);
             VersionColumnTestRootEntity entity = null;
 
             try
             {
-                int id = 55;
+                var id = 55;
                 entity = new VersionColumnTestRootEntity();
                 entity.IdCol =id;
                 entity.Name = "Org-Name";
-                VersionColumnTestOne2ManyEntity one2ManyEntityOrg = new VersionColumnTestOne2ManyEntity();
+                var one2ManyEntityOrg = new VersionColumnTestOne2ManyEntity();
                 one2ManyEntityOrg.Name = "One2Many";
                 one2ManyEntityOrg.IndexNo = 1; 
                 entity.One2ManyEntities.Add(one2ManyEntityOrg);
@@ -358,11 +350,11 @@ namespace DbGate.Persist
                 transaction.Commit();
 
                 transaction = CreateTransaction(con);
-                VersionColumnTestRootEntity loadedEntity = new VersionColumnTestRootEntity();
+                var loadedEntity = new VersionColumnTestRootEntity();
                 LoadWithVersionColumnEntityWithId(transaction,loadedEntity,id);
-                IEnumerator<VersionColumnTestOne2ManyEntity> loadedEnumerator = loadedEntity.One2ManyEntities.GetEnumerator();
+                var loadedEnumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 loadedEnumerator.MoveNext();
-                VersionColumnTestOne2ManyEntity loadedOne2ManyEntity = loadedEnumerator.Current;
+                var loadedOne2ManyEntity = loadedEnumerator.Current;
                 loadedOne2ManyEntity.Name ="Modified One2Many";
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
@@ -374,29 +366,29 @@ namespace DbGate.Persist
             }
 
             transaction =  CreateTransaction(con);
-            IEnumerator<VersionColumnTestOne2ManyEntity> orgEnumerator = entity.One2ManyEntities.GetEnumerator();
+            var orgEnumerator = entity.One2ManyEntities.GetEnumerator();
             orgEnumerator.MoveNext();
-            VersionColumnTestOne2ManyEntity orgOne2ManyEntity = orgEnumerator.Current;
+            var orgOne2ManyEntity = orgEnumerator.Current;
             orgOne2ManyEntity.Name = "Modified2 One2Many";
             Assert.Throws<PersistException>(() => entity.Persist(transaction));
             transaction.Commit();
             con.Close();
         }
 
-        [Test]
+        [Fact]
         public void Version_One2manyChildUpdateFromAnotherTransaction_WithoutVersionColumnEntity_ShouldThrowException()
         {
             var con = SetupTables();
-            ITransaction transaction = CreateTransaction(con);
+            var transaction = CreateTransaction(con);
             VersionGeneralTestRootEntity entity = null;
 
             try
             {
-                int id = 55;
+                var id = 55;
                 entity = new VersionGeneralTestRootEntity();
                 entity.IdCol =id;
                 entity.Name = "Org-Name";
-                VersionGeneralTestOne2ManyEntity orgOne2ManyEntityOrg = new VersionGeneralTestOne2ManyEntity();
+                var orgOne2ManyEntityOrg = new VersionGeneralTestOne2ManyEntity();
                 orgOne2ManyEntityOrg.Name = "One2Many";
                 orgOne2ManyEntityOrg.IndexNo = 1;
                 entity.One2ManyEntities.Add(orgOne2ManyEntityOrg);
@@ -404,12 +396,12 @@ namespace DbGate.Persist
                 transaction.Commit();
 
                 transaction = CreateTransaction(con);
-                VersionGeneralTestRootEntity loadedEntity = new VersionGeneralTestRootEntity();
+                var loadedEntity = new VersionGeneralTestRootEntity();
                 LoadWithoutVersionColumnEntityWithId(transaction,loadedEntity,id);
 
-                IEnumerator<VersionGeneralTestOne2ManyEntity> loadedEnumerator = loadedEntity.One2ManyEntities.GetEnumerator();
+                var loadedEnumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 loadedEnumerator.MoveNext();
-                VersionGeneralTestOne2ManyEntity loadedOne2ManyEntity = loadedEnumerator.Current;
+                var loadedOne2ManyEntity = loadedEnumerator.Current;
                 loadedOne2ManyEntity.Name = "Modified One2Many";
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
@@ -421,9 +413,9 @@ namespace DbGate.Persist
             }
 
             transaction = CreateTransaction(con);
-            IEnumerator<VersionGeneralTestOne2ManyEntity> orgEnumerator = entity.One2ManyEntities.GetEnumerator();
+            var orgEnumerator = entity.One2ManyEntities.GetEnumerator();
             orgEnumerator.MoveNext();
-            VersionGeneralTestOne2ManyEntity orgOne2ManyEntity = orgEnumerator.Current;
+            var orgOne2ManyEntity = orgEnumerator.Current;
             orgOne2ManyEntity.Name = "Modified2 One2Many";
             Assert.Throws<PersistException>(() => entity.Persist(transaction));
             transaction.Commit();
@@ -432,18 +424,18 @@ namespace DbGate.Persist
 
         private bool LoadWithVersionColumnEntityWithId(ITransaction transaction, VersionColumnTestRootEntity loadEntity, int id)
         {
-            bool loaded = false;
+            var loaded = false;
 
-            IDbCommand cmd = transaction.CreateCommand();
+            var cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from version_test_root where id_col = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Direction = ParameterDirection.Input;
             parameter.Value = id;
 
-            IDataReader dataReader = cmd.ExecuteReader();
+            var dataReader = cmd.ExecuteReader();
             if (dataReader.Read())
             {
                 loadEntity.Retrieve(dataReader, transaction);
@@ -455,18 +447,18 @@ namespace DbGate.Persist
 
         private bool LoadWithoutVersionColumnEntityWithId(ITransaction transaction, VersionGeneralTestRootEntity loadEntity, int id)
         {
-            bool loaded = false;
+            var loaded = false;
 
-            IDbCommand cmd = transaction.CreateCommand();
+            var cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from version_test_root where id_col = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Direction = ParameterDirection.Input;
             parameter.Value = id;
 
-            IDataReader dataReader = cmd.ExecuteReader();
+            var dataReader = cmd.ExecuteReader();
             if (dataReader.Read())
             {
                 loadEntity.Retrieve(dataReader, transaction);

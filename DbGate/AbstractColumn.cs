@@ -69,12 +69,12 @@ namespace DbGate
 
         public static string PredictColumnName(String attributeName)
         {
-            bool previousCaps = false;
+            var previousCaps = false;
             var stringBuilder = new StringBuilder();
-            char[] chars = attributeName.ToCharArray();
-            for (int i = 0; i < chars.Length; i++)
+            var chars = attributeName.ToCharArray();
+            for (var i = 0; i < chars.Length; i++)
             {
-                char aChar = chars[i];
+                var aChar = chars[i];
                 if (Char.IsUpper(aChar) && i > 0)
                 {
                     if (!previousCaps)

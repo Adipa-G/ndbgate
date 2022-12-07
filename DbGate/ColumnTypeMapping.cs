@@ -10,15 +10,15 @@ namespace DbGate
         private static readonly Dictionary<Type,ColumnType> NetType2ColumnType = new Dictionary<Type, ColumnType>();
         private static readonly Dictionary<ColumnType,Type> ColumnType2NetType = new Dictionary<ColumnType, Type>();
         private static readonly Dictionary<ColumnType,DbType> ColumnType2DbType = new Dictionary<ColumnType, DbType>();
-        private static bool _initialized = false;
+        private static bool initialized = false;
 
         private static void Init()
         {
-            if (!_initialized)
+            if (!initialized)
             {
                 lock (NetType2ColumnType)
                 {
-                    if (_initialized)
+                    if (initialized)
                         return;
 
                     AddNetTypeAndColumnTypeRelation(typeof(Guid), ColumnType.Guid);
@@ -46,7 +46,7 @@ namespace DbGate
                     AddDbTypeAndColumnTypeRelation(DbType.DateTime, ColumnType.Timestamp);
                     AddDbTypeAndColumnTypeRelation(DbType.Int32, ColumnType.Version);
                 }
-                _initialized = true;
+                initialized = true;
             }
         }
 

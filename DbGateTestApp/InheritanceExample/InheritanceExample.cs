@@ -15,7 +15,7 @@ namespace DbGateTestApp.InheritanceExample
 
         public BottomEntity CreateEntity()
         {
-            BottomEntity entity = new BottomEntity();
+            var entity = new BottomEntity();
             entity.Id = Id;
             entity.SuperName = "Super";
             entity.MiddleName = "Middle";
@@ -37,16 +37,16 @@ namespace DbGateTestApp.InheritanceExample
 
         public BottomEntity Retrieve(ITransaction tx)
         {
-            IDbCommand cmd = tx.CreateCommand();
+            var cmd = tx.CreateCommand();
             cmd.CommandText = "select * from bottom_entity where id = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Value = Id;
 
             BottomEntity entity = null;
-            IDataReader reader = cmd.ExecuteReader();
+            var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 entity = new BottomEntity();
@@ -59,11 +59,11 @@ namespace DbGateTestApp.InheritanceExample
 
         public static void DoTest()
         {
-            InheritanceExample example = new InheritanceExample();
-            ITransaction tx = ExampleBase.SetupDb();
+            var example = new InheritanceExample();
+            var tx = ExampleBase.SetupDb();
             example.Patch(tx);
 
-            BottomEntity entity = example.CreateEntity();
+            var entity = example.CreateEntity();
             example.Persist(tx, entity);
 
             entity = example.Retrieve(tx);

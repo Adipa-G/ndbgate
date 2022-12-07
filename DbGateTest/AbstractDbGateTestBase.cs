@@ -3,31 +3,27 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Xml;
 using DbGate.Caches;
 using DbGate.Caches.Impl;
 using DbGate.ErManagement.ErMapper;
-using NUnit.Framework;
 using log4net;
+using Xunit;
 
 namespace DbGate
 {
     public class AbstractDbGateTestBase
     {
-        protected static ITransactionFactory TransactionFactory;
-        protected static IDbConnection Connection;
+        protected ITransactionFactory TransactionFactory;
+        protected IDbConnection Connection;
         
-        private static readonly Dictionary<string,ICollection<string>> DBTableNameMap = new Dictionary<string, ICollection<string>>();
-        private static readonly Dictionary<string,ICollection<Type>> DBEntityTypeMap = new Dictionary<string, ICollection<Type>>();
+        private readonly Dictionary<string,ICollection<string>> dbTableNameMap = new Dictionary<string, ICollection<string>>();
+        private readonly Dictionary<string,ICollection<Type>> dbEntityTypeMap = new Dictionary<string, ICollection<Type>>();
         
         protected static Type TestClass = typeof(AbstractDbGateTestBase);
 
-        protected static void BeginInit(string dbName)
+        protected void BeginInit(string dbName)
         {
             try
             {
@@ -39,15 +35,15 @@ namespace DbGate
                     LogManager.GetLogger(TestClass).Info("Starting in-memory database for unit tests");
                     TransactionFactory = new DefaultTransactionFactory(
                         () => new SQLiteConnection(
-                            "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON"),
+                            "Data Source=:memory:;Version=3;Mode=Memory;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON"),
                         DefaultTransactionFactory.DbSqllite);
                 }
                 
                 var transaction = TransactionFactory.CreateTransaction();
-                Assert.IsNotNull(transaction);
+                Assert.NotNull(transaction);
                 
                 Connection = transaction.Connection;
-                Assert.IsNotNull(Connection);
+                Assert.NotNull(Connection);
             }
             catch (System.Exception ex)
             {
@@ -55,7 +51,7 @@ namespace DbGate
             }
         }
 
-        protected static ITransaction CreateTransaction(IDbConnection con = null)
+        protected ITransaction CreateTransaction(IDbConnection con = null)
         {
             if (con != null)
             {
@@ -64,12 +60,12 @@ namespace DbGate
             return new Transaction(TransactionFactory, Connection.BeginTransaction());
         }
 
-        protected static void CreateTableFromSql(string sql,string dbName,IDbConnection con = null)
+        protected void CreateTableFromSql(string sql,string dbName,IDbConnection con = null)
         {
             try
             {
-                ITransaction tx = CreateTransaction(con);
-                IDbCommand cmd = tx.CreateCommand();
+                var tx = CreateTransaction(con);
+                var cmd = tx.CreateCommand();
                 cmd.CommandText = sql;
                 cmd.ExecuteNonQuery();
                 tx.Commit();
@@ -82,46 +78,46 @@ namespace DbGate
             }
         }
 
-        protected static void RegisterClassForDbPatching(Type entity,string dbName)
+        protected void RegisterClassForDbPatching(Type entity,string dbName)
         {
             ICollection<Type> entityTypes;
-            if (DBEntityTypeMap.ContainsKey(dbName))
+            if (dbEntityTypeMap.ContainsKey(dbName))
             {
-                entityTypes = DBEntityTypeMap[dbName];
+                entityTypes = dbEntityTypeMap[dbName];
             }
             else
             {
                 entityTypes = new List<Type>();
-                DBEntityTypeMap.Add(dbName,entityTypes);
+                dbEntityTypeMap.Add(dbName,entityTypes);
             }
             entityTypes.Add(entity);
         }
 
-        private static void AddTableNameFromSql(string sql,string dbName)
+        private void AddTableNameFromSql(string sql,string dbName)
         {
             var match = Regex.Match(sql,@"(create)([\\s]*)(table)([\\s]*)([^\\s]*)",RegexOptions.IgnoreCase);
             if (match.Success)
             {
-                string tableName = match.Groups[match.Groups.Count].Value;
+                var tableName = match.Groups[match.Groups.Count].Value;
                 AddTableName(tableName,dbName);
             }
         }
 
-        protected static void EndInit(string dbName,IDbConnection con = null)
+        protected void EndInit(string dbName,IDbConnection con = null)
         {
             try
             {
-                ITransaction tx = CreateTransaction(con);
-                if (DBEntityTypeMap.ContainsKey(dbName))
+                var tx = CreateTransaction(con);
+                if (dbEntityTypeMap.ContainsKey(dbName))
                 {
-                    ICollection<Type> typeList = DBEntityTypeMap[dbName];
+                    var typeList = dbEntityTypeMap[dbName];
                     if (typeList.Count > 0)
                     {
                         tx.DbGate.PatchDataBase(tx,typeList,true);
                         tx.Commit();
                     }
 
-                    foreach (Type aType in typeList)
+                    foreach (var aType in typeList)
                     {
                         AddTableNameFromEntity(aType,dbName);
                     }
@@ -133,9 +129,9 @@ namespace DbGate
             }
         }
 
-        private static void AddTableNameFromEntity(Type entityType,string dbName)
+        private void AddTableNameFromEntity(Type entityType,string dbName)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(entityType);
+            var entityInfo = CacheManager.GetEntityInfo(entityType);
             while (entityInfo != null)
             {
                 AddTableName(entityInfo.TableInfo.TableName,dbName);
@@ -143,17 +139,17 @@ namespace DbGate
             }
         }
 
-        private static void AddTableName(string tableName,string dbName)
+        private void AddTableName(string tableName,string dbName)
         {
             ICollection<string> tableNames;
-            if (DBTableNameMap.ContainsKey(dbName))
+            if (dbTableNameMap.ContainsKey(dbName))
             {
-                tableNames = DBTableNameMap[dbName];
+                tableNames = dbTableNameMap[dbName];
             }
             else
             {
                 tableNames = new List<string>();
-                DBTableNameMap.Add(dbName, tableNames);
+                dbTableNameMap.Add(dbName, tableNames);
             }
             if (!tableNames.Contains(tableName))
             {
@@ -161,19 +157,19 @@ namespace DbGate
             }
         }
 
-        protected static void CleanupDb(string dbName)
+        protected void CleanupDb(string dbName)
         {
             try
             {
-                if (DBTableNameMap.ContainsKey(dbName))
+                if (dbTableNameMap.ContainsKey(dbName))
                 {
-                    ICollection<string> tableNames = DBTableNameMap[dbName];
+                    var tableNames = dbTableNameMap[dbName];
                     if (tableNames.Count > 0)
                     {
-                        ITransaction tx = TransactionFactory.CreateTransaction();
-                        foreach (string tableName in tableNames)
+                        var tx = TransactionFactory.CreateTransaction();
+                        foreach (var tableName in tableNames)
                         {
-                            IDbCommand cmd = tx.CreateCommand();
+                            var cmd = tx.CreateCommand();
                             cmd.CommandText = string.Format("DELETE FROM {0}",tableName);
                             cmd.ExecuteNonQuery();
                         }
@@ -187,7 +183,7 @@ namespace DbGate
             }
         }
 
-        protected static void FinalizeDb(string dbName)
+        protected void FinalizeDb(string dbName)
         {
             LogManager.GetLogger(TestClass).Info(string.Format("Stopping in-memory database {0}.",dbName));
 
@@ -202,8 +198,8 @@ namespace DbGate
                 LogManager.GetLogger(TestClass).Fatal("Exception during test cleanup.", ex);
             }
 
-            DBEntityTypeMap.Clear();
-            DBTableNameMap.Clear();
+            dbEntityTypeMap.Clear();
+            dbTableNameMap.Clear();
         }
     }
 }

@@ -4,21 +4,21 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures
 {
     public abstract class AbstractMetaItem : IMetaItem
     {
-        private MetaItemType _itemType;
-        private string _name;
+        private MetaItemType itemType;
+        private string name;
 
         #region IMetaItem Members
 
         public string Name
         {
-            get { return _name; }
-            set { _name = value; }
+            get => name;
+            set => name = value;
         }
 
         public MetaItemType ItemType
         {
-            get { return _itemType; }
-            set { _itemType = value; }
+            get => itemType;
+            set => itemType = value;
         }
 
         #endregion
@@ -30,8 +30,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures
 
             var that = (AbstractMetaItem) o;
 
-            if (_itemType != that._itemType) return false;
-            if (!_name.Equals(that._name, StringComparison.OrdinalIgnoreCase)) return false;
+            if (itemType != that.itemType) return false;
+            if (!name.Equals(that.name, StringComparison.OrdinalIgnoreCase)) return false;
 
             return true;
         }

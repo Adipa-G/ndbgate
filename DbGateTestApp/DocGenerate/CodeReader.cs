@@ -16,9 +16,9 @@ namespace DbGateTestApp.DocGenerate
 	  	public static ICollection<WikiCodeBlockInfo> ReadAndExtractWikiBlocks(ICollection<string> sourceFileList)
 	  	{
             var allBlocks = new List<WikiCodeBlockInfo>();
-	  	    foreach (string srcFile in sourceFileList)
+	  	    foreach (var srcFile in sourceFileList)
 	  	    {
-	  	        string fileContent = File.ReadAllText(srcFile);
+	  	        var fileContent = File.ReadAllText(srcFile);
 	  	        allBlocks.AddRange(FindBlocks(fileContent));
 	  	    }
 	  	    return allBlocks;
@@ -26,7 +26,7 @@ namespace DbGateTestApp.DocGenerate
 	  	 	
 	  	private static IEnumerable<WikiCodeBlockInfo> FindBlocks(string source)
 	  	{
-	  	 	int curPos = 0;
+	  	 	var curPos = 0;
 	  	 	var infoList = new List<WikiCodeBlockInfo>();
 
 	  	    var match = Regex.Match(source,string.Format(@"(\[\s*{0}\(\s*\"")([^\""]*)(\""\s*\)\s*\])",BlockAttributeName));
@@ -44,11 +44,11 @@ namespace DbGateTestApp.DocGenerate
 	  	private static string ReadBlock(String source, int position)
 	  	{
 	  	 	var block = new StringBuilder();
-	  	 	bool blockStart = false;
-	  	 	int bracketCount = 0;
-	  	 	char[] chars = source.Substring(position).ToCharArray();
+	  	 	var blockStart = false;
+	  	 	var bracketCount = 0;
+	  	 	var chars = source.Substring(position).ToCharArray();
 	  	 	
-	  	 	foreach (char aChar in chars)
+	  	 	foreach (var aChar in chars)
             {
 	  	 	    switch (aChar)
 	  	 	    {

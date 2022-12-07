@@ -18,15 +18,12 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.From
 
         #region IAbstractFrom Members
 
-        public QueryFromExpressionType FromExpressionType
-        {
-            get { return QueryFromExpressionType.Query; }
-        }
+        public QueryFromExpressionType FromExpressionType => QueryFromExpressionType.Query;
 
         public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
         {
-            QueryBuildInfo result = dbLayer.DataManipulate().ProcessQuery(buildInfo, Query.Structure);
-            string sql = "(" + result.ExecInfo.Sql + ")";
+            var result = dbLayer.DataManipulate().ProcessQuery(buildInfo, Query.Structure);
+            var sql = "(" + result.ExecInfo.Sql + ")";
             if (!string.IsNullOrEmpty(Alias))
             {
                 sql = sql + " as " + Alias;

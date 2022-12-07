@@ -12,46 +12,40 @@ namespace DbGate.Caches.Impl
 {
     public class EntityInfo
     {
-        private readonly Type _entityType;
-        private readonly IDictionary<string,PropertyInfo> _propertyMap;
-        private readonly List<IColumn> _columns;
-        private readonly List<IRelation> _relations;
-        private readonly IDictionary<string,string> _queries;
-        private readonly List<EntityInfo> _subEntityInfo;
-        private readonly ICollection<EntityRelationColumnInfo> _relationColumnInfoList;
+        private readonly Type entityType;
+        private readonly IDictionary<string,PropertyInfo> propertyMap;
+        private readonly List<IColumn> columns;
+        private readonly List<IRelation> relations;
+        private readonly IDictionary<string,string> queries;
+        private readonly List<EntityInfo> subEntityInfo;
+        private readonly ICollection<EntityRelationColumnInfo> relationColumnInfoList;
 
 
-        private bool _relationColumnsPopulated;
+        private bool relationColumnsPopulated;
     
         public EntityInfo(Type entityType)
         {
-            _relationColumnsPopulated = false;
-            _entityType = entityType;
-            _columns = new List<IColumn>();
-            _relations = new List<IRelation>();
-            _propertyMap = new Dictionary<string, PropertyInfo>();
-            _queries = new Dictionary<string, string>();
-            _subEntityInfo = new List<EntityInfo>();
-            _relationColumnInfoList = new List<EntityRelationColumnInfo>();
+            relationColumnsPopulated = false;
+            this.entityType = entityType;
+            columns = new List<IColumn>();
+            relations = new List<IRelation>();
+            propertyMap = new Dictionary<string, PropertyInfo>();
+            queries = new Dictionary<string, string>();
+            subEntityInfo = new List<EntityInfo>();
+            relationColumnInfoList = new List<EntityRelationColumnInfo>();
         }
 
-        public Type EntityType
-        {
-            get { return _entityType; }
-        }
+        public Type EntityType => entityType;
 
         public ITable TableInfo { get; set; }
 
         public EntityInfo SuperEntityInfo { get; set; }
 
-        public ICollection<EntityInfo> SubEntityInfo
-	    {
-            get { return  _subEntityInfo.AsReadOnly(); }
-	    }
+        public ICollection<EntityInfo> SubEntityInfo => subEntityInfo.AsReadOnly();
 
         public void AddSubEntityInfo(EntityInfo subEntityInfo)
         {
-            _subEntityInfo.Add(subEntityInfo);
+            this.subEntityInfo.Add(subEntityInfo);
         }
 
         public ICollection<IColumn> Columns
@@ -59,36 +53,30 @@ namespace DbGate.Caches.Impl
             get
             {
                 PopulateRelationColumns();
-                return _columns.AsReadOnly();
+                return columns.AsReadOnly();
             }
         }
 
         public EntityRelationColumnInfo FindRelationColumnInfo(string attributeName)
         {
             return
-                _relationColumnInfoList.FirstOrDefault(
+                relationColumnInfoList.FirstOrDefault(
                     l => attributeName.Equals(l.Column.AttributeName, StringComparison.InvariantCultureIgnoreCase));
         }
 	
 	    public IColumn FindColumnByAttribute(string attributeName)
 	    {
-	        return _columns.First(c => attributeName.Equals(c.AttributeName, StringComparison.InvariantCultureIgnoreCase));
+	        return columns.First(c => attributeName.Equals(c.AttributeName, StringComparison.InvariantCultureIgnoreCase));
 	    }
 
-        public ICollection<IRelation> Relations
-        {
-            get { return _relations.AsReadOnly(); }
-        }
+        public ICollection<IRelation> Relations => relations.AsReadOnly();
 
-        public IDictionary<string, string> Queries
-        {
-            get { return new ReadOnlyDictionary<string, string>(_queries); }
-        }
+        public IDictionary<string, string> Queries => new ReadOnlyDictionary<string, string>(queries);
 
         public ICollection<IColumn> GetKeys()
         {
             var keys = new List<IColumn>();
-            foreach (IColumn column in Columns)
+            foreach (var column in Columns)
             {
                 if (column.Key)
                 {
@@ -100,46 +88,46 @@ namespace DbGate.Caches.Impl
     
         public void SetFields(ICollection<IField> fields)
         {
-            foreach (IField field in fields)
+            foreach (var field in fields)
             {
                 var dbColumn = field as IColumn;
                 if (dbColumn != null)
                 {
-                    _columns.Add(dbColumn);
+                    columns.Add(dbColumn);
                 }
                 else
                 {
                     var relation = field as IRelation;
                     if (relation != null)
-                        _relations.Add(relation);
+                        relations.Add(relation);
                 }
             }
         }
 
         private void PopulateRelationColumns()
 	    {
-	        if (_relationColumnsPopulated)
+	        if (relationColumnsPopulated)
 	            return;
 	
 
-	        foreach (IRelation relation in _relations)
+	        foreach (var relation in relations)
 	        {
-	            bool found = HasManualRelationColumnsDefined(relation);
+	            var found = HasManualRelationColumnsDefined(relation);
 	            if (!found)
 	            {
 	                CreateRelationColumns(relation);
 	            }
 	        }
 
-            _relationColumnsPopulated = true;
+            relationColumnsPopulated = true;
 	    }
 	
 	    private bool HasManualRelationColumnsDefined(IRelation relation)
 	    {
-	        bool found = false;
-	        foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
+	        var found = false;
+	        foreach (var mapping in relation.TableColumnMappings)
 	        {
-	            foreach (IColumn column in _columns)
+	            foreach (var column in columns)
 	            {
 	                if (column.AttributeName.Equals(mapping.FromField,StringComparison.InvariantCultureIgnoreCase))
 	                {
@@ -155,14 +143,14 @@ namespace DbGate.Caches.Impl
 	
 	    private void CreateRelationColumns(IRelation relation)
 	    {
-	        EntityInfo relationInfo = CacheManager.GetEntityInfo(relation.RelatedObjectType);
+	        var relationInfo = CacheManager.GetEntityInfo(relation.RelatedObjectType);
 	        while (relationInfo != null)
 	        {
-	            ICollection<IColumn> relationKeys = relationInfo.GetKeys();
-	            foreach (IColumn relationKey in relationKeys)
+	            var relationKeys = relationInfo.GetKeys();
+	            foreach (var relationKey in relationKeys)
 	            {
 	                RelationColumnMapping matchingMapping = null;
-	                foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
+	                foreach (var mapping in relation.TableColumnMappings)
 	                {
 	                    if (mapping.ToField.Equals(relationKey.AttributeName,StringComparison.InvariantCultureIgnoreCase))
 	                    {
@@ -171,7 +159,7 @@ namespace DbGate.Caches.Impl
 	                    }
 	                }
 	
-	                IColumn cloned = relationKey.Clone();
+	                var cloned = relationKey.Clone();
 	                cloned.Key =false;
 	                if (matchingMapping != null)
 	                {
@@ -180,8 +168,8 @@ namespace DbGate.Caches.Impl
 	                }
 	                cloned.Nullable = relation.Nullable;
 
-                    _columns.Add(cloned);
-	                _relationColumnInfoList.Add(new EntityRelationColumnInfo(cloned,relation,matchingMapping));
+                    columns.Add(cloned);
+	                relationColumnInfoList.Add(new EntityRelationColumnInfo(cloned,relation,matchingMapping));
 	            }
 	            relationInfo = relationInfo.SuperEntityInfo;
 	        }
@@ -190,7 +178,7 @@ namespace DbGate.Caches.Impl
         public string GetLoadQuery(IDbLayer dbLayer)
         {
             const string queryId = "LOAD";
-            string query = GetQuery(queryId);
+            var query = GetQuery(queryId);
             if (query == null)
             {
                 PopulateRelationColumns();
@@ -208,7 +196,7 @@ namespace DbGate.Caches.Impl
         public string GetInsertQuery(IDbLayer dbLayer)
         {
             const string queryId = "INSERT";
-            string query = GetQuery(queryId);
+            var query = GetQuery(queryId);
             if (query == null)
             {
                 PopulateRelationColumns();
@@ -226,7 +214,7 @@ namespace DbGate.Caches.Impl
         public string GetUpdateQuery(IDbLayer dbLayer)
         {
             const string queryId = "UPDATE";
-            string query = GetQuery(queryId);
+            var query = GetQuery(queryId);
             if (query == null)
             {
                 PopulateRelationColumns();
@@ -244,7 +232,7 @@ namespace DbGate.Caches.Impl
         public string GetDeleteQuery(IDbLayer dbLayer)
         {
             const string queryId = "DELETE";
-            string query = GetQuery(queryId);
+            var query = GetQuery(queryId);
             if (query == null)
             {
                 PopulateRelationColumns();
@@ -260,8 +248,8 @@ namespace DbGate.Caches.Impl
     
         public string GetRelationObjectLoad(IDbLayer dbLayer, IRelation relation)
         {
-            string queryId = relation.RelationShipName + "_" + relation.RelatedObjectType.FullName;
-            string query = GetQuery(queryId);
+            var queryId = relation.RelationShipName + "_" + relation.RelatedObjectType.FullName;
+            var query = GetQuery(queryId);
             if (query == null)
             {
                 query = dbLayer.DataManipulate().CreateRelatedObjectsLoadQuery(relation);
@@ -285,7 +273,7 @@ namespace DbGate.Caches.Impl
         {
             lock (Queries)
             {
-                _queries[id] = query;
+                queries[id] = query;
             }
         }
 
@@ -296,27 +284,27 @@ namespace DbGate.Caches.Impl
 
         public PropertyInfo GetProperty(string propertyName)
         {
-            string cacheKey = "prop_" + propertyName;
+            var cacheKey = "prop_" + propertyName;
 
-            if (_propertyMap.ContainsKey(cacheKey))
+            if (propertyMap.ContainsKey(cacheKey))
             {
-                return _propertyMap[cacheKey];
+                return propertyMap[cacheKey];
             }
 
-            lock (_propertyMap)
+            lock (propertyMap)
             {
-                if (_propertyMap.ContainsKey(cacheKey))
+                if (propertyMap.ContainsKey(cacheKey))
                 {
-                    return _propertyMap[cacheKey];
+                    return propertyMap[cacheKey];
                 }
 
                 try
                 {
-                    PropertyInfo propertyInfo = EntityType.GetProperty(propertyName);
+                    var propertyInfo = EntityType.GetProperty(propertyName);
                     if (propertyInfo == null)
                         throw CreatePropertyNotFoundException(propertyName);
 
-                    _propertyMap.Add(cacheKey, propertyInfo);
+                    propertyMap.Add(cacheKey, propertyInfo);
                     return propertyInfo;
                 }
                 catch (Exception)

@@ -2,19 +2,16 @@ namespace DbGate.Context.Impl
 {
     public class EntityFieldValueList : EntityTypeFieldValueList, IEntityFieldValueList
     {
-        private readonly IReadOnlyEntity _entity;
+        private readonly IReadOnlyEntity entity;
 
         public EntityFieldValueList(IReadOnlyEntity entity) : base(entity.GetType())
         {
-            _entity = entity;
+            this.entity = entity;
         }
 
         #region IEntityFieldValueList Members
 
-        public IReadOnlyEntity Entity
-        {
-            get { return _entity; }
-        }
+        public IReadOnlyEntity Entity => entity;
 
         #endregion
     }

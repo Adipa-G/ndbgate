@@ -2,62 +2,55 @@
 using System.Data;
 using DbGate.Persist.Support.InheritanceTest;
 using log4net;
-using NUnit.Framework;
+using Xunit;
 
 namespace DbGate.Persist
 {
-    [TestFixture]
-    public class DbGateInheritancePersistTests : AbstractDbGateTestBase
+    [Collection("Sequential")]
+    public class DbGateInheritancePersistTests : AbstractDbGateTestBase, IDisposable
     {
-        public const int TYPE_ATTRIBUTE = 1;
-        public const int TYPE_FIELD = 2;
-        public const int TYPE_EXTERNAL = 3;
+        public const int TypeAttribute = 1;
+        public const int TypeField = 2;
+        public const int TypeExternal = 3;
 
-        private const string DBName = "unit-testing-inheritance-persist";
+        private const string DbName = "unit-testing-inheritance-persist";
 
-        [OneTimeSetUp]
-        public static void Before()
+        public DbGateInheritancePersistTests()
         {
             TestClass = typeof(DbGateInheritancePersistTests);
-        }
-
-        [SetUp]
-        public void BeforeEach()
-        {
-            BeginInit(DBName);
+            BeginInit(DbName);
             TransactionFactory.DbGate.ClearCache();
             TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
             TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.DoNotVerify;
         }
 
-        [TearDown]
-        public void AfterEach()
+        public void Dispose()
         {
-            CleanupDb(DBName);
-            FinalizeDb(DBName);
+            CleanupDb(DbName);
+            FinalizeDb(DbName);
         }
-
+        
         private IDbConnection SetupTables()
         {
-            string sql = "Create table inheritance_test_super (\n" +
-                         "\tid_col Int NOT NULL,\n" +
-                         "\tname Varchar(20) NOT NULL,\n" +
-                         " Primary Key (id_col))";
-            CreateTableFromSql(sql,DBName);
+            var sql = "Create table inheritance_test_super (\n" +
+                      "\tid_col Int NOT NULL,\n" +
+                      "\tname Varchar(20) NOT NULL,\n" +
+                      " Primary Key (id_col))";
+            CreateTableFromSql(sql,DbName);
             
             sql = "Create table inheritance_test_suba (\n" +
                   "\tid_col Int NOT NULL,\n" +
                   "\tname_a Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col))";
-            CreateTableFromSql(sql, DBName);
+            CreateTableFromSql(sql, DbName);
 
             sql = "Create table inheritance_test_subb (\n" +
                   "\tid_col Int NOT NULL,\n" +
                   "\tname_b Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col))";
-            CreateTableFromSql(sql, DBName);
+            CreateTableFromSql(sql, DbName);
 
-            EndInit(DBName);
+            EndInit(DbName);
             return Connection;
         }
 
@@ -65,9 +58,9 @@ namespace DbGate.Persist
         {
             try
             {
-                ITransaction transaction = CreateTransaction(connection);
+                var transaction = CreateTransaction(connection);
 
-                IDbCommand command = connection.CreateCommand();
+                var command = connection.CreateCommand();
                 command.CommandText = "DELETE FROM inheritance_test_super";
                 command.ExecuteNonQuery();
 
@@ -89,7 +82,7 @@ namespace DbGate.Persist
 
         private void RegisterForExternal()
         {
-            Type objType = typeof (InheritanceTestSuperEntityExt);
+            var objType = typeof (InheritanceTestSuperEntityExt);
             TransactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableInfo(objType),
                                                       InheritanceTestExtFactory.GetFieldInfo(objType));
 
@@ -102,34 +95,34 @@ namespace DbGate.Persist
                                                       InheritanceTestExtFactory.GetFieldInfo(objType));
         }
 
-        [Test]
+        [Fact]
         public void Inheritance_Insert_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded()
         {
             try
             {
-                var types = new[] {TYPE_ATTRIBUTE, TYPE_EXTERNAL, TYPE_FIELD};
+                var types = new[] {TypeAttribute, TypeExternal, TypeField};
                 var idAs = new[] {35, 45, 55};
                 var idBs = new[] {36, 46, 56};
 
-                IDbConnection connection = SetupTables();
+                var connection = SetupTables();
 
-                for (int i = 0; i < types.Length; i++)
+                for (var i = 0; i < types.Length; i++)
                 {
-                    int type = types[i];
-                    int idA = idAs[i];
-                    int idB = idBs[i];
+                    var type = types[i];
+                    var idA = idAs[i];
+                    var idB = idBs[i];
 
                     switch (type)
                     {
-                        case TYPE_ATTRIBUTE:
+                        case TypeAttribute:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Insert_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With attributes");
                             break;
-                        case TYPE_EXTERNAL:
+                        case TypeExternal:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Insert_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With externals");
                             break;
-                        case TYPE_FIELD:
+                        case TypeField:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Insert_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With fields");
                             break;
@@ -137,7 +130,7 @@ namespace DbGate.Persist
                     ClearTables(connection);
 
                     TransactionFactory.DbGate.ClearCache();
-                    if (type == TYPE_EXTERNAL)
+                    if (type == TypeExternal)
                     {
                         RegisterForExternal();
                     }
@@ -145,7 +138,7 @@ namespace DbGate.Persist
                     IInheritanceTestSuperEntity entityA = CreateObjectWithDataTypeA(idA, type);
                     IInheritanceTestSuperEntity entityB = CreateObjectWithDataTypeB(idB, type);
 
-                    ITransaction transaction = CreateTransaction(connection);
+                    var transaction = CreateTransaction(connection);
                     entityA.Persist(transaction);
                     entityB.Persist(transaction);
                     transaction.Commit();
@@ -157,10 +150,10 @@ namespace DbGate.Persist
                     LoadEntityWithTypeB(transaction, loadedEntityB, idB);
                     transaction.Commit();
 
-                    bool compareResult = CompareEntities(entityA, loadedEntityA);
-                    Assert.IsTrue(compareResult);
+                    var compareResult = CompareEntities(entityA, loadedEntityA);
+                    Assert.True(compareResult);
                     compareResult = CompareEntities(entityB, loadedEntityB);
-                    Assert.IsTrue(compareResult);
+                    Assert.True(compareResult);
                 }
                 connection.Close();
             }
@@ -171,41 +164,41 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void Inheritance_Update_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded()
         {
             try
             {
-                var types = new[] {TYPE_ATTRIBUTE, TYPE_EXTERNAL, TYPE_FIELD};
+                var types = new[] {TypeAttribute, TypeExternal, TypeField};
                 var idAs = new[] {35, 45, 55};
                 var idBs = new[] {36, 46, 56};
 
-                IDbConnection connection = SetupTables();
+                var connection = SetupTables();
 
-                for (int i = 0; i < types.Length; i++)
+                for (var i = 0; i < types.Length; i++)
                 {
-                    int type = types[i];
-                    int idA = idAs[i];
-                    int idB = idBs[i];
+                    var type = types[i];
+                    var idA = idAs[i];
+                    var idB = idBs[i];
 
                     switch (type)
                     {
-                        case TYPE_ATTRIBUTE:
+                        case TypeAttribute:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Update_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With attributes");
                             break;
-                        case TYPE_EXTERNAL:
+                        case TypeExternal:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Update_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With externals");
                             break;
-                        case TYPE_FIELD:
+                        case TypeField:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Update_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With fields");
                             break;
                     }
 
                     TransactionFactory.DbGate.ClearCache();
-                    if (type == TYPE_EXTERNAL)
+                    if (type == TypeExternal)
                     {
                         RegisterForExternal();
                     }
@@ -215,14 +208,14 @@ namespace DbGate.Persist
                     IInheritanceTestSuperEntity entityA = CreateObjectWithDataTypeA(idA, type);
                     IInheritanceTestSuperEntity entityB = CreateObjectWithDataTypeB(idB, type);
 
-                    ITransaction transaction = CreateTransaction(connection);
+                    var transaction = CreateTransaction(connection);
                     entityA.Persist(transaction);
                     entityB.Persist(transaction);
                     transaction.Commit();
 
                     transaction = CreateTransaction(connection);
-                    IInheritanceTestSubEntityA loadedEntityA = CreateObjectEmptyTypeA(type);
-                    IInheritanceTestSubEntityB loadedEntityB = CreateObjectEmptyTypeB(type);
+                    var loadedEntityA = CreateObjectEmptyTypeA(type);
+                    var loadedEntityB = CreateObjectEmptyTypeB(type);
                     LoadEntityWithTypeA(transaction, loadedEntityA, idA);
                     LoadEntityWithTypeB(transaction, loadedEntityB, idB);
 
@@ -237,16 +230,16 @@ namespace DbGate.Persist
                     loadedEntityA.Persist(transaction);
                     loadedEntityB.Persist(transaction);
 
-                    IInheritanceTestSubEntityA reLoadedEntityA = CreateObjectEmptyTypeA(type);
-                    IInheritanceTestSubEntityB reLoadedEntityB = CreateObjectEmptyTypeB(type);
+                    var reLoadedEntityA = CreateObjectEmptyTypeA(type);
+                    var reLoadedEntityB = CreateObjectEmptyTypeB(type);
                     LoadEntityWithTypeA(transaction, reLoadedEntityA, idA);
                     LoadEntityWithTypeB(transaction, reLoadedEntityB, idB);
                     transaction.Commit();
 
-                    bool compareResult = CompareEntities(loadedEntityA, reLoadedEntityA);
-                    Assert.IsTrue(compareResult);
+                    var compareResult = CompareEntities(loadedEntityA, reLoadedEntityA);
+                    Assert.True(compareResult);
                     compareResult = CompareEntities(loadedEntityB, reLoadedEntityB);
-                    Assert.IsTrue(compareResult);
+                    Assert.True(compareResult);
                 }
 
                 connection.Close();
@@ -258,34 +251,34 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void Inheritance_Delete_WithAllModesWithBothSubClasses_ShouldDelete()
         {
             try
             {
-                var types = new[] {TYPE_ATTRIBUTE, TYPE_EXTERNAL, TYPE_FIELD};
+                var types = new[] {TypeAttribute, TypeExternal, TypeField};
                 var idAs = new[] {35, 45, 55};
                 var idBs = new[] {36, 46, 56};
 
-                IDbConnection connection = SetupTables();
+                var connection = SetupTables();
 
-                for (int i = 0; i < types.Length; i++)
+                for (var i = 0; i < types.Length; i++)
                 {
-                    int type = types[i];
-                    int idA = idAs[i];
-                    int idB = idBs[i];
+                    var type = types[i];
+                    var idA = idAs[i];
+                    var idB = idBs[i];
 
                     switch (type)
                     {
-                        case TYPE_ATTRIBUTE:
+                        case TypeAttribute:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Delete_WithAllModesWithBothSubClasses_ShouldDelete With attributes");
                             break;
-                        case TYPE_EXTERNAL:
+                        case TypeExternal:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Delete_WithAllModesWithBothSubClasses_ShouldDelete With externals");
                             break;
-                        case TYPE_FIELD:
+                        case TypeField:
                             LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Delete_WithAllModesWithBothSubClasses_ShouldDelete With fields");
                             break;
@@ -294,7 +287,7 @@ namespace DbGate.Persist
                     ClearTables(connection);
 
                     TransactionFactory.DbGate.ClearCache();
-                    if (type == TYPE_EXTERNAL)
+                    if (type == TypeExternal)
                     {
                         RegisterForExternal();
                     }
@@ -302,14 +295,14 @@ namespace DbGate.Persist
                     IInheritanceTestSuperEntity entityA = CreateObjectWithDataTypeA(idA, type);
                     IInheritanceTestSuperEntity entityB = CreateObjectWithDataTypeB(idB, type);
 
-                    ITransaction transaction = CreateTransaction(connection);
+                    var transaction = CreateTransaction(connection);
                     entityA.Persist(transaction);
                     entityB.Persist(transaction);
                     transaction.Commit();
 
                     transaction = CreateTransaction(connection);
-                    IInheritanceTestSubEntityA loadedEntityA = CreateObjectEmptyTypeA(type);
-                    IInheritanceTestSubEntityB loadedEntityB = CreateObjectEmptyTypeB(type);
+                    var loadedEntityA = CreateObjectEmptyTypeA(type);
+                    var loadedEntityB = CreateObjectEmptyTypeB(type);
                     LoadEntityWithTypeA(transaction, loadedEntityA, idA);
                     LoadEntityWithTypeB(transaction, loadedEntityB, idB);
 
@@ -324,22 +317,22 @@ namespace DbGate.Persist
                     loadedEntityA.Persist(transaction);
                     loadedEntityB.Persist(transaction);
 
-                    IInheritanceTestSubEntityA reLoadedEntityA = CreateObjectEmptyTypeA(type);
-                    IInheritanceTestSubEntityB reLoadedEntityB = CreateObjectEmptyTypeB(type);
+                    var reLoadedEntityA = CreateObjectEmptyTypeA(type);
+                    var reLoadedEntityB = CreateObjectEmptyTypeB(type);
 
-                    bool reLoadedA = LoadEntityWithTypeA(transaction, reLoadedEntityA, idA);
-                    bool existesSuperA = ExistsSuper(transaction, idA);
-                    bool existesSubA = ExistsSubA(transaction, idA);
-                    bool reLoadedB = LoadEntityWithTypeB(transaction, reLoadedEntityB, idB);
-                    bool existesSuperB = ExistsSuper(transaction, idB);
-                    bool existesSubB = ExistsSubB(transaction, idB);
+                    var reLoadedA = LoadEntityWithTypeA(transaction, reLoadedEntityA, idA);
+                    var existesSuperA = ExistsSuper(transaction, idA);
+                    var existesSubA = ExistsSubA(transaction, idA);
+                    var reLoadedB = LoadEntityWithTypeB(transaction, reLoadedEntityB, idB);
+                    var existesSuperB = ExistsSuper(transaction, idB);
+                    var existesSubB = ExistsSubB(transaction, idB);
 
-                    Assert.IsFalse(reLoadedA);
-                    Assert.IsFalse(existesSuperA);
-                    Assert.IsFalse(existesSubA);
-                    Assert.IsFalse(reLoadedB);
-                    Assert.IsFalse(existesSuperB);
-                    Assert.IsFalse(existesSubB);
+                    Assert.False(reLoadedA);
+                    Assert.False(existesSuperA);
+                    Assert.False(existesSubA);
+                    Assert.False(reLoadedB);
+                    Assert.False(existesSuperB);
+                    Assert.False(existesSubB);
                     transaction.Commit();
                 }
 
@@ -354,17 +347,17 @@ namespace DbGate.Persist
 
         private bool LoadEntityWithTypeA(ITransaction transaction, IInheritanceTestSuperEntity loadEntity, int id)
         {
-            bool loaded = false;
+            var loaded = false;
 
-            IDbCommand cmd = transaction.CreateCommand();
+            var cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from inheritance_test_suba where id_col = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Value = id;
 
-            IDataReader reader = cmd.ExecuteReader();
+            var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 loadEntity.Retrieve(reader, transaction);
@@ -376,17 +369,17 @@ namespace DbGate.Persist
 
         private bool LoadEntityWithTypeB(ITransaction transaction, IInheritanceTestSuperEntity loadEntity, int id)
         {
-            bool loaded = false;
+            var loaded = false;
 
-            IDbCommand cmd = transaction.CreateCommand();
+            var cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from inheritance_test_subb where id_col = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Value = id;
 
-            IDataReader reader = cmd.ExecuteReader();
+            var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 loadEntity.Retrieve(reader, transaction);
@@ -398,17 +391,17 @@ namespace DbGate.Persist
 
         private bool ExistsSuper(ITransaction transaction, int id)
         {
-            bool exists = false;
+            var exists = false;
 
-            IDbCommand cmd = transaction.CreateCommand();
+            var cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from inheritance_test_super where id_col = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Value = id;
 
-            IDataReader reader = cmd.ExecuteReader();
+            var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 exists = true;
@@ -418,17 +411,17 @@ namespace DbGate.Persist
 
         private bool ExistsSubA(ITransaction transaction, int id)
         {
-            bool exists = false;
+            var exists = false;
 
-            IDbCommand cmd = transaction.CreateCommand();
+            var cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from inheritance_test_suba where id_col = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Value = id;
 
-            IDataReader reader = cmd.ExecuteReader();
+            var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 exists = true;
@@ -438,17 +431,17 @@ namespace DbGate.Persist
 
         private bool ExistsSubB(ITransaction transaction, int id)
         {
-            bool exists = false;
+            var exists = false;
 
-            IDbCommand cmd = transaction.CreateCommand();
+            var cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from inheritance_test_subb where id_col = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Value = id;
 
-            IDataReader reader = cmd.ExecuteReader();
+            var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 exists = true;
@@ -459,9 +452,9 @@ namespace DbGate.Persist
         private IInheritanceTestSubEntityA CreateObjectWithDataTypeA(int id, int type)
         {
             IInheritanceTestSubEntityA entity = null;
-            entity = (type == TYPE_ATTRIBUTE)
+            entity = (type == TypeAttribute)
                          ? new InheritanceTestSubEntityAAttribute()
-                         : (type == TYPE_FIELD)
+                         : (type == TypeField)
                                ? (IInheritanceTestSubEntityA) new InheritanceTestSubEntityAFields()
                                : new InheritanceTestSubEntityAExt();
             entity.IdCol = id;
@@ -474,9 +467,9 @@ namespace DbGate.Persist
         private IInheritanceTestSubEntityB CreateObjectWithDataTypeB(int id, int type)
         {
             IInheritanceTestSubEntityB entity = null;
-            entity = (type == TYPE_ATTRIBUTE)
+            entity = (type == TypeAttribute)
                          ? new InheritanceTestSubEntityBAttributes()
-                         : (type == TYPE_FIELD)
+                         : (type == TypeField)
                                ? (IInheritanceTestSubEntityB) new InheritanceTestSubEntityBFields()
                                : new InheritanceTestSubEntityBExt();
             entity.IdCol = id;
@@ -489,9 +482,9 @@ namespace DbGate.Persist
         private IInheritanceTestSubEntityA CreateObjectEmptyTypeA(int type)
         {
             IInheritanceTestSubEntityA entity = null;
-            entity = (type == TYPE_ATTRIBUTE)
+            entity = (type == TypeAttribute)
                          ? new InheritanceTestSubEntityAAttribute()
-                         : (type == TYPE_FIELD)
+                         : (type == TypeField)
                                ? (IInheritanceTestSubEntityA) new InheritanceTestSubEntityAFields()
                                : new InheritanceTestSubEntityAExt();
             return entity;
@@ -500,9 +493,9 @@ namespace DbGate.Persist
         private IInheritanceTestSubEntityB CreateObjectEmptyTypeB(int type)
         {
             IInheritanceTestSubEntityB entity = null;
-            entity = (type == TYPE_ATTRIBUTE)
+            entity = (type == TypeAttribute)
                          ? new InheritanceTestSubEntityBAttributes()
-                         : (type == TYPE_FIELD)
+                         : (type == TypeField)
                                ? (IInheritanceTestSubEntityB) new InheritanceTestSubEntityBFields()
                                : new InheritanceTestSubEntityBExt();
             return entity;
@@ -510,7 +503,7 @@ namespace DbGate.Persist
 
         private bool CompareEntities(IInheritanceTestSuperEntity entityA, IInheritanceTestSuperEntity entityB)
         {
-            bool result = entityA.IdCol == entityB.IdCol;
+            var result = entityA.IdCol == entityB.IdCol;
             result &= entityA.Name.Equals(entityB.Name);
 
             if (entityA is IInheritanceTestSubEntityA

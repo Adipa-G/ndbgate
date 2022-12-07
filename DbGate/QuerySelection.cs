@@ -9,17 +9,17 @@ namespace DbGate
 {
     public class QuerySelection
     {
-        private static AbstractSelectionFactory _factory;
+        private static AbstractSelectionFactory factory;
 
         public static AbstractSelectionFactory Factory
         {
-            set { _factory = value; }
+            set => factory = value;
         }
 
         public static IQuerySelection RawSql(string sql)
         {
             var querySelection =
-                (AbstractSqlQuerySelection) _factory.CreateSelection(QuerySelectionExpressionType.RawSql);
+                (AbstractSqlQuerySelection) factory.CreateSelection(QuerySelectionExpressionType.RawSql);
             querySelection.Sql = sql;
             return querySelection;
         }
@@ -27,7 +27,7 @@ namespace DbGate
         public static IQuerySelection EntityType(Type type)
         {
             var querySelection =
-                (AbstractTypeSelection) _factory.CreateSelection(QuerySelectionExpressionType.EntityType);
+                (AbstractTypeSelection) factory.CreateSelection(QuerySelectionExpressionType.EntityType);
             querySelection.EntityType = type;
             return querySelection;
         }
@@ -35,7 +35,7 @@ namespace DbGate
         public static IQuerySelection EntityType<T>()
         {
             var querySelection =
-                (AbstractTypeSelection)_factory.CreateSelection(QuerySelectionExpressionType.EntityType);
+                (AbstractTypeSelection)factory.CreateSelection(QuerySelectionExpressionType.EntityType);
             querySelection.EntityType = typeof(T);
             return querySelection;
         }
@@ -43,7 +43,7 @@ namespace DbGate
         public static IQuerySelection Query(ISelectionQuery query, String alias)
         {
             var expressionSelection =
-                (AbstractExpressionSelection) _factory.CreateSelection(QuerySelectionExpressionType.Expression);
+                (AbstractExpressionSelection) factory.CreateSelection(QuerySelectionExpressionType.Expression);
             expressionSelection.Expr = SelectExpr.Build().Query(query, alias);
             return expressionSelection;
         }
@@ -51,7 +51,7 @@ namespace DbGate
         private static IQuerySelection Expression(SelectExpr expr)
         {
             var expressionSelection =
-                (AbstractExpressionSelection) _factory.CreateSelection(QuerySelectionExpressionType.Expression);
+                (AbstractExpressionSelection) factory.CreateSelection(QuerySelectionExpressionType.Expression);
             expressionSelection.Expr = expr;
             return expressionSelection;
         }

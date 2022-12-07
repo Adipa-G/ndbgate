@@ -4,33 +4,24 @@ namespace DbGate.ErManagement.Query.Expr.Segments
 {
     public class MergeSegment : BaseSegment
     {
-        private readonly MergeSegmentMode _mode;
-        private readonly ICollection<ISegment> _segments;
+        private readonly MergeSegmentMode mode;
+        private readonly ICollection<ISegment> segments;
 
         public MergeSegment(MergeSegmentMode mode)
         {
-            _segments = new List<ISegment>();
-            _mode = mode;
+            segments = new List<ISegment>();
+            this.mode = mode;
         }
 
-        public override SegmentType SegmentType
-        {
-            get { return SegmentType.Merge; }
-        }
+        public override SegmentType SegmentType => SegmentType.Merge;
 
-        public MergeSegmentMode Mode
-        {
-            get { return _mode; }
-        }
+        public MergeSegmentMode Mode => mode;
 
-        public ICollection<ISegment> Segments
-        {
-            get { return _segments; }
-        }
+        public ICollection<ISegment> Segments => segments;
 
         public void AddSub(ISegment segment)
         {
-            _segments.Add(segment);
+            segments.Add(segment);
         }
 
         public override ISegment Add(ISegment segment)
@@ -42,7 +33,7 @@ namespace DbGate.ErManagement.Query.Expr.Segments
                 case SegmentType.Query:
                 case SegmentType.Group:
                 case SegmentType.Compare:
-                    ISegment result = Active != null ? Active.Add(segment) : segment;
+                    var result = Active != null ? Active.Add(segment) : segment;
                     if (result.SegmentType == SegmentType.Compare
                         && ((CompareSegment) result).Right != null)
                     {

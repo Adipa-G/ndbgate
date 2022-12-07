@@ -5,10 +5,10 @@ namespace DbGate.ErManagement.ErMapper
 {
     public class DbGateStatistics : IDbGateStatistics
     {
-        private Hashtable _deleteCount;
-        private Hashtable _inertCount;
-        private Hashtable _selectCount;
-        private Hashtable _updateCount;
+        private Hashtable deleteCount;
+        private Hashtable inertCount;
+        private Hashtable selectCount;
+        private Hashtable updateCount;
 
         public DbGateStatistics()
         {
@@ -24,10 +24,10 @@ namespace DbGate.ErManagement.ErMapper
             UpdateQueryCount = 0;
             DbPatchQueryCount = 0;
             DeleteQueryCount = 0;
-            _selectCount = new Hashtable();
-            _inertCount = new Hashtable();
-            _updateCount = new Hashtable();
-            _deleteCount = new Hashtable();
+            selectCount = new Hashtable();
+            inertCount = new Hashtable();
+            updateCount = new Hashtable();
+            deleteCount = new Hashtable();
         }
 
         public int SelectQueryCount { get; set; }
@@ -42,46 +42,46 @@ namespace DbGate.ErManagement.ErMapper
 
         public int GetSelectCount(Type type)
         {
-            return GetTypeCount(type, _selectCount);
+            return GetTypeCount(type, selectCount);
         }
 
         public int GetInsertCount(Type type)
         {
-            return GetTypeCount(type, _inertCount);
+            return GetTypeCount(type, inertCount);
         }
 
         public int GetUpdateCount(Type type)
         {
-            return GetTypeCount(type, _updateCount);
+            return GetTypeCount(type, updateCount);
         }
 
         public int GetDeleteCount(Type type)
         {
-            return GetTypeCount(type, _deleteCount);
+            return GetTypeCount(type, deleteCount);
         }
 
         public void RegisterSelect(Type type)
         {
             SelectQueryCount++;
-            registerCount(type, _selectCount);
+            RegisterCount(type, selectCount);
         }
 
         public void RegisterInsert(Type type)
         {
             InsertQueryCount++;
-            registerCount(type, _inertCount);
+            RegisterCount(type, inertCount);
         }
 
         public void RegisterUpdate(Type type)
         {
             UpdateQueryCount++;
-            registerCount(type, _updateCount);
+            RegisterCount(type, updateCount);
         }
 
         public void RegisterDelete(Type type)
         {
             DeleteQueryCount++;
-            registerCount(type, _deleteCount);
+            RegisterCount(type, deleteCount);
         }
 
         public void RegisterPatch()
@@ -100,7 +100,7 @@ namespace DbGate.ErManagement.ErMapper
             return 0;
         }
 
-        private void registerCount(Type type, Hashtable typeCountMap)
+        private void RegisterCount(Type type, Hashtable typeCountMap)
         {
             if (typeCountMap.ContainsKey(type))
             {

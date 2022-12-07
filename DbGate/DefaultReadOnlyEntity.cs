@@ -7,11 +7,11 @@ namespace DbGate
 {
     public class DefaultReadOnlyEntity : IReadOnlyEntity
     {
-        private IEntityContext _context;
+        private IEntityContext context;
 
         public DefaultReadOnlyEntity()
         {
-            _context = new EntityContext();
+            context = new EntityContext();
         }
 
         public void Retrieve(IDataReader reader, ITransaction tx)
@@ -19,9 +19,6 @@ namespace DbGate
             tx.DbGate.Load(this,reader,tx);
         }
 
-        public IEntityContext Context
-        {
-            get { return _context; }
-        }
+        public IEntityContext Context => context;
     }
 }

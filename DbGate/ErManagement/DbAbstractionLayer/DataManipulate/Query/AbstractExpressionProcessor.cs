@@ -18,7 +18,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
 
         private ICollection<IColumn> FindColumnsForType(Type fieldType)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(fieldType);
+            var entityInfo = CacheManager.GetEntityInfo(fieldType);
             return entityInfo.Columns;
         }
 
@@ -26,7 +26,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
         {
             if (columns != null)
             {
-                foreach (IColumn column in columns)
+                foreach (var column in columns)
                 {
                     if (column.AttributeName.Equals(field,StringComparison.InvariantCultureIgnoreCase))
                     {
@@ -40,17 +40,17 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
         public string GetFieldName(FieldSegment fieldSegment, bool withAlias, QueryBuildInfo buildInfo)
         {
             var fieldSegmentType = GetFieldType(fieldSegment, buildInfo);
-            string tableAlias = buildInfo.GetAlias(fieldSegmentType);
+            var tableAlias = buildInfo.GetAlias(fieldSegmentType);
             if (!string.IsNullOrEmpty(fieldSegment.TypeAlias))
             {
                 tableAlias = fieldSegment.TypeAlias;
             }
             tableAlias = (tableAlias == null) ? "" : tableAlias + ".";
-            IColumn column = GetColumn(fieldSegment,buildInfo);
+            var column = GetColumn(fieldSegment,buildInfo);
 
             if (column != null)
             {
-                string sql = tableAlias + column.ColumnName;
+                var sql = tableAlias + column.ColumnName;
                 if (withAlias)
                 {
                     sql = AppendAlias(sql, fieldSegment);
@@ -72,13 +72,13 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
             else
             {
                 var values =  buildInfo.Aliases.Values;
-                foreach (Object value in values)
+                foreach (var value in values)
                 {
                     if (value is Type)
                     {
                         var targetType = (Type) value;
                         var columns = FindColumnsForType(targetType);
-                        IColumn column = FindColumn(segment.Field, columns);
+                        var column = FindColumn(segment.Field, columns);
                         if (column != null)
                         {
                             return targetType;
@@ -100,8 +100,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
 
         public string GetGroupFunction(GroupFunctionSegment groupSegment, bool withAlias, QueryBuildInfo buildInfo)
         {
-            FieldSegment fieldSegment = groupSegment.SegmentToGroup;
-            string sql = GetFieldName(fieldSegment, false, buildInfo);
+            var fieldSegment = groupSegment.SegmentToGroup;
+            var sql = GetFieldName(fieldSegment, false, buildInfo);
             switch (groupSegment.GroupFunctionMode)
             {
                 case GroupFunctionSegmentMode.Count:
@@ -150,13 +150,13 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
 
         private void ProcessField(StringBuilder sb, FieldSegment segment, QueryBuildInfo buildInfo)
         {
-            string fieldName = GetFieldName(segment, false, buildInfo);
+            var fieldName = GetFieldName(segment, false, buildInfo);
             sb.Append(fieldName);
         }
 
         private void ProcessGroup(StringBuilder sb, GroupFunctionSegment segment, QueryBuildInfo buildInfo)
         {
-            string groupFunction = GetGroupFunction(segment, false, buildInfo);
+            var groupFunction = GetGroupFunction(segment, false, buildInfo);
             sb.Append(groupFunction);
         }
 
@@ -239,10 +239,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
         {
             sb.Append(" BETWEEN ? AND ? ");
             var valueSegment = (ValueSegment) segment.Right;
-            object[] values = valueSegment.Values;
+            var values = valueSegment.Values;
             for (int i = 0, valuesLength = 2; i < valuesLength; i++)
             {
-                Object value = values[i];
+                var value = values[i];
                 var param = new QueryExecParam();
                 param.Index = buildInfo.ExecInfo.Params.Count;
                 param.Type = valueSegment.Type;
@@ -255,10 +255,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
         {
             sb.Append(" IN (");
             var valueSegment = (ValueSegment) segment.Right;
-            object[] values = valueSegment.Values;
+            var values = valueSegment.Values;
             for (int i = 0, valuesLength = values.Length; i < valuesLength; i++)
             {
-                Object value = values[i];
+                var value = values[i];
                 if (i > 0)
                 {
                     sb.Append(",");
@@ -284,13 +284,13 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
 
         private void ProcessMerge(StringBuilder sb, MergeSegment segment, QueryBuildInfo buildInfo, IDbLayer dbLayer)
         {
-            int count = 0;
+            var count = 0;
             if (segment.Mode == MergeSegmentMode.ParaAnd
                 || segment.Mode == MergeSegmentMode.ParaOr)
             {
                 sb.Append("(");
             }
-            foreach (ISegment subSegment in segment.Segments)
+            foreach (var subSegment in segment.Segments)
             {
                 if (count > 0)
                 {
@@ -318,12 +318,12 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
 
         public IRelation GetRelation(Type typeFrom, Type typeTo)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(typeFrom);
-            ICollection<IRelation> relations = entityInfo.Relations;
+            var entityInfo = CacheManager.GetEntityInfo(typeFrom);
+            var relations = entityInfo.Relations;
 
             if (relations != null)
             {
-                foreach (IRelation relation in relations)
+                foreach (var relation in relations)
                 {
                     if (relation.RelatedObjectType == typeTo)
                     {

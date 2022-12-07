@@ -13,24 +13,24 @@ namespace DbGateTestApp
     [WikiCodeBlock("example_base")]
     public class ExampleBase
     {
-        private static DefaultTransactionFactory _transactionFactory;
+        private static DefaultTransactionFactory transactionFactory;
 
         public static ITransaction SetupDb()
         {
             try
             {
-                if (_transactionFactory == null)
+                if (transactionFactory == null)
                 {
                     var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
                     log4net.Config.XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
                     LogManager.GetLogger(typeof(ExampleBase)).Info("Starting in-memory database for unit tests");
-                    _transactionFactory = new DefaultTransactionFactory(
+                    transactionFactory = new DefaultTransactionFactory(
                         () => new SQLiteConnection(
                             "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON"),
                         DefaultTransactionFactory.DbSqllite);
                 }
-                return _transactionFactory.CreateTransaction();
+                return transactionFactory.CreateTransaction();
             }
             catch (Exception ex)
             {
@@ -44,10 +44,10 @@ namespace DbGateTestApp
         {
             try
             {
-                ITransaction connection = _transactionFactory.CreateTransaction();
+                var connection = transactionFactory.CreateTransaction();
                 connection.Close();
 
-                _transactionFactory = null;
+                transactionFactory = null;
             }
             catch (Exception ex)
             {

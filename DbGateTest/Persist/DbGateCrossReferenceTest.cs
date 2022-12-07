@@ -1,76 +1,67 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using DbGate.Persist.Support.CrossReference;
 using log4net;
-using NUnit.Framework;
+using Xunit;
 
 namespace DbGate.Persist
 {
-    [TestFixture]
-    public class DbGateCrossReferenceTest : AbstractDbGateTestBase
+    [Collection("Sequential")]
+    public class DbGateCrossReferenceTest : AbstractDbGateTestBase, IDisposable
     {
-        private const string DBName = "unit-testing-cross-reference";
+        private const string DbName = "unit-testing-cross-reference";
 
-        [OneTimeSetUp]
-        public static void Before()
+        public DbGateCrossReferenceTest()
         {
             TestClass = typeof(DbGateCrossReferenceTest);
-        }
-
-        [SetUp]
-        public void BeforeEach()
-        {
-            BeginInit(DBName);
-            TransactionFactory.DbGate.ClearCache();
+            BeginInit(DbName);
             TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
             TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.DoNotVerify;
         }
-
-        [TearDown]
-        public void AfterEach()
+        public void Dispose()
         {
-            CleanupDb(DBName);
-            FinalizeDb(DBName);
+            CleanupDb(DbName);
+            FinalizeDb(DbName);
         }
-
         private IDbConnection SetupTables()
         {
-            string sql = "Create table cross_reference_test_root (\n" +
-                         "\tid_col Int NOT NULL,\n" +
-                         "\tname Varchar(20) NOT NULL,\n" +
-                         " Primary Key (id_col))";
-            CreateTableFromSql(sql,DBName);
+            var sql = "Create table cross_reference_test_root (\n" +
+                      "\tid_col Int NOT NULL,\n" +
+                      "\tname Varchar(20) NOT NULL,\n" +
+                      " Primary Key (id_col))";
+            CreateTableFromSql(sql,DbName);
 
             sql = "Create table cross_reference_test_one2many (\n" +
                   "\tid_col Int NOT NULL,\n" +
                   "\tindex_no Int NOT NULL,\n" +
                   "\tname Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col,index_no))";
-            CreateTableFromSql(sql, DBName);
+            CreateTableFromSql(sql, DbName);
 
             sql = "Create table cross_reference_test_one2one (\n" +
                   "\tid_col Int NOT NULL,\n" +
                   "\tname Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col))";
-            CreateTableFromSql(sql, DBName);
-            EndInit(DBName);
+            CreateTableFromSql(sql, DbName);
+            EndInit(DbName);
 
             return Connection;
         }
 
-        [Test]
+        [Fact]
         public void CrossReference_PersistWithOne2OneChild_WithCrossReference_LoadedShouldBeSameAsPersisted()
         {
             try
             {
-                IDbConnection connection = SetupTables();
+                var connection = SetupTables();
                 
-                ITransaction transaction = CreateTransaction(connection);
-                int id = 45;
-                CrossReferenceTestRootEntity entity = new CrossReferenceTestRootEntity();
+                var transaction = CreateTransaction(connection);
+                var id = 45;
+                var entity = new CrossReferenceTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                CrossReferenceTestOne2OneEntity one2OneEntity = new CrossReferenceTestOne2OneEntity();
+                var one2OneEntity = new CrossReferenceTestOne2OneEntity();
                 one2OneEntity.IdCol = id;
                 one2OneEntity.Name = "Child-Entity";
                 one2OneEntity.RootEntity = entity;
@@ -79,15 +70,15 @@ namespace DbGate.Persist
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                CrossReferenceTestRootEntity loadedEntity = new CrossReferenceTestRootEntity();
+                var loadedEntity = new CrossReferenceTestRootEntity();
                 LoadEntityWithId(transaction, loadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                Assert.IsNotNull(loadedEntity);
-                Assert.IsNotNull(loadedEntity.One2OneEntity);
-                Assert.IsNotNull(loadedEntity.One2OneEntity.RootEntity);
-                Assert.IsTrue(loadedEntity == loadedEntity.One2OneEntity.RootEntity);
+                Assert.NotNull(loadedEntity);
+                Assert.NotNull(loadedEntity.One2OneEntity);
+                Assert.NotNull(loadedEntity.One2OneEntity.RootEntity);
+                Assert.True(loadedEntity == loadedEntity.One2OneEntity.RootEntity);
             }
             catch (System.Exception e)
             {
@@ -96,19 +87,19 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void CrossReference_PersistWithOne2ManyChild_WithCrossReference_LoadedShouldBeSameAsPersisted()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                var transaction = CreateTransaction(connection);
 
-                int id = 45;
-                CrossReferenceTestRootEntity entity = new CrossReferenceTestRootEntity();
+                var id = 45;
+                var entity = new CrossReferenceTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                CrossReferenceTestOne2ManyEntity one2ManyEntity = new CrossReferenceTestOne2ManyEntity();
+                var one2ManyEntity = new CrossReferenceTestOne2ManyEntity();
                 one2ManyEntity.IdCol = id;
                 one2ManyEntity.IndexNo =1;
                 one2ManyEntity.Name = "Child-Entity";
@@ -118,16 +109,16 @@ namespace DbGate.Persist
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                CrossReferenceTestRootEntity loadedEntity = new CrossReferenceTestRootEntity();
+                var loadedEntity = new CrossReferenceTestRootEntity();
                 LoadEntityWithId(transaction, loadedEntity, id);
                 
-                Assert.IsNotNull(loadedEntity);
-                Assert.IsTrue(loadedEntity.One2ManyEntities.Count == 1);
-                IEnumerator<CrossReferenceTestOne2ManyEntity> childEnumerator = loadedEntity.One2ManyEntities.GetEnumerator();
+                Assert.NotNull(loadedEntity);
+                Assert.True(loadedEntity.One2ManyEntities.Count == 1);
+                var childEnumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 childEnumerator.MoveNext();
-                CrossReferenceTestOne2ManyEntity childOne2ManyEntity = childEnumerator.Current;
-                Assert.IsNotNull(childOne2ManyEntity);
-                Assert.IsTrue(loadedEntity == childOne2ManyEntity.RootEntity);
+                var childOne2ManyEntity = childEnumerator.Current;
+                Assert.NotNull(childOne2ManyEntity);
+                Assert.True(loadedEntity == childOne2ManyEntity.RootEntity);
 
                 transaction.Commit();
                 connection.Close();
@@ -141,18 +132,18 @@ namespace DbGate.Persist
 
         private bool LoadEntityWithId(ITransaction transaction, CrossReferenceTestRootEntity loadEntity,int id)
         {
-            bool loaded = false;
+            var loaded = false;
 
-            IDbCommand cmd = transaction.CreateCommand();
+            var cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from cross_reference_test_root where id_col = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Direction = ParameterDirection.Input;
             parameter.Value = id;
 
-            IDataReader dataReader = cmd.ExecuteReader();
+            var dataReader = cmd.ExecuteReader();
             if (dataReader.Read())
             {
                 loadEntity.Retrieve(dataReader, transaction);

@@ -6,17 +6,17 @@ namespace DbGate
 {
     public class QueryGroupCondition
     {
-        private static AbstractGroupConditionFactory _factory;
+        private static AbstractGroupConditionFactory factory;
 
         public static AbstractGroupConditionFactory Factory
         {
-            set { _factory = value; }
+            set => factory = value;
         }
 
         public static IQueryGroupCondition RawSql(string sql)
         {
             var queryGroupCondition =
-                (AbstractSqlQueryGroupCondition) _factory.CreateGroupCondition(QueryGroupConditionExpressionType.RawSql);
+                (AbstractSqlQueryGroupCondition) factory.CreateGroupCondition(QueryGroupConditionExpressionType.RawSql);
             queryGroupCondition.Sql = sql;
             return queryGroupCondition;
         }
@@ -25,7 +25,7 @@ namespace DbGate
         {
             var expressionGroupCondition =
                 (AbstractExpressionGroupCondition)
-                _factory.CreateGroupCondition(QueryGroupConditionExpressionType.Expression);
+                factory.CreateGroupCondition(QueryGroupConditionExpressionType.Expression);
             expressionGroupCondition.Expr = expr;
             return expressionGroupCondition;
         }

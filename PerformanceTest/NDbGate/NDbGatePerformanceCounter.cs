@@ -60,7 +60,7 @@ namespace PerformanceTest.NDbGate
         public void Start(int threads)
         {
             var threadList = new List<Thread>();
-            for (int i = 0; i < threads; i++)
+            for (var i = 0; i < threads; i++)
             {
                 var copy = i;
                 var thread = new Thread(() => DoInThread(copy * 100000));
@@ -97,7 +97,7 @@ namespace PerformanceTest.NDbGate
             
             sw.Start();
             var tx = transactionFactory.CreateTransaction();
-            for (int i = 0; i < items.Count; i++)
+            for (var i = 0; i < items.Count; i++)
             {
                 items[i].Persist(tx);
                 if (i % 100 == 0)
@@ -123,7 +123,7 @@ namespace PerformanceTest.NDbGate
 
             sw.Start();
             var tx = transactionFactory.CreateTransaction();
-            for (int i = 0; i < items.Count; i++)
+            for (var i = 0; i < items.Count; i++)
             {
                 items[i].Status = EntityStatus.Modified;
                 items[i].Persist(tx);
@@ -151,7 +151,7 @@ namespace PerformanceTest.NDbGate
             var sw = new Stopwatch();
             sw.Start();
             var tx = transactionFactory.CreateTransaction();
-            for (int i = 0; i < items.Count; i++)
+            for (var i = 0; i < items.Count; i++)
             {
                 var item = items[i];
                 var itemType = item.GetType();
@@ -210,7 +210,7 @@ namespace PerformanceTest.NDbGate
 
             sw.Start();
             var tx = transactionFactory.CreateTransaction();
-            for (int i = items.Count - 1; i >= 0 ; i--)
+            for (var i = items.Count - 1; i >= 0 ; i--)
             {
                 items[i].Status = EntityStatus.Deleted;
                 items[i].Persist(tx);

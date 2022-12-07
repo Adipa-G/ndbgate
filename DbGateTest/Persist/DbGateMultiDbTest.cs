@@ -1,32 +1,27 @@
+using System;
 using System.Data;
 using DbGate.Persist.Support.MultiDb;
-using NUnit.Framework;
+using Xunit;
 
 namespace DbGate.Persist
 {
-    [TestFixture]
-    public class DbGateMultiDbTest : AbstractDbGateTestBase
+    [Collection("Sequential")]
+    public class DbGateMultiDbTest : AbstractDbGateTestBase, IDisposable
     {
-        private const string DB1Name = "unit-testing-multi-db-1";
-        private const string DB2Name = "unit-testing-multi-db-2";
+        private const string Db1Name = "unit-testing-multi-db-1";
+        private const string Db2Name = "unit-testing-multi-db-2";
 
         protected static ITransactionFactory TransactionFactoryDb1;
         protected static IDbConnection ConnectionDb1;
 
-        [OneTimeSetUp]
-        public static void Before()
+        public DbGateMultiDbTest()
         {
             TestClass = typeof(DbGateMultiDbTest);
-        }
-
-        [SetUp]
-        public void BeforeEach()
-        {
-            BeginInit(DB1Name);
+            BeginInit(Db1Name);
             TransactionFactoryDb1 = TransactionFactory;
             ConnectionDb1 = Connection;
             
-            BeginInit(DB2Name);
+            BeginInit(Db2Name);
             
             TransactionFactoryDb1.DbGate.ClearCache();
             TransactionFactoryDb1.DbGate.Config.UpdateStrategy = UpdateStrategy.AllColumns;
@@ -35,66 +30,65 @@ namespace DbGate.Persist
             TransactionFactory.DbGate.Config.UpdateStrategy = UpdateStrategy.AllColumns;
         }
 
-        [TearDown]
-        public void AfterEach()
+        public void Dispose()
         {
-            CleanupDb(DB1Name);
-            CleanupDb(DB2Name);
+            CleanupDb(Db1Name);
+            CleanupDb(Db2Name);
 
             ConnectionDb1.Close();
             ConnectionDb1 = null;
             TransactionFactoryDb1 = null;
 
-            FinalizeDb(DB2Name);
+            FinalizeDb(Db2Name);
         }
-        
+       
         private void SetupTables()
         {
-            string sql = "Create table multi_db_test_root (\n" +
-                "\tid_col Int NOT NULL,\n" +
-                "\tname Varchar(100) NOT NULL,\n" +
-                " Primary Key (id_col))";
+            var sql = "Create table multi_db_test_root (\n" +
+                      "\tid_col Int NOT NULL,\n" +
+                      "\tname Varchar(100) NOT NULL,\n" +
+                      " Primary Key (id_col))";
             
-            CreateTableFromSql(sql,DB1Name,ConnectionDb1);
-            CreateTableFromSql(sql,DB2Name,Connection);
+            CreateTableFromSql(sql,Db1Name,ConnectionDb1);
+            CreateTableFromSql(sql,Db2Name,Connection);
 
-            EndInit(DB1Name,ConnectionDb1);
-            EndInit(DB2Name,Connection);
+            EndInit(Db1Name,ConnectionDb1);
+            EndInit(Db2Name,Connection);
         }
 
-        [Test]
+        [Fact]
         public void MultipleDatabaseSupport_PersistTwoEntitiesInTwoDbs_AndFetchThem_ShouldFetch()
         {
             try
             {
                 SetupTables();
 
-                ITransaction txDb1 = CreateTransaction(ConnectionDb1);
-                int id = 35;
+                var txDb1 = CreateTransaction(ConnectionDb1);
+                var id = 35;
                 var db1Entity = new MultiDbEntity();
                 db1Entity.IdCol = id;
-                db1Entity.Name = DB1Name;
+                db1Entity.Name = Db1Name;
                 
                 db1Entity.Persist(txDb1);
                 txDb1.Commit();
  
-                ITransaction txDb2 = CreateTransaction(Connection);
+                var txDb2 = CreateTransaction(Connection);
                 var db2Entity = new MultiDbEntity();
                 db2Entity.IdCol = id;
-                db2Entity.Name = DB2Name;
+                db2Entity.Name = Db2Name;
                 db2Entity.Persist(txDb2);
                 txDb2.Commit();
 
                 txDb1 = CreateTransaction(ConnectionDb1);
                 var db1LoadedEntity = new MultiDbEntity();
                 LoadWithId(txDb1,db1LoadedEntity,id);
-                Assert.AreEqual(db1LoadedEntity.Name,DB1Name);
+                Assert.Equal(Db1Name,db1LoadedEntity.Name);
                 txDb1.Commit();
 
                 txDb2 = CreateTransaction(Connection);
                 var db2LoadedEntity = new MultiDbEntity();
                 LoadWithId(txDb2,db2LoadedEntity,id);
-                Assert.AreEqual(db2LoadedEntity.Name,DB2Name);
+                Assert.Equal(Db2Name,db2LoadedEntity.Name);
             }
             catch (System.Exception e)
             {
@@ -104,17 +98,17 @@ namespace DbGate.Persist
 
         private bool LoadWithId(ITransaction tx, MultiDbEntity loadEntity,int id)
         {
-            bool loaded = false;
+            var loaded = false;
 
-            IDbCommand cmd = tx.CreateCommand();
+            var cmd = tx.CreateCommand();
             cmd.CommandText = "select * from multi_db_test_root where id_col = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Value = id;
 
-            IDataReader reader = cmd.ExecuteReader();
+            var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 loadEntity.Retrieve(reader, tx);

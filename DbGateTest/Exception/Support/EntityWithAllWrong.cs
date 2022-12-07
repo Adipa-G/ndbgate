@@ -9,14 +9,8 @@ namespace DbGate.Exception.Support
         [ColumnInfo(ColumnType.Integer, Key = true)]
         public int IdCol
         {
-            get
-            {
-                throw new System.Exception("cant' get");
-            }
-            set
-            {
-                throw new System.Exception("cant' set");
-            }
+            get => throw new System.Exception("cant' get");
+            set => throw new System.Exception("cant' set");
         }
  		
  		public EntityWithAllWrong(int id)
@@ -24,14 +18,8 @@ namespace DbGate.Exception.Support
  		    
  		}
 
-        public override Dictionary<Type, ICollection<IField>> FieldInfo
-        {
-            get { return null; }
-        }
+        public override Dictionary<Type, ICollection<IField>> FieldInfo => null;
 
-        public override Dictionary<Type, ITable> TableInfo
-        {
-            get { return null; }
-        }
+        public override Dictionary<Type, ITable> TableInfo => null;
     }
 }

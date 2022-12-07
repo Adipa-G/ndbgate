@@ -13,14 +13,14 @@ using PerformanceTest.EF.Entities.Product;
 
 namespace PerformanceTest.EF
 {
-    public class EFPerformanceCounter
+    public class EfPerformanceCounter
     {
         private readonly int perThread;
         private readonly string connectionString;
 
         private readonly Factory factory;
 
-        public EFPerformanceCounter(string connectionString, int perThread)
+        public EfPerformanceCounter(string connectionString, int perThread)
         {
             this.perThread = perThread;
             this.connectionString = connectionString;
@@ -32,19 +32,19 @@ namespace PerformanceTest.EF
                 log4net.Config.XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
                 Database.SetInitializer(new DropCreateDatabaseIfModelChanges<TestDbContext>());
-                LogManager.GetLogger(typeof(EFPerformanceCounter)).Info("Connecting to sql server for performance testing");
+                LogManager.GetLogger(typeof(EfPerformanceCounter)).Info("Connecting to sql server for performance testing");
             }
             catch (Exception ex)
             {
-                LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(EFPerformanceCounter)).Log(
-                    typeof(EFPerformanceCounter), Level.Fatal, "Exception during database startup.", ex);
+                LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(EfPerformanceCounter)).Log(
+                    typeof(EfPerformanceCounter), Level.Fatal, "Exception during database startup.", ex);
             }
         }
 
         public void Start(int threads)
         {
             var threadList = new List<Thread>();
-            for (int i = 0; i < threads; i++)
+            for (var i = 0; i < threads; i++)
             {
                 var copy = i;
                 var thread = new Thread(() => DoInThread(copy * 100000));
@@ -78,7 +78,7 @@ namespace PerformanceTest.EF
 
             sw.Start();
             var ctx = new TestDbContext(connectionString);
-            for (int i = 0; i < items.Count; i++)
+            for (var i = 0; i < items.Count; i++)
             {
                 var item = items[i];
                 var itemType = item.GetType();
@@ -107,8 +107,8 @@ namespace PerformanceTest.EF
 
             var speed = items.Count * 1000 / sw.ElapsedMilliseconds;
 
-            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(EFPerformanceCounter))
-                .Log(typeof(EFPerformanceCounter), Level.Warn, $"EF Thread Insert speed  {speed} entities/second", null);
+            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(EfPerformanceCounter))
+                .Log(typeof(EfPerformanceCounter), Level.Warn, $"EF Thread Insert speed  {speed} entities/second", null);
         }
 
         private IList<object> QueryTest(IList<object> items)
@@ -118,7 +118,7 @@ namespace PerformanceTest.EF
 
             sw.Start();
             var ctx = new TestDbContext(connectionString);
-            for (int i = 0; i < items.Count; i++)
+            for (var i = 0; i < items.Count; i++)
             {
                 var item = items[i];
                 var itemType = item.GetType();
@@ -156,8 +156,8 @@ namespace PerformanceTest.EF
 
             var speed = items.Count * 1000 / sw.ElapsedMilliseconds;
 
-            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(EFPerformanceCounter))
-                .Log(typeof(EFPerformanceCounter), Level.Warn, $"EF Thread Query speed  {speed} entities/second", null);
+            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(EfPerformanceCounter))
+                .Log(typeof(EfPerformanceCounter), Level.Warn, $"EF Thread Query speed  {speed} entities/second", null);
             return newList;
         }
 
@@ -168,7 +168,7 @@ namespace PerformanceTest.EF
 
             sw.Start();
             var ctx = new TestDbContext(connectionString);
-            for (int i = 0; i < items.Count; i++)
+            for (var i = 0; i < items.Count; i++)
             {
                 var item = items[i];
                 var itemType = item.GetType();
@@ -210,8 +210,8 @@ namespace PerformanceTest.EF
 
             var speed = items.Count * 1000 / sw.ElapsedMilliseconds;
 
-            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(EFPerformanceCounter))
-                .Log(typeof(EFPerformanceCounter), Level.Warn, $"EF Thread Update speed  {speed} entities/second", null);
+            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(EfPerformanceCounter))
+                .Log(typeof(EfPerformanceCounter), Level.Warn, $"EF Thread Update speed  {speed} entities/second", null);
             return newList;
         }
 
@@ -222,7 +222,7 @@ namespace PerformanceTest.EF
             sw.Start();
             var ctx = new TestDbContext(connectionString);
 
-            for (int i = items.Count - 1; i >= 0; i--)
+            for (var i = items.Count - 1; i >= 0; i--)
             {
                 var item = items[i];
                 ctx.Set(item.GetType()).Attach(item);
@@ -241,8 +241,8 @@ namespace PerformanceTest.EF
 
             var speed = items.Count * 1000 / sw.ElapsedMilliseconds;
 
-            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(EFPerformanceCounter))
-                .Log(typeof(EFPerformanceCounter), Level.Warn, $"EF Thread Delete speed  {speed} entities/second", null);
+            LoggerManager.GetLogger(Assembly.GetExecutingAssembly(), typeof(EfPerformanceCounter))
+                .Log(typeof(EfPerformanceCounter), Level.Warn, $"EF Thread Delete speed  {speed} entities/second", null);
         }
     }
 }

@@ -20,17 +20,17 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures
             if (this == o) return true;
             if (!(o is AbstractMetaItem)) return false;
  		
- 			MetaPrimaryKey that = (MetaPrimaryKey) o;
+ 			var that = (MetaPrimaryKey) o;
 
             if (ItemType != that.ItemType) return false;
  			 if (!"PRIMARY".Equals(Name,StringComparison.InvariantCultureIgnoreCase)
                     && !"PRIMARY".Equals(that.Name,StringComparison.InvariantCultureIgnoreCase)
                     && !Name.Equals(that.Name, StringComparison.InvariantCultureIgnoreCase)) return false;
 
-            bool foundMatch = false;
-            foreach (string thisColumn in ColumnNames)
+            var foundMatch = false;
+            foreach (var thisColumn in ColumnNames)
             {
-                foreach (string thatColumn in that.ColumnNames)
+                foreach (var thatColumn in that.ColumnNames)
                 {
                     if (thisColumn.Equals(thatColumn, StringComparison.OrdinalIgnoreCase))
                     {

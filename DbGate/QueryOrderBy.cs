@@ -9,16 +9,16 @@ namespace DbGate
 {
     public class QueryOrderBy
     {
-        private static AbstractOrderByFactory _factory;
+        private static AbstractOrderByFactory factory;
 
         public static AbstractOrderByFactory Factory
         {
-            set { _factory = value; }
+            set => factory = value;
         }
 
         public static IQueryOrderBy RawSql(string sql)
         {
-            var queryOrderBy = (AbstractSqlQueryOrderBy) _factory.CreateOrderBy(QueryOrderByExpressionType.RawSql);
+            var queryOrderBy = (AbstractSqlQueryOrderBy) factory.CreateOrderBy(QueryOrderByExpressionType.RawSql);
             queryOrderBy.Sql = sql;
             return queryOrderBy;
         }
@@ -42,7 +42,7 @@ namespace DbGate
         public static IQueryOrderBy Field(Type type, string field, QueryOrderType orderType)
         {
             var expressionOrderBy =
-                (AbstractExpressionOrderBy) _factory.CreateOrderBy(QueryOrderByExpressionType.Expression);
+                (AbstractExpressionOrderBy) factory.CreateOrderBy(QueryOrderByExpressionType.Expression);
             expressionOrderBy.Expr = OrderByExpr.Build().Field(type, field);
             expressionOrderBy.OrderType = orderType;
             return expressionOrderBy;

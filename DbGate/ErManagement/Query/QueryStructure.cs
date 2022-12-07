@@ -6,24 +6,24 @@ namespace DbGate.ErManagement.Query
 {
     public class QueryStructure
     {
-        private readonly ICollection<IQueryCondition> _conditionList;
-        private readonly ICollection<IQueryFrom> _fromList;
-        private readonly ICollection<IQueryGroupCondition> _groupConditionList;
-        private readonly ICollection<IQueryGroup> _groupList;
-        private readonly ICollection<IQueryJoin> _joinList;
-        private readonly ICollection<IQueryOrderBy> _orderList;
-        private readonly ICollection<IQuerySelection> _selectList;
+        private readonly ICollection<IQueryCondition> conditionList;
+        private readonly ICollection<IQueryFrom> fromList;
+        private readonly ICollection<IQueryGroupCondition> groupConditionList;
+        private readonly ICollection<IQueryGroup> groupList;
+        private readonly ICollection<IQueryJoin> joinList;
+        private readonly ICollection<IQueryOrderBy> orderList;
+        private readonly ICollection<IQuerySelection> selectList;
 
         public QueryStructure()
         {
             QueryId = Guid.NewGuid().ToString();
-            _fromList = new Collection<IQueryFrom>();
-            _joinList = new Collection<IQueryJoin>();
-            _conditionList = new Collection<IQueryCondition>();
-            _selectList = new Collection<IQuerySelection>();
-            _groupList = new Collection<IQueryGroup>();
-            _orderList = new Collection<IQueryOrderBy>();
-            _groupConditionList = new Collection<IQueryGroupCondition>();
+            fromList = new Collection<IQueryFrom>();
+            joinList = new Collection<IQueryJoin>();
+            conditionList = new Collection<IQueryCondition>();
+            selectList = new Collection<IQuerySelection>();
+            groupList = new Collection<IQueryGroup>();
+            orderList = new Collection<IQueryOrderBy>();
+            groupConditionList = new Collection<IQueryGroupCondition>();
         }
 
         public bool Distinct { get; set; }
@@ -34,39 +34,18 @@ namespace DbGate.ErManagement.Query
 
         public string QueryId { get; private set; }
 
-        public ICollection<IQueryFrom> FromList
-        {
-            get { return _fromList; }
-        }
+        public ICollection<IQueryFrom> FromList => fromList;
 
-        public ICollection<IQueryJoin> JoinList
-        {
-            get { return _joinList; }
-        }
+        public ICollection<IQueryJoin> JoinList => joinList;
 
-        public ICollection<IQueryCondition> ConditionList
-        {
-            get { return _conditionList; }
-        }
+        public ICollection<IQueryCondition> ConditionList => conditionList;
 
-        public ICollection<IQuerySelection> SelectList
-        {
-            get { return _selectList; }
-        }
+        public ICollection<IQuerySelection> SelectList => selectList;
 
-        public ICollection<IQueryGroup> GroupList
-        {
-            get { return _groupList; }
-        }
+        public ICollection<IQueryGroup> GroupList => groupList;
 
-        public ICollection<IQueryOrderBy> OrderList
-        {
-            get { return _orderList; }
-        }
+        public ICollection<IQueryOrderBy> OrderList => orderList;
 
-        public ICollection<IQueryGroupCondition> GroupConditionList
-        {
-            get { return _groupConditionList; }
-        }
+        public ICollection<IQueryGroupCondition> GroupConditionList => groupConditionList;
     }
 }

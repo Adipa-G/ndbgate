@@ -4,14 +4,14 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Support
 {
     public class MetaQueryHolder : IComparable<MetaQueryHolder>
     {
-        public const int OBJECT_TYPE_TABLE = 1;
-        public const int OBJECT_TYPE_COLUMN = 2;
-        public const int OBJECT_TYPE_PRIMARY_KEY = 3;
-        public const int OBJECT_TYPE_FOREIGN_KEY = 4;
+        public const int ObjectTypeTable = 1;
+        public const int ObjectTypeColumn = 2;
+        public const int ObjectTypePrimaryKey = 3;
+        public const int ObjectTypeForeignKey = 4;
 
-        public const int OPERATION_TYPE_ADD = 1;
-        public const int OPERATION_TYPE_ALTER = 2;
-        public const int OPERATION_TYPE_DELETE = 3;
+        public const int OperationTypeAdd = 1;
+        public const int OperationTypeAlter = 2;
+        public const int OperationTypeDelete = 3;
 
         public MetaQueryHolder()
         {
@@ -41,9 +41,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Support
             }
             else
             {
-                if (QueryType == OPERATION_TYPE_ADD)
+                if (QueryType == OperationTypeAdd)
                     return 1;
-                if (QueryType == OPERATION_TYPE_DELETE)
+                if (QueryType == OperationTypeDelete)
                     return -1;
                 return 0;
             }

@@ -3,33 +3,32 @@ using System.Data.SQLite;
 using System.IO;
 using System.Reflection;
 using log4net;
-using log4net.Config;
 using log4net.Core;
-using NUnit.Framework;
+using Xunit;
 
 namespace DbGate.Utility
 {
-    [TestFixture]
+    [Collection("Sequential")]
     public class DbUtilsTests
     {
-        private static ITransactionFactory _transactionFactory;
+        private static ITransactionFactory transactionFactory;
 
         private static ITransaction SetupDb()
         {
             try
             {
-                if (_transactionFactory == null)
+                if (transactionFactory == null)
                 {
                     var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
                     log4net.Config.XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
                     LogManager.GetLogger(typeof(DbUtilsTests)).Info("Starting in-memory database for unit tests");
-                    _transactionFactory = new DefaultTransactionFactory(
+                    transactionFactory = new DefaultTransactionFactory(
                         () => new SQLiteConnection(
                             "Data Source=:memory:;Version=3;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON"),
                         DefaultTransactionFactory.DbSqllite);
                 }
-                return _transactionFactory.CreateTransaction();
+                return transactionFactory.CreateTransaction();
             }
             catch (System.Exception ex)
             {
@@ -39,14 +38,14 @@ namespace DbGate.Utility
             }
         }
 
-        [Test]
+        [Fact]
         public void Utils_GetConnection_DatabaseInitialized_ShouldCreateConnection()
         {
             try
             {
                 var transaction = SetupDb();
-                IDbConnection connection = transaction.Connection;
-                Assert.IsTrue(connection.State != ConnectionState.Closed);
+                var connection = transaction.Connection;
+                Assert.True(connection.State != ConnectionState.Closed);
                 transaction.Close();
             }
             catch (System.Exception ex)

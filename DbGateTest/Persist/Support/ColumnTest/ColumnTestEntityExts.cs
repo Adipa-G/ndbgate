@@ -7,11 +7,11 @@ namespace DbGate.Persist.Support.ColumnTest
 {
     public class ColumnTestEntityExts : IColumnTestEntity
     {
-        private IEntityContext _context;
+        private IEntityContext context;
 
         public ColumnTestEntityExts()
         {
-            _context = new EntityContext();
+            context = new EntityContext();
         }
 
         public EntityStatus Status { get; set; }
@@ -47,9 +47,6 @@ namespace DbGate.Persist.Support.ColumnTest
             tx.DbGate.Load(this, reader, tx);
         }
 
-        public IEntityContext Context
-        {
-            get { return _context; }
-        }
+        public IEntityContext Context => context;
     }
 }

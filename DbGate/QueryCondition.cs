@@ -6,23 +6,23 @@ namespace DbGate
 {
     public class QueryCondition
     {
-		private static AbstractConditionFactory _factory;
+		private static AbstractConditionFactory factory;
 
 		public static AbstractConditionFactory Factory
 		{
-			set { _factory = value;}
-		}
+			set => factory = value;
+        }
 
         public static IQueryCondition RawSql(string sql)
         {
-			var queryCondition = (AbstractSqlQueryCondition) _factory.CreateCondition(QueryConditionExpressionType.RawSql);
+			var queryCondition = (AbstractSqlQueryCondition) factory.CreateCondition(QueryConditionExpressionType.RawSql);
 			queryCondition.Sql = sql;
 			return queryCondition;
         }
 
         public static IQueryCondition Expression(ConditionExpr expr)
         {
-            var queryCondition = (AbstractExpressionCondition)_factory.CreateCondition(QueryConditionExpressionType.Expression);
+            var queryCondition = (AbstractExpressionCondition)factory.CreateCondition(QueryConditionExpressionType.Expression);
             queryCondition.Expr = expr;
             return queryCondition;
         }

@@ -21,9 +21,9 @@ namespace DbGateTestApp.DocGenerate
 	  	                                        SearchOption.AllDirectories);
 	  	    var allCodeBlocks = CodeReader.ReadAndExtractWikiBlocks(allCsFiles);
 	  	
-	  	    foreach (string wikiTemplateFile in allWikiTemplateFiles)
+	  	    foreach (var wikiTemplateFile in allWikiTemplateFiles)
 	  	    {
-                string wikiText = TempleateProcessor.ProcessTemplate(wikiTemplateFile, allCodeBlocks);
+                var wikiText = TempleateProcessor.ProcessTemplate(wikiTemplateFile, allCodeBlocks);
 	  	        var file = new FileInfo(Path.Combine(srcOut,new FileInfo(wikiTemplateFile).Name.Replace(WikiTemplateExtension,WikiExtension)));
                 File.WriteAllText(file.FullName,wikiText);
 	  	    }

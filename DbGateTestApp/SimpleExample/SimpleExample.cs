@@ -17,7 +17,7 @@ namespace DbGateTestApp.SimpleExample
 
         public SimpleEntity CreateEntity()
         {
-            SimpleEntity entity = new SimpleEntity();
+            var entity = new SimpleEntity();
             entity.Id = Id;
             entity.Name = "Entity";
             return entity;
@@ -37,7 +37,7 @@ namespace DbGateTestApp.SimpleExample
 
         public SimpleEntity RetrieveWithQuery(ITransaction tx)
         {
-            ISelectionQuery query = new SelectionQuery()
+            var query = new SelectionQuery()
                 .From(QueryFrom.EntityType(typeof(SimpleEntity)))
                 .Select(QuerySelection.EntityType(typeof(SimpleEntity)));
 
@@ -51,11 +51,11 @@ namespace DbGateTestApp.SimpleExample
 
         public static void DoTest()
         {
-            SimpleExample example = new SimpleExample();
-            ITransaction tx = ExampleBase.SetupDb();
+            var example = new SimpleExample();
+            var tx = ExampleBase.SetupDb();
             example.Patch(tx);
 
-            SimpleEntity entity = example.CreateEntity();
+            var entity = example.CreateEntity();
             example.Persist(tx, entity);
 
             entity = example.RetrieveWithQuery(tx);

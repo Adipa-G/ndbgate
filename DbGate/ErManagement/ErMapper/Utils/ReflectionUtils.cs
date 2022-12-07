@@ -17,7 +17,7 @@ namespace DbGate.ErManagement.ErMapper.Utils
                 return true;
             }
 
-            foreach (Type aClass in type.GetInterfaces())
+            foreach (var aClass in type.GetInterfaces())
             {
                 if (aClass == interfaceType)
                 {
@@ -29,7 +29,7 @@ namespace DbGate.ErManagement.ErMapper.Utils
                 }
             }
 
-            Type superType = type.BaseType;
+            var superType = type.BaseType;
             while (superType != null)
             {
                 if (IsImplementInterface(superType, interfaceType))
@@ -46,11 +46,11 @@ namespace DbGate.ErManagement.ErMapper.Utils
             var superTypes = new List<Type>();
 
             bool interfacesMatched;
-            Type iteratedType = type;
+            var iteratedType = type;
             do
             {
                 interfacesMatched = true;
-                foreach (Type iType in interfaceType)
+                foreach (var iType in interfaceType)
                 {
                     interfacesMatched &= IsImplementInterface(iteratedType, iType);
                 }
@@ -89,7 +89,7 @@ namespace DbGate.ErManagement.ErMapper.Utils
             }
             catch (Exception ex)
             {
-                String message = String.Format("Exception while trying get property {0} value of entity {1}"
+                var message = String.Format("Exception while trying get property {0} value of entity {1}"
                                                , property.Name, target.GetType().FullName);
                 throw new MethodInvocationException(message, ex);
             }
@@ -103,7 +103,7 @@ namespace DbGate.ErManagement.ErMapper.Utils
             }
             catch (Exception ex)
             {
-                String message = String.Format("Exception while trying to set property {0} of entity {1}"
+                var message = String.Format("Exception while trying to set property {0} of entity {1}"
                                                , property.Name, target.GetType().FullName);
                 throw new MethodInvocationException(message, ex);
             }
@@ -117,7 +117,7 @@ namespace DbGate.ErManagement.ErMapper.Utils
             }
             catch (Exception ex)
             {
-                String message = String.Format("Exception while trying to create an instance of type {0}"
+                var message = String.Format("Exception while trying to create an instance of type {0}"
                                                , type.FullName);
                 throw new EntityInstantiationException(message, ex);
             }
@@ -132,7 +132,7 @@ namespace DbGate.ErManagement.ErMapper.Utils
             }
             catch (Exception ex)
             {
-                string message = string.Format("Exception while trying to extract field value of {0} of entity {1}",field,target.GetType().FullName);
+                var message = string.Format("Exception while trying to extract field value of {0} of entity {1}",field,target.GetType().FullName);
                 throw new FieldValueExtractionException(message,ex);
             }
         }

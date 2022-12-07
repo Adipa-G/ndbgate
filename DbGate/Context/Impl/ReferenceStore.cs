@@ -5,11 +5,11 @@ namespace DbGate.Context.Impl
 {
     public class ReferenceStore : IReferenceStore
     {
-        private readonly ICollection<IEntityFieldValueList> _entityFieldValueList;
+        private readonly ICollection<IEntityFieldValueList> entityFieldValueList;
 
         public ReferenceStore()
         {
-            _entityFieldValueList = new List<IEntityFieldValueList>();
+            entityFieldValueList = new List<IEntityFieldValueList>();
         }
 
         #region IErSession Members
@@ -21,7 +21,7 @@ namespace DbGate.Context.Impl
 
         public IReadOnlyEntity GetFromCurrentObjectGraph(ITypeFieldValueList keys)
         {
-            foreach (IEntityFieldValueList existingEntity in _entityFieldValueList)
+            foreach (var existingEntity in entityFieldValueList)
             {
                 if (OperationUtils.IsTypeKeyEquals(keys, existingEntity))
                 {
@@ -33,10 +33,10 @@ namespace DbGate.Context.Impl
 
         public void AddToCurrentObjectGraphIndex(IReadOnlyEntity refEntity)
         {
-            IEntityFieldValueList refKeyList = OperationUtils.ExtractEntityKeyValues(refEntity);
+            var refKeyList = OperationUtils.ExtractEntityKeyValues(refEntity);
             if (!AlreadyInCurrentObjectGraph(refKeyList))
             {
-                _entityFieldValueList.Add(refKeyList);
+                entityFieldValueList.Add(refKeyList);
             }
         }
         #endregion

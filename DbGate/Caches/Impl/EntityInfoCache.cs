@@ -13,11 +13,11 @@ namespace DbGate.Caches.Impl
     public class EntityInfoCache : IEntityInfoCache
     {
         private static readonly ConcurrentDictionary<Type, EntityInfo> Cache = new ConcurrentDictionary<Type, EntityInfo>();
-        private IDbGateConfig _config;
+        private IDbGateConfig config;
 
         public EntityInfoCache(IDbGateConfig config)
         {
-            _config = config;
+            this.config = config;
         }
 
         public EntityInfo GetEntityInfo(IReadOnlyClientEntity entity)
@@ -43,14 +43,14 @@ namespace DbGate.Caches.Impl
             }
             catch (Exception ex)
             {
-                Logger.GetLogger(_config.LoggerName).Fatal(ex.Message, ex);
+                Logger.GetLogger(config.LoggerName).Fatal(ex.Message, ex);
             }
             return Cache[entityType];
         }
         
         public IList<IRelation> GetReversedRelationships(Type entityType)
         {
-            Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(entityType,
+            var typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(entityType,
                 new Type[]
                     {typeof (IReadOnlyEntity)});
 
@@ -63,10 +63,10 @@ namespace DbGate.Caches.Impl
 
         public void Register(Type type, ITable table, ICollection<IField> fields)
         {
-            Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(type,
+            var typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(type,
                                                                                      new Type[]
                                                                                          {typeof (IReadOnlyEntity)});
-            Type immediateSuper = typeList.Length > 1 ? typeList[1] : null;
+            var immediateSuper = typeList.Length > 1 ? typeList[1] : null;
 
             var subEntityInfo = new EntityInfo(type);
             subEntityInfo.SetFields(fields);
@@ -75,7 +75,7 @@ namespace DbGate.Caches.Impl
             if (immediateSuper != null
                 && Cache.ContainsKey(immediateSuper))
             {
-                EntityInfo immediateSuperEntityInfo = Cache[immediateSuper];
+                var immediateSuperEntityInfo = Cache[immediateSuper];
                 subEntityInfo.SuperEntityInfo = immediateSuperEntityInfo;
                 immediateSuperEntityInfo.AddSubEntityInfo(subEntityInfo);
             }
@@ -90,7 +90,7 @@ namespace DbGate.Caches.Impl
                 return;
             }
             var extracted = ExtractTableAndFieldInfo(entityType);
-            foreach (Type regType in extracted.Keys)
+            foreach (var regType in extracted.Keys)
             {
                 Cache.TryAdd(regType, extracted[regType]);
             }
@@ -109,20 +109,20 @@ namespace DbGate.Caches.Impl
             var entityInfoMap = new Dictionary<Type, EntityInfo>();
 
             EntityInfo subEntity = null;
-            Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(subType,
+            var typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(subType,
                                                                                      new[] {typeof (IReadOnlyEntity)});
-            foreach (Type regType in typeList)
+            foreach (var regType in typeList)
             {
                 if (subEntity != null && Cache.ContainsKey(regType))
                 {
-                    EntityInfo superEntityInfo = Cache[regType];
+                    var superEntityInfo = Cache[regType];
                     subEntity.SuperEntityInfo = superEntityInfo;
                     superEntityInfo.AddSubEntityInfo(subEntity);
                     continue;
                 }
 
-                ITable tableInfo = GetTableInfo(regType, subType);
-                ICollection<IField> fields = GetAllFields(regType, subType);
+                var tableInfo = GetTableInfo(regType, subType);
+                var fields = GetAllFields(regType, subType);
 
                 if (tableInfo != null || fields.Count > 0)
                 {
@@ -143,16 +143,16 @@ namespace DbGate.Caches.Impl
 
         private ITable GetTableInfo(Type regType, Type subType)
         {
-            ITable table = GetTableInfoIfManagedClass(regType, subType);
+            var table = GetTableInfoIfManagedClass(regType, subType);
             if (table == null)
             {
-                object[] attributes = regType.GetCustomAttributes(false);
-                foreach (object attribute in attributes)
+                var attributes = regType.GetCustomAttributes(false);
+                foreach (var attribute in attributes)
                 {
                     if (attribute is TableInfo)
                     {
                         var tableInfo = (TableInfo) attribute;
-                        TableInfo annotatedTableInfo = (TableInfo) attribute;
+                        var annotatedTableInfo = (TableInfo) attribute;
                         table = new DefaultTable(annotatedTableInfo.TableName
                             ,annotatedTableInfo.UpdateStrategy
                             ,annotatedTableInfo.VerifyOnWriteStrategy
@@ -169,13 +169,13 @@ namespace DbGate.Caches.Impl
             if (table != null)
             {
                 if (table.DirtyCheckStrategy == DirtyCheckStrategy.Default)
-                    table.DirtyCheckStrategy = _config.DirtyCheckStrategy;
+                    table.DirtyCheckStrategy = config.DirtyCheckStrategy;
 
                 if (table.UpdateStrategy == UpdateStrategy.Default)
-                    table.UpdateStrategy = _config.UpdateStrategy;
+                    table.UpdateStrategy = config.UpdateStrategy;
 
                 if (table.VerifyOnWriteStrategy == VerifyOnWriteStrategy.Default)
-                    table.VerifyOnWriteStrategy = _config.VerifyOnWriteStrategy;
+                    table.VerifyOnWriteStrategy = config.VerifyOnWriteStrategy;
             }
         }
 
@@ -185,8 +185,8 @@ namespace DbGate.Caches.Impl
             {
                 try
                 {
-                    var managedDBClass = (IManagedEntity) Activator.CreateInstance(subType);
-                    return managedDBClass.TableInfo.ContainsKey(regType) ? managedDBClass.TableInfo[regType] : null;
+                    var managedDbClass = (IManagedEntity) Activator.CreateInstance(subType);
+                    return managedDbClass.TableInfo.ContainsKey(regType) ? managedDbClass.TableInfo[regType] : null;
                 }
                 catch (Exception e)
                 {
@@ -199,25 +199,25 @@ namespace DbGate.Caches.Impl
 
         private ICollection<IField> GetAllFields(Type regType, Type subType)
         {
-            List<IField> fields = GetFieldsIfManagedClass(regType, subType);
-            Type[] superTypes = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(regType,
+            var fields = GetFieldsIfManagedClass(regType, subType);
+            var superTypes = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(regType,
                                                                                        new Type[]
                                                                                            {typeof (IReadOnlyEntity)});
 
-            for (int i = 0; i < superTypes.Length; i++)
+            for (var i = 0; i < superTypes.Length; i++)
             {
-                Type superType = superTypes[i];
+                var superType = superTypes[i];
                 fields.AddRange(GetAllFields(superType, i > 0));
             }
 
-            foreach (IField field in fields)
+            foreach (var field in fields)
 	        {
 	            if (field is IRelation)
 	            {
-	                IRelation relation = (IRelation) field;
+	                var relation = (IRelation) field;
 	
 	                if (relation.FetchStrategy == FetchStrategy.Default)
-	                    relation.FetchStrategy = _config.FetchStrategy;
+	                    relation.FetchStrategy = config.FetchStrategy;
 	            }
 	        }
 
@@ -230,8 +230,8 @@ namespace DbGate.Caches.Impl
             {
                 try
                 {
-                    var managedDBClass = (IManagedEntity) Activator.CreateInstance(subType);
-                    return GetFieldsForManagedClass(managedDBClass, regType);
+                    var managedDbClass = (IManagedEntity) Activator.CreateInstance(subType);
+                    return GetFieldsForManagedClass(managedDbClass, regType);
                 }
                 catch (Exception e)
                 {
@@ -246,11 +246,11 @@ namespace DbGate.Caches.Impl
         {
             var fields = new List<IField>();
 
-            Type[] typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(type,
+            var typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(type,
                                                                                      new[] {typeof (IReadOnlyEntity)});
-            foreach (Type targetType in typeList)
+            foreach (var targetType in typeList)
             {
-                ICollection<IField> targetTypeFields = entity.FieldInfo.ContainsKey(targetType)
+                var targetTypeFields = entity.FieldInfo.ContainsKey(targetType)
                                                            ? entity.FieldInfo[targetType]
                                                            : null;
                 if (targetType == type && targetTypeFields != null)
@@ -259,7 +259,7 @@ namespace DbGate.Caches.Impl
                 }
                 else if (targetTypeFields != null)
                 {
-                    foreach (IField field in targetTypeFields)
+                    foreach (var field in targetTypeFields)
                     {
                         var dbColumn = field as IColumn;
                         if (dbColumn != null && dbColumn.SubClassCommonColumn)
@@ -277,16 +277,16 @@ namespace DbGate.Caches.Impl
         {
             var fields = new List<IField>();
 
-            PropertyInfo[] dbClassFields = entityType.GetProperties();
-            foreach (PropertyInfo propertyInfo in dbClassFields)
+            var dbClassFields = entityType.GetProperties();
+            foreach (var propertyInfo in dbClassFields)
             {
                 if (propertyInfo.DeclaringType != entityType)
                 {
                     continue;
                 }
 
-                object[] attributes = propertyInfo.GetCustomAttributes(false);
-                foreach (object attribute in attributes)
+                var attributes = propertyInfo.GetCustomAttributes(false);
+                foreach (var attribute in attributes)
                 {
                     if (attribute is ColumnInfo)
                     {
@@ -295,7 +295,7 @@ namespace DbGate.Caches.Impl
                         {
                             continue;
                         }
-                        IColumn column = CreateColumnMapping(propertyInfo, dbColumnInfo);
+                        var column = CreateColumnMapping(propertyInfo, dbColumnInfo);
                         fields.Add(column);
                     }
                     else
@@ -372,8 +372,8 @@ namespace DbGate.Caches.Impl
         private static RelationColumnMapping[] CreateForeignKeyColumnMappings(ForeignKeyInfo foreignKeyInfo)
         {
             var objectMappings = new RelationColumnMapping[foreignKeyInfo.FromFieldMappings.Length];
-            string[] fromFieldMappings = foreignKeyInfo.FromFieldMappings;
-            string[] toFieldMappings = foreignKeyInfo.ToFieldMappings;
+            var fromFieldMappings = foreignKeyInfo.FromFieldMappings;
+            var toFieldMappings = foreignKeyInfo.ToFieldMappings;
 
             if (fromFieldMappings.Length != toFieldMappings.Length)
             {
@@ -383,10 +383,10 @@ namespace DbGate.Caches.Impl
                     "incorrect relation definition, no of from columns should ne equal to no of to columns");
             }
 
-            for (int i = 0; i < fromFieldMappings.Length; i++)
+            for (var i = 0; i < fromFieldMappings.Length; i++)
             {
-                string fromMapping = fromFieldMappings[i];
-                string toMapping = toFieldMappings[i];
+                var fromMapping = fromFieldMappings[i];
+                var toMapping = toFieldMappings[i];
                 objectMappings[i] = new RelationColumnMapping(fromMapping, toMapping);
             }
             return objectMappings;

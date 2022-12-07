@@ -21,16 +21,16 @@ namespace DbGate
         public const int DbMysql = 6;
         public const int DbSqlServer = 7;
 
-        private readonly IDbGate _dbGate;
-        private readonly int _dbType;
-        private readonly Func<IDbConnection> _connectionFactory;
+        private readonly IDbGate dbGate;
+        private readonly int dbType;
+        private readonly Func<IDbConnection> connectionFactory;
 
         public DefaultTransactionFactory(Func<IDbConnection> connectionFactory,
             int dbType)
         {
-            _dbType = dbType;
-            _dbGate = new ErManagement.ErMapper.DbGate(_dbType);
-            _connectionFactory = connectionFactory;
+            this.dbType = dbType;
+            dbGate = new ErManagement.ErMapper.DbGate(this.dbType);
+            this.connectionFactory = connectionFactory;
         }
 
         public ITransaction CreateTransaction()
@@ -39,7 +39,7 @@ namespace DbGate
             IDbTransaction tx = null;
             try
             {
-                conn = _connectionFactory.Invoke();
+                conn = connectionFactory.Invoke();
                 conn.Open();
                 tx = conn.BeginTransaction();
             }
@@ -50,10 +50,7 @@ namespace DbGate
             return new Transaction(this,tx);
         }
 
-        public IDbGate DbGate
-        {
-            get { return _dbGate; }
-        }
+        public IDbGate DbGate => dbGate;
 
         #region IDisposable Members
         public void Dispose()

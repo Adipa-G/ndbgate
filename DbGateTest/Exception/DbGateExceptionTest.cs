@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using System.Reflection;
 using DbGate.Caches.Impl;
@@ -5,50 +6,43 @@ using DbGate.ErManagement.ErMapper;
 using DbGate.ErManagement.ErMapper.Utils;
 using DbGate.Exception.Support;
 using DbGate.Exceptions.Common;
-using NUnit.Framework;
+using Xunit;
 
 namespace DbGate.Exception
 {
-    [TestFixture]
-    public class DbGateExceptionTest : AbstractDbGateTestBase
+    [Collection("Sequential")]
+    public class DbGateExceptionTest : AbstractDbGateTestBase, IDisposable
     {
-        private const string DBName = "unit-testing-exceptions";
+        private const string DbName = "unit-testing-exceptions";
 
-        [OneTimeSetUp]
-        public static void Before()
+        public DbGateExceptionTest()
         {
             TestClass = typeof(DbGateExceptionTest);
-        }
-
-        [SetUp]
-        public void BeforeEach()
-        {
-            BeginInit(DBName);
+            BeginInit(DbName);
             TransactionFactory.DbGate.ClearCache();
             TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
             TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.DoNotVerify;
         }
 
-        [TearDown]
-        public void AfterEach()
+        public void Dispose()
         {
-            CleanupDb(DBName);
-            FinalizeDb(DBName);
+            CleanupDb(DbName);
+            FinalizeDb(DbName); 
         }
 
         private IDbConnection SetupTables()
         {
-            string sql = "Create table exception_test_root (\n" +
-                         "\tid_col Int NOT NULL,\n" +
-                         "\tname Varchar(20) NOT NULL,\n" +
-                         " Primary Key (id_col))";
-            CreateTableFromSql(sql,DBName);
-            EndInit(DBName);
+            var sql = "Create table exception_test_root (\n" +
+                      "\tid_col Int NOT NULL,\n" +
+                      "\tname Varchar(20) NOT NULL,\n" +
+                      " Primary Key (id_col))";
+            CreateTableFromSql(sql,DbName);
+            EndInit(DbName);
 
             return Connection;
         }
 
-        [Test]
+        [Fact]
         public void EntityInstantiationException_EntityWithoutDefaultConstructor_ShouldFail()
         {
             try
@@ -58,11 +52,11 @@ namespace DbGate.Exception
             }
             catch (EntityInstantiationException)
             {
-                Assert.IsTrue(true,"could not create instance without default constructor");
+                Assert.True(true,"could not create instance without default constructor");
             }
         }
 
-        [Test]
+        [Fact]
         public void EntityRegistrationException_EntityWithoutDefaultConstructor_ShouldFail()
         {
             try
@@ -73,7 +67,7 @@ namespace DbGate.Exception
             }
             catch (EntityRegistrationException)
             {
-                Assert.IsTrue(true,"could not register class without default constructor");
+                Assert.True(true,"could not register class without default constructor");
             }
             catch (System.Exception e)
             {
@@ -81,19 +75,19 @@ namespace DbGate.Exception
             }
         }
 
-        [Test]
+        [Fact]
         public void MethodInvocationException_EntityWithExceptionsWhenGetterInvoked_ShouldFail()
         {
             try
             {
                 var entity = new EntityWithAllWrong(123);
-                PropertyInfo property = entity.GetType().GetProperty("IdCol");
+                var property = entity.GetType().GetProperty("IdCol");
                 ReflectionUtils.GetValue(property, entity);
                 Assert.Fail("could invoke getter method");
             }
             catch (MethodInvocationException)
             {
-                Assert.IsTrue(true,"could not invoke getter method");
+                Assert.True(true,"could not invoke getter method");
             }
             catch (System.Exception e)
             {
@@ -101,19 +95,19 @@ namespace DbGate.Exception
             }
         }
 
-        [Test]
+        [Fact]
         public void MethodInvocationException_EntityWithExceptionsWhenSetterInvoked_ShouldFail()
         {
             try
             {
                 var entity = new EntityWithAllWrong(123);
-                PropertyInfo property = entity.GetType().GetProperty("IdCol");
+                var property = entity.GetType().GetProperty("IdCol");
                 ReflectionUtils.SetValue(property, entity, 0);
                 Assert.Fail("could invoke setter method");
             }
             catch (MethodInvocationException)
             {
-                Assert.IsTrue(true,"could not invoke setter method");
+                Assert.True(true,"could not invoke setter method");
             }
             catch (System.Exception e)
             {
@@ -121,18 +115,18 @@ namespace DbGate.Exception
             }
         }
 
-        [Test]
+        [Fact]
         public void MethodNotFoundException_GetInfoOnNonExistentMethod_ShouldFail()
         {
             try
             {
-                EntityInfo info = new EntityInfo(typeof(EntityWithAllWrong));
+                var info = new EntityInfo(typeof(EntityWithAllWrong));
                 info.GetProperty("nonExistent");
                 Assert.Fail("could get method");
             }
             catch (PropertyNotFoundException)
             {
-                Assert.IsTrue(true,"could not get method");
+                Assert.True(true,"could not get method");
             }
             catch (System.Exception e)
             {

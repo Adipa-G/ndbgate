@@ -18,7 +18,7 @@ namespace PerformanceTest.NDbGate
             var serviceIds = new List<int>();
 
             var productOrServiceCount = txCount * productsOrServicesPerTx;
-            for (int i = 0; i < productOrServiceCount; i++)
+            for (var i = 0; i < productOrServiceCount; i++)
             {
                 var product = new Product();
                 product.ItemId = seed + 2 * i;
@@ -30,7 +30,7 @@ namespace PerformanceTest.NDbGate
                 list.Add(product);
             }
 
-            for (int i = 0; i < productOrServiceCount; i++)
+            for (var i = 0; i < productOrServiceCount; i++)
             {
                 var service = new Service();
                 service.ItemId = seed + 2 * i + 1;
@@ -41,14 +41,14 @@ namespace PerformanceTest.NDbGate
                 list.Add(service);
             }
 
-            for (int i = 0; i < txCount; i++)
+            for (var i = 0; i < txCount; i++)
             {
                 var transaction = new Transaction();
                 transaction.TransactionId = Guid.NewGuid();
                 transaction.Name = $"TRS-000{i}";
 
-                int productsCount = random.Next(1, productsOrServicesPerTx);
-                for (int j = 0; j < productsCount; j++)
+                var productsCount = random.Next(1, productsOrServicesPerTx);
+                for (var j = 0; j < productsCount; j++)
                 {
                     var productId = productIds[random.Next(0, productIds.Count)];
                     var product = list.OfType<Product>().Single(p => p.ItemId == productId);
@@ -64,8 +64,8 @@ namespace PerformanceTest.NDbGate
                     productTransaction.ItemTransactionCharges.Add(productTransactionCharge);
                 }
 
-                int servicesCount = random.Next(1, productsOrServicesPerTx);
-                for (int j = 0; j < servicesCount; j++)
+                var servicesCount = random.Next(1, productsOrServicesPerTx);
+                for (var j = 0; j < servicesCount; j++)
                 {
                     var serviceId = serviceIds[random.Next(0, serviceIds.Count)];
                     var service = list.OfType<Service>().Single(p => p.ItemId == serviceId);
@@ -107,7 +107,7 @@ namespace PerformanceTest.NDbGate
                     transaction.Name = "Upd " + transaction.Name;
                     var itemTransactions = transaction.ItemTransactions.ToArray();
 
-                    for (int i = 0; i < itemTransactions.Length; i++)
+                    for (var i = 0; i < itemTransactions.Length; i++)
                     {
                         var itemTx = itemTransactions.ToArray()[i];
                         itemTx.Item = itemTransactions[itemTransactions.Length -1 - i].Item;

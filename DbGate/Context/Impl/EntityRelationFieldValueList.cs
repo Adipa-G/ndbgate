@@ -5,35 +5,26 @@ namespace DbGate.Context.Impl
 {
     public class EntityRelationFieldValueList : ITypeFieldValueList
     {
-        private readonly ICollection<EntityFieldValue> _fieldValues;
-        private readonly IRelation _relation;
+        private readonly ICollection<EntityFieldValue> fieldValues;
+        private readonly IRelation relation;
 
         public EntityRelationFieldValueList(IRelation relation)
         {
-            _relation = relation;
-            _fieldValues = new List<EntityFieldValue>();
+            this.relation = relation;
+            fieldValues = new List<EntityFieldValue>();
         }
 
-        public IRelation Relation
-        {
-            get { return _relation; }
-        }
+        public IRelation Relation => relation;
 
         #region ITypeFieldValueList Members
 
-        public Type Type
-        {
-            get { return _relation.RelatedObjectType; }
-        }
+        public Type Type => relation.RelatedObjectType;
 
-        public ICollection<EntityFieldValue> FieldValues
-        {
-            get { return _fieldValues; }
-        }
+        public ICollection<EntityFieldValue> FieldValues => fieldValues;
 
         public EntityFieldValue GetFieldValue(String attributeName)
         {
-            foreach (EntityFieldValue fieldValue in _fieldValues)
+            foreach (var fieldValue in fieldValues)
             {
                 if (fieldValue.Column.AttributeName.Equals(attributeName))
                 {

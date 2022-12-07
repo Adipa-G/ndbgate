@@ -8,10 +8,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Group
 
         #region IAbstractGroup Members
 
-        public QueryGroupExpressionType GroupExpressionType
-        {
-            get { return QueryGroupExpressionType.RawSql; }
-        }
+        public QueryGroupExpressionType GroupExpressionType => QueryGroupExpressionType.RawSql;
 
         public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
         {

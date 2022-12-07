@@ -44,9 +44,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlLiteMm
             sb.Append("CREATE TABLE ");
             sb.Append(metaTable.Name);
             sb.Append(" ( ");
-            bool first = true;
+            var first = true;
 
-            foreach (MetaColumn metaColumn in metaTable.Columns)
+            foreach (var metaColumn in metaTable.Columns)
             {
                 if (!first)
                 {
@@ -81,8 +81,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlLiteMm
                 sb.Append(",");
                 sb.Append("PRIMARY KEY(");
 
-                bool mapFirst = true;
-                foreach (string colName in primaryKey.ColumnNames)
+                var mapFirst = true;
+                foreach (var colName in primaryKey.ColumnNames)
                 {
                     if (!mapFirst)
                     {
@@ -94,14 +94,14 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlLiteMm
                 sb.Append(") ");
             }
 
-            foreach (MetaComparisonForeignKeyGroup foreignKeyGroup in tableGroup.ForeignKeys)
+            foreach (var foreignKeyGroup in tableGroup.ForeignKeys)
             {
                 var requiredKey = (MetaForeignKey) foreignKeyGroup.RequiredItem;
                 sb.Append(",");
                 sb.Append("FOREIGN KEY(");
 
-                bool mapFirst = true;
-                foreach (MetaForeignKeyColumnMapping mapping in requiredKey.ColumnMappings)
+                var mapFirst = true;
+                foreach (var mapping in requiredKey.ColumnMappings)
                 {
                     if (!mapFirst)
                     {
@@ -116,7 +116,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlLiteMm
                 sb.Append(" (");
 
                 mapFirst = true;
-                foreach (MetaForeignKeyColumnMapping mapping in requiredKey.ColumnMappings)
+                foreach (var mapping in requiredKey.ColumnMappings)
                 {
                     if (!mapFirst)
                     {

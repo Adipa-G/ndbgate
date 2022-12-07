@@ -23,12 +23,12 @@ namespace DbGate.ErManagement.ErMapper
 {
     public class RetrievalOperationLayer : BaseOperationLayer
     {
-        private ProxyGenerator _proxyGenerator;
+        private ProxyGenerator proxyGenerator;
 
         public RetrievalOperationLayer(IDbLayer dbLayer,IDbGateStatistics statistics, IDbGateConfig config)
             : base(dbLayer,statistics, config)
         {
-            _proxyGenerator = new ProxyGenerator();
+            proxyGenerator = new ProxyGenerator();
         }
 
 		public ICollection<Object> Select (ISelectionQuery query, ITransaction tx)
@@ -54,17 +54,17 @@ namespace DbGate.ErManagement.ErMapper
 				rs = DbLayer.DataManipulate().CreateResultSet(tx, execInfo);
 
                 IList<Object> retList = new List<Object> ();
-				ICollection<IQuerySelection> selections = query.Structure.SelectList;
+				var selections = query.Structure.SelectList;
                 var selectionCount = selections.Count;
 
 				while (rs.Read()) 
 				{
-					int count = 0;
+					var count = 0;
 				    
 				    object rowObject = selectionCount > 1 ? new object[selectionCount] : null;
-					foreach (IQuerySelection selection in selections) 
+					foreach (var selection in selections) 
 					{
-						Object loaded = ((IAbstractSelection)selection).Retrieve (rs,tx,buildInfo);
+						var loaded = ((IAbstractSelection)selection).Retrieve (rs,tx,buildInfo);
                         if (selectionCount > 1)
                         {
                             ((object[])rowObject)[count++] = loaded;
@@ -94,7 +94,7 @@ namespace DbGate.ErManagement.ErMapper
         {
             if (roEntity is IEntity)
             {
-                IEntity entity = (IEntity)roEntity;
+                var entity = (IEntity)roEntity;
                 entity.Status = EntityStatus.Unmodified;
             }
             try
@@ -111,10 +111,10 @@ namespace DbGate.ErManagement.ErMapper
 
         private void LoadFromDb(IReadOnlyEntity roEntity, IDataReader reader, ITransaction tx)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(roEntity);
+            var entityInfo = CacheManager.GetEntityInfo(roEntity);
             while (entityInfo != null)
             {
-                string tableName = entityInfo.TableInfo.TableName;
+                var tableName = entityInfo.TableInfo.TableName;
                 if (entityInfo.EntityType == roEntity.GetType() || tableName == null) //if i==0 that means it's base class and can use existing result set
                 {
                     LoadForType(roEntity, entityInfo.EntityType, reader, tx);
@@ -125,7 +125,7 @@ namespace DbGate.ErManagement.ErMapper
                     IDataReader superReader = null;
                     try
                     {
-                        ITypeFieldValueList keyValueList = OperationUtils.ExtractEntityTypeKeyValues(roEntity, entityInfo.EntityType);
+                        var keyValueList = OperationUtils.ExtractEntityTypeKeyValues(roEntity, entityInfo.EntityType);
                         superCmd = CreateRetrievalPreparedStatement(keyValueList, tx);
                         superReader = superCmd.ExecuteReader();
                         if (superReader.Read())
@@ -134,7 +134,7 @@ namespace DbGate.ErManagement.ErMapper
                         }
                         else
                         {
-                            string message =
+                            var message =
                                 String.Format(
                                     "Super class {0} does not contains a matching record for the base class {1}",
                                     entityInfo.EntityType.FullName, roEntity.GetType().FullName);
@@ -143,7 +143,7 @@ namespace DbGate.ErManagement.ErMapper
                     }
                     catch(Exception ex)
                     {
-                        String message = String.Format("SQL Exception while trying to read from table {0}",tableName);
+                        var message = String.Format("SQL Exception while trying to read from table {0}",tableName);
                         throw new ReadFromResultSetException(message,ex);
                     }
                     finally
@@ -158,9 +158,9 @@ namespace DbGate.ErManagement.ErMapper
 
         private void LoadForType(IReadOnlyEntity entity, Type type, IDataReader reader, ITransaction tx)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
-            IEntityContext entityContext = entity.Context;
-            ITypeFieldValueList valueTypeList = ReadValues(type, reader);
+            var entityInfo = CacheManager.GetEntityInfo(type);
+            var entityContext = entity.Context;
+            var valueTypeList = ReadValues(type, reader);
             SetValues(entity, valueTypeList);
             entity.Context.AddToCurrentObjectGraphIndex(entity);
 
@@ -169,8 +169,8 @@ namespace DbGate.ErManagement.ErMapper
                 entityContext.ChangeTracker.AddFields(valueTypeList.FieldValues);
             }
 
-            ICollection<IRelation> dbRelations = entityInfo.Relations;
-            foreach (IRelation relation in dbRelations)
+            var dbRelations = entityInfo.Relations;
+            foreach (var relation in dbRelations)
             {
                 LoadChildrenFromRelation(entity, type, tx, relation,false);
             }
@@ -179,11 +179,11 @@ namespace DbGate.ErManagement.ErMapper
         public void LoadChildrenFromRelation(IReadOnlyEntity parentRoEntity, Type entityType, ITransaction tx
             , IRelation relation,bool lazy)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(entityType);
-            IEntityContext entityContext = parentRoEntity.Context;
+            var entityInfo = CacheManager.GetEntityInfo(entityType);
+            var entityContext = parentRoEntity.Context;
 
-            PropertyInfo property = entityInfo.GetProperty(relation.AttributeName);
-            Object value = ReflectionUtils.GetValue(property,parentRoEntity);
+            var property = entityInfo.GetProperty(relation.AttributeName);
+            var value = ReflectionUtils.GetValue(property,parentRoEntity);
             
             if (!lazy && relation.FetchStrategy == FetchStrategy.Lazy)
             {
@@ -191,13 +191,13 @@ namespace DbGate.ErManagement.ErMapper
                 return;
             }
 
-            ICollection<IReadOnlyEntity> children = ReadRelationChildrenFromDb(parentRoEntity, entityType, tx, relation);
+            var children = ReadRelationChildrenFromDb(parentRoEntity, entityType, tx, relation);
             if (entityContext != null
                     && !relation.ReverseRelationship)
             {
-                foreach (IReadOnlyEntity childEntity in children)
+                foreach (var childEntity in children)
                 {
-                    ITypeFieldValueList valueTypeList = OperationUtils.ExtractRelationKeyValues(childEntity, relation);
+                    var valueTypeList = OperationUtils.ExtractRelationKeyValues(childEntity, relation);
                     if (valueTypeList != null)
                     {
                         entityContext.ChangeTracker.AddChildEntityKey(valueTypeList);
@@ -208,16 +208,16 @@ namespace DbGate.ErManagement.ErMapper
             if ((value == null || ProxyUtil.IsProxyType(value.GetType()))
                     && ReflectionUtils.IsImplementInterface(property.PropertyType, typeof(ICollection<>)))
             {
-                Type propertyType = property.PropertyType;
+                var propertyType = property.PropertyType;
                 if (propertyType.IsInterface)
                 {
-                    Type generic = propertyType.GetGenericArguments()[0];
+                    var generic = propertyType.GetGenericArguments()[0];
                     propertyType = typeof(List<>).MakeGenericType(new Type[] { generic });
                 }
                 value = Activator.CreateInstance(propertyType);
 
-                IList genCollection = (IList)value;
-                foreach (IReadOnlyEntity serverRoDbClass in children)
+                var genCollection = (IList)value;
+                foreach (var serverRoDbClass in children)
                 {
                     genCollection.Add(serverRoDbClass);
                 }
@@ -226,25 +226,25 @@ namespace DbGate.ErManagement.ErMapper
             else if (value != null
                     && ReflectionUtils.IsImplementInterface(property.PropertyType, typeof(ICollection<>)))
             {
-                IList genCollection = (IList)value;
-                foreach (IReadOnlyEntity serverRoDbClass in children)
+                var genCollection = (IList)value;
+                foreach (var serverRoDbClass in children)
                 {
                     genCollection.Add(serverRoDbClass);
                 }
             }
             else
             {
-                IEnumerator<IReadOnlyEntity> childEnumarator = children.GetEnumerator();
+                var childEnumarator = children.GetEnumerator();
                 if (childEnumarator.MoveNext())
                 {
-                    IReadOnlyEntity singleRoDbClass = childEnumarator.Current;
+                    var singleRoDbClass = childEnumarator.Current;
                     if (property.PropertyType.IsAssignableFrom(singleRoDbClass.GetType()))
                     {
                         ReflectionUtils.SetValue(property,parentRoEntity,singleRoDbClass);
                     }
                     else
                     {
-                        string message = singleRoDbClass.GetType().FullName + " is not matching the getter " + property.Name;
+                        var message = singleRoDbClass.GetType().FullName + " is not matching the getter " + property.Name;
                         Logger.GetLogger( Config.LoggerName).Fatal(message);
                         throw new NoSetterFoundToSetChildObjectListException(message);
                     }
@@ -255,10 +255,10 @@ namespace DbGate.ErManagement.ErMapper
         private void CreateProxy(IReadOnlyEntity parentRoEntity, Type type, ITransaction tx, IRelation relation,
                                  object value, PropertyInfo property)
         {
-            Type proxyType = value == null ? property.PropertyType : value.GetType();
+            var proxyType = value == null ? property.PropertyType : value.GetType();
             if (proxyType.IsGenericType)
             {
-                Type generic = proxyType.GetGenericArguments()[0];
+                var generic = proxyType.GetGenericArguments()[0];
                 if (proxyType.IsInterface)
                 {
                     proxyType = typeof(List<>).MakeGenericType(new Type[] { generic });
@@ -272,15 +272,15 @@ namespace DbGate.ErManagement.ErMapper
             Object proxy = null;
             if (ReflectionUtils.IsImplementInterface(property.PropertyType, typeof (ICollection<>)))
             {
-                Type generic = proxyType.GetGenericArguments()[0];
-                Type genericType = typeof (ICollection<>).MakeGenericType(new Type[] {generic});
-                proxy = _proxyGenerator.CreateInterfaceProxyWithTarget(genericType, value,
+                var generic = proxyType.GetGenericArguments()[0];
+                var genericType = typeof (ICollection<>).MakeGenericType(new Type[] {generic});
+                proxy = proxyGenerator.CreateInterfaceProxyWithTarget(genericType, value,
                                                                        new ChildLoadInterceptor(this, parentRoEntity, type, tx,
                                                                                                 relation));
             }
             else
             {
-                proxy = _proxyGenerator.CreateClassProxy(proxyType, new object[] {},
+                proxy = proxyGenerator.CreateClassProxy(proxyType, new object[] {},
                                                          new ChildLoadInterceptor(this, parentRoEntity, type, tx, relation));
             }
             ReflectionUtils.SetValue(property,parentRoEntity,proxy);

@@ -20,21 +20,18 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.From
 
         #region IAbstractFrom Members
 
-        public QueryFromExpressionType FromExpressionType
-        {
-            get { return QueryFromExpressionType.QueryUnion; }
-        }
+        public QueryFromExpressionType FromExpressionType => QueryFromExpressionType.QueryUnion;
 
         public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
         {
-            String alias = "union_src_" + Guid.NewGuid().ToString().Substring(0, 5);
+            var alias = "union_src_" + Guid.NewGuid().ToString().Substring(0, 5);
 
             var sqlBuilder = new StringBuilder();
             sqlBuilder.Append("(");
             for (int i = 0, queriesLength = Queries.Length; i < queriesLength; i++)
             {
-                ISelectionQuery query = Queries[i];
-                QueryBuildInfo result = dbLayer.DataManipulate().ProcessQuery(buildInfo, query.Structure);
+                var query = Queries[i];
+                var result = dbLayer.DataManipulate().ProcessQuery(buildInfo, query.Structure);
                 if (i > 0)
                 {
                     sqlBuilder.Append(" UNION ");

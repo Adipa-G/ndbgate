@@ -15,16 +15,16 @@ namespace DbGateTestApp.One2ManyExample
 
         public One2ManyParentEntity CreateEntity()
         {
-            One2ManyParentEntity entity = new One2ManyParentEntity();
+            var entity = new One2ManyParentEntity();
             entity.Id = Id;
             entity.Name = "Parent";
 
-            One2ManyChildEntityA childEntityA = new One2ManyChildEntityA();
+            var childEntityA = new One2ManyChildEntityA();
             childEntityA.IndexNo = 0;
             childEntityA.Name = "Child A";
             entity.ChildEntities.Add(childEntityA);
 
-            One2ManyChildEntityB childEntityB = new One2ManyChildEntityB();
+            var childEntityB = new One2ManyChildEntityB();
             childEntityB.IndexNo = 1;
             childEntityB.Name = "Child B";
             entity.ChildEntities.Add(childEntityB);
@@ -48,16 +48,16 @@ namespace DbGateTestApp.One2ManyExample
 
         public One2ManyParentEntity Retrieve(ITransaction tx)
         {
-            IDbCommand cmd = tx.CreateCommand();
+            var cmd = tx.CreateCommand();
             cmd.CommandText = "select * from parent_entity where id = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Value = Id;
 
             One2ManyParentEntity entity = null;
-            IDataReader reader = cmd.ExecuteReader();
+            var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 entity = new One2ManyParentEntity();
@@ -70,22 +70,22 @@ namespace DbGateTestApp.One2ManyExample
 
         public static void DoTest()
         {
-            One2ManyExample example = new One2ManyExample();
-            ITransaction tx = ExampleBase.SetupDb();
+            var example = new One2ManyExample();
+            var tx = ExampleBase.SetupDb();
             example.Patch(tx);
 
-            One2ManyParentEntity entity = example.CreateEntity();
+            var entity = example.CreateEntity();
             example.Persist(tx, entity);
 
             entity = example.Retrieve(tx);
             Console.WriteLine("Entity Name = " + entity.Name);
-            foreach (One2ManyChildEntity childEntity in entity.ChildEntities)
+            foreach (var childEntity in entity.ChildEntities)
             {
                 Console.WriteLine("Entity Child Name = " + childEntity.Name);
             }
 
             entity.Name = "Updated Entity A";
-            foreach (One2ManyChildEntity childEntity in entity.ChildEntities)
+            foreach (var childEntity in entity.ChildEntities)
             {
                 childEntity.Name += " Updated";
             }
@@ -93,7 +93,7 @@ namespace DbGateTestApp.One2ManyExample
 
             entity = example.Retrieve(tx);
             Console.WriteLine("Entity Name = " + entity.Name);
-            foreach (One2ManyChildEntity childEntity in entity.ChildEntities)
+            foreach (var childEntity in entity.ChildEntities)
             {
                 Console.WriteLine("Entity Child Name = " + childEntity.Name);
             }

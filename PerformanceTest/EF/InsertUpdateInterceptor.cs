@@ -11,7 +11,7 @@ namespace PerformanceTest.EF
         public virtual void NonQueryExecuting(
             DbCommand command, DbCommandInterceptionContext<int> interceptionContext)
         {
-            logCommand(command);
+            LogCommand(command);
         }
 
         public virtual void ReaderExecuting(
@@ -19,19 +19,19 @@ namespace PerformanceTest.EF
         {
             // this will capture all SELECT queries if you care about them..
             // however it also captures INSERT statements as well 
-            logCommand(command);
+            LogCommand(command);
         }
 
         public virtual void ScalarExecuting(
          DbCommand command, DbCommandInterceptionContext<object> interceptionContext)
         {
-            logCommand(command);
+            LogCommand(command);
         }
 
 
-        private void logCommand(DbCommand dbCommand)
+        private void LogCommand(DbCommand dbCommand)
         {
-            StringBuilder commandText = new StringBuilder();
+            var commandText = new StringBuilder();
 
             commandText.AppendLine("-- New statement generated: " + System.DateTime.Now.ToString());
             commandText.AppendLine();
@@ -46,7 +46,7 @@ namespace PerformanceTest.EF
                 commandText.AppendLine(String.Format("DECLARE {0} {1} {2}",
                                                         sqlParam.ParameterName,
                                                         sqlParam.SqlDbType.ToString().ToLower(),
-                                                        getSqlDataTypeSize(sqlParam)));
+                                                        GetSqlDataTypeSize(sqlParam)));
 
                 var escapedValue = sqlParam.SqlValue.ToString().Replace("'", "''");
                 commandText.AppendLine(String.Format("SET {0} = '{1}'", sqlParam.ParameterName, escapedValue));
@@ -61,7 +61,7 @@ namespace PerformanceTest.EF
             System.IO.File.AppendAllText("outputfile.sql", commandText.ToString());
         }
 
-        private string getSqlDataTypeSize(SqlParameter param)
+        private string GetSqlDataTypeSize(SqlParameter param)
         {
             if (param.Size == 0)
             {

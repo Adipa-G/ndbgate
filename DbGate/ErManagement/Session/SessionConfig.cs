@@ -14,9 +14,6 @@ namespace DbGate.ErManagement.Session
 
         public bool EnableHistory { get; set; }
 
-        public Dictionary<string, string> HistoryMappings
-        {
-            get { return historyMappings; }
-        }
+        public Dictionary<string, string> HistoryMappings => historyMappings;
     }
 }

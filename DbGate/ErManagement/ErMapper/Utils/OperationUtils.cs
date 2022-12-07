@@ -14,15 +14,15 @@ namespace DbGate.ErManagement.ErMapper.Utils
     {
         public static ICollection<IEntity> GetRelationEntities(IReadOnlyEntity rootEntity, IRelation relation)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(rootEntity);
-            PropertyInfo property = entityInfo.GetProperty(relation.AttributeName);
-            object value = ReflectionUtils.GetValue(property, rootEntity);
+            var entityInfo = CacheManager.GetEntityInfo(rootEntity);
+            var property = entityInfo.GetProperty(relation.AttributeName);
+            var value = ReflectionUtils.GetValue(property, rootEntity);
 
             ICollection<IEntity> treeEntities = new List<IEntity>();
             if (value is ICollection)
             {
-                ICollection collection = (ICollection) value;
-                foreach (object o in collection)
+                var collection = (ICollection) value;
+                foreach (var o in collection)
                 {
                     if (o is IEntity
                         && ReflectionUtils.IsSubClassOf(o.GetType(),relation.RelatedObjectType))
@@ -45,9 +45,9 @@ namespace DbGate.ErManagement.ErMapper.Utils
             if (entity is IEntity)
             {
                 valueList = new EntityFieldValueList(entity);
-                IEntity entityDbClass = (IEntity) entity;
-                ICollection<EntityFieldValue> extractedValues = ExtractValues(entityDbClass, true, entity.GetType());
-                foreach (EntityFieldValue entityFieldValue in extractedValues)
+                var entityDbClass = (IEntity) entity;
+                var extractedValues = ExtractValues(entityDbClass, true, entity.GetType());
+                foreach (var entityFieldValue in extractedValues)
                 {
                     valueList.FieldValues.Add(entityFieldValue);
                 }
@@ -61,9 +61,9 @@ namespace DbGate.ErManagement.ErMapper.Utils
             if (entity is IEntity)
             {
                 valueList = new EntityTypeFieldValueList(type);
-                IEntity entityDbClass = (IEntity) entity;
-                ICollection<EntityFieldValue> extractedValues = ExtractValues(entityDbClass,false,type);
-                foreach (EntityFieldValue entityFieldValue in extractedValues)
+                var entityDbClass = (IEntity) entity;
+                var extractedValues = ExtractValues(entityDbClass,false,type);
+                foreach (var entityFieldValue in extractedValues)
                 {
                     valueList.FieldValues.Add(entityFieldValue);
                 }
@@ -77,9 +77,9 @@ namespace DbGate.ErManagement.ErMapper.Utils
             if (entity is IEntity)
             {
                 valueList = new EntityTypeFieldValueList(type);
-                IEntity entityDbClass = (IEntity) entity;
-                ICollection<EntityFieldValue> extractedValues = ExtractValues(entityDbClass,true,type);
-                foreach (EntityFieldValue entityFieldValue in extractedValues)
+                var entityDbClass = (IEntity) entity;
+                var extractedValues = ExtractValues(entityDbClass,true,type);
+                foreach (var entityFieldValue in extractedValues)
                 {
                     valueList.FieldValues.Add(entityFieldValue);
                 }
@@ -93,9 +93,9 @@ namespace DbGate.ErManagement.ErMapper.Utils
             if (child is IEntity)
             {
                 valueList = new EntityRelationFieldValueList(relation);
-                IEntity childDbClass = (IEntity) child;
-                ICollection<EntityFieldValue> extractedValues = ExtractValues(childDbClass,true,null);
-                foreach (EntityFieldValue entityFieldValue in extractedValues)
+                var childDbClass = (IEntity) child;
+                var extractedValues = ExtractValues(childDbClass,true,null);
+                foreach (var entityFieldValue in extractedValues)
                 {
                     valueList.FieldValues.Add(entityFieldValue);
                 }
@@ -106,8 +106,8 @@ namespace DbGate.ErManagement.ErMapper.Utils
         private static ICollection<EntityFieldValue> ExtractValues(IEntity entity,bool key,Type typeToLoad)
         {
             ICollection<EntityFieldValue> entityFieldValues = new List<EntityFieldValue>();
-            EntityInfo parentEntityInfo = CacheManager.GetEntityInfo(entity);
-            EntityInfo entityInfo = parentEntityInfo;
+            var parentEntityInfo = CacheManager.GetEntityInfo(entity);
+            var entityInfo = parentEntityInfo;
 
             while (entityInfo != null)
             {
@@ -116,8 +116,8 @@ namespace DbGate.ErManagement.ErMapper.Utils
                     entityInfo = entityInfo.SuperEntityInfo;
                     continue;
                 }
-                ICollection<IColumn> subLevelColumns = entityInfo.Columns;
-                foreach (IColumn subLevelColumn in subLevelColumns)
+                var subLevelColumns = entityInfo.Columns;
+                foreach (var subLevelColumn in subLevelColumns)
                 {
                     if (!key || (subLevelColumn.Key && key))
                     {
@@ -126,16 +126,16 @@ namespace DbGate.ErManagement.ErMapper.Utils
                             continue;
                         }
                         
-                        EntityRelationColumnInfo relationColumnInfo = entityInfo.FindRelationColumnInfo(subLevelColumn.AttributeName);
+                        var relationColumnInfo = entityInfo.FindRelationColumnInfo(subLevelColumn.AttributeName);
                         if (relationColumnInfo != null)
                         {
-                            ICollection<IEntity> relationEntities = GetRelationEntities(entity,relationColumnInfo.Relation);
+                            var relationEntities = GetRelationEntities(entity,relationColumnInfo.Relation);
                             if (relationEntities.Count > 0)
                             {
-                                foreach (IEntity relationEntity in relationEntities)
+                                foreach (var relationEntity in relationEntities)
                                 {
-                                    IEntityFieldValueList keyValueList = ExtractEntityKeyValues(relationEntity);
-                                    EntityFieldValue fieldValue = keyValueList.GetFieldValue(relationColumnInfo.Mapping.ToField);
+                                    var keyValueList = ExtractEntityKeyValues(relationEntity);
+                                    var fieldValue = keyValueList.GetFieldValue(relationColumnInfo.Mapping.ToField);
                                     entityFieldValues.Add(new EntityFieldValue(fieldValue.Value,subLevelColumn));
                                 }
                             }
@@ -146,8 +146,8 @@ namespace DbGate.ErManagement.ErMapper.Utils
                         }
                         else
                         {
-                            PropertyInfo getter = entityInfo.GetProperty(subLevelColumn.AttributeName);
-                            Object value = ReflectionUtils.GetValue(getter, entity);
+                            var getter = entityInfo.GetProperty(subLevelColumn.AttributeName);
+                            var value = ReflectionUtils.GetValue(getter, entity);
 
                             entityFieldValues.Add(new EntityFieldValue(value, subLevelColumn));
                         }
@@ -160,7 +160,7 @@ namespace DbGate.ErManagement.ErMapper.Utils
 
         private static bool AlreadyHasTheColumnAdded(ICollection<EntityFieldValue> entityFieldValues,IColumn column)
         {
-            foreach (EntityFieldValue fieldValue in entityFieldValues)
+            foreach (var fieldValue in entityFieldValues)
             {
                 if (fieldValue.Column.AttributeName.Equals(column.AttributeName))
                 {
@@ -175,10 +175,10 @@ namespace DbGate.ErManagement.ErMapper.Utils
         {
             ICollection<ITypeFieldValueList> deletedListRelation = new List<ITypeFieldValueList>();
 
-            foreach (ITypeFieldValueList keyValueList in startListRelation)
+            foreach (var keyValueList in startListRelation)
             {
-                bool found  = false;
-                foreach (ITypeFieldValueList relationKeyValueListCurrent in currentListRelation)
+                var found  = false;
+                foreach (var relationKeyValueListCurrent in currentListRelation)
                 {
                     found = IsTypeKeyEquals(keyValueList, relationKeyValueListCurrent);
                     if (found)
@@ -207,10 +207,10 @@ namespace DbGate.ErManagement.ErMapper.Utils
 
         private static bool IsValueKeyEquals(IFieldValueList item1, IFieldValueList item2)
         {
-            foreach (EntityFieldValue fieldValue1 in item1.FieldValues)
+            foreach (var fieldValue1 in item1.FieldValues)
             {
-                bool found  = false;
-                foreach (EntityFieldValue fieldValue2 in item2.FieldValues)
+                var found  = false;
+                foreach (var fieldValue2 in item2.FieldValues)
                 {
                     if (fieldValue1.Column.AttributeName.Equals(fieldValue2.Column.AttributeName))
                     {
@@ -232,11 +232,11 @@ namespace DbGate.ErManagement.ErMapper.Utils
 
         public static void IncrementVersion(ITypeFieldValueList fieldValues)
         {
-            foreach (EntityFieldValue fieldValue in fieldValues.FieldValues)
+            foreach (var fieldValue in fieldValues.FieldValues)
             {
                 if (fieldValue.Column.ColumnType == ColumnType.Version)
                 {
-                    int version = int.Parse(fieldValue.Value.ToString());
+                    var version = int.Parse(fieldValue.Value.ToString());
                     version++;
                     fieldValue.Value = version;
                     break;

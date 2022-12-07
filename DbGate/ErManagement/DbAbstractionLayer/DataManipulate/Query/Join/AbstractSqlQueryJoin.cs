@@ -8,10 +8,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Join
 
         #region IAbstractJoin Members
 
-        public QueryJoinExpressionType JoinExpressionType
-        {
-            get { return QueryJoinExpressionType.RawSql; }
-        }
+        public QueryJoinExpressionType JoinExpressionType => QueryJoinExpressionType.RawSql;
 
         public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
         {

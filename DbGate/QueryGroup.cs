@@ -9,16 +9,16 @@ namespace DbGate
 {
     public class QueryGroup
     {
-        private static AbstractGroupFactory _factory;
+        private static AbstractGroupFactory factory;
 
         public static AbstractGroupFactory Factory
         {
-            set { _factory = value; }
+            set => factory = value;
         }
 
         public static IQueryGroup RawSql(string sql)
         {
-            var queryGroup = (AbstractSqlQueryGroup) _factory.CreateGroup(QueryGroupExpressionType.RawSql);
+            var queryGroup = (AbstractSqlQueryGroup) factory.CreateGroup(QueryGroupExpressionType.RawSql);
             queryGroup.Sql = sql;
             return queryGroup;
         }
@@ -31,7 +31,7 @@ namespace DbGate
         
         public static IQueryGroup Field(Type entityType, string field)
         {
-            var expressionGroup = (AbstractExpressionGroup) _factory.CreateGroup(QueryGroupExpressionType.Expression);
+            var expressionGroup = (AbstractExpressionGroup) factory.CreateGroup(QueryGroupExpressionType.Expression);
             expressionGroup.Expr = GroupExpr.Build().Field(entityType, field);
             return expressionGroup;
         }

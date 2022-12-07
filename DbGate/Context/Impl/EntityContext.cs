@@ -2,63 +2,60 @@ namespace DbGate.Context.Impl
 {
     public class EntityContext : IEntityContext
     {
-        private readonly IChangeTracker _changeTracker;
-        private IReferenceStore _referenceStore;
+        private readonly IChangeTracker changeTracker;
+        private IReferenceStore referenceStore;
 
         public EntityContext()
         {
-            _changeTracker = new ChangeTracker();
+            changeTracker = new ChangeTracker();
         }
 
         #region IEntityContext Members
 
-        public IChangeTracker ChangeTracker
-        {
-            get { return _changeTracker; }
-        }
+        public IChangeTracker ChangeTracker => changeTracker;
 
         public IReferenceStore ReferenceStore
         {
             get
             {
                 InitReferenceStore();
-                return _referenceStore;
+                return referenceStore;
             }
         }
 
         public void DestroyReferenceStore()
         {
-            _referenceStore = null;
+            referenceStore = null;
         }
 
         public void CopyReferenceStoreFrom(IReadOnlyEntity entity)
         {
             if (entity.Context != null)
-	            _referenceStore = entity.Context.ReferenceStore;
+	            referenceStore = entity.Context.ReferenceStore;
         }
 
         public bool AlreadyInCurrentObjectGraph(ITypeFieldValueList keys)
         {
             InitReferenceStore();
-            return _referenceStore.AlreadyInCurrentObjectGraph(keys);
+            return referenceStore.AlreadyInCurrentObjectGraph(keys);
         }
 
         public IReadOnlyEntity GetFromCurrentObjectGraph(ITypeFieldValueList keys)
         {
             InitReferenceStore();
-	        return _referenceStore.GetFromCurrentObjectGraph(keys);
+	        return referenceStore.GetFromCurrentObjectGraph(keys);
         }
 
         public void AddToCurrentObjectGraphIndex(IReadOnlyEntity refEntity)
         {
             InitReferenceStore();
-	        _referenceStore.AddToCurrentObjectGraphIndex(refEntity);
+	        referenceStore.AddToCurrentObjectGraphIndex(refEntity);
         }
 
         private void InitReferenceStore()
 	    {
-	        if (_referenceStore == null)
-	            _referenceStore = new ReferenceStore();
+	        if (referenceStore == null)
+	            referenceStore = new ReferenceStore();
 	    }
         #endregion
     }

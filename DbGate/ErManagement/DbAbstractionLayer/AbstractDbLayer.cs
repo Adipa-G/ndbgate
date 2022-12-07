@@ -7,8 +7,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer
     public abstract class AbstractDbLayer : IDbLayer
     {
         protected IDbGateConfig Config;
-        private IDataManipulate _dataManipulate;
-        private IMetaManipulate _metaManipulate;
+        private IDataManipulate dataManipulate;
+        private IMetaManipulate metaManipulate;
 
         protected AbstractDbLayer(IDbGateConfig config)
         {
@@ -19,21 +19,21 @@ namespace DbGate.ErManagement.DbAbstractionLayer
 
         public IDataManipulate DataManipulate()
         {
-            if (_dataManipulate == null)
+            if (dataManipulate == null)
             {
-                _dataManipulate = CreateDataManipulate();
+                dataManipulate = CreateDataManipulate();
             }
-            return _dataManipulate;
+            return dataManipulate;
         }
 
         public IMetaManipulate MetaManipulate(ITransaction tx)
         {
-            if (_metaManipulate == null)
+            if (metaManipulate == null)
             {
-                _metaManipulate = CreateMetaManipulate();
-                _metaManipulate.Initialize(tx);
+                metaManipulate = CreateMetaManipulate();
+                metaManipulate.Initialize(tx);
             }
-            return _metaManipulate;
+            return metaManipulate;
         }
 
         #endregion

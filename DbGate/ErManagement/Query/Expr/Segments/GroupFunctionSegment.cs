@@ -5,37 +5,28 @@ namespace DbGate.ErManagement.Query.Expr.Segments
 {
     public class GroupFunctionSegment : BaseSegment
     {
-        private readonly string _custFunction;
-        private readonly GroupFunctionSegmentMode _groupFunctionMode;
+        private readonly string custFunction;
+        private readonly GroupFunctionSegmentMode groupFunctionMode;
 
         public GroupFunctionSegment(GroupFunctionSegmentMode groupFunctionMode)
         {
-            _groupFunctionMode = groupFunctionMode;
-            _custFunction = null;
+            this.groupFunctionMode = groupFunctionMode;
+            custFunction = null;
         }
 
         public GroupFunctionSegment(String custFunction)
         {
-            _groupFunctionMode = GroupFunctionSegmentMode.CustFunc;
-            _custFunction = custFunction;
+            groupFunctionMode = GroupFunctionSegmentMode.CustFunc;
+            this.custFunction = custFunction;
         }
 
         public FieldSegment SegmentToGroup { get; set; }
 
-        public override SegmentType SegmentType
-        {
-            get { return SegmentType.Group; }
-        }
+        public override SegmentType SegmentType => SegmentType.Group;
 
-        public GroupFunctionSegmentMode GroupFunctionMode
-        {
-            get { return _groupFunctionMode; }
-        }
+        public GroupFunctionSegmentMode GroupFunctionMode => groupFunctionMode;
 
-        public string CustFunction
-        {
-            get { return _custFunction; }
-        }
+        public string CustFunction => custFunction;
 
         public override ISegment Add(ISegment segment)
         {

@@ -34,17 +34,14 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Join
             return CreateSqlForExpression(dbLayer, buildInfo);
         }
 
-        public QueryJoinExpressionType JoinExpressionType
-        {
-            get { return QueryJoinExpressionType.Type; }
-        }
+        public QueryJoinExpressionType JoinExpressionType => QueryJoinExpressionType.Type;
 
         #endregion
 
         private void CreateJoinExpressionForDefinedRelation(QueryBuildInfo buildInfo)
         {
-            string typeFromAlias = buildInfo.GetAlias(TypeFrom);
-            IRelation relation = processor.GetRelation(TypeFrom, TypeTo);
+            var typeFromAlias = buildInfo.GetAlias(TypeFrom);
+            var relation = processor.GetRelation(TypeFrom, TypeTo);
             if (relation == null)
             {
                 relation = processor.GetRelation(TypeTo, TypeFrom);
@@ -53,9 +50,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Join
             if (relation != null)
             {
                 Expr = JoinExpr.Build();
-                ICollection<RelationColumnMapping> tableColumnMappings = relation.TableColumnMappings;
-                int i = 0;
-                foreach (RelationColumnMapping mapping in tableColumnMappings)
+                var tableColumnMappings = relation.TableColumnMappings;
+                var i = 0;
+                foreach (var mapping in tableColumnMappings)
                 {
                     if (i > 0)
                     {

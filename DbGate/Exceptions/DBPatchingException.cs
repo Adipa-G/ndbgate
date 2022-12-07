@@ -3,9 +3,9 @@ using System.Runtime.Serialization;
 
 namespace DbGate.Exceptions
 {
-    public class DBPatchingException : DbGateException
+    public class DbPatchingException : DbGateException
     {
-        public DBPatchingException(string message, Exception innerException) : base(message, innerException)
+        public DbPatchingException(string message, Exception innerException) : base(message, innerException)
         {
         }
     }

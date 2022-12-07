@@ -8,10 +8,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Condition
 
         #region IAbstractCondition Members
 
-        public QueryConditionExpressionType ConditionExpressionType
-        {
-            get { return QueryConditionExpressionType.RawSql; }
-        }
+        public QueryConditionExpressionType ConditionExpressionType => QueryConditionExpressionType.RawSql;
 
         public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
         {

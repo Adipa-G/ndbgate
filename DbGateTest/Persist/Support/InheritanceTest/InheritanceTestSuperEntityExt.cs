@@ -6,12 +6,12 @@ namespace DbGate.Persist.Support.InheritanceTest
 {
     public abstract class InheritanceTestSuperEntityExt : IInheritanceTestSuperEntity
     {
-        private readonly IEntityContext _context;
+        private readonly IEntityContext context;
 
         protected InheritanceTestSuperEntityExt()
         {
             Status = EntityStatus.New;
-            _context = new EntityContext();
+            context = new EntityContext();
         }
 
         #region IInheritanceTestSuperEntity Members
@@ -24,10 +24,7 @@ namespace DbGate.Persist.Support.InheritanceTest
 
         public abstract void Persist(ITransaction tx);
 
-        public IEntityContext Context
-        {
-            get { return _context; }
-        }
+        public IEntityContext Context => context;
 
         #endregion
     }

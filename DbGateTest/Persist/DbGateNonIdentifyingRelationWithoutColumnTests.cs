@@ -1,59 +1,52 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Linq;
 using DbGate.ErManagement.Query;
 using DbGate.ErManagement.Query.Expr;
 using DbGate.Persist.Support.NonIdentifyingRelationWithoutColumn;
 using log4net;
-using NUnit.Framework;
+using Xunit;
 
 namespace DbGate.Persist
 {
-    [TestFixture]
-    public class DbGateNonIdentifyingRelationWithoutColumnTests : AbstractDbGateTestBase
+    [Collection("Sequential")]
+    public class DbGateNonIdentifyingRelationWithoutColumnTests : AbstractDbGateTestBase, IDisposable
     {
-        private const string DBName = "testing-non-identifying-relatin-without-column";
+        private const string DbName = "testing-non-identifying-relatin-without-column";
 
-        [OneTimeSetUp]
-        public static void Before()
+        public DbGateNonIdentifyingRelationWithoutColumnTests()
         {
             TestClass = typeof(DbGateFeatureIntegrationTest);
-        }
-
-        [SetUp]
-        public void BeforeEach()
-        {
-            BeginInit(DBName);
+            BeginInit(DbName);
             TransactionFactory.DbGate.ClearCache();
             TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.DoNotVerify;
             TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
         }
-
-        [TearDown]
-        public void AfterEach()
+        public void Dispose()
         {
-            CleanupDb(DBName);
-            FinalizeDb(DBName);
+            CleanupDb(DbName);
+            FinalizeDb(DbName);
         }
 
         private IDbConnection SetupTables()
         {
-            RegisterClassForDbPatching(typeof(Currency), DBName);
-            RegisterClassForDbPatching(typeof(Product), DBName);
-            EndInit(DBName);
+            RegisterClassForDbPatching(typeof(Currency), DbName);
+            RegisterClassForDbPatching(typeof(Product), DbName);
+            EndInit(DbName);
 
             return Connection;
         }
 
-        [Test]
+        [Fact]
         public void NonIdentifyingRelationWithoutColumn_Persist_WithRelation_LoadedShouldBeSameAsPersisted()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction tx = CreateTransaction(connection);
+                var connection = SetupTables();
+                var tx = CreateTransaction(connection);
 
-                int currencyId = 45;
-                int productId = 55;
+                var currencyId = 45;
+                var productId = 55;
 
                 var currency = new Currency();
                 currency.CurrencyId = currencyId;
@@ -68,11 +61,11 @@ namespace DbGate.Persist
                 tx.Commit();
 
                 tx = CreateTransaction(connection);
-                Product loaded = LoadProductWithId(tx, productId);
-                Assert.IsNotNull(loaded);
-                Assert.IsNotNull(loaded.Currency);
-                Assert.AreEqual(loaded.Currency.CurrencyId, currency.CurrencyId);
-                Assert.AreEqual(loaded.Currency.Code, currency.Code);
+                var loaded = LoadProductWithId(tx, productId);
+                Assert.NotNull(loaded);
+                Assert.NotNull(loaded.Currency);
+                Assert.Equal(loaded.Currency.CurrencyId, currency.CurrencyId);
+                Assert.Equal(loaded.Currency.Code, currency.Code);
             }
             catch (System.Exception e)
             {
@@ -81,29 +74,29 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void NonIdentifyingRelationWithoutColumn_Persist_WithRelation_UpdateShouldBeSameAsPersisted()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction tx = CreateTransaction(connection);
+                var connection = SetupTables();
+                var tx = CreateTransaction(connection);
 
-                int currencyAId = 35;
-                int currencyBId = 45;
-                int productId = 55;
+                var currencyAId = 35;
+                var currencyBId = 45;
+                var productId = 55;
 
-                Currency currencyA = new Currency();
+                var currencyA = new Currency();
                 currencyA.CurrencyId = currencyAId;
                 currencyA.Code = "LKR";
                 currencyA.Persist(tx);
 
-                Currency currencyB = new Currency();
+                var currencyB = new Currency();
                 currencyB.CurrencyId = currencyBId;
                 currencyB.Code = "USD";
                 currencyB.Persist(tx);
 
-                Product product = new Product();
+                var product = new Product();
                 product.ProductId = productId;
                 product.Price = 300;
                 product.Currency = currencyA;
@@ -111,17 +104,17 @@ namespace DbGate.Persist
                 tx.Commit();
 
                 tx = CreateTransaction(connection);
-                Product loaded = LoadProductWithId(tx,productId);
+                var loaded = LoadProductWithId(tx,productId);
                 loaded.Currency = currencyB;
                 loaded.Persist(tx);
                 tx.Commit();
 
                 tx = CreateTransaction(connection);
                 loaded = LoadProductWithId(tx,productId);
-                Assert.IsNotNull(loaded);
-                Assert.IsNotNull(loaded.Currency);
-                Assert.AreEqual(loaded.Currency.CurrencyId,currencyB.CurrencyId);
-                Assert.AreEqual(loaded.Currency.Code, currencyB.Code);
+                Assert.NotNull(loaded);
+                Assert.NotNull(loaded.Currency);
+                Assert.Equal(loaded.Currency.CurrencyId,currencyB.CurrencyId);
+                Assert.Equal(loaded.Currency.Code, currencyB.Code);
             }
             catch (System.Exception e)
             {
@@ -130,16 +123,16 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void NonIdentifyingRelationWithoutColumn_Persist_WithRelation_DeleteShouldBeSameAsPersisted()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction tx = CreateTransaction(connection);
+                var connection = SetupTables();
+                var tx = CreateTransaction(connection);
 
-                int currencyId = 45;
-                int productId = 55;
+                var currencyId = 45;
+                var productId = 55;
 
                 var currency = new Currency();
                 currency.CurrencyId = currencyId;
@@ -154,15 +147,15 @@ namespace DbGate.Persist
                 tx.Commit();
 
                 tx = CreateTransaction(connection);
-                Product loaded = LoadProductWithId(tx, productId);
+                var loaded = LoadProductWithId(tx, productId);
                 loaded.Currency = null;
                 loaded.Persist(tx);
                 tx.Commit();
 
                 tx = CreateTransaction(connection);
                 loaded = LoadProductWithId(tx, productId);
-                Assert.IsNotNull(loaded);
-                Assert.IsNull(loaded.Currency);
+                Assert.NotNull(loaded);
+                Assert.Null(loaded.Currency);
             }
             catch (System.Exception e)
             {

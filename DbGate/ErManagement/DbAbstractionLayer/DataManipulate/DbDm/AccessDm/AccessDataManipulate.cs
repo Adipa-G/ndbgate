@@ -10,7 +10,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.DbDm.AccessDm
 
         public override object ReadFromResultSet(IDataReader reader, IColumn column)
         {
-            object result = base.ReadFromResultSet(reader, column);
+            var result = base.ReadFromResultSet(reader, column);
             if (result != null
                 && column.ColumnType == ColumnType.Varchar)
             {

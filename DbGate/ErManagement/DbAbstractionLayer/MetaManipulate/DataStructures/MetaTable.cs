@@ -30,10 +30,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures
             if (PrimaryKey != null && that.PrimaryKey != null
                 && !PrimaryKey.Equals(that.PrimaryKey)) return false;
 
-            foreach (MetaForeignKey foreignKey in ForeignKeys)
+            foreach (var foreignKey in ForeignKeys)
             {
-                bool found = false;
-                foreach (MetaForeignKey thatForeignKey in that.ForeignKeys)
+                var found = false;
+                foreach (var thatForeignKey in that.ForeignKeys)
                 {
                     if (foreignKey.Name.Equals(thatForeignKey.Name))
                     {
@@ -44,10 +44,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures
                 if (!found) return false;
             }
 
-            foreach (MetaForeignKey thatForeignKey in that.ForeignKeys)
+            foreach (var thatForeignKey in that.ForeignKeys)
             {
-                bool found = false;
-                foreach (MetaForeignKey foreignKey in ForeignKeys)
+                var found = false;
+                foreach (var foreignKey in ForeignKeys)
                 {
                     if (foreignKey.Name.Equals(thatForeignKey.Name))
                     {
@@ -57,10 +57,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures
                 if (!found) return false;
             }
 
-            foreach (MetaColumn column in Columns)
+            foreach (var column in Columns)
             {
-                bool found = false;
-                foreach (MetaColumn thatColumn in that.Columns)
+                var found = false;
+                foreach (var thatColumn in that.Columns)
                 {
                     if (column.Name.Equals(thatColumn.Name))
                     {
@@ -71,10 +71,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures
                 if (!found) return false;
             }
 
-            foreach (MetaColumn thatColumn in that.Columns)
+            foreach (var thatColumn in that.Columns)
             {
-                bool found = false;
-                foreach (MetaColumn column in Columns)
+                var found = false;
+                foreach (var column in Columns)
                 {
                     if (column.Name.Equals(thatColumn.Name))
                     {

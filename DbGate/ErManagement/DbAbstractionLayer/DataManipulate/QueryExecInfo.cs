@@ -5,18 +5,15 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 {
     public class QueryExecInfo
     {
-        private readonly ICollection<QueryExecParam> _params;
+        private readonly ICollection<QueryExecParam> @params;
 
         public QueryExecInfo()
         {
-            _params = new Collection<QueryExecParam>();
+            @params = new Collection<QueryExecParam>();
         }
 
         public string Sql { get; set; }
 
-        public ICollection<QueryExecParam> Params
-        {
-            get { return _params; }
-        }
+        public ICollection<QueryExecParam> Params => @params;
     }
 }

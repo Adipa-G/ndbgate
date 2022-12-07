@@ -16,7 +16,7 @@ namespace DbGateTestApp.One2OneExample
 
         public One2OneParentEntity CreateEntityWithChildA()
         {
-            One2OneParentEntity entity = new One2OneParentEntity();
+            var entity = new One2OneParentEntity();
             entity.Id = IdA;
             entity.Name = "Parent A";
             entity.ChildEntity = new One2OneChildEntityA();
@@ -27,7 +27,7 @@ namespace DbGateTestApp.One2OneExample
 
         public One2OneParentEntity CreateEntityWithChildB()
         {
-            One2OneParentEntity entity = new One2OneParentEntity();
+            var entity = new One2OneParentEntity();
             entity.Id = IdB;
             entity.Name = "Parent B";
             entity.ChildEntity = new One2OneChildEntityB();
@@ -51,16 +51,16 @@ namespace DbGateTestApp.One2OneExample
 
         public One2OneParentEntity Retrieve(ITransaction tx,int id)
         {
-            IDbCommand cmd = tx.CreateCommand();
+            var cmd = tx.CreateCommand();
             cmd.CommandText = "select * from parent_entity where id = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Value = id;
 
             One2OneParentEntity entity = null;
-            IDataReader reader = cmd.ExecuteReader();
+            var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 entity = new One2OneParentEntity();
@@ -73,13 +73,13 @@ namespace DbGateTestApp.One2OneExample
 
         public static void DoTest()
         {
-            One2OneExample example = new One2OneExample();
-            ITransaction tx = ExampleBase.SetupDb();
+            var example = new One2OneExample();
+            var tx = ExampleBase.SetupDb();
             example.Patch(tx);
 
-            One2OneParentEntity entityA = example.CreateEntityWithChildA();
+            var entityA = example.CreateEntityWithChildA();
             example.Persist(tx, entityA);
-            One2OneParentEntity entityB = example.CreateEntityWithChildB();
+            var entityB = example.CreateEntityWithChildB();
             example.Persist(tx, entityB);
 
             entityA = example.Retrieve(tx, One2OneExample.IdA);

@@ -13,10 +13,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
 
         #region IAbstractSelection Members
 
-        public QuerySelectionExpressionType SelectionType
-        {
-            get { return QuerySelectionExpressionType.RawSql; }
-        }
+        public QuerySelectionExpressionType SelectionType => QuerySelectionExpressionType.RawSql;
 
         public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
         {
@@ -29,8 +26,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
             {
                 IList<String> columns = new List<string>();
 
-                string[] segments = Regex.Split(Sql, "\\s*,\\s*");
-                foreach (string segment in segments)
+                var segments = Regex.Split(Sql, "\\s*,\\s*");
+                foreach (var segment in segments)
                 {
                     if (segment.Trim().Length == 0)
                         continue;
@@ -40,13 +37,13 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
                 var readObjects = new Object[columns.Count];
                 for (int i = 0, columnsLength = columns.Count; i < columnsLength; i++)
                 {
-                    String column = columns[i].ToLowerInvariant();
+                    var column = columns[i].ToLowerInvariant();
                     if (column.Contains(" as "))
                     {
                         column = column.Split(new[] {"as"}, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
                     }
-                    int ordinal = rs.GetOrdinal(column);
-                    Object obj = rs.GetValue(ordinal);
+                    var ordinal = rs.GetOrdinal(column);
+                    var obj = rs.GetValue(ordinal);
                     readObjects[i] = obj;
                 }
 

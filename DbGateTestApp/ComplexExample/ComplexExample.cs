@@ -83,16 +83,16 @@ namespace DbGateTestApp.ComplexExample
 
         public Transaction Retrieve(ITransaction tx)
         {
-            IDbCommand cmd = tx.CreateCommand();
+            var cmd = tx.CreateCommand();
             cmd.CommandText = "select * from order_transaction where transaction_id = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Value = TransactionId;
 
             Transaction entity = null;
-            IDataReader reader = cmd.ExecuteReader();
+            var reader = cmd.ExecuteReader();
             if (reader.Read())
             {
                 entity = new Transaction();
@@ -106,21 +106,21 @@ namespace DbGateTestApp.ComplexExample
         public static void DoTest()
         {
             var example = new ComplexExample();
-            ITransaction tx = ExampleBase.SetupDb();
+            var tx = ExampleBase.SetupDb();
             example.Patch(tx);
 
-            Product product = example.CreateDefaultProduct(tx);
+            var product = example.CreateDefaultProduct(tx);
             example.Persist(tx, product);
 
-            Service service = example.CreateDefaultService(tx);
+            var service = example.CreateDefaultService(tx);
             example.Persist(tx, service);
 
-            Transaction transaction = example.CreateDefaultTransaction(tx, product, service);
+            var transaction = example.CreateDefaultTransaction(tx, product, service);
             example.Persist(tx, transaction);
 
             transaction = example.Retrieve(tx);
             Console.WriteLine("Transaction Name = " + transaction.Name);
-            foreach (ItemTransaction itemTransaction in transaction.ItemTransactions)
+            foreach (var itemTransaction in transaction.ItemTransactions)
             {
                 Console.WriteLine("Item Name = " + itemTransaction.Item.Name);
             }

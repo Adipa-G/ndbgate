@@ -5,15 +5,15 @@ namespace DbGate.ErManagement.Query.Expr.Segments
 {
     public class FieldSegment : BaseSegment
     {
-        private readonly string _alias;
-        private readonly Type _entityType;
-        private readonly string _field;
-        private readonly string _typeAlias;
+        private readonly string alias;
+        private readonly Type entityType;
+        private readonly string field;
+        private readonly string typeAlias;
 
         public FieldSegment(string field)
             : this((Type) null, field)
         {
-            _field = field;
+            this.field = field;
         }
 
         public FieldSegment(string field, string alias)
@@ -23,46 +23,31 @@ namespace DbGate.ErManagement.Query.Expr.Segments
 
         public FieldSegment(Type entitytType, string field)
         {
-            _entityType = entitytType;
-            _field = field;
+            entityType = entitytType;
+            this.field = field;
         }
 
         public FieldSegment(Type entitytType, string field, string alias)
             : this(entitytType, field)
         {
-            _alias = alias;
+            this.alias = alias;
         }
 
         public FieldSegment(Type entityType, string typeAlias, string field, string alias)
             : this(entityType, field, alias)
         {
-            _typeAlias = typeAlias;
+            this.typeAlias = typeAlias;
         }
 
-        public override SegmentType SegmentType
-        {
-            get { return SegmentType.Field; }
-        }
+        public override SegmentType SegmentType => SegmentType.Field;
 
-        public Type EntityType
-        {
-            get { return _entityType; }
-        }
+        public Type EntityType => entityType;
 
-        public string Field
-        {
-            get { return _field; }
-        }
+        public string Field => field;
 
-        public string Alias
-        {
-            get { return _alias; }
-        }
+        public string Alias => alias;
 
-        public string TypeAlias
-        {
-            get { return _typeAlias; }
-        }
+        public string TypeAlias => typeAlias;
 
         public override ISegment Add(ISegment segment)
         {

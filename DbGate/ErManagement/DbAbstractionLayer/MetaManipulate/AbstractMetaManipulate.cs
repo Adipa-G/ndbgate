@@ -15,12 +15,12 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
     {
         protected List<ColumnTypeMapItem> ColumnTypeMapItems;
         protected List<ReferentialRuleTypeMapItem> ReferentialRuleTypeMapItems;
-        protected IDbLayer DBLayer;
+        protected IDbLayer DbLayer;
         protected IDbGateConfig Config;
 
         public AbstractMetaManipulate(IDbLayer dbLayer,IDbGateConfig config)
         {
-            DBLayer = dbLayer;
+            DbLayer = dbLayer;
             Config = config;
             ColumnTypeMapItems = new List<ColumnTypeMapItem>();
             ReferentialRuleTypeMapItems = new List<ReferentialRuleTypeMapItem>();
@@ -65,8 +65,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
             {
                 if (tx.Connection is SqlConnection)
                 {
-                    SqlConnection sqlConnection = (SqlConnection) tx.Connection;
-                    DataTable typeTable = sqlConnection.GetSchema();
+                    var sqlConnection = (SqlConnection) tx.Connection;
+                    var typeTable = sqlConnection.GetSchema();
                     if (typeTable == null)
                     {
                         Logger.GetLogger(Config.LoggerName).Fatal("Unable to read the list of types");                        
@@ -74,7 +74,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
                     }
                     foreach (DataRow dataRow in typeTable.Rows)
                     {
-                        ColumnTypeMapItem mapItem = new ColumnTypeMapItem();
+                        var mapItem = new ColumnTypeMapItem();
                         mapItem.Name = dataRow["TYPE_NAME"].ToString();
                         mapItem.SetTypeFromSqlType((DbType)dataRow["DATA_TYPE"]);
                         ColumnTypeMapItems.Add(mapItem);
@@ -88,7 +88,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
             catch (Exception e)
             {
                 Logger.GetLogger(Config.LoggerName).Fatal("Exception occured while trying to read type information", e);
-                throw new DBPatchingException(e.Message, e);
+                throw new DbPatchingException(e.Message, e);
             }  
         }
 
@@ -100,7 +100,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
 
         public ColumnType MapColumnTypeNameToType(string columnTypeName)
         {
-            foreach (ColumnTypeMapItem typeMapItem in ColumnTypeMapItems)
+            foreach (var typeMapItem in ColumnTypeMapItems)
             {
                 if (typeMapItem.Name.Equals(columnTypeName,StringComparison.OrdinalIgnoreCase))
                 {
@@ -112,7 +112,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
 
         public string MapColumnTypeToTypeName(ColumnType columnTypeId)
         {
-            foreach (ColumnTypeMapItem typeMapItem in ColumnTypeMapItems)
+            foreach (var typeMapItem in ColumnTypeMapItems)
             {
                 if (typeMapItem.ColumnType == columnTypeId)
                 {
@@ -125,7 +125,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
        
         public string GetDefaultValueForType(ColumnType columnTypeId)
         {
-            foreach (ColumnTypeMapItem typeMapItem in ColumnTypeMapItems)
+            foreach (var typeMapItem in ColumnTypeMapItems)
             {
                 if (typeMapItem.ColumnType == columnTypeId)
                 {
@@ -137,7 +137,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
 
         public ReferentialRuleType MapReferentialRuleNameToType(String ruleTypeName)
         {
-            foreach (ReferentialRuleTypeMapItem ruleTypeMapItem in ReferentialRuleTypeMapItems)
+            foreach (var ruleTypeMapItem in ReferentialRuleTypeMapItems)
             {
                 if (ruleTypeMapItem.RuleName.Equals(ruleTypeName,StringComparison.OrdinalIgnoreCase))
                 {
@@ -149,10 +149,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
 
         public ICollection<IMetaItem> GetMetaData(ITransaction tx)
         {
-            ICollection<MetaTable> metaTables = ExtractTableData(tx);
+            var metaTables = ExtractTableData(tx);
             ICollection<IMetaItem> metaItems = new List<IMetaItem>();
 
-            foreach (MetaTable metaTable in metaTables)
+            foreach (var metaTable in metaTables)
             {
                 ExtractColumnData(tx, metaTable);
 
@@ -167,113 +167,113 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate
 
         public ICollection<MetaQueryHolder> CreateDbPathSql(IMetaComparisonGroup metaComparisonGroup)
         {
-            List<MetaQueryHolder> holders = new List<MetaQueryHolder>();
+            var holders = new List<MetaQueryHolder>();
             if (metaComparisonGroup is MetaComparisonTableGroup)
             {
-                MetaComparisonTableGroup tableGroup = (MetaComparisonTableGroup) metaComparisonGroup;
+                var tableGroup = (MetaComparisonTableGroup) metaComparisonGroup;
                 if (metaComparisonGroup.ShouldCreateInDb())
                 {
-                    string query = CreateCreateTableQuery(tableGroup);
+                    var query = CreateCreateTableQuery(tableGroup);
                     if (!string.IsNullOrEmpty(query))
                     {
-                        holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_TABLE,
-                                                        MetaQueryHolder.OPERATION_TYPE_ADD, query));
+                        holders.Add(new MetaQueryHolder(MetaQueryHolder.ObjectTypeTable,
+                                                        MetaQueryHolder.OperationTypeAdd, query));
                     }
                 }
                 if (metaComparisonGroup.ShouldDeleteFromDb())
                 {
-                    string query = CreateDropTableQuery(tableGroup);
+                    var query = CreateDropTableQuery(tableGroup);
                     if (!string.IsNullOrEmpty(query))
                     {
-                        holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_TABLE,
-                                                        MetaQueryHolder.OPERATION_TYPE_DELETE, query));
+                        holders.Add(new MetaQueryHolder(MetaQueryHolder.ObjectTypeTable,
+                                                        MetaQueryHolder.OperationTypeDelete, query));
                     }
                 }
                 if (metaComparisonGroup.ShouldAlterInDb())
                 {
-                    string query = CreateAlterTableQuery(tableGroup);
+                    var query = CreateAlterTableQuery(tableGroup);
                     if (!string.IsNullOrEmpty(query))
                     {
-                        holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_TABLE,
-                                                        MetaQueryHolder.OPERATION_TYPE_ALTER, query));
+                        holders.Add(new MetaQueryHolder(MetaQueryHolder.ObjectTypeTable,
+                                                        MetaQueryHolder.OperationTypeAlter, query));
                     }
                 }
                 if (tableGroup.PrimaryKey != null)
                 {
-                    MetaComparisonPrimaryKeyGroup primaryKeyGroup =  tableGroup.PrimaryKey;
+                    var primaryKeyGroup =  tableGroup.PrimaryKey;
                     if (primaryKeyGroup.ShouldCreateInDb()
                             || primaryKeyGroup.ShouldAlterInDb())
                     {
-                        string query = CreateCreatePrimaryKeyQuery(tableGroup,primaryKeyGroup);
+                        var query = CreateCreatePrimaryKeyQuery(tableGroup,primaryKeyGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_PRIMARY_KEY,
-                                                            MetaQueryHolder.OPERATION_TYPE_ADD, query));
+                            holders.Add(new MetaQueryHolder(MetaQueryHolder.ObjectTypePrimaryKey,
+                                                            MetaQueryHolder.OperationTypeAdd, query));
                         }
                     }
                     if (tableGroup.ShouldDeleteFromDb()
                             || primaryKeyGroup.ShouldAlterInDb())
                     {
-                        string query = CreateDropPrimaryKeyQuery(tableGroup,primaryKeyGroup);
+                        var query = CreateDropPrimaryKeyQuery(tableGroup,primaryKeyGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_PRIMARY_KEY,
-                                                            MetaQueryHolder.OPERATION_TYPE_DELETE, query));
+                            holders.Add(new MetaQueryHolder(MetaQueryHolder.ObjectTypePrimaryKey,
+                                                            MetaQueryHolder.OperationTypeDelete, query));
                         }
                     }
                 }
 
-                foreach (MetaComparisonColumnGroup comparisonColumnGroup in tableGroup.Columns)
+                foreach (var comparisonColumnGroup in tableGroup.Columns)
                 {
                     if (comparisonColumnGroup.ShouldCreateInDb())
                     {
-                        string query = CreateCreateColumnQuery(tableGroup,comparisonColumnGroup);
+                        var query = CreateCreateColumnQuery(tableGroup,comparisonColumnGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_COLUMN,
-                                                            MetaQueryHolder.OPERATION_TYPE_ADD, query));
+                            holders.Add(new MetaQueryHolder(MetaQueryHolder.ObjectTypeColumn,
+                                                            MetaQueryHolder.OperationTypeAdd, query));
                         }
                     }
                     if (comparisonColumnGroup.ShouldDeleteFromDb())
                     {
-                        string query = CreateDropColumnQuery(tableGroup,comparisonColumnGroup);
+                        var query = CreateDropColumnQuery(tableGroup,comparisonColumnGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_COLUMN,
-                                                            MetaQueryHolder.OPERATION_TYPE_DELETE, query));
+                            holders.Add(new MetaQueryHolder(MetaQueryHolder.ObjectTypeColumn,
+                                                            MetaQueryHolder.OperationTypeDelete, query));
                         }
                     }
                     if (comparisonColumnGroup.ShouldAlterInDb())
                     {
-                        string query = CreateAlterColumnQuery(tableGroup,comparisonColumnGroup);
+                        var query = CreateAlterColumnQuery(tableGroup,comparisonColumnGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_COLUMN,
-                                                            MetaQueryHolder.OPERATION_TYPE_ALTER, query));
+                            holders.Add(new MetaQueryHolder(MetaQueryHolder.ObjectTypeColumn,
+                                                            MetaQueryHolder.OperationTypeAlter, query));
                         }
                     }
                 }
 
-                foreach (MetaComparisonForeignKeyGroup foreignKeyGroup in tableGroup.ForeignKeys)
+                foreach (var foreignKeyGroup in tableGroup.ForeignKeys)
                 {
                     if (foreignKeyGroup.ShouldCreateInDb()
                             || foreignKeyGroup.ShouldAlterInDb())
                     {
-                        string query = CreateCreateForeginKeyQuery(tableGroup,foreignKeyGroup);
+                        var query = CreateCreateForeginKeyQuery(tableGroup,foreignKeyGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_FOREIGN_KEY,
-                                                            MetaQueryHolder.OPERATION_TYPE_ADD, query));
+                            holders.Add(new MetaQueryHolder(MetaQueryHolder.ObjectTypeForeignKey,
+                                                            MetaQueryHolder.OperationTypeAdd, query));
                         }
                     }
                     if (tableGroup.ShouldDeleteFromDb()
                             || foreignKeyGroup.ShouldAlterInDb())
                     {
-                        string query = CreateDropForeignKeyQuery(tableGroup,foreignKeyGroup);
+                        var query = CreateDropForeignKeyQuery(tableGroup,foreignKeyGroup);
                         if (!string.IsNullOrEmpty(query))
                         {
-                            holders.Add(new MetaQueryHolder(MetaQueryHolder.OBJECT_TYPE_FOREIGN_KEY,
-                                                            MetaQueryHolder.OPERATION_TYPE_DELETE, query));
+                            holders.Add(new MetaQueryHolder(MetaQueryHolder.ObjectTypeForeignKey,
+                                                            MetaQueryHolder.OperationTypeDelete, query));
                         }
                     }
                 }

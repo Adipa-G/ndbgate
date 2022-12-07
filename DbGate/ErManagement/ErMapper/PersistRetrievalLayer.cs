@@ -8,28 +8,28 @@ namespace DbGate.ErManagement.ErMapper
 {
     public class PersistRetrievalLayer : IPersistRetrievalLayer
     {
-        private readonly RetrievalOperationLayer _retrievalOperationLayer;
-        private readonly PersistOperationLayer _persistOperationLayer;
+        private readonly RetrievalOperationLayer retrievalOperationLayer;
+        private readonly PersistOperationLayer persistOperationLayer;
 
         public PersistRetrievalLayer(IDbLayer dbLayer,IDbGateStatistics statistics,IDbGateConfig config)
         {
-            _retrievalOperationLayer = new RetrievalOperationLayer(dbLayer,statistics,config);
-            _persistOperationLayer = new PersistOperationLayer(dbLayer,statistics,config);
+            retrievalOperationLayer = new RetrievalOperationLayer(dbLayer,statistics,config);
+            persistOperationLayer = new PersistOperationLayer(dbLayer,statistics,config);
         }
 
         public void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, ITransaction tx) 
         {
-            _retrievalOperationLayer.Load(readOnlyEntity, reader, tx);
+            retrievalOperationLayer.Load(readOnlyEntity, reader, tx);
         }
 
         public void Save(IEntity entity, ITransaction tx)
         {
-            _persistOperationLayer.Save(entity,tx);
+            persistOperationLayer.Save(entity,tx);
         }
 
         public ICollection<Object> Select(ISelectionQuery query, ITransaction tx)
         {
-            return _retrievalOperationLayer.Select(query,tx);
+            return retrievalOperationLayer.Select(query,tx);
         }
 
         public void ClearCache()

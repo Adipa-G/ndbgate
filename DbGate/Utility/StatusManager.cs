@@ -8,7 +8,7 @@ namespace DbGate.Utility
 {
     public class StatusManager
     {
-        private const string fmt = "%24s: %s%n";
+        private const string Fmt = "%24s: %s%n";
 
         public static void SetStatus(IClientEntity clientEntity, EntityStatus status)
         {
@@ -19,19 +19,19 @@ namespace DbGate.Utility
 
             clientEntity.Status = status;
 
-            Type objectType = clientEntity.GetType();
-            PropertyInfo[] properties = objectType.GetProperties();
-            foreach (PropertyInfo propertyInfo in properties)
+            var objectType = clientEntity.GetType();
+            var properties = objectType.GetProperties();
+            foreach (var propertyInfo in properties)
             {
                 try
                 {
-                    Object value = propertyInfo.GetValue(clientEntity, null);
+                    var value = propertyInfo.GetValue(clientEntity, null);
                     if (value != null)
                     {
                         if (value is ICollection)
                         {
                             var enumerable = (ICollection) value;
-                            foreach (Object o in enumerable)
+                            foreach (var o in enumerable)
                             {
                                 if (o is IClientEntity)
                                 {
@@ -55,7 +55,7 @@ namespace DbGate.Utility
 
         public static bool IsModified(Object obO)
         {
-            bool modified = false;
+            var modified = false;
             if (obO == null)
             {
                 return false;
@@ -64,7 +64,7 @@ namespace DbGate.Utility
             if (obO is ICollection)
             {
                 var enumerable = (ICollection) obO;
-                foreach (Object o in enumerable)
+                foreach (var o in enumerable)
                 {
                     modified = IsModified(o);
                     if (modified)
@@ -90,19 +90,19 @@ namespace DbGate.Utility
                     return true;
                 }
 
-                Type objectType = dbClass.GetType();
-                PropertyInfo[] properties = objectType.GetProperties();
-                foreach (PropertyInfo propertyInfo in properties)
+                var objectType = dbClass.GetType();
+                var properties = objectType.GetProperties();
+                foreach (var propertyInfo in properties)
                 {
                     try
                     {
-                        Object value = propertyInfo.GetValue(dbClass, null);
+                        var value = propertyInfo.GetValue(dbClass, null);
                         if (value != null)
                         {
                             if (value is ICollection)
                             {
                                 var enumerable = (ICollection) value;
-                                foreach (Object o in enumerable)
+                                foreach (var o in enumerable)
                                 {
                                     modified = IsModified(o);
                                     if (modified)
@@ -135,20 +135,20 @@ namespace DbGate.Utility
         {
             var childList = new List<IClientEntity>();
 
-            Type objectType = clientEntity.GetType();
-            PropertyInfo[] properties = objectType.GetProperties();
+            var objectType = clientEntity.GetType();
+            var properties = objectType.GetProperties();
 
-            foreach (PropertyInfo propertyInfo in properties)
+            foreach (var propertyInfo in properties)
             {
                 try
                 {
-                    Object value = propertyInfo.GetValue(clientEntity, null);
+                    var value = propertyInfo.GetValue(clientEntity, null);
                     if (value != null)
                     {
                         if (value is IList)
                         {
                             var enumerable = (IList) value;
-                            foreach (Object o in enumerable)
+                            foreach (var o in enumerable)
                             {
                                 if (o is IClientEntity)
                                 {

@@ -5,36 +5,27 @@ namespace DbGate.ErManagement.Query.Expr.Segments
 {
     public class ValueSegment : BaseSegment
     {
-        private readonly ColumnType _type;
-        private readonly object[] _values;
+        private readonly ColumnType type;
+        private readonly object[] values;
 
         public ValueSegment(ColumnType type, object[] values)
         {
-            _type = type;
-            _values = values;
+            this.type = type;
+            this.values = values;
         }
 
         public ValueSegment(object[] values)
         {
-            _values = values;
-            Type valueType = _values[0].GetType();
-            _type = ColumnTypeMapping.GetColumnType(valueType);
+            this.values = values;
+            var valueType = this.values[0].GetType();
+            type = ColumnTypeMapping.GetColumnType(valueType);
         }
 
-        public override SegmentType SegmentType
-        {
-            get { return SegmentType.Value; }
-        }
+        public override SegmentType SegmentType => SegmentType.Value;
 
-        public ColumnType Type
-        {
-            get { return _type; }
-        }
+        public ColumnType Type => type;
 
-        public object[] Values
-        {
-            get { return _values; }
-        }
+        public object[] Values => values;
 
         public override ISegment Add(ISegment segment)
         {

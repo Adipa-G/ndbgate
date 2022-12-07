@@ -4,29 +4,20 @@ namespace DbGate.ErManagement.Query.Expr.Segments
 {
     public class QuerySegment : BaseSegment
     {
-        private readonly string _alias;
-        private readonly ISelectionQuery _query;
+        private readonly string alias;
+        private readonly ISelectionQuery query;
 
         public QuerySegment(ISelectionQuery query, string alias)
         {
-            _query = query;
-            _alias = alias;
+            this.query = query;
+            this.alias = alias;
         }
 
-        public override SegmentType SegmentType
-        {
-            get { return SegmentType.Query; }
-        }
+        public override SegmentType SegmentType => SegmentType.Query;
 
-        public string Alias
-        {
-            get { return _alias; }
-        }
+        public string Alias => alias;
 
-        public ISelectionQuery Query
-        {
-            get { return _query; }
-        }
+        public ISelectionQuery Query => query;
 
         public override ISegment Add(ISegment segment)
         {

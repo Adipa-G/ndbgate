@@ -5,25 +5,22 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.GroupCondi
 {
     public class AbstractExpressionGroupCondition : IAbstractGroupCondition
     {
-        private readonly AbstractExpressionProcessor _processor;
+        private readonly AbstractExpressionProcessor processor;
 
         public AbstractExpressionGroupCondition()
         {
-            _processor = new AbstractExpressionProcessor();
+            processor = new AbstractExpressionProcessor();
         }
 
         public GroupConditionExpr Expr { get; set; }
 
         #region IAbstractGroupCondition Members
 
-        public QueryGroupConditionExpressionType GroupConditionExpressionType
-        {
-            get { return QueryGroupConditionExpressionType.Expression; }
-        }
+        public QueryGroupConditionExpressionType GroupConditionExpressionType => QueryGroupConditionExpressionType.Expression;
 
         public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
         {
-            return _processor.Process(null, Expr.RootSegment, buildInfo, dbLayer);
+            return processor.Process(null, Expr.RootSegment, buildInfo, dbLayer);
         }
 
         #endregion

@@ -8,10 +8,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.From
 
         #region IAbstractFrom Members
 
-        public QueryFromExpressionType FromExpressionType
-        {
-            get { return QueryFromExpressionType.RawSql; }
-        }
+        public QueryFromExpressionType FromExpressionType => QueryFromExpressionType.RawSql;
 
         public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
         {

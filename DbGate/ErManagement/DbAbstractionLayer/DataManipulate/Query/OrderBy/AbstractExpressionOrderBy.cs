@@ -7,11 +7,11 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.OrderBy
 {
     public class AbstractExpressionOrderBy : IAbstractOrderBy
     {
-        private readonly AbstractExpressionProcessor _processor;
+        private readonly AbstractExpressionProcessor processor;
 
         public AbstractExpressionOrderBy()
         {
-            _processor = new AbstractExpressionProcessor();
+            processor = new AbstractExpressionProcessor();
         }
 
         public OrderByExpr Expr { get; set; }
@@ -19,18 +19,15 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.OrderBy
 
         #region IAbstractOrderBy Members
 
-        public QueryOrderByExpressionType OrderByExpressionType
-        {
-            get { return QueryOrderByExpressionType.Expression; }
-        }
+        public QueryOrderByExpressionType OrderByExpressionType => QueryOrderByExpressionType.Expression;
 
         public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
         {
-            ISegment rootSegment = Expr.RootSegment;
+            var rootSegment = Expr.RootSegment;
             switch (rootSegment.SegmentType)
             {
                 case SegmentType.Field:
-                    String sql = _processor.GetFieldName((FieldSegment) rootSegment, false, buildInfo);
+                    var sql = processor.GetFieldName((FieldSegment) rootSegment, false, buildInfo);
                     switch (OrderType)
                     {
                         case QueryOrderType.Ascend:

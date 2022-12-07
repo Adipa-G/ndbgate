@@ -31,7 +31,7 @@ namespace DbGate.ErManagement.ErMapper
                 TrackAndCommitChanges(entity, tx);
 
                 var entityInfoStack = new Stack<EntityInfo>();
-                EntityInfo entityInfo = CacheManager.GetEntityInfo(entity);
+                var entityInfo = CacheManager.GetEntityInfo(entity);
                 while (entityInfo != null)
                 {
                     entityInfoStack.Push(entityInfo);
@@ -56,7 +56,7 @@ namespace DbGate.ErManagement.ErMapper
         private void TrackAndCommitChanges(IEntity entity, ITransaction tx)
         {
             var entityInfo = CacheManager.GetEntityInfo(entity);
-            IEntityContext entityContext = entity.Context;
+            var entityContext = entity.Context;
             IEnumerable<ITypeFieldValueList> originalChildren;
 
             if (entityInfo.TableInfo.DirtyCheckStrategy == DirtyCheckStrategy.Automatic)
@@ -76,15 +76,15 @@ namespace DbGate.ErManagement.ErMapper
                 originalChildren = GetChildEntityValueListIncludingDeletedStatusItems(entity);
             }
 
-            ICollection<ITypeFieldValueList> currentChildren = GetChildEntityValueListExcludingDeletedStatusItems(entity);
+            var currentChildren = GetChildEntityValueListExcludingDeletedStatusItems(entity);
             ValidateForChildDeletion(entity, currentChildren);
-            ICollection<ITypeFieldValueList> deletedChildren = OperationUtils.FindDeletedChildren(originalChildren, currentChildren);
+            var deletedChildren = OperationUtils.FindDeletedChildren(originalChildren, currentChildren);
             DeleteOrphanChildren(tx, deletedChildren);
         }
 
         private void SaveForType(IEntity entity, Type type, ITransaction tx)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
+            var entityInfo = CacheManager.GetEntityInfo(type);
             if (entityInfo == null)
             {
                 return;
@@ -92,7 +92,7 @@ namespace DbGate.ErManagement.ErMapper
 
             ProcessNonIdentifyingRelations(entity, entityInfo);
 
-            ITypeFieldValueList fieldValues = OperationUtils.ExtractEntityTypeFieldValues(entity, type);
+            var fieldValues = OperationUtils.ExtractEntityTypeFieldValues(entity, type);
             if (entity.Status == EntityStatus.Unmodified)
             {
                 //do nothing
@@ -120,12 +120,12 @@ namespace DbGate.ErManagement.ErMapper
             }
             else
             {
-                string message = String.Format("In-corret status for class {0}", type.FullName);
+                var message = String.Format("In-corret status for class {0}", type.FullName);
                 throw new IncorrectStatusException(message);
             }
 
             fieldValues = OperationUtils.ExtractEntityTypeFieldValues(entity, type);
-            IEntityContext entityContext = entity.Context;
+            var entityContext = entity.Context;
             if (entityContext != null)
             {
                 entityContext.ChangeTracker.AddFields(fieldValues.FieldValues);
@@ -138,8 +138,8 @@ namespace DbGate.ErManagement.ErMapper
         private static void ProcessIdentifyingRelations(IEntity entity, Type type, ITransaction tx
             , EntityInfo entityInfo,ITypeFieldValueList fieldValues)
         {
-            ICollection<IRelation> dbRelations = entityInfo.Relations;
-            foreach (IRelation relation in dbRelations)
+            var dbRelations = entityInfo.Relations;
+            foreach (var relation in dbRelations)
             {
                 if (relation.ReverseRelationship
                     || relation.NonIdentifyingRelation)
@@ -151,13 +151,13 @@ namespace DbGate.ErManagement.ErMapper
                     continue;
                 }
 
-                ICollection<IEntity> childObjects = OperationUtils.GetRelationEntities(entity, relation);
+                var childObjects = OperationUtils.GetRelationEntities(entity, relation);
                 if (childObjects != null)
                 {
                     SetRelationObjectKeyValues(fieldValues, type, relation.RelatedObjectType, childObjects, relation);
-                    foreach (IEntity fieldObject in childObjects)
+                    foreach (var fieldObject in childObjects)
                     {
-                        IEntityFieldValueList childEntityKeyList = OperationUtils.ExtractEntityKeyValues(fieldObject);
+                        var childEntityKeyList = OperationUtils.ExtractEntityKeyValues(fieldObject);
                         if (entity.Context.AlreadyInCurrentObjectGraph(childEntityKeyList))
                         {
                             continue;
@@ -175,8 +175,8 @@ namespace DbGate.ErManagement.ErMapper
 
         private static void ProcessNonIdentifyingRelations(IEntity entity, EntityInfo entityInfo)
         {
-            ICollection<IRelation> dbRelations = entityInfo.Relations;
-            foreach (IRelation relation in dbRelations)
+            var dbRelations = entityInfo.Relations;
+            foreach (var relation in dbRelations)
             {
                 if (relation.ReverseRelationship)
                 {
@@ -186,12 +186,12 @@ namespace DbGate.ErManagement.ErMapper
                 {
                     continue;
                 }
-                ICollection<IEntity> childObjects = OperationUtils.GetRelationEntities(entity, relation);
+                var childObjects = OperationUtils.GetRelationEntities(entity, relation);
                 if (childObjects != null)
                 {
                     if (relation.NonIdentifyingRelation)
                     {
-                        foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
+                        foreach (var mapping in relation.TableColumnMappings)
                         {
                             if (entityInfo.FindRelationColumnInfo(mapping.FromField) == null)
                             {
@@ -205,29 +205,29 @@ namespace DbGate.ErManagement.ErMapper
 
         private void Insert(IEntity entity,ITypeFieldValueList valueTypeList, Type entityType, ITransaction tx)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(entityType);
+            var entityInfo = CacheManager.GetEntityInfo(entityType);
 
-            StringBuilder logSb = new StringBuilder();
-            string query = entityInfo.GetInsertQuery(DbLayer);
-            IDbCommand cmd = tx.CreateCommand();
+            var logSb = new StringBuilder();
+            var query = entityInfo.GetInsertQuery(DbLayer);
+            var cmd = tx.CreateCommand();
             cmd.CommandText = query;
 
-            bool showQuery = Config.ShowQueries;
+            var showQuery = Config.ShowQueries;
             if (showQuery)
             {
                 logSb.Append(query);
             }
-            int i = 0;
-            foreach (EntityFieldValue fieldValue in valueTypeList.FieldValues)
+            var i = 0;
+            foreach (var fieldValue in valueTypeList.FieldValues)
             {
-                IColumn column = fieldValue.Column;
+                var column = fieldValue.Column;
                 Object columnValue;
 
                 if (column.ReadFromSequence
                         && column.SequenceGenerator != null)
                 {
                     columnValue = column.SequenceGenerator.GetNextSequenceValue(tx);
-                    PropertyInfo setter = entityType.GetProperty(column.AttributeName);
+                    var setter = entityType.GetProperty(column.AttributeName);
                     ReflectionUtils.SetValue(setter,entity,columnValue);
                 }
                 else
@@ -255,10 +255,10 @@ namespace DbGate.ErManagement.ErMapper
 
         private void Update(IEntity entity, ITypeFieldValueList valueTypeList, Type type, ITransaction tx)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
+            var entityInfo = CacheManager.GetEntityInfo(type);
             ICollection<EntityFieldValue> keys = new List<EntityFieldValue>();
             ICollection<EntityFieldValue> values = new List<EntityFieldValue>();
-            StringBuilder logSb = new StringBuilder();
+            var logSb = new StringBuilder();
             string query;
             
 
@@ -270,11 +270,11 @@ namespace DbGate.ErManagement.ErMapper
 
                 keys = OperationUtils.ExtractEntityKeyValues(entity).FieldValues;
                 ICollection<IColumn> keysAndModified = new List<IColumn>();
-                foreach (EntityFieldValue fieldValue in values)
+                foreach (var fieldValue in values)
                 {
                     keysAndModified.Add(fieldValue.Column);
                 }
-                foreach (EntityFieldValue fieldValue in keys)
+                foreach (var fieldValue in keys)
                 {
                     keysAndModified.Add(fieldValue.Column);
                 }
@@ -283,7 +283,7 @@ namespace DbGate.ErManagement.ErMapper
             else
             {
                 query = entityInfo.GetUpdateQuery(DbLayer);
-                foreach (EntityFieldValue fieldValue in valueTypeList.FieldValues)
+                foreach (var fieldValue in valueTypeList.FieldValues)
                 {
                     if (fieldValue.Column.Key)
                     {
@@ -296,16 +296,16 @@ namespace DbGate.ErManagement.ErMapper
                 }
             }
 
-            bool showQuery = Config.ShowQueries;
+            var showQuery = Config.ShowQueries;
             if (showQuery)
             {
                 logSb.Append(query);
             }
 
-            IDbCommand cmd = tx.CreateCommand();
+            var cmd = tx.CreateCommand();
             cmd.CommandText = query;
-            int count = 0;
-            foreach (EntityFieldValue fieldValue in values)
+            var count = 0;
+            foreach (var fieldValue in values)
             {
                 if (showQuery)
                 {
@@ -314,7 +314,7 @@ namespace DbGate.ErManagement.ErMapper
                 DbLayer.DataManipulate().SetToPreparedStatement(cmd, fieldValue.Value, ++count, fieldValue.Column);
             }
 
-            foreach (EntityFieldValue fieldValue in keys)
+            foreach (var fieldValue in keys)
             {
                 if (showQuery)
                 {
@@ -336,12 +336,12 @@ namespace DbGate.ErManagement.ErMapper
 
         private void Delete(ITypeFieldValueList valueTypeList, Type type, ITransaction tx)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
-            StringBuilder logSb = new StringBuilder();
-            string query = entityInfo.GetDeleteQuery(DbLayer);
+            var entityInfo = CacheManager.GetEntityInfo(type);
+            var logSb = new StringBuilder();
+            var query = entityInfo.GetDeleteQuery(DbLayer);
             IList<EntityFieldValue> keys = new List<EntityFieldValue>();
 
-            foreach (EntityFieldValue fieldValue in valueTypeList.FieldValues)
+            foreach (var fieldValue in valueTypeList.FieldValues)
             {
                 if (fieldValue.Column.Key)
                 {
@@ -349,16 +349,16 @@ namespace DbGate.ErManagement.ErMapper
                 }
             }
 
-            bool showQuery = Config.ShowQueries;
+            var showQuery = Config.ShowQueries;
             if (showQuery)
             {
                 logSb.Append(query);
             }
-            IDbCommand ps = tx.CreateCommand();
+            var ps = tx.CreateCommand();
             ps.CommandText = query;
-            for (int i = 0; i < keys.Count; i++)
+            for (var i = 0; i < keys.Count; i++)
             {
-                EntityFieldValue fieldValue = keys[i];
+                var fieldValue = keys[i];
 
                 if (showQuery)
                 {
@@ -381,12 +381,12 @@ namespace DbGate.ErManagement.ErMapper
         private static void SetRelationObjectKeyValues(ITypeFieldValueList valueTypeList, Type entityType,Type childEntityType
             , IEnumerable<IEntity> childObjects, IRelation relation)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(entityType);
-            ICollection<IColumn> columns = entityInfo.Columns;
-            foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
+            var entityInfo = CacheManager.GetEntityInfo(entityType);
+            var columns = entityInfo.Columns;
+            foreach (var mapping in relation.TableColumnMappings)
             {
-                IColumn matchColumn = entityInfo.FindColumnByAttribute(mapping.FromField);
-                EntityFieldValue fieldValue = valueTypeList.GetFieldValue(matchColumn.AttributeName);
+                var matchColumn = entityInfo.FindColumnByAttribute(mapping.FromField);
+                var fieldValue = valueTypeList.GetFieldValue(matchColumn.AttributeName);
 
                 if (fieldValue != null)
                 {
@@ -394,7 +394,7 @@ namespace DbGate.ErManagement.ErMapper
                 }
                 else
                 {
-                    string message = String.Format("The column {0} does not have a matching column in the object {1}", matchColumn.ColumnName, valueTypeList.Type.FullName);
+                    var message = String.Format("The column {0} does not have a matching column in the object {1}", matchColumn.ColumnName, valueTypeList.Type.FullName);
                     throw new NoMatchingColumnFoundException(message);
                 }
             }
@@ -403,18 +403,18 @@ namespace DbGate.ErManagement.ErMapper
         private static void SetChildPrimaryKeys(EntityFieldValue parentFieldValue,Type childEntityType
             , IEnumerable<IEntity> childObjects, RelationColumnMapping mapping)
         {
-            bool foundOnce = false;
-            EntityInfo parentEntityInfo = CacheManager.GetEntityInfo(childEntityType);
-            EntityInfo entityInfo = parentEntityInfo;
+            var foundOnce = false;
+            var parentEntityInfo = CacheManager.GetEntityInfo(childEntityType);
+            var entityInfo = parentEntityInfo;
 
             while (entityInfo != null)
             {
-                IColumn subLevelMatchedColumn = entityInfo.FindColumnByAttribute(mapping.ToField);
+                var subLevelMatchedColumn = entityInfo.FindColumnByAttribute(mapping.ToField);
 
                 if (subLevelMatchedColumn != null)
                 {
                     foundOnce = true;
-                    PropertyInfo setter = parentEntityInfo.GetProperty(subLevelMatchedColumn);
+                    var setter = parentEntityInfo.GetProperty(subLevelMatchedColumn);
                     foreach (IReadOnlyEntity dbObject in childObjects)
                     {
                         ReflectionUtils.SetValue(setter, dbObject, parentFieldValue.Value);
@@ -424,7 +424,7 @@ namespace DbGate.ErManagement.ErMapper
             }
             if (!foundOnce)
             {
-                string message = String.Format("The field {0} does not have a matching field in the object {1}", mapping.ToField, childEntityType.FullName);
+                var message = String.Format("The field {0} does not have a matching field in the object {1}", mapping.ToField, childEntityType.FullName);
                 throw new NoMatchingColumnFoundException(message);
             }
         }
@@ -433,7 +433,7 @@ namespace DbGate.ErManagement.ErMapper
             ,IEnumerable<IEntity> childObjects, RelationColumnMapping mapping)
         {
             IReadOnlyEntity firstObject = null;
-            IEnumerator<IEntity> childEnumerator = childObjects.GetEnumerator();
+            var childEnumerator = childObjects.GetEnumerator();
             if (childEnumerator.MoveNext())
             {
                 firstObject = childEnumerator.Current;
@@ -442,14 +442,14 @@ namespace DbGate.ErManagement.ErMapper
             {
                 return;
             }
-            EntityInfo parentInfo = CacheManager.GetEntityInfo(parentEntity);
-            EntityInfo childInfo = CacheManager.GetEntityInfo(firstObject);
+            var parentInfo = CacheManager.GetEntityInfo(parentEntity);
+            var childInfo = CacheManager.GetEntityInfo(firstObject);
 
             PropertyInfo setter = null;
-            bool foundOnce = false;
+            var foundOnce = false;
             while (parentInfo != null)
             {
-                IColumn parentMatchedColumn = parentInfo.FindColumnByAttribute(mapping.FromField);
+                var parentMatchedColumn = parentInfo.FindColumnByAttribute(mapping.FromField);
                 if (parentMatchedColumn != null)
                 {
                     foundOnce = true;
@@ -459,22 +459,22 @@ namespace DbGate.ErManagement.ErMapper
             }
             if (!foundOnce)
             {
-                string message = String.Format("The field {0} does not have a matching field in the object {1}", mapping.ToField, firstObject.GetType().FullName);
+                var message = String.Format("The field {0} does not have a matching field in the object {1}", mapping.ToField, firstObject.GetType().FullName);
                 throw new NoMatchingColumnFoundException(message);
             }
 
             foundOnce = false;
             while (childInfo != null)
             {
-                IColumn childMatchedColumn = childInfo.FindColumnByAttribute(mapping.ToField);
+                var childMatchedColumn = childInfo.FindColumnByAttribute(mapping.ToField);
 
                 if (childMatchedColumn != null)
                 {
                     foundOnce = true;
                     foreach (IReadOnlyEntity dbObject in childObjects)
                     {
-                        ITypeFieldValueList fieldValueList = OperationUtils.ExtractEntityTypeFieldValues(dbObject, childInfo.EntityType);
-                        EntityFieldValue childFieldValue = fieldValueList.GetFieldValue(childMatchedColumn.AttributeName);
+                        var fieldValueList = OperationUtils.ExtractEntityTypeFieldValues(dbObject, childInfo.EntityType);
+                        var childFieldValue = fieldValueList.GetFieldValue(childMatchedColumn.AttributeName);
                         setter.SetValue(parentEntity, childFieldValue.Value, null);
                     }
                 }
@@ -482,16 +482,16 @@ namespace DbGate.ErManagement.ErMapper
             }
             if (!foundOnce)
             {
-                string message = String.Format("The field {0} does not have a matching field in the object {1}", mapping.ToField, firstObject.GetType().FullName);
+                var message = String.Format("The field {0} does not have a matching field in the object {1}", mapping.ToField, firstObject.GetType().FullName);
                 throw new NoMatchingColumnFoundException(message);
             }
         }
 
         private static void ValidateForChildDeletion(IEntity currentEntity, IEnumerable<ITypeFieldValueList> currentChildren)
         {
-            foreach (ITypeFieldValueList keyValueList in currentChildren)
+            foreach (var keyValueList in currentChildren)
             {
-                EntityRelationFieldValueList entityRelationKeyValueList = (EntityRelationFieldValueList)keyValueList;
+                var entityRelationKeyValueList = (EntityRelationFieldValueList)keyValueList;
                 if (entityRelationKeyValueList.Relation.DeleteRule == ReferentialRuleType.Restrict
                         && !entityRelationKeyValueList.Relation.ReverseRelationship
                         && currentEntity.Status == EntityStatus.Deleted)
@@ -508,23 +508,23 @@ namespace DbGate.ErManagement.ErMapper
                 FillChangeTrackerValues(entity, tx, entityContext);
             }
 
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(entity);
+            var entityInfo = CacheManager.GetEntityInfo(entity);
             while (entityInfo != null)
             {
-                ICollection<IColumn> subLevelColumns = entityInfo.Columns;
-                foreach (IColumn subLevelColumn in subLevelColumns)
+                var subLevelColumns = entityInfo.Columns;
+                foreach (var subLevelColumn in subLevelColumns)
                 {
                     if (subLevelColumn.Key)
                     {
                         continue;
                     }
 
-                    PropertyInfo getter = entityInfo.GetProperty(subLevelColumn.AttributeName);
-                    Object value = ReflectionUtils.GetValue(getter,entity);
+                    var getter = entityInfo.GetProperty(subLevelColumn.AttributeName);
+                    var value = ReflectionUtils.GetValue(getter,entity);
 
-                    EntityFieldValue fieldValue = entityContext.ChangeTracker.GetFieldValue(subLevelColumn.AttributeName);
-                    bool isMatch = (fieldValue != null && fieldValue.Value == value)
-                            || (fieldValue != null && fieldValue.Value != null && fieldValue.Equals(value));
+                    var fieldValue = entityContext.ChangeTracker.GetFieldValue(subLevelColumn.AttributeName);
+                    var isMatch = (fieldValue != null && fieldValue.Value == value)
+                                  || (fieldValue != null && fieldValue.Value != null && fieldValue.Equals(value));
                     if (!isMatch)
                     {
                         return true;
@@ -543,19 +543,19 @@ namespace DbGate.ErManagement.ErMapper
                 return;
             }
 
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(entity);
+            var entityInfo = CacheManager.GetEntityInfo(entity);
             while (entityInfo != null)
             {
-                ITypeFieldValueList values = ExtractCurrentRowValues(entity,entityInfo.EntityType,tx);
+                var values = ExtractCurrentRowValues(entity,entityInfo.EntityType,tx);
                 entityContext.ChangeTracker.AddFields(values.FieldValues);
                 
-                ICollection<IRelation> dbRelations = entityInfo.Relations;
-                foreach (IRelation relation in dbRelations)
+                var dbRelations = entityInfo.Relations;
+                foreach (var relation in dbRelations)
                 {
-                    ICollection<IReadOnlyEntity> children = ReadRelationChildrenFromDb(entity,entityInfo.EntityType,tx,relation);
-                    foreach (IReadOnlyEntity childEntity in children)
+                    var children = ReadRelationChildrenFromDb(entity,entityInfo.EntityType,tx,relation);
+                    foreach (var childEntity in children)
                     {
-                        ITypeFieldValueList valueTypeList = OperationUtils.ExtractRelationKeyValues(childEntity,relation);
+                        var valueTypeList = OperationUtils.ExtractRelationKeyValues(childEntity,relation);
                         if (valueTypeList != null)
                         {
                             entityContext.ChangeTracker.AddChildEntityKey(valueTypeList);
@@ -568,9 +568,9 @@ namespace DbGate.ErManagement.ErMapper
 
         private void DeleteOrphanChildren(ITransaction tx, IEnumerable<ITypeFieldValueList> childrenToDelete)
         {
-            foreach (ITypeFieldValueList relationKeyValueList in childrenToDelete)
+            foreach (var relationKeyValueList in childrenToDelete)
             {
-                EntityInfo entityInfo = CacheManager.GetEntityInfo(relationKeyValueList.Type);
+                var entityInfo = CacheManager.GetEntityInfo(relationKeyValueList.Type);
                 if (entityInfo == null)
                 {
                     continue;
@@ -578,7 +578,7 @@ namespace DbGate.ErManagement.ErMapper
 
                 if (relationKeyValueList is EntityRelationFieldValueList)
                 {
-                    EntityRelationFieldValueList entityRelationFieldValueList = (EntityRelationFieldValueList) relationKeyValueList;
+                    var entityRelationFieldValueList = (EntityRelationFieldValueList) relationKeyValueList;
                     if (entityRelationFieldValueList.Relation.ReverseRelationship 
                         || entityRelationFieldValueList.Relation.NonIdentifyingRelation)
                     {
@@ -586,7 +586,7 @@ namespace DbGate.ErManagement.ErMapper
                     }
                 }
 
-                bool recordExists = false;
+                var recordExists = false;
                 IDbCommand cmd = null;
                 IDataReader reader = null;
                 try
@@ -600,7 +600,7 @@ namespace DbGate.ErManagement.ErMapper
                 }
                 catch (Exception ex)
                 {
-                    string message =
+                    var message =
                         String.Format(
                             "SQL Exception while trying determine if orphan child entities are available for type {0}",
                             relationKeyValueList.Type.FullName);
@@ -621,14 +621,14 @@ namespace DbGate.ErManagement.ErMapper
 
         private bool VersionValidated(IReadOnlyEntity entity, Type type, ITransaction tx)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
-            ICollection<IColumn> typeColumns = entityInfo.Columns;
-            foreach (IColumn typeColumn in typeColumns)
+            var entityInfo = CacheManager.GetEntityInfo(type);
+            var typeColumns = entityInfo.Columns;
+            foreach (var typeColumn in typeColumns)
             {
                 if (typeColumn.ColumnType == ColumnType.Version)
                 {
-                    Object classValue = ExtractCurrentVersionValue(entity,typeColumn,type,tx);
-                    EntityFieldValue originalFieldValue = entity.Context.ChangeTracker.GetFieldValue(typeColumn.AttributeName);
+                    var classValue = ExtractCurrentVersionValue(entity,typeColumn,type,tx);
+                    var originalFieldValue = entity.Context.ChangeTracker.GetFieldValue(typeColumn.AttributeName);
                     return originalFieldValue != null && classValue == originalFieldValue.Value
                             || (originalFieldValue != null && classValue != null && classValue.Equals(originalFieldValue.Value));
                 }
@@ -636,25 +636,25 @@ namespace DbGate.ErManagement.ErMapper
 
             if (entityInfo.TableInfo.UpdateStrategy == UpdateStrategy.ChangedColumns)
 		 	{
-		 	    ICollection<EntityFieldValue> modified = GetModifiedFieldValues(entity, type);
+		 	    var modified = GetModifiedFieldValues(entity, type);
 		 	    typeColumns = new List<IColumn>();
-		 	    foreach (EntityFieldValue fieldValue in modified)
+		 	    foreach (var fieldValue in modified)
 		 	    {
 		 	        typeColumns.Add(fieldValue.Column);
 		 	    }
 		 	}
 
-            ITypeFieldValueList fieldValueList = ExtractCurrentRowValues(entity,type,tx);
+            var fieldValueList = ExtractCurrentRowValues(entity,type,tx);
             if (fieldValueList == null)
             {
                 return false;
             }
-            foreach (IColumn typeColumn in typeColumns)
+            foreach (var typeColumn in typeColumns)
             {
-                EntityFieldValue classFieldValue = fieldValueList.GetFieldValue(typeColumn.AttributeName);
-                EntityFieldValue originalFieldValue = entity.Context != null ? entity.Context.ChangeTracker.GetFieldValue(typeColumn.AttributeName) : null;
-                bool matches = originalFieldValue != null && classFieldValue != null && classFieldValue.Value == originalFieldValue.Value
-                            || (originalFieldValue != null && classFieldValue != null && classFieldValue.Value != null && classFieldValue.Value.Equals(originalFieldValue.Value));
+                var classFieldValue = fieldValueList.GetFieldValue(typeColumn.AttributeName);
+                var originalFieldValue = entity.Context != null ? entity.Context.ChangeTracker.GetFieldValue(typeColumn.AttributeName) : null;
+                var matches = originalFieldValue != null && classFieldValue != null && classFieldValue.Value == originalFieldValue.Value
+                              || (originalFieldValue != null && classFieldValue != null && classFieldValue.Value != null && classFieldValue.Value.Equals(originalFieldValue.Value));
                 if (!matches)
                 {
                     return false;
@@ -665,20 +665,20 @@ namespace DbGate.ErManagement.ErMapper
 
         private ICollection<EntityFieldValue> GetModifiedFieldValues(IReadOnlyEntity entity, Type type)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
-            ICollection<IColumn> typeColumns = entityInfo.Columns;
-            ITypeFieldValueList currentValues = OperationUtils.ExtractEntityTypeFieldValues(entity,type);
+            var entityInfo = CacheManager.GetEntityInfo(type);
+            var typeColumns = entityInfo.Columns;
+            var currentValues = OperationUtils.ExtractEntityTypeFieldValues(entity,type);
             ICollection<EntityFieldValue> modifiedColumns = new  List<EntityFieldValue>();
 
-            foreach (IColumn typeColumn in typeColumns)
+            foreach (var typeColumn in typeColumns)
             {
                 if (typeColumn.Key)
                     continue;
 
-                EntityFieldValue classFieldValue = currentValues.GetFieldValue(typeColumn.AttributeName);
-                EntityFieldValue originalFieldValue = entity.Context != null ? entity.Context.ChangeTracker.GetFieldValue(typeColumn.AttributeName) : null;
-                bool matches = originalFieldValue != null && classFieldValue != null && classFieldValue.Value == originalFieldValue.Value
-                        || (originalFieldValue != null && classFieldValue != null && classFieldValue.Value != null && classFieldValue.Value.Equals(originalFieldValue.Value));
+                var classFieldValue = currentValues.GetFieldValue(typeColumn.AttributeName);
+                var originalFieldValue = entity.Context != null ? entity.Context.ChangeTracker.GetFieldValue(typeColumn.AttributeName) : null;
+                var matches = originalFieldValue != null && classFieldValue != null && classFieldValue.Value == originalFieldValue.Value
+                              || (originalFieldValue != null && classFieldValue != null && classFieldValue.Value != null && classFieldValue.Value.Equals(originalFieldValue.Value));
                 if (!matches)
                 {
                     modifiedColumns.Add(classFieldValue);
@@ -692,7 +692,7 @@ namespace DbGate.ErManagement.ErMapper
         {
             Object versionValue = null;
 
-            ITypeFieldValueList keyFieldValueList = OperationUtils.ExtractEntityTypeKeyValues(entity, type);
+            var keyFieldValueList = OperationUtils.ExtractEntityTypeKeyValues(entity, type);
             IDbCommand cmd = null;
             IDataReader reader = null;
             try
@@ -706,7 +706,7 @@ namespace DbGate.ErManagement.ErMapper
             }
             catch (Exception ex)
             {
-                String message = String.Format("SQL Exception while trying retrieve version information from {0}"
+                var message = String.Format("SQL Exception while trying retrieve version information from {0}"
                                                , entity.GetType().FullName);
                 throw new StatementExecutionException(message, ex);
             }
@@ -722,7 +722,7 @@ namespace DbGate.ErManagement.ErMapper
         {
             ITypeFieldValueList fieldValueList = null;
 
-            ITypeFieldValueList keyFieldValueList = OperationUtils.ExtractEntityTypeKeyValues(entity, type);
+            var keyFieldValueList = OperationUtils.ExtractEntityTypeKeyValues(entity, type);
             IDbCommand cmd = null;
             IDataReader reader = null;
             try
@@ -736,7 +736,7 @@ namespace DbGate.ErManagement.ErMapper
             }
             catch (Exception ex)
             {
-                string message = String.Format("SQL Exception while trying retrieve current data row from {0}"
+                var message = String.Format("SQL Exception while trying retrieve current data row from {0}"
                                                , entity.GetType().FullName);
                 throw new StatementExecutionException(message, ex);
             }

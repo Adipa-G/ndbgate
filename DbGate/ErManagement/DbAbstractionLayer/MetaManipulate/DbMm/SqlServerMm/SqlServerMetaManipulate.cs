@@ -61,7 +61,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
             {
                 Logger.GetLogger(Config.LoggerName).Fatal(
                     "Exception occured while trying to read table information", e);
-                throw new DBPatchingException(e.Message, e);
+                throw new DbPatchingException(e.Message, e);
             }
             return metaItems;
         }
@@ -102,7 +102,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
                 Logger.GetLogger(Config.LoggerName).Fatal(
                     string.Format("Exception occured while trying to read column information in table {0}", table.Name),
                     e);
-                throw new DBPatchingException(e.Message, e);
+                throw new DbPatchingException(e.Message, e);
             }
         }
 
@@ -134,7 +134,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
             {
                 Logger.GetLogger(Config.LoggerName).Fatal(
                     string.Format("Exception occured while trying to read primary key in table {0}", table.Name), e);
-                throw new DBPatchingException(e.Message, e);
+                throw new DbPatchingException(e.Message, e);
             }
         }
 
@@ -184,7 +184,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
             {
                 Logger.GetLogger(Config.LoggerName).Fatal(
                     string.Format("Exception occured while trying to read primary key in table {0}", table.Name), e);
-                throw new DBPatchingException(e.Message, e);
+                throw new DbPatchingException(e.Message, e);
             }
         }
 
@@ -196,9 +196,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
             sb.Append("CREATE TABLE [");
             sb.Append(metaTable.Name);
             sb.Append("] ( ");
-            bool first = true;
+            var first = true;
 
-            foreach (MetaColumn metaColumn in metaTable.Columns)
+            foreach (var metaColumn in metaTable.Columns)
             {
                 if (!first)
                 {
@@ -275,7 +275,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
             sb.Append(" DEFAULT ");
             if (!metaColumn.Null)
             {
-                string defaultValue = GetDefaultValueForType(metaColumn.ColumnType);
+                var defaultValue = GetDefaultValueForType(metaColumn.ColumnType);
                 if (defaultValue != null)
                 {
                     sb.Append(defaultValue);
@@ -338,7 +338,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
             sb.Append(" DEFAULT ");
             if (!metaColumn.Null)
             {
-                string defaultValue = GetDefaultValueForType(metaColumn.ColumnType);
+                var defaultValue = GetDefaultValueForType(metaColumn.ColumnType);
                 if (defaultValue != null)
                 {
                     sb.Append(defaultValue);
@@ -369,8 +369,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
             sb.Append(primaryKey.Name);
             sb.Append(" PRIMARY KEY ( ");
 
-            bool first = true;
-            foreach (String columnName in primaryKey.ColumnNames)
+            var first = true;
+            foreach (var columnName in primaryKey.ColumnNames)
             {
                 if (!first)
                 {
@@ -416,13 +416,13 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
             sb.Append(" FOREIGN KEY ");
 
             sb.Append(" ( ");
-            IEnumerator<MetaForeignKeyColumnMapping> enumerator = metaForeignKey.ColumnMappings.GetEnumerator();
+            var enumerator = metaForeignKey.ColumnMappings.GetEnumerator();
             enumerator.Reset();
 
-            int i = 0;
+            var i = 0;
             while (enumerator.MoveNext())
             {
-                MetaForeignKeyColumnMapping mapping = enumerator.Current;
+                var mapping = enumerator.Current;
                 if (i > 0)
                 {
                     sb.Append(" , ");
@@ -441,7 +441,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
             i = 0;
             while (enumerator.MoveNext())
             {
-                MetaForeignKeyColumnMapping mapping = enumerator.Current;
+                var mapping = enumerator.Current;
                 if (i > 0)
                 {
                     sb.Append(" , ");

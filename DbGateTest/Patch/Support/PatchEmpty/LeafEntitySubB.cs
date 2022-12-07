@@ -11,7 +11,7 @@ namespace DbGate.Patch.Support.PatchEmpty
         {
             get
             {
-                Dictionary<Type, ITable> map = base.TableInfo;
+                var map = base.TableInfo;
                 map.Add(typeof (LeafEntitySubB), new DefaultTable("leaf_entity_b"));
                 return map;
             }
@@ -21,7 +21,7 @@ namespace DbGate.Patch.Support.PatchEmpty
         {
             get
             {
-                Dictionary<Type, ICollection<IField>> map = base.FieldInfo;
+                var map = base.FieldInfo;
                 var dbColumns = new List<IField>();
 
                 dbColumns.Add(new DefaultColumn("SomeTextB", ColumnType.Varchar));

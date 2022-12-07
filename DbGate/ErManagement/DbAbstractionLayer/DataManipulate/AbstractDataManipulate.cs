@@ -19,11 +19,11 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 {
     public abstract class AbstractDataManipulate : IDataManipulate
     {
-    	private IDbLayer _dbLayer;
+    	private IDbLayer dbLayer;
     	
         protected AbstractDataManipulate(IDbLayer dbLayer)
         {
-        	_dbLayer = dbLayer;
+        	this.dbLayer = dbLayer;
         	Initialize();
 		}
 	
@@ -49,7 +49,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
         {
             var keys = new List<IColumn>();
 
-            foreach (IColumn dbColumn in dbColumns)
+            foreach (var dbColumn in dbColumns)
             {
                 if (dbColumn.Key)
                 {
@@ -62,9 +62,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
             sb.Append(tableName);
             sb.Append(" WHERE ");
 
-            for (int i = 0; i < keys.Count; i++)
+            for (var i = 0; i < keys.Count; i++)
             {
-                IColumn column = keys[i];
+                var column = keys[i];
                 if (i != 0)
                 {
                     sb.Append(" AND ");
@@ -83,12 +83,12 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
             sb.Append(tableName);
             sb.Append(" (");
 
-            IEnumerator<IColumn> enumerator = dbColumns.GetEnumerator();
-            int i = 0;
+            var enumerator = dbColumns.GetEnumerator();
+            var i = 0;
 
             while (enumerator.MoveNext())
             {
-                IColumn column = enumerator.Current;
+                var column = enumerator.Current;
                 if (i != 0)
                 {
                     sb.Append(",");
@@ -120,7 +120,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
             var keys = new List<IColumn>();
             var values = new List<IColumn>();
 
-            foreach (IColumn dbColumn in dbColumns)
+            foreach (var dbColumn in dbColumns)
             {
                 if (dbColumn.Key)
                 {
@@ -137,9 +137,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
             sb.Append(tableName);
             sb.Append(" SET ");
 
-            for (int i = 0; i < values.Count; i++)
+            for (var i = 0; i < values.Count; i++)
             {
-                IColumn column = values[i];
+                var column = values[i];
                 if (i != 0)
                 {
                     sb.Append(",");
@@ -149,9 +149,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
             }
 
             sb.Append(" WHERE ");
-            for (int i = 0; i < keys.Count; i++)
+            for (var i = 0; i < keys.Count; i++)
             {
-                IColumn column = keys[i];
+                var column = keys[i];
                 if (i != 0)
                 {
                     sb.Append(" AND ");
@@ -167,7 +167,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
         {
             var keys = new List<IColumn>();
 
-            foreach (IColumn dbColumn in dbColumns)
+            foreach (var dbColumn in dbColumns)
             {
                 if (dbColumn.Key)
                 {
@@ -180,9 +180,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
             sb.Append(tableName);
             sb.Append(" WHERE ");
 
-            for (int i = 0; i < keys.Count; i++)
+            for (var i = 0; i < keys.Count; i++)
             {
-                IColumn column = keys[i];
+                var column = keys[i];
                 if (i != 0)
                 {
                     sb.Append(" AND ");
@@ -203,13 +203,13 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
             sb.Append(entityInfo.TableInfo.TableName);
             sb.Append(" WHERE ");
 
-            IEnumerator<RelationColumnMapping> enumerator = relation.TableColumnMappings.GetEnumerator();
-            int i = 0;
+            var enumerator = relation.TableColumnMappings.GetEnumerator();
+            var i = 0;
 
             enumerator.Reset();
             while (enumerator.MoveNext())
             {
-                RelationColumnMapping columnMapping = enumerator.Current;
+                var columnMapping = enumerator.Current;
                 if (i != 0)
                 {
                     sb.Append(" AND ");
@@ -224,10 +224,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 
         public virtual object ReadFromResultSet(IDataReader reader, IColumn column)
         {
-            int ordinal = reader.GetOrdinal(column.ColumnName);
+            var ordinal = reader.GetOrdinal(column.ColumnName);
             if (column.Nullable)
             {
-                object obj = reader.GetValue(ordinal);
+                var obj = reader.GetValue(ordinal);
                 if (obj is System.DBNull)
                 {
                     return null;
@@ -287,7 +287,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
             var cmdParams = execInfo.Params;
             var sortedParams = cmdParams.OrderBy(p => p.Index);
 
-            foreach (QueryExecParam param in sortedParams)
+            foreach (var param in sortedParams)
             {
 				SetToPreparedStatement(cmd,param.Value,param.Index + 1,param.Value == null,param.Type);
             }
@@ -299,7 +299,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
             buildInfo = new QueryBuildInfo(buildInfo);
             buildInfo.CurrentQueryId = structure.QueryId;
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             ProcessFrom(sb, buildInfo, structure);
 			ProcessJoin(sb, buildInfo, structure);
             ProcessWhere(sb, buildInfo, structure);
@@ -316,8 +316,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 
 		protected void AddPagingClause(StringBuilder sb,QueryBuildInfo buildInfo,QueryStructure structure)
 		{
-			long pageSize = structure.Fetch;
-			long currentOffset = structure.Skip;
+			var pageSize = structure.Fetch;
+			var currentOffset = structure.Skip;
 
 			if (currentOffset > 0 && pageSize == 0)
 				pageSize = long.MaxValue;
@@ -326,7 +326,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 		 	{
 			 	sb.Append(" LIMIT ? ");
 			 	
-			 	QueryExecParam param = new QueryExecParam();
+			 	var param = new QueryExecParam();
 			 	param.Index = buildInfo.ExecInfo.Params.Count;
 			 	param.Type = ColumnType.Long;
 			 	param.Value = pageSize;
@@ -337,7 +337,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 		 	{
 			 	sb.Append(" OFFSET ? ");
 			 	
-				QueryExecParam param = new QueryExecParam();
+				var param = new QueryExecParam();
 				param.Index = buildInfo.ExecInfo.Params.Count;
 			 	param.Type = ColumnType.Long;
 			 	param.Value = currentOffset;
@@ -356,9 +356,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 			if (structure.Distinct)
                 selectionSb.Append(" DISTINCT ");
 
-            ICollection<IQuerySelection> selections = structure.SelectList;
-            bool initial = true;
-            foreach (IQuerySelection selection in selections)
+            var selections = structure.SelectList;
+            var initial = true;
+            foreach (var selection in selections)
             {
                 if (!initial)
                 {
@@ -375,7 +375,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
         {
             if (selection != null)
             {
-                return ((IAbstractSelection) selection).CreateSql(_dbLayer,buildInfo);
+                return ((IAbstractSelection) selection).CreateSql(dbLayer,buildInfo);
             }
             return "/*Incorrect Selection*/";
         }
@@ -384,9 +384,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
         {
             sb.Append(" FROM ");
 
-            ICollection<IQueryFrom> fromList = structure.FromList;
-            bool initial = true;
-            foreach (IQueryFrom from in fromList)
+            var fromList = structure.FromList;
+            var initial = true;
+            foreach (var from in fromList)
             {
                 if (!initial)
                 {
@@ -401,7 +401,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
         {
             if (from != null)
             {
-                return ((IAbstractFrom) from).CreateSql(_dbLayer,buildInfo);
+                return ((IAbstractFrom) from).CreateSql(dbLayer,buildInfo);
             }
             return "/*Incorrect From*/";
         }
@@ -423,21 +423,21 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
         {
             if (join != null)
             {
-                return ((IAbstractJoin) join).CreateSql(_dbLayer,buildInfo);
+                return ((IAbstractJoin) join).CreateSql(dbLayer,buildInfo);
             }
             return "/*Incorrect Join*/";
         }
 
 		private void ProcessWhere(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
 	 	{
-		 	ICollection<IQueryCondition> conditionList = structure.ConditionList;
+		 	var conditionList = structure.ConditionList;
 		 	if (conditionList.Count == 0)
 		 	return;
 		 	
 		 	sb.Append(" WHERE ");
 		 	
-		 	bool initial = true;
-			foreach (IQueryCondition condition in conditionList)
+		 	var initial = true;
+			foreach (var condition in conditionList)
 		 	{
 			 	if (!initial)
 			 	{
@@ -452,21 +452,21 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 	 	{
 			if (condition != null)
 		 	{
-		 		return ((IAbstractCondition) condition).CreateSql(_dbLayer,buildInfo);
+		 		return ((IAbstractCondition) condition).CreateSql(dbLayer,buildInfo);
 		 	}
 		 	return "/*Incorrect Where*/";
 	 	}
 		 	
 	 	private void ProcessGroup(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
 	 	{
-		 	ICollection<IQueryGroup> groupList = structure.GroupList;
+		 	var groupList = structure.GroupList;
 		 	if (groupList.Count == 0)
 		 	return;
 		 	
 		 	sb.Append(" GROUP BY ");
 		 	
-		 	bool initial = true;
-		 	foreach (IQueryGroup group in groupList)
+		 	var initial = true;
+		 	foreach (var group in groupList)
 			 	{
 			 	if (!initial)
 			 	{
@@ -481,21 +481,21 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 	 	{
 			if (group != null)
 		 	{
-		 		return ((IAbstractGroup) group).CreateSql(_dbLayer,buildInfo);
+		 		return ((IAbstractGroup) group).CreateSql(dbLayer,buildInfo);
 		 	}
 		 	return "/*Incorrect Group*/";
 	 	}
 
 		private void ProcessGroupCondition(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
 	 	{
-		 	ICollection<IQueryGroupCondition> groupConditionList = structure.GroupConditionList;
+		 	var groupConditionList = structure.GroupConditionList;
 		 	if (groupConditionList.Count == 0)
 		 	return;
 		 	
 		 	sb.Append(" HAVING ");
 		 	
-		 	bool initial = true;
-			foreach (IQueryGroupCondition groupCondition in groupConditionList)
+		 	var initial = true;
+			foreach (var groupCondition in groupConditionList)
 		 	{
 			 	if (!initial)
 			 	{
@@ -510,21 +510,21 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 	 	{
 			if (groupCondition != null)
 		 	{
-		 		return ((IAbstractGroupCondition) groupCondition).CreateSql(_dbLayer,buildInfo);
+		 		return ((IAbstractGroupCondition) groupCondition).CreateSql(dbLayer,buildInfo);
 		 	}
 		 	return "/*Incorrect Group condition*/";
 	 	}
 
 		private void ProcessOrderBy(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
 	 	{
-		 	ICollection<IQueryOrderBy> orderList = structure.OrderList;
+		 	var orderList = structure.OrderList;
 		 	if (orderList.Count == 0)
 		 	return;
 		 	
 		 	sb.Append(" ORDER BY ");
 		 	
-		 	bool initial = true;
-			foreach (IQueryOrderBy orderBy in orderList)
+		 	var initial = true;
+			foreach (var orderBy in orderList)
 		 	{
 			 	if (!initial)
 			 	{
@@ -539,7 +539,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 	 	{
 			if (orderBy != null)
 		 	{
-		 		return ((IAbstractOrderBy) orderBy).CreateSql(_dbLayer,buildInfo);
+		 		return ((IAbstractOrderBy) orderBy).CreateSql(dbLayer,buildInfo);
 		 	}
 		 	return "/*Incorrect Order by*/";
 	 	}

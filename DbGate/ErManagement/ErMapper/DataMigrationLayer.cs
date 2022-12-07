@@ -18,48 +18,48 @@ namespace DbGate.ErManagement.ErMapper
 {
     public class DataMigrationLayer
     {
-        private readonly IDbLayer _dbLayer;
-        private readonly IDbGateStatistics _statistics;
-        private readonly IDbGateConfig _config;
+        private readonly IDbLayer dbLayer;
+        private readonly IDbGateStatistics statistics;
+        private readonly IDbGateConfig config;
 
         public DataMigrationLayer(IDbLayer dbLayer,IDbGateStatistics statistics,IDbGateConfig config)
         {
-            _dbLayer = dbLayer;
-            _statistics = statistics;
-            _config = config;
+            this.dbLayer = dbLayer;
+            this.statistics = statistics;
+            this.config = config;
         }
 
         public void PatchDataBase(ITransaction tx, ICollection<Type> entityTypes,bool dropAll)
         {
             try
             {
-                foreach (Type entityType in entityTypes)
+                foreach (var entityType in entityTypes)
                 {
                     CacheManager.Register(entityType);
                 }
 
-                IMetaManipulate metaManipulate =  _dbLayer.MetaManipulate(tx);
-                ICollection<IMetaItem> existingItems = metaManipulate.GetMetaData(tx);
-                ICollection<IMetaItem> requiredItems = CreateMetaItemsFromEntityTypes(entityTypes);
+                var metaManipulate =  dbLayer.MetaManipulate(tx);
+                var existingItems = metaManipulate.GetMetaData(tx);
+                var requiredItems = CreateMetaItemsFromEntityTypes(entityTypes);
 
-                List<MetaQueryHolder> queryHolders = new List<MetaQueryHolder>();
+                var queryHolders = new List<MetaQueryHolder>();
 
                 if (dropAll)
                 {
-                    ICollection<IMetaComparisonGroup> groupExisting = CompareUtility.Compare(metaManipulate,existingItems,new List<IMetaItem>());
-                    ICollection<IMetaComparisonGroup> groupRequired = CompareUtility.Compare(metaManipulate,new List<IMetaItem>(), requiredItems);
+                    var groupExisting = CompareUtility.Compare(metaManipulate,existingItems,new List<IMetaItem>());
+                    var groupRequired = CompareUtility.Compare(metaManipulate,new List<IMetaItem>(), requiredItems);
 
-                    List<MetaQueryHolder> queryHoldersExisting = new List<MetaQueryHolder>();
-                    foreach (IMetaComparisonGroup comparisonGroup in groupExisting)
+                    var queryHoldersExisting = new List<MetaQueryHolder>();
+                    foreach (var comparisonGroup in groupExisting)
                     {
-                        queryHoldersExisting.AddRange(_dbLayer.MetaManipulate(tx).CreateDbPathSql(comparisonGroup));
+                        queryHoldersExisting.AddRange(dbLayer.MetaManipulate(tx).CreateDbPathSql(comparisonGroup));
                     }
                     queryHoldersExisting.Sort();
 
-                    List<MetaQueryHolder> queryHoldersRequired = new List<MetaQueryHolder>();
-                    foreach (IMetaComparisonGroup comparisonGroup in groupRequired)
+                    var queryHoldersRequired = new List<MetaQueryHolder>();
+                    foreach (var comparisonGroup in groupRequired)
                     {
-                        queryHoldersRequired.AddRange(_dbLayer.MetaManipulate(tx).CreateDbPathSql(comparisonGroup));
+                        queryHoldersRequired.AddRange(dbLayer.MetaManipulate(tx).CreateDbPathSql(comparisonGroup));
                     }
                     queryHoldersRequired.Sort();
 
@@ -68,32 +68,32 @@ namespace DbGate.ErManagement.ErMapper
                 }
                 else
                 {
-                    ICollection<IMetaComparisonGroup> groups = CompareUtility.Compare(metaManipulate,existingItems,requiredItems);
-                    foreach (IMetaComparisonGroup comparisonGroup in groups)
+                    var groups = CompareUtility.Compare(metaManipulate,existingItems,requiredItems);
+                    foreach (var comparisonGroup in groups)
                     {
-                        queryHolders.AddRange(_dbLayer.MetaManipulate(tx).CreateDbPathSql(comparisonGroup));
+                        queryHolders.AddRange(dbLayer.MetaManipulate(tx).CreateDbPathSql(comparisonGroup));
                     }
                     queryHolders.Sort();
                 }
 
-                foreach (MetaQueryHolder holder in queryHolders)
+                foreach (var holder in queryHolders)
                 {
                     if (holder.QueryString == null)
                         continue;
 
-                    Logger.GetLogger( _config.LoggerName).Debug(holder.QueryString);
+                    Logger.GetLogger( config.LoggerName).Debug(holder.QueryString);
 
-                    IDbCommand cmd = tx.CreateCommand();
+                    var cmd = tx.CreateCommand();
                     cmd.CommandText = holder.QueryString;
                     cmd.ExecuteNonQuery();
                     DbMgtUtility.Close(cmd);
 
-                    if (_config.EnableStatistics) _statistics.RegisterPatch();
+                    if (config.EnableStatistics) statistics.RegisterPatch();
                 }
             }
             catch (Exception e)
             {
-                Logger.GetLogger( _config.LoggerName).Fatal(e.Message,e);
+                Logger.GetLogger( config.LoggerName).Fatal(e.Message,e);
                 throw new MetaDataException(e.Message,e);
             }
         }
@@ -103,10 +103,10 @@ namespace DbGate.ErManagement.ErMapper
             ICollection<IMetaItem> metaItems = new List<IMetaItem>();
             ICollection<String> uniqueNames = new List<String>();
 
-            foreach (Type entityType in entityTypes)
+            foreach (var entityType in entityTypes)
             {
-                IEnumerable<IMetaItem> classMetaItems = ExtractMetaItems(entityType);
-                foreach (IMetaItem metaItem in classMetaItems)
+                var classMetaItems = ExtractMetaItems(entityType);
+                foreach (var metaItem in classMetaItems)
                 {
                     //this is to remove duplicate tables in case of different sub classes inheriting same superclass
                     if (!uniqueNames.Contains(metaItem.Name))
@@ -122,15 +122,15 @@ namespace DbGate.ErManagement.ErMapper
         private static IEnumerable<IMetaItem> ExtractMetaItems(Type subType)
         {
             ICollection<IMetaItem> retItems = new List<IMetaItem>();
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(subType);
+            var entityInfo = CacheManager.GetEntityInfo(subType);
 
             while (entityInfo != null)
             {
-                ICollection<IColumn> dbColumns = entityInfo.Columns;
-                ICollection<IRelation> dbRelations = entityInfo.Relations;
+                var dbColumns = entityInfo.Columns;
+                var dbRelations = entityInfo.Relations;
                 var filteredRelations = new List<IRelation>();
 
-                foreach (IRelation relation in dbRelations)
+                foreach (var relation in dbRelations)
                 {
                     if (relation.NonIdentifyingRelation)
                     {
@@ -161,13 +161,13 @@ namespace DbGate.ErManagement.ErMapper
 
         private static IMetaItem CreateTable(Type type,IEnumerable<IColumn> dbColumns,IEnumerable<IRelation> dbRelations)
         {
-            MetaTable table = new MetaTable();
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
+            var table = new MetaTable();
+            var entityInfo = CacheManager.GetEntityInfo(type);
             table.Name = entityInfo.TableInfo.TableName;
 
-            foreach (IColumn dbColumn in dbColumns)
+            foreach (var dbColumn in dbColumns)
             {
-                MetaColumn metaColumn = new MetaColumn();
+                var metaColumn = new MetaColumn();
                 metaColumn.ColumnType = dbColumn.ColumnType;
                 metaColumn.Name = dbColumn.ColumnName;
                 metaColumn.Null = dbColumn.Nullable;
@@ -175,17 +175,17 @@ namespace DbGate.ErManagement.ErMapper
                 table.Columns.Add(metaColumn);
             }
 
-            foreach (IRelation relation in dbRelations)
+            foreach (var relation in dbRelations)
             {
-                EntityInfo relatedEntityInfo = CacheManager.GetEntityInfo(relation.RelatedObjectType);
+                var relatedEntityInfo = CacheManager.GetEntityInfo(relation.RelatedObjectType);
 
-                MetaForeignKey foreignKey = new MetaForeignKey();
+                var foreignKey = new MetaForeignKey();
                 foreignKey.Name = relation.RelationShipName;
                 foreignKey.ToTable = relatedEntityInfo.TableInfo.TableName;
-                foreach (RelationColumnMapping mapping in relation.TableColumnMappings)
+                foreach (var mapping in relation.TableColumnMappings)
                 {
-                    string fromCol = entityInfo.FindColumnByAttribute(mapping.FromField).ColumnName;
-                    string toCol = relatedEntityInfo.FindColumnByAttribute(mapping.ToField).ColumnName;
+                    var fromCol = entityInfo.FindColumnByAttribute(mapping.FromField).ColumnName;
+                    var toCol = relatedEntityInfo.FindColumnByAttribute(mapping.ToField).ColumnName;
                     foreignKey.ColumnMappings.Add(new MetaForeignKeyColumnMapping(fromCol,toCol));
                 }
                 foreignKey.DeleteRule = relation.DeleteRule;
@@ -193,9 +193,9 @@ namespace DbGate.ErManagement.ErMapper
                 table.ForeignKeys.Add(foreignKey);
             }
 
-            MetaPrimaryKey primaryKey = new MetaPrimaryKey();
+            var primaryKey = new MetaPrimaryKey();
             primaryKey.Name = "pk_" + table.Name;
-            foreach (IColumn dbColumn in dbColumns)
+            foreach (var dbColumn in dbColumns)
             {
                 if (dbColumn.Key)
                 {

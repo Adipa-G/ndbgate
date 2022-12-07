@@ -9,7 +9,7 @@ namespace DbGate.Persist.Support.InheritanceTest
         {
             get
             {
-                Dictionary<Type, ITable> map = base.TableInfo;
+                var map = base.TableInfo;
                 map.Add(typeof (InheritanceTestSubEntityBFields), new DefaultTable("inheritance_test_subb"));
                 return map;
             }
@@ -19,7 +19,7 @@ namespace DbGate.Persist.Support.InheritanceTest
         {
             get
             {
-                Dictionary<Type, ICollection<IField>> map = base.FieldInfo;
+                var map = base.FieldInfo;
                 var dbColumns = new List<IField>();
 
                 dbColumns.Add(new DefaultColumn("NameB", ColumnType.Varchar));

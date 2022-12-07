@@ -4,26 +4,19 @@ using System.Data;
 using DbGate.Exceptions;
 using DbGate.Patch.Support.PatchEmpty;
 using log4net;
-using NUnit.Framework;
+using Xunit;
 
 namespace DbGate.Patch
 {
-    [TestFixture]
-    public class DbGatePatchEmptyDbTests : AbstractDbGateTestBase
+    [Collection("Sequential")]
+    public class DbGatePatchEmptyDbTests : AbstractDbGateTestBase, IDisposable
     {
-        private const string DBName = "unit-testing-metadata-empty";
+        private const string DbName = "unit-testing-metadata-empty";
 
-        [OneTimeSetUp]
-        public static void Before()
+        public DbGatePatchEmptyDbTests()
         {
             TestClass = typeof(DbGatePatchEmptyDbTests);
-        }
-
-        [SetUp]
-        public void BeforeEach()
-        {
-            BeginInit(DBName);
-            TransactionFactory.DbGate.ClearCache();
+            BeginInit(DbName);
             TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
             TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.DoNotVerify;
             
@@ -32,34 +25,33 @@ namespace DbGate.Patch
             types.Add(typeof(LeafEntitySubB));
             types.Add(typeof(RootEntity));
 
-            ITransaction transaction = CreateTransaction();
+            var transaction = CreateTransaction();
             transaction.DbGate.PatchDataBase(transaction, types, true);
             transaction.Commit();
         }
 
-        [TearDown]
-        public void AfterEach()
+        public void Dispose()
         {
-            CleanupDb(DBName);
-            FinalizeDb(DBName);
+            CleanupDb(DbName);
+            FinalizeDb(DbName);
         }
 
-        [Test]
+        [Fact]
         public void PatchEmpty_PatchDataBase_WithEmptyDb_ShouldCreateTables_ShouldBeAbleToInsertData()
         {
             try
             {
-                ITransaction transaction = CreateTransaction();
+                var transaction = CreateTransaction();
 
-                int id = 36;
-                RootEntity entity = CreateRootEntityWithoutNullValues(id);
+                var id = 36;
+                var entity = CreateRootEntityWithoutNullValues(id);
                 entity.LeafEntities.Add(CreateLeafEntityA(id, 1));
                 entity.LeafEntities.Add(CreateLeafEntityB(id, 2));
                 entity.Persist(transaction);
                 transaction.Commit();
  
                 transaction = CreateTransaction();
-                RootEntity loadedEntity = LoadRootEntityWithId(transaction, id);
+                var loadedEntity = LoadRootEntityWithId(transaction, id);
                 transaction.Commit();
 
                 AssertTwoRootEntitiesEquals(entity, loadedEntity);
@@ -72,13 +64,13 @@ namespace DbGate.Patch
         }
 
 
-        [Test]
+        [Fact]
         public void PatchEmpty_PatchDataBase_WithEmptyDb_ShouldCreatePrimaryKeys_ShouldNotAbleToPutDuplicateData()
         {
-            ITransaction transaction = CreateTransaction();
+            var transaction = CreateTransaction();
 
-            int id = 37;
-            RootEntity entity = CreateRootEntityWithoutNullValues(id);
+            var id = 37;
+            var entity = CreateRootEntityWithoutNullValues(id);
             entity.LeafEntities.Add(CreateLeafEntityA(id, 1));
             entity.LeafEntities.Add(CreateLeafEntityB(id, 1));
             Assert.Throws<PersistException>(() => entity.Persist(transaction));
@@ -87,13 +79,13 @@ namespace DbGate.Patch
             transaction.Close();
         }
 
-        [Test]
+        [Fact]
         public void PatchEmpty_PatchDataBase_WithEmptyDb_ShouldCreateForeignKeys_ShouldNotAbleToInconsistantData()
         {
-            ITransaction transaction = CreateTransaction();
+            var transaction = CreateTransaction();
 
-            int id = 38;
-            RootEntity entity = CreateRootEntityWithoutNullValues(id);
+            var id = 38;
+            var entity = CreateRootEntityWithoutNullValues(id);
             entity.Persist(transaction);
 
             var leafEntityA = CreateLeafEntityA(id, 1);
@@ -106,10 +98,10 @@ namespace DbGate.Patch
             transaction.Close();
         }
 
-        [Test]
+        [Fact]
         public void PatchEmpty_PatchDataBase_PatchTwice_ShouldNotThrowException()
         {
-            ITransaction transaction = CreateTransaction();
+            var transaction = CreateTransaction();
 
             ICollection<Type> types = new List<Type>();
             types.Add(typeof(LeafEntitySubA));
@@ -122,33 +114,33 @@ namespace DbGate.Patch
 
         private void AssertTwoRootEntitiesEquals(RootEntity entityA, RootEntity entityB)
         {
-            Assert.AreEqual(entityA.IdCol, entityB.IdCol);
+            Assert.Equal(entityA.IdCol, entityB.IdCol);
 
-            Assert.AreEqual(entityA.CharNotNull, entityB.CharNotNull);
-            Assert.AreEqual(entityA.CharNull, entityB.CharNull);
-            Assert.AreEqual(entityA.DateNotNull, entityB.DateNotNull);
-            Assert.AreEqual(entityA.DateNull, entityB.DateNull);
-            Assert.AreEqual(entityA.DoubleNotNull, entityB.DoubleNotNull);
-            Assert.AreEqual(entityA.DoubleNull, entityB.DoubleNull);
-            Assert.AreEqual(entityA.FloatNotNull, entityB.FloatNotNull);
-            Assert.AreEqual(entityA.FloatNull, entityB.FloatNull);
-            Assert.AreEqual(entityA.IntNotNull, entityB.IntNotNull);
-            Assert.AreEqual(entityA.IntNull, entityB.IntNull);
-            Assert.AreEqual(entityA.LongNotNull, entityB.LongNotNull);
-            Assert.AreEqual(entityA.LongNull, entityB.LongNull);
-            Assert.AreEqual(entityA.TimestampNotNull, entityB.TimestampNotNull);
-            Assert.AreEqual(entityA.TimestampNull, entityB.TimestampNull);
-            Assert.AreEqual(entityA.VarcharNotNull, entityB.VarcharNotNull);
-            Assert.AreEqual(entityA.VarcharNull, entityB.VarcharNull);
-            Assert.AreEqual(entityA.LeafEntities.Count, entityB.LeafEntities.Count);
+            Assert.Equal(entityA.CharNotNull, entityB.CharNotNull);
+            Assert.Equal(entityA.CharNull, entityB.CharNull);
+            Assert.Equal(entityA.DateNotNull, entityB.DateNotNull);
+            Assert.Equal(entityA.DateNull, entityB.DateNull);
+            Assert.Equal(entityA.DoubleNotNull, entityB.DoubleNotNull);
+            Assert.Equal(entityA.DoubleNull, entityB.DoubleNull);
+            Assert.Equal(entityA.FloatNotNull, entityB.FloatNotNull);
+            Assert.Equal(entityA.FloatNull, entityB.FloatNull);
+            Assert.Equal(entityA.IntNotNull, entityB.IntNotNull);
+            Assert.Equal(entityA.IntNull, entityB.IntNull);
+            Assert.Equal(entityA.LongNotNull, entityB.LongNotNull);
+            Assert.Equal(entityA.LongNull, entityB.LongNull);
+            Assert.Equal(entityA.TimestampNotNull, entityB.TimestampNotNull);
+            Assert.Equal(entityA.TimestampNull, entityB.TimestampNull);
+            Assert.Equal(entityA.VarcharNotNull, entityB.VarcharNotNull);
+            Assert.Equal(entityA.VarcharNull, entityB.VarcharNull);
+            Assert.Equal(entityA.LeafEntities.Count, entityB.LeafEntities.Count);
 
-            IEnumerator<LeafEntity> iteratorA = entityA.LeafEntities.GetEnumerator();
+            var iteratorA = entityA.LeafEntities.GetEnumerator();
 
             while (iteratorA.MoveNext())
             {
-                LeafEntity leafEntityA = iteratorA.Current;
-                bool bFound = false;
-                foreach (LeafEntity leafEntityB in entityB.LeafEntities)
+                var leafEntityA = iteratorA.Current;
+                var bFound = false;
+                foreach (var leafEntityB in entityB.LeafEntities)
                 {
                     if (leafEntityB.IdCol == leafEntityA.IdCol
                         && leafEntityB.IndexNo == leafEntityA.IndexNo)
@@ -166,16 +158,16 @@ namespace DbGate.Patch
 
         private void AssertTwoLeafEntitiesTypeAEquals(LeafEntity entityA, LeafEntity entityB)
         {
-            Assert.AreEqual(entityA.IdCol, entityB.IdCol);
-            Assert.AreEqual(entityA.IndexNo, entityB.IndexNo);
-            Assert.AreEqual(entityA.SomeText, entityB.SomeText);
+            Assert.Equal(entityA.IdCol, entityB.IdCol);
+            Assert.Equal(entityA.IndexNo, entityB.IndexNo);
+            Assert.Equal(entityA.SomeText, entityB.SomeText);
             if (entityA is LeafEntitySubA && entityB is LeafEntitySubA)
             {
-                Assert.AreEqual(((LeafEntitySubA)entityA).SomeTextA, ((LeafEntitySubA)entityB).SomeTextA);
+                Assert.Equal(((LeafEntitySubA)entityA).SomeTextA, ((LeafEntitySubA)entityB).SomeTextA);
             }
             if (entityA is LeafEntitySubB && entityB is LeafEntitySubB)
             {
-                Assert.AreEqual(((LeafEntitySubB)entityA).SomeTextB, ((LeafEntitySubB)entityB).SomeTextB);
+                Assert.Equal(((LeafEntitySubB)entityA).SomeTextB, ((LeafEntitySubB)entityB).SomeTextB);
             }
         }
 
@@ -183,15 +175,15 @@ namespace DbGate.Patch
         {
             RootEntity loadedEntity = null;
 
-            IDbCommand cmd = transaction.CreateCommand();
+            var cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from root_entity where id_col = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Value = id;
 
-            IDataReader rs = cmd.ExecuteReader();
+            var rs = cmd.ExecuteReader();
             if (rs.Read())
             {
                 loadedEntity = new RootEntity();
@@ -203,7 +195,7 @@ namespace DbGate.Patch
 
         private LeafEntity CreateLeafEntityA(int id, int index)
         {
-            LeafEntitySubA leafEntity = new LeafEntitySubA();
+            var leafEntity = new LeafEntitySubA();
             leafEntity.IdCol = id;
             leafEntity.IndexNo = index;
             leafEntity.SomeTextA = "text A";
@@ -214,7 +206,7 @@ namespace DbGate.Patch
 
         private LeafEntity CreateLeafEntityB(int id, int index)
         {
-            LeafEntitySubB leafEntity = new LeafEntitySubB();
+            var leafEntity = new LeafEntitySubB();
             leafEntity.IdCol = id;
             leafEntity.IndexNo = index;
             leafEntity.SomeTextB = "text B";
@@ -225,7 +217,7 @@ namespace DbGate.Patch
 
         private RootEntity CreateRootEntityWithoutNullValues(int id)
         {
-            RootEntity entity = new RootEntity();
+            var entity = new RootEntity();
             entity.IdCol = id;
 
             entity.BooleanNotNull = true;

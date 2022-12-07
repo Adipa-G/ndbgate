@@ -12,10 +12,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
         {
             var retGroups = new List<IMetaComparisonGroup>();
 
-            foreach (IMetaItem existingItem in existing)
+            foreach (var existingItem in existing)
             {
-                bool found = false;
-                foreach (IMetaItem requiredItem in required)
+                var found = false;
+                foreach (var requiredItem in required)
                 {
                     if (metaManipulate.Equals(existingItem, requiredItem))
                     {
@@ -31,10 +31,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
                 }
             }
 
-            foreach (IMetaItem requiredItem in required)
+            foreach (var requiredItem in required)
             {
-                bool found = false;
-                foreach (IMetaItem existingItem in existing)
+                var found = false;
+                foreach (var existingItem in existing)
                 {
                     if (metaManipulate.Equals(requiredItem, existingItem))
                     {
@@ -87,8 +87,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
                 existingColumns.AddRange(((MetaTable) tableGroup.ExistingItem).Columns.Cast<IMetaItem>());
                 requiredColumns.AddRange(((MetaTable) tableGroup.RequiredItem).Columns.Cast<IMetaItem>());
 
-                ICollection<IMetaComparisonGroup> compared = Compare(metaManipulate, existingColumns, requiredColumns);
-                foreach (IMetaComparisonGroup columnComparison in compared)
+                var compared = Compare(metaManipulate, existingColumns, requiredColumns);
+                foreach (var columnComparison in compared)
                 {
                     comparedColumns.Add((MetaComparisonColumnGroup) columnComparison);
                 }
@@ -107,9 +107,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
                 }
                 requiredForeignKeys.AddRange(((MetaTable) tableGroup.RequiredItem).ForeignKeys.Cast<IMetaItem>());
 
-                ICollection<IMetaComparisonGroup> compared = Compare(metaManipulate, existingForeignKeys,
+                var compared = Compare(metaManipulate, existingForeignKeys,
                                                                      requiredForeignKeys);
-                foreach (IMetaComparisonGroup columnComparison in compared)
+                foreach (var columnComparison in compared)
                 {
                     comparedForeignKeys.Add((MetaComparisonForeignKeyGroup) columnComparison);
                 }
@@ -133,9 +133,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
                     requiredPrimaryKey.Add(((MetaTable) tableGroup.RequiredItem).PrimaryKey);
                 }
 
-                ICollection<IMetaComparisonGroup> compared = Compare(metaManipulate, existingPrimaryKey,
+                var compared = Compare(metaManipulate, existingPrimaryKey,
                                                                      requiredPrimaryKey);
-                foreach (IMetaComparisonGroup columnComparison in compared)
+                foreach (var columnComparison in compared)
                 {
                     comparedPrimaryKey.Add((MetaComparisonPrimaryKeyGroup) columnComparison);
                 }

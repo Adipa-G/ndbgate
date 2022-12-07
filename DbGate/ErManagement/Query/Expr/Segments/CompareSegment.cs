@@ -4,22 +4,16 @@ namespace DbGate.ErManagement.Query.Expr.Segments
 {
     public class CompareSegment : BaseSegment
     {
-        private readonly CompareSegmentMode _mode;
+        private readonly CompareSegmentMode mode;
 	  		
 	  	public CompareSegment(CompareSegmentMode mode)
 	  	{
-	  		_mode = mode;
+	  		this.mode = mode;
 	  	}
 
-        public CompareSegmentMode Mode
-        {
-            get { return _mode; }
-        }
-	  	
-        public override SegmentType SegmentType
-        {
-            get { return SegmentType.Compare; }
-        }
+        public CompareSegmentMode Mode => mode;
+
+        public override SegmentType SegmentType => SegmentType.Compare;
 
         public ISegment Left { get; set; }
 
@@ -33,7 +27,7 @@ namespace DbGate.ErManagement.Query.Expr.Segments
                 case SegmentType.Value:
                 case SegmentType.Query:
                     if (Left == null
-                        && !(_mode == CompareSegmentMode.Exists || _mode == CompareSegmentMode.NotExists))
+                        && !(mode == CompareSegmentMode.Exists || mode == CompareSegmentMode.NotExists))
                     {
                         Left = segment;
                     }

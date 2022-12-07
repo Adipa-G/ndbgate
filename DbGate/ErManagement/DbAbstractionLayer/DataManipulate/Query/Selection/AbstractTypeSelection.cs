@@ -9,12 +9,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
 	{
 		public Type EntityType { get; set; }
 
-		public QuerySelectionExpressionType SelectionType
-		{
-			get {return QuerySelectionExpressionType.EntityType;}
-		}
-		
-		public string CreateSql(IDbLayer dbLayer,QueryBuildInfo buildInfo)
+		public QuerySelectionExpressionType SelectionType => QuerySelectionExpressionType.EntityType;
+
+        public string CreateSql(IDbLayer dbLayer,QueryBuildInfo buildInfo)
 		{
 			var aliases = buildInfo.GetAlias(EntityType);
 			if (!string.IsNullOrEmpty(aliases))

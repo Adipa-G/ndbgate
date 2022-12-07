@@ -8,10 +8,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.OrderBy
 
         #region IAbstractOrderBy Members
 
-        public QueryOrderByExpressionType OrderByExpressionType
-        {
-            get { return QueryOrderByExpressionType.RawSql; }
-        }
+        public QueryOrderByExpressionType OrderByExpressionType => QueryOrderByExpressionType.RawSql;
 
         public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
         {

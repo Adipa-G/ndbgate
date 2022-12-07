@@ -2,3 +2,5 @@
 **/obj/**/*.*
 DbGateTestApp/wikigen/*.*
 DbGateTestApp/logs/*
+/.vs/**
+**/TestResults/**

@@ -13,42 +13,30 @@ namespace DbGate.ErManagement.ErMapper
 {
     public class Transaction : ITransaction
     {
-        private Guid _transactionId;
-	    private IDbGate _dbGate;
-	    private ITransactionFactory _factory;
-	    private IDbTransaction _transaction;
-        private IDbConnection _connection;
+        private Guid transactionId;
+	    private IDbGate dbGate;
+	    private ITransactionFactory factory;
+	    private IDbTransaction transaction;
+        private IDbConnection connection;
 	
 	    public Transaction(ITransactionFactory factory, IDbTransaction transaction)
 	    {
-	        this._transactionId = Guid.NewGuid();
-	        this._factory = factory;
-	        this._transaction = transaction;
-	        this._connection = transaction.Connection;
-	        this._dbGate = factory.DbGate;
+	        this.transactionId = Guid.NewGuid();
+	        this.factory = factory;
+	        this.transaction = transaction;
+	        this.connection = transaction.Connection;
+	        this.dbGate = factory.DbGate;
 	    }
 	
-	    public ITransactionFactory Factory
-	    {
-	        get { return _factory; }
-	    }
-	
-	    public Guid TransactionId
-	    {
-            get { return _transactionId; }
-	    }
-	
-	    public IDbConnection Connection
-	    {
-	         get { return _connection; }
-	    }
-	
-	    public IDbGate DbGate
-	    {
-	        get { return _dbGate; }
-	    }
-	
-	    public bool Closed
+	    public ITransactionFactory Factory => factory;
+
+        public Guid TransactionId => transactionId;
+
+        public IDbConnection Connection => connection;
+
+        public IDbGate DbGate => dbGate;
+
+        public bool Closed
 	    {
             get
             {
@@ -70,12 +58,12 @@ namespace DbGate.ErManagement.ErMapper
 	    {
 	        try
 	        {
-	            _transaction.Commit();
+	            transaction.Commit();
 	        }
 	        catch (Exception e)
 	        {
 	            throw new TransactionCommitFailedException(String.Format("Unable to commit the transaction {0}"
-                    ,_transactionId.ToString()),e);
+                    ,transactionId.ToString()),e);
 	        }    
         }
 	
@@ -83,12 +71,12 @@ namespace DbGate.ErManagement.ErMapper
         {
 	        try
 	        {
-	            _transaction.Rollback();
+	            transaction.Rollback();
 	        }
 	        catch (Exception e)
 	        {
 	            throw new TransactionRollbackFailedException(String.Format("Unable to rollback the transaction {0}"
-	                ,_transactionId.ToString()),e);
+	                ,transactionId.ToString()),e);
 	        }
 	    }
 	
@@ -96,21 +84,21 @@ namespace DbGate.ErManagement.ErMapper
 	    {
 	        try
 	        {
-	            _factory = null;
-	            _connection?.Close();
-	            _connection?.Dispose();
+	            factory = null;
+	            connection?.Close();
+	            connection?.Dispose();
 	        }
 	        catch (Exception e)
 	        {
 	                throw new TransactionCloseFailedException(String.Format("Unable to close the transaction {0}"
-	                    ,_transactionId.ToString()),e);
+	                    ,transactionId.ToString()),e);
 	        }
 	    }
 
         public IDbCommand CreateCommand()
         {
-            var cmd = _connection.CreateCommand();
-            cmd.Transaction = _transaction;
+            var cmd = connection.CreateCommand();
+            cmd.Transaction = transaction;
             return cmd;
         }
     }

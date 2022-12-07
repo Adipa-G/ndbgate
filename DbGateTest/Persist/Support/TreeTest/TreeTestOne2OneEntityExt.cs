@@ -6,7 +6,7 @@ namespace DbGate.Persist.Support.TreeTest
 {
     public class TreeTestOne2OneEntityExt : ITreeTestOne2OneEntity
     {
-        private IEntityContext _context;
+        private IEntityContext context;
 
         public EntityStatus Status { get; set; }
         public int IdCol { get; set; }
@@ -15,7 +15,7 @@ namespace DbGate.Persist.Support.TreeTest
         public TreeTestOne2OneEntityExt()
         {
             Status = EntityStatus.New;
-            _context = new EntityContext();
+            context = new EntityContext();
         }
 
         public void Retrieve(IDataReader reader, ITransaction tx)
@@ -28,9 +28,6 @@ namespace DbGate.Persist.Support.TreeTest
             tx.DbGate.Save(this,tx);
         }
 
-        public IEntityContext Context
-        {
-            get { return _context; }
-        }
+        public IEntityContext Context => context;
     }
 }

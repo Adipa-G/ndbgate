@@ -4,13 +4,13 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
 {
     public abstract class AbstractMetaComparisonGroup : IMetaComparisonGroup
     {
-        private IMetaItem _existingItem;
-        private IMetaItem _requiredItem;
+        private IMetaItem existingItem;
+        private IMetaItem requiredItem;
 
         protected AbstractMetaComparisonGroup(IMetaItem existingItem, IMetaItem requiredItem)
         {
-            _existingItem = existingItem;
-            _requiredItem = requiredItem;
+            this.existingItem = existingItem;
+            this.requiredItem = requiredItem;
         }
 
         #region IMetaComparisonGroup Members
@@ -25,13 +25,13 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
         {
             get
             {
-                if (_existingItem != null)
+                if (existingItem != null)
                 {
-                    return _existingItem.ItemType;
+                    return existingItem.ItemType;
                 }
-                else if (_requiredItem != null)
+                else if (requiredItem != null)
                 {
-                    return _requiredItem.ItemType;
+                    return requiredItem.ItemType;
                 }
                 return MetaItemType.Unknown;
             }
@@ -39,14 +39,14 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
 
         public virtual IMetaItem ExistingItem
         {
-            get { return _existingItem; }
-            set { _existingItem = value; }
+            get => existingItem;
+            set => existingItem = value;
         }
 
         public IMetaItem RequiredItem
         {
-            get { return _requiredItem; }
-            set { _requiredItem = value; }
+            get => requiredItem;
+            set => requiredItem = value;
         }
 
         #endregion

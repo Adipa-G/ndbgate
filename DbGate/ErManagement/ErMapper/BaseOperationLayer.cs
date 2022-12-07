@@ -32,9 +32,9 @@ namespace DbGate.ErManagement.ErMapper
 
         protected IDbCommand CreateRetrievalPreparedStatement(ITypeFieldValueList keyValueList, ITransaction tx)
         {
-            Type targetType = keyValueList.Type;
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(targetType);
-            string query = entityInfo.GetLoadQuery(DbLayer);
+            var targetType = keyValueList.Type;
+            var entityInfo = CacheManager.GetEntityInfo(targetType);
+            var query = entityInfo.GetLoadQuery(DbLayer);
 
             IDbCommand cmd;
             try
@@ -44,22 +44,22 @@ namespace DbGate.ErManagement.ErMapper
             }
             catch (Exception ex)
             {
-                string message = String.Format("SQL Exception while trying create command for sql {0}",query);
+                var message = String.Format("SQL Exception while trying create command for sql {0}",query);
                 throw new CommandCreationException(message,ex);
             }
             
-            ICollection<IColumn> keys = entityInfo.GetKeys();
+            var keys = entityInfo.GetKeys();
 
-            StringBuilder logSb = new StringBuilder();
-            bool showQuery = Config.ShowQueries;
+            var logSb = new StringBuilder();
+            var showQuery = Config.ShowQueries;
             if (showQuery)
             {
                 logSb.Append(query);
             }
-            int i = 0;
-            foreach (IColumn key in keys)
+            var i = 0;
+            foreach (var key in keys)
             {
-                Object fieldValue = keyValueList.GetFieldValue(key.AttributeName).Value;
+                var fieldValue = keyValueList.GetFieldValue(key.AttributeName).Value;
                 if (showQuery)
                 {
                     logSb.Append(" ,").Append(key.ColumnName).Append("=").Append(fieldValue);
@@ -79,13 +79,13 @@ namespace DbGate.ErManagement.ErMapper
 
         protected ITypeFieldValueList ReadValues(Type type, IDataReader reader)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(type);
+            var entityInfo = CacheManager.GetEntityInfo(type);
 
             ITypeFieldValueList valueTypeList = new EntityTypeFieldValueList(type);
-            ICollection<IColumn> dbColumns = entityInfo.Columns;
-            foreach (IColumn dbColumn in dbColumns)
+            var dbColumns = entityInfo.Columns;
+            foreach (var dbColumn in dbColumns)
             {
-                Object value = DbLayer.DataManipulate().ReadFromResultSet(reader, dbColumn);
+                var value = DbLayer.DataManipulate().ReadFromResultSet(reader, dbColumn);
                 valueTypeList.FieldValues.Add(new EntityFieldValue(value, dbColumn));
             }
             return valueTypeList;
@@ -93,13 +93,13 @@ namespace DbGate.ErManagement.ErMapper
 
         protected static void SetValues(IReadOnlyEntity roEntity, ITypeFieldValueList values)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(roEntity);
+            var entityInfo = CacheManager.GetEntityInfo(roEntity);
 
-            foreach (EntityFieldValue fieldValue in values.FieldValues)
+            foreach (var fieldValue in values.FieldValues)
             {
                 if (entityInfo.FindRelationColumnInfo(fieldValue.Column.AttributeName) == null)
                 {
-                    PropertyInfo setter = entityInfo.GetProperty(fieldValue.Column.AttributeName);
+                    var setter = entityInfo.GetProperty(fieldValue.Column.AttributeName);
                     ReflectionUtils.SetValue(setter, roEntity, fieldValue.Value);
                 }
             }
@@ -117,13 +117,13 @@ namespace DbGate.ErManagement.ErMapper
 
         protected static ICollection<ITypeFieldValueList> GetChildEntityValueList(IEntity parentEntity, bool takeDeleted)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(parentEntity);
+            var entityInfo = CacheManager.GetEntityInfo(parentEntity);
             ICollection<ITypeFieldValueList> existingEntityChildRelations = new List<ITypeFieldValueList>();
 
             while (entityInfo != null)
             {
-                ICollection<IRelation> typeRelations = entityInfo.Relations;
-                foreach (IRelation typeRelation in typeRelations)
+                var typeRelations = entityInfo.Relations;
+                foreach (var typeRelation in typeRelations)
                 {
                     if (typeRelation.ReverseRelationship)
                     {
@@ -134,8 +134,8 @@ namespace DbGate.ErManagement.ErMapper
                         continue;
                     }
 
-                    ICollection<IEntity> childEntities = OperationUtils.GetRelationEntities(parentEntity, typeRelation);
-                    foreach (IEntity childEntity in childEntities)
+                    var childEntities = OperationUtils.GetRelationEntities(parentEntity, typeRelation);
+                    foreach (var childEntity in childEntities)
                     {
                         if (parentEntity.Status == EntityStatus.Deleted
                             && typeRelation.DeleteRule == ReferentialRuleType.Cascade)
@@ -146,7 +146,7 @@ namespace DbGate.ErManagement.ErMapper
                         {
                             continue;
                         }
-                        ITypeFieldValueList childKeyValueList = OperationUtils.ExtractRelationKeyValues(childEntity, typeRelation);
+                        var childKeyValueList = OperationUtils.ExtractRelationKeyValues(childEntity, typeRelation);
                         if (childKeyValueList != null)
                         {
                             existingEntityChildRelations.Add(childKeyValueList);
@@ -162,22 +162,22 @@ namespace DbGate.ErManagement.ErMapper
                 , ITransaction tx, IRelation relation)
         {
             var retrievedEntities = new List<IReadOnlyEntity>();
-	        ICollection<Type> childTypesToProcess = GetChildTypesToProcess(relation);
+	        var childTypesToProcess = GetChildTypesToProcess(relation);
 
-            int index = 0;
+            var index = 0;
             foreach (var childType in childTypesToProcess)
             {
                 index++;
-                IRelation effectiveRelation = relation.Clone();
+                var effectiveRelation = relation.Clone();
                 effectiveRelation.RelatedObjectType = childType;
                 effectiveRelation.RelationShipName = relation.RelationShipName + "_" + index;
 
-                EntityInfo entityInfo = CacheManager.GetEntityInfo(entityType);
+                var entityInfo = CacheManager.GetEntityInfo(entityType);
                 var logSb = new StringBuilder();
                 var query = entityInfo.GetRelationObjectLoad(DbLayer, effectiveRelation);
 
                 IList<string> fields = new List<string>();
-                foreach (RelationColumnMapping mapping in effectiveRelation.TableColumnMappings)
+                foreach (var mapping in effectiveRelation.TableColumnMappings)
                 {
                     fields.Add(mapping.FromField);
                 }
@@ -190,37 +190,37 @@ namespace DbGate.ErManagement.ErMapper
                 }
                 catch (Exception ex)
                 {
-                    string message = String.Format("SQL Exception while trying create command for sql {0}", query);
+                    var message = String.Format("SQL Exception while trying create command for sql {0}", query);
                     throw new CommandCreationException(message, ex);
                 }
 
-                bool showQuery = Config.ShowQueries;
+                var showQuery = Config.ShowQueries;
                 if (showQuery)
                 {
                     logSb.Append(query);
                 }
 
-                for (int i = 0; i < fields.Count; i++)
+                for (var i = 0; i < fields.Count; i++)
                 {
-                    string field = fields[i];
+                    var field = fields[i];
                     object fieldValue = null;
 
-                    IColumn matchColumn = entityInfo.FindColumnByAttribute(field);
-                    EntityRelationColumnInfo entityRelationColumnInfo =
+                    var matchColumn = entityInfo.FindColumnByAttribute(field);
+                    var entityRelationColumnInfo =
                         entityInfo.FindRelationColumnInfo(matchColumn != null ? matchColumn.AttributeName : "");
 	                if (entityRelationColumnInfo != null)
 	                {
-	                    EntityFieldValue entityFieldValue =  entity.Context.ChangeTracker.GetFieldValue(matchColumn.AttributeName);
+	                    var entityFieldValue =  entity.Context.ChangeTracker.GetFieldValue(matchColumn.AttributeName);
 	                    fieldValue = entityFieldValue.Value;
 	                }
 	                else if (matchColumn != null)
 	                {		                
-                        PropertyInfo getter = entityInfo.GetProperty(matchColumn.AttributeName);
+                        var getter = entityInfo.GetProperty(matchColumn.AttributeName);
 	                    fieldValue = ReflectionUtils.GetValue(getter, entity);
 	                }	
                     else
                     {
-                        string message = String.Format("The field {0} does not have a matching field in the object {1}"
+                        var message = String.Format("The field {0} does not have a matching field in the object {1}"
                             , field,entity.GetType().FullName);
                         throw new NoMatchingColumnFoundException(message);
                     }
@@ -241,7 +241,7 @@ namespace DbGate.ErManagement.ErMapper
                     Statistics.RegisterSelect(childType);
                 }
 
-                ICollection<IReadOnlyEntity> retrievedEntitiesForType = ExecuteAndReadFromPreparedStatement(entity, tx, cmd, childType);
+                var retrievedEntitiesForType = ExecuteAndReadFromPreparedStatement(entity, tx, cmd, childType);
                 retrievedEntities.AddRange(retrievedEntitiesForType);
             }
             return retrievedEntities;
@@ -250,12 +250,12 @@ namespace DbGate.ErManagement.ErMapper
         private ICollection<Type> GetChildTypesToProcess(IRelation relation)
         {
             ICollection<Type> childTypesToProcess = new List<Type>();
-            Type childType = relation.RelatedObjectType;
-            EntityInfo childEntityInfo = CacheManager.GetEntityInfo(childType);
+            var childType = relation.RelatedObjectType;
+            var childEntityInfo = CacheManager.GetEntityInfo(childType);
 
             if (childEntityInfo.SubEntityInfo.Count > 0)
             {
-                foreach (EntityInfo entityInfo in childEntityInfo.SubEntityInfo)
+                foreach (var entityInfo in childEntityInfo.SubEntityInfo)
                 {
                     childTypesToProcess.Add(entityInfo.EntityType);
                 }
@@ -271,7 +271,7 @@ namespace DbGate.ErManagement.ErMapper
         private ICollection<IReadOnlyEntity> ExecuteAndReadFromPreparedStatement(IReadOnlyEntity entity, ITransaction tx, IDbCommand cmd
             , Type childType)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(childType);
+            var entityInfo = CacheManager.GetEntityInfo(childType);
             ICollection<IColumn> childKeys = null;
             ICollection<IReadOnlyEntity> data = new List<IReadOnlyEntity>();
 
@@ -286,9 +286,9 @@ namespace DbGate.ErManagement.ErMapper
                         childKeys = entityInfo.GetKeys();
                     }
                     ITypeFieldValueList childTypeKeyList = new EntityTypeFieldValueList(childType);
-                    foreach (IColumn childKey in childKeys)
+                    foreach (var childKey in childKeys)
                     {
-                        Object value = DbLayer.DataManipulate().ReadFromResultSet(reader, childKey);
+                        var value = DbLayer.DataManipulate().ReadFromResultSet(reader, childKey);
                         childTypeKeyList.FieldValues.Add(new EntityFieldValue(value, childKey));
                     }
                     if (entity.Context.AlreadyInCurrentObjectGraph(childTypeKeyList))
@@ -297,7 +297,7 @@ namespace DbGate.ErManagement.ErMapper
                         continue;
                     }
 
-                    IReadOnlyEntity rodbClass = (IReadOnlyEntity)Activator.CreateInstance(childType);
+                    var rodbClass = (IReadOnlyEntity)Activator.CreateInstance(childType);
                     rodbClass.Context.CopyReferenceStoreFrom(entity);
                     rodbClass.Retrieve(reader, tx);
                     data.Add(rodbClass);
@@ -307,7 +307,7 @@ namespace DbGate.ErManagement.ErMapper
             }
             catch (Exception ex)
             {
-                string message = String.Format("SQL Exception while trying to read type {0} from result set",childType.FullName);
+                var message = String.Format("SQL Exception while trying to read type {0} from result set",childType.FullName);
                 throw new ReadFromResultSetException(message,ex);
             }
             finally
@@ -323,9 +323,9 @@ namespace DbGate.ErManagement.ErMapper
         {
             if (relation.FetchStrategy == FetchStrategy.Lazy)
             {
-                EntityInfo entityInfo = CacheManager.GetEntityInfo(entity);
-                PropertyInfo property = entityInfo.GetProperty(relation.AttributeName);
-                Object value = ReflectionUtils.GetValue(property, entity); ;
+                var entityInfo = CacheManager.GetEntityInfo(entity);
+                var property = entityInfo.GetProperty(relation.AttributeName);
+                var value = ReflectionUtils.GetValue(property, entity); ;
                
                 if (value == null)
                 {

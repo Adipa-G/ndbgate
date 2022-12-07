@@ -12,15 +12,12 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.From
 
         #region IAbstractFrom Members
 
-        public QueryFromExpressionType FromExpressionType
-        {
-            get { return QueryFromExpressionType.EntityType; }
-        }
+        public QueryFromExpressionType FromExpressionType => QueryFromExpressionType.EntityType;
 
         public string CreateSql(IDbLayer dbLayer, QueryBuildInfo buildInfo)
         {
-            EntityInfo entityInfo = CacheManager.GetEntityInfo(EntityType);
-            string sql = entityInfo.TableInfo.TableName;
+            var entityInfo = CacheManager.GetEntityInfo(EntityType);
+            var sql = entityInfo.TableInfo.TableName;
 
             if (!string.IsNullOrEmpty(Alias))
             {

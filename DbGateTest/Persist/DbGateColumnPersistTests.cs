@@ -3,78 +3,70 @@ using System.Data;
 using DbGate.Patch;
 using DbGate.Persist.Support.ColumnTest;
 using log4net;
-using NUnit.Framework;
+using Xunit;
 
 namespace DbGate.Persist
 {
-    [TestFixture]
-    public class DbGateColumnPersistTests :  AbstractDbGateTestBase
+    [Collection("Sequential")]
+    public class DbGateColumnPersistTests :  AbstractDbGateTestBase, IDisposable
     {
-        private const string DBName = "unit-testing-column-persist";
+        private const string DbName = "unit-testing-column-persist";
 
-        [OneTimeSetUp]
-        public static void Before()
+        public DbGateColumnPersistTests()
         {
             TestClass = typeof(DbGateColumnPersistTests);
-        }
-
-        [SetUp]
-        public void BeforeEach()
-        {
-            BeginInit(DBName);
-            TransactionFactory.DbGate.ClearCache();
+            BeginInit(DbName);
             TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
             TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.DoNotVerify;
         }
 
-        [TearDown]
-        public void AfterEach()
+        public void Dispose()
         {
-            CleanupDb(DBName);
-            FinalizeDb(DBName);
+            CleanupDb(DbName);
+            FinalizeDb(DbName);
         }
         
         private IDbConnection SetupTables()
         {
-            string sql = "Create table column_test_entity (\n" +
-                        "\tid_col Int NOT NULL,\n" +
-                        "\tlong_not_null Bigint NOT NULL,\n" +
-                        "\tlong_null Bigint,\n" +
-                        "\tboolean_not_null SmallInt NOT NULL,\n" +
-                        "\tboolean_null SmallInt,\n" +
-                        "\tchar_not_null Char(1) NOT NULL,\n" +
-                        "\tchar_null Char(1),\n" +
-                        "\tint_not_null Int NOT NULL,\n" +
-                        "\tint_null Int,\n" +
-                        "\tdate_not_null Date NOT NULL,\n" +
-                        "\tdate_null Date,\n" +
-                        "\tdouble_not_null Double NOT NULL,\n" +
-                        "\tdouble_null Double,\n" +
-                        "\tfloat_not_null Float NOT NULL,\n" +
-                        "\tfloat_null Float,\n" +
-                        "\ttimestamp_not_null Timestamp NOT NULL,\n" +
-                        "\ttimestamp_null Timestamp,\n" +
-                        "\tvarchar_not_null Varchar(20) NOT NULL,\n" +
-                        "\tvarchar_null Varchar(20),\n" +
-                         "\tguid_not_null Varchar(36) NOT NULL,\n" +
-                         "\tguid_null Varchar(36),\n" +
-                        " Primary Key (id_col))";
+            var sql = "Create table column_test_entity (\n" +
+                      "\tid_col Int NOT NULL,\n" +
+                      "\tlong_not_null Bigint NOT NULL,\n" +
+                      "\tlong_null Bigint,\n" +
+                      "\tboolean_not_null SmallInt NOT NULL,\n" +
+                      "\tboolean_null SmallInt,\n" +
+                      "\tchar_not_null Char(1) NOT NULL,\n" +
+                      "\tchar_null Char(1),\n" +
+                      "\tint_not_null Int NOT NULL,\n" +
+                      "\tint_null Int,\n" +
+                      "\tdate_not_null Date NOT NULL,\n" +
+                      "\tdate_null Date,\n" +
+                      "\tdouble_not_null Double NOT NULL,\n" +
+                      "\tdouble_null Double,\n" +
+                      "\tfloat_not_null Float NOT NULL,\n" +
+                      "\tfloat_null Float,\n" +
+                      "\ttimestamp_not_null Timestamp NOT NULL,\n" +
+                      "\ttimestamp_null Timestamp,\n" +
+                      "\tvarchar_not_null Varchar(20) NOT NULL,\n" +
+                      "\tvarchar_null Varchar(20),\n" +
+                      "\tguid_not_null Varchar(36) NOT NULL,\n" +
+                      "\tguid_null Varchar(36),\n" +
+                      " Primary Key (id_col))";
             
-            CreateTableFromSql(sql,DBName);
-            EndInit(DBName);
+            CreateTableFromSql(sql,DbName);
+            EndInit(DbName);
 
             return Connection;
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Insert_WithFieldsDifferentTypesWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                var transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityFields();
                 CreateEntityWithNonNullValues(entity);
 
@@ -96,19 +88,19 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Insert_WithExtsDifferentTypesWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                var transaction = CreateTransaction(connection);
 
-                Type type = typeof(ColumnTestEntityExts);
+                var type = typeof(ColumnTestEntityExts);
                 TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityExts();
                 CreateEntityWithNonNullValues(entity);
 
@@ -130,15 +122,15 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Insert_WithAttributesDifferentTypesWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                var transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityAttribute();
                 
                 CreateEntityWithNonNullValues(entity);
@@ -160,15 +152,15 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Insert_WithFieldsDifferentTypesWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                var transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityFields();
                 
                 CreateEntityWithNullValues(entity);
@@ -191,19 +183,19 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Insert_WithExtsDifferentTypesWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                var transaction = CreateTransaction(connection);
 
-                Type type = typeof(ColumnTestEntityExts);
+                var type = typeof(ColumnTestEntityExts);
                 TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
  
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityExts();
                 
                 CreateEntityWithNullValues(entity);
@@ -226,15 +218,15 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Insert_WithAttributesDifferentTypesWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                var transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityAttribute();
                 CreateEntityWithNullValues(entity);
 
@@ -256,15 +248,15 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Update_WithFieldsDifferentTypesStartWithoutNullEndWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                var transaction = CreateTransaction(connection);
 
-                int id =(int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id =(int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -293,19 +285,19 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Update_WithExtsDifferentTypesStartWithoutNullEndWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                 ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                 var transaction = CreateTransaction(connection);
 
-                Type type = typeof (ColumnTestEntityExts);
+                var type = typeof (ColumnTestEntityExts);
                 TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -334,15 +326,15 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Update_WithAttributesDifferentTypesStartWithoutNullEndWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                var transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityAttribute();
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -371,15 +363,15 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Update_WithFieldsDifferentTypesStartWithoutNullEndWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                var transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -408,19 +400,19 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Update_WithExtsDifferentTypesStartWithoutNullEndWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                 ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                 var transaction = CreateTransaction(connection);
 
-                Type type = typeof(ColumnTestEntityExts);
+                var type = typeof(ColumnTestEntityExts);
                 TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -449,15 +441,15 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Update_WithAttributesDifferentTypesStartWithoutNullEndWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                 ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                 var transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityAttribute();
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -486,15 +478,15 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Update_WithFieldsDifferentTypesStartWithNullEndWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                var transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -523,19 +515,19 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Update_WithExtsDifferentTypesStartWithNullEndWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                 ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                 var transaction = CreateTransaction(connection);
 
-                Type type = typeof(ColumnTestEntityExts);
+                var type = typeof(ColumnTestEntityExts);
                 TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -564,15 +556,15 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Update_WithAttributesDifferentTypesStartWithNullEndWithoutNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                 ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                 var transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityAttribute();
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -601,15 +593,15 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Update_WithFieldsDifferentTypesStartWithNullEndWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                 ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                 var transaction = CreateTransaction(connection);
 
-                int id =(int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id =(int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -638,19 +630,19 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Update_WithExtsDifferentTypesStartWithNullEndWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                 ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                 var transaction = CreateTransaction(connection);
 
-                Type type = typeof(ColumnTestEntityExts);
+                var type = typeof(ColumnTestEntityExts);
                 TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -679,15 +671,15 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Update_WithAttributesDifferentTypesStartWithNullEndWithNull_ShouldEqualWhenLoaded()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                var transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityAttribute();
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -716,15 +708,15 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Delete_WithFieldsDifferentTypesStartWithNullEndWithNull_ShouldDelete()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                 ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                 var transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -739,11 +731,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityFields();
-                bool  loaded = LoadEntityWithId(transaction,reLoadedEntity,id);
+                var  loaded = LoadEntityWithId(transaction,reLoadedEntity,id);
                 transaction.Commit();
                 connection.Close();
 
-                Assert.IsFalse(loaded);
+                Assert.False(loaded);
             }
             catch (System.Exception e)
             {
@@ -752,19 +744,19 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Delete_WithExtsDifferentTypesStartWithNullEndWithNull_ShouldDelete()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                var transaction = CreateTransaction(connection);
 
-                Type type = typeof(ColumnTestEntityExts);
+                var type = typeof(ColumnTestEntityExts);
                 TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityExts();
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -779,11 +771,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityExts();
-                bool loaded = LoadEntityWithId(transaction,reLoadedEntity,id);
+                var loaded = LoadEntityWithId(transaction,reLoadedEntity,id);
                 transaction.Commit();
                 connection.Close();
 
-                Assert.IsFalse(loaded);
+                Assert.False(loaded);
             }
             catch (System.Exception e)
             {
@@ -792,15 +784,15 @@ namespace DbGate.Persist
             }
         }
 
-        [Test]
+        [Fact]
         public void ColumnPersist_Delete_WithAttributesDifferentTypesStartWithNullEndWithNull_ShouldDelete()
         {
             try
             {
-                IDbConnection connection = SetupTables();
-                ITransaction transaction = CreateTransaction(connection);
+                var connection = SetupTables();
+                var transaction = CreateTransaction(connection);
 
-                int id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityAttribute();
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -815,11 +807,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityAttribute();
-                bool  loaded = LoadEntityWithId(transaction,reLoadedEntity,id);
+                var  loaded = LoadEntityWithId(transaction,reLoadedEntity,id);
                 transaction.Commit();
                 connection.Close();
 
-                Assert.IsFalse(loaded);
+                Assert.False(loaded);
             }
             catch (System.Exception e)
             {
@@ -830,18 +822,18 @@ namespace DbGate.Persist
 
         private bool LoadEntityWithId(ITransaction transaction, IColumnTestEntity loadEntity,int id)
         {
-            bool loaded = false;
+            var loaded = false;
 
-            IDbCommand cmd = transaction.CreateCommand();
+            var cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from column_test_entity where id_col = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Direction = ParameterDirection.Input;
             parameter.Value = id;
 
-            IDataReader dataReader = cmd.ExecuteReader();
+            var dataReader = cmd.ExecuteReader();
             if (dataReader.Read())
             {
                 loadEntity.Retrieve(dataReader, transaction);
@@ -949,26 +941,26 @@ namespace DbGate.Persist
 
         private void AssertTwoEntitiesEquals(IColumnTestEntity entityA, IColumnTestEntity entityB)
         {
-            Assert.AreEqual(entityA.IdCol,entityB.IdCol);
+            Assert.Equal(entityA.IdCol,entityB.IdCol);
 
-            Assert.AreEqual(entityA.CharNotNull,entityB.CharNotNull);
-            Assert.AreEqual(entityA.CharNull,entityB.CharNull);
-            Assert.AreEqual(entityA.DateNotNull,entityB.DateNotNull);
-            Assert.AreEqual(entityA.DateNull,entityB.DateNull);
-            Assert.AreEqual(entityA.DoubleNotNull,entityB.DoubleNotNull);
-            Assert.AreEqual(entityA.DoubleNull,entityB.DoubleNull);
-            Assert.AreEqual(entityA.FloatNotNull,entityB.FloatNotNull);
-            Assert.AreEqual(entityA.FloatNull,entityB.FloatNull);
-            Assert.AreEqual(entityA.IntNotNull,entityB.IntNotNull);
-            Assert.AreEqual(entityA.IntNull,entityB.IntNull);
-            Assert.AreEqual(entityA.LongNotNull,entityB.LongNotNull);
-            Assert.AreEqual(entityA.LongNull,entityB.LongNull);
-            Assert.AreEqual(entityA.TimestampNotNull,entityB.TimestampNotNull);
-            Assert.AreEqual(entityA.TimestampNull,entityB.TimestampNull);
-            Assert.AreEqual(entityA.VarcharNotNull,entityB.VarcharNotNull);
-            Assert.AreEqual(entityA.VarcharNull,entityB.VarcharNull);
-            Assert.AreEqual(entityA.GuidNotNull,entityB.GuidNotNull);
-            Assert.AreEqual(entityA.GuidNull,entityB.GuidNull);
+            Assert.Equal(entityA.CharNotNull,entityB.CharNotNull);
+            Assert.Equal(entityA.CharNull,entityB.CharNull);
+            Assert.Equal(entityA.DateNotNull,entityB.DateNotNull);
+            Assert.Equal(entityA.DateNull,entityB.DateNull);
+            Assert.Equal(entityA.DoubleNotNull,entityB.DoubleNotNull);
+            Assert.Equal(entityA.DoubleNull,entityB.DoubleNull);
+            Assert.Equal(entityA.FloatNotNull,entityB.FloatNotNull);
+            Assert.Equal(entityA.FloatNull,entityB.FloatNull);
+            Assert.Equal(entityA.IntNotNull,entityB.IntNotNull);
+            Assert.Equal(entityA.IntNull,entityB.IntNull);
+            Assert.Equal(entityA.LongNotNull,entityB.LongNotNull);
+            Assert.Equal(entityA.LongNull,entityB.LongNull);
+            Assert.Equal(entityA.TimestampNotNull,entityB.TimestampNotNull);
+            Assert.Equal(entityA.TimestampNull,entityB.TimestampNull);
+            Assert.Equal(entityA.VarcharNotNull,entityB.VarcharNotNull);
+            Assert.Equal(entityA.VarcharNull,entityB.VarcharNull);
+            Assert.Equal(entityA.GuidNotNull,entityB.GuidNotNull);
+            Assert.Equal(entityA.GuidNull,entityB.GuidNull);
         }
     }
 }

@@ -7,16 +7,16 @@ namespace DbGate
 {
     public class QueryJoin
     {
-        private static AbstractJoinFactory _factory;
+        private static AbstractJoinFactory factory;
 
         public static AbstractJoinFactory Factory
         {
-            set { _factory = value; }
+            set => factory = value;
         }
 
         public static IQueryJoin RawSql(string sql)
         {
-            var queryJoin = (AbstractSqlQueryJoin) _factory.CreateJoin(QueryJoinExpressionType.RawSql);
+            var queryJoin = (AbstractSqlQueryJoin) factory.CreateJoin(QueryJoinExpressionType.RawSql);
             queryJoin.Sql = sql;
             return queryJoin;
         }
@@ -88,7 +88,7 @@ namespace DbGate
 
         public static IQueryJoin EntityType(Type from, Type to, JoinExpr expr, QueryJoinType? joinType, string alias)
         {
-            var typeJoin = (AbstractTypeJoin) _factory.CreateJoin(QueryJoinExpressionType.Type);
+            var typeJoin = (AbstractTypeJoin) factory.CreateJoin(QueryJoinExpressionType.Type);
             typeJoin.TypeFrom = from;
             typeJoin.TypeTo = to;
             if (expr != null)

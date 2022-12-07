@@ -3,41 +3,33 @@ using System.Collections.Generic;
 using System.Data;
 using DbGate.Patch.Support.PatchTableDifferences;
 using log4net;
-using NUnit.Framework;
+using Xunit;
 
 namespace DbGate.Patch
 {
-    [TestFixture]
-    public class DbGatePatchTableDifferenceDbTests : AbstractDbGateTestBase
+    [Collection("Sequential")]
+    public class DbGatePatchTableDifferenceDbTests : AbstractDbGateTestBase, IDisposable
     {
-        private const string DBName = "unit-testing-metadata-table-difference";
+        private const string DbName = "unit-testing-metadata-table-difference";
 
-        [OneTimeSetUp]
-        public static void Before()
+        public DbGatePatchTableDifferenceDbTests()
         {
             TestClass = typeof(DbGatePatchTableDifferenceDbTests);
+            BeginInit(DbName);
         }
 
-        [SetUp]
-        public void BeforeEach()
+        public void Dispose()
         {
-            BeginInit(DBName);
-            TransactionFactory.DbGate.ClearCache();
+            CleanupDb(DbName);
+            FinalizeDb(DbName);
         }
 
-        [TearDown]
-        public void AfterEach()
-        {
-            CleanupDb(DBName);
-            FinalizeDb(DBName);
-        }
-
-        [Test]
+        [Fact]
         public void PatchDifference_PatchDB_WithTableColumnAdded_ShouldAddColumn()
         {
             try
             {
-                ITransaction transaction = TransactionFactory.CreateTransaction();
+                var transaction = TransactionFactory.CreateTransaction();
                 ICollection<Type> types = new List<Type>();
                 types.Add(typeof (ThreeColumnEntity));
                 TransactionFactory.DbGate.PatchDataBase(transaction, types, true);
@@ -49,9 +41,9 @@ namespace DbGate.Patch
                 TransactionFactory.DbGate.PatchDataBase(transaction, types, false);
                 transaction.Commit();
 
-                int id = 35;
+                var id = 35;
                 transaction = CreateTransaction(); 
-                FourColumnEntity columnEntity = CreateFourColumnEntity(id);
+                var columnEntity = CreateFourColumnEntity(id);
                 columnEntity.Persist(transaction);
                 columnEntity = LoadFourColumnEntityWithId(transaction, id);
                 transaction.Commit();
@@ -63,12 +55,12 @@ namespace DbGate.Patch
             }
         }
 
-        [Test]
+        [Fact]
         public void PatchDifference_PatchDB_WithTableColumnDeleted_ShouldDeleteColumn()
         {
             try
             {
-                ITransaction transaction = TransactionFactory.CreateTransaction(); 
+                var transaction = TransactionFactory.CreateTransaction(); 
                 ICollection<Type> types = new List<Type>();
                 types.Add(typeof (FourColumnEntity));
                 transaction.DbGate.PatchDataBase(transaction, types, true);
@@ -89,30 +81,26 @@ namespace DbGate.Patch
             }
         }
 
-        [Test]
+        [Fact]
         public void PatchDifference_PatchDB_WithTableColumnChanged_ShouldUpdateColumn()
         {
             try
             {
                 var longStr = new string('A', 220);
 
-                ITransaction transaction = TransactionFactory.CreateTransaction(); 
+                var transaction = TransactionFactory.CreateTransaction(); 
                 ICollection<Type> types = new List<Type>();
                 types.Add(typeof (ThreeColumnEntity));
                 transaction.DbGate.PatchDataBase(transaction, types, true);
                 transaction.Commit();
  
-                int id = 34;
+                var id = 34;
                 transaction = CreateTransaction(); 
-                ThreeColumnEntity columnEntity = CreateThreeColumnEntity(id);
+                var columnEntity = CreateThreeColumnEntity(id);
                 columnEntity.Name = longStr;
                 try
                 {
                     columnEntity.Persist(transaction);
-                }
-                catch (AssertionException)
-                {
-                    throw;
                 }
                 catch (System.Exception)
                 {
@@ -142,15 +130,15 @@ namespace DbGate.Patch
         {
             FourColumnEntity loadedEntity = null;
 
-            IDbCommand cmd = transaction.CreateCommand();
+            var cmd = transaction.CreateCommand();
             cmd.CommandText = "select * from table_change_test_entity where id_col = ?";
 
-            IDbDataParameter parameter = cmd.CreateParameter();
+            var parameter = cmd.CreateParameter();
             cmd.Parameters.Add(parameter);
             parameter.DbType = DbType.Int32;
             parameter.Value = id;
 
-            IDataReader rs = cmd.ExecuteReader();
+            var rs = cmd.ExecuteReader();
             if (rs.Read())
             {
                 loadedEntity = new FourColumnEntity();

@@ -11,7 +11,7 @@ namespace PerformanceTest
         public static void Main(string[] args)
         {
             new NDbGatePerformanceCounter(connectionString,5000).Start(1);   
-            new EFPerformanceCounter(connectionString,5000).Start(1);   
+            new EfPerformanceCounter(connectionString,5000).Start(1);   
         }
     }
 }
