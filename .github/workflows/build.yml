@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: code-coverage
-          path: TestResults/Index.html
+          path: "**/TestResults/Index.html"
       - run: echo "🍏 This job's status is ${{ job.status }}."
       
   publish-to-nuget:
