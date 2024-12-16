@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -8,6 +7,7 @@ using System.Reflection;
 using System.Threading;
 using log4net;
 using log4net.Core;
+using Microsoft.EntityFrameworkCore;
 using PerformanceTest.EF.Entities.Order;
 using PerformanceTest.EF.Entities.Product;
 
@@ -31,7 +31,11 @@ namespace PerformanceTest.EF
                 var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
                 log4net.Config.XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
 
-                Database.SetInitializer(new DropCreateDatabaseIfModelChanges<TestDbContext>());
+                TestDbContext context = new TestDbContext(connectionString);
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+                context.Database.Migrate();
+
                 LogManager.GetLogger(typeof(EfPerformanceCounter)).Info("Connecting to sql server for performance testing");
             }
             catch (Exception ex)
@@ -82,16 +86,15 @@ namespace PerformanceTest.EF
             {
                 var item = items[i];
                 var itemType = item.GetType();
-                if (itemType == typeof(Transaction))
+               
+                if (item is Product)
                 {
-                    var tx = (Transaction)item;
-                    foreach (var itemTx in tx.ItemTransactions)
-                    {
-                        ctx.Set(itemTx.Item.GetType()).Attach(itemTx.Item);
-                    }
+                    ctx.Products.Add((Product)item);
                 }
-
-                ctx.Set(item.GetType()).Add(item);
+                else if (itemType == typeof(Service))
+                {
+                    ctx.Services.Add((Service)item);
+                }
 
                 if (i % 100 == 0 || (i < items.Count - 1 && items[i].GetType() != items[i + 1].GetType()))
                 {
@@ -101,6 +104,32 @@ namespace PerformanceTest.EF
                 }
             }
 
+            ctx.SaveChanges();
+            ctx.Dispose();
+
+            ctx = new TestDbContext(connectionString);
+            for (var i = 0; i < items.Count; i++)
+            {
+                var item = items[i];
+                var itemType = item.GetType();
+                if (itemType == typeof(Transaction))
+                {
+                    var tx = (Transaction)item;
+
+                    foreach (var txItemTransaction in tx.ItemTransactions)
+                    {
+                        ctx.Items.Attach(txItemTransaction.Item);
+                    }
+                    ctx.Transactions.Add(tx);
+                }
+
+                if (i % 100 == 0 || (i < items.Count - 1 && items[i].GetType() != items[i + 1].GetType()))
+                {
+                    ctx.SaveChanges();
+                    ctx.Dispose();
+                    ctx = new TestDbContext(connectionString);
+                }
+            }
             ctx.SaveChanges();
             ctx.Dispose();
             sw.Stop();
@@ -127,11 +156,13 @@ namespace PerformanceTest.EF
                 {
                     var tx = (Transaction)item;
                     var loaded = ctx.Set<Transaction>()
-                        .Include(r => r.ItemTransactions.Select(itx => itx.ItemTransactionCharges))
+                        .Include(t => t.ItemTransactions)
+                        .ThenInclude(it => it.ItemTransactionCharges)
                         .Single(t => t.TransactionId == tx.TransactionId);
                     newList.Add(loaded);
                 }
-                else if (itemType == typeof(Service))
+                else 
+                if (itemType == typeof(Service))
                 {
                     var svc = (Service)item;
                     var loaded = ctx.Set<Service>().Single(t => t.ItemId == svc.ItemId);
@@ -177,7 +208,8 @@ namespace PerformanceTest.EF
                 {
                     var tx = (Transaction)item;
                     var loaded = ctx.Set<Transaction>()
-                        .Include(r => r.ItemTransactions.Select(itx => itx.ItemTransactionCharges))
+                        .Include(r => r.ItemTransactions)
+                        .ThenInclude(it => it.ItemTransactionCharges)
                         .Single(t => t.TransactionId == tx.TransactionId);
                     factory.Update(loaded);
                     newList.Add(loaded);
@@ -225,8 +257,8 @@ namespace PerformanceTest.EF
             for (var i = items.Count - 1; i >= 0; i--)
             {
                 var item = items[i];
-                ctx.Set(item.GetType()).Attach(item);
-                ctx.Set(item.GetType()).Remove(item);
+                ctx.Attach(item);
+                ctx.Remove(item);
 
                 if (i % 100 == 0)
                 {
