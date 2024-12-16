@@ -1,33 +1,53 @@
 ﻿using System;
 using System.Data.Common;
-using System.Data.Entity.Infrastructure.Interception;
 using System.Data.SqlClient;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace PerformanceTest.EF
 {
     public class InsertUpdateInterceptor : IDbCommandInterceptor
     {
-        public virtual void NonQueryExecuting(
-            DbCommand command, DbCommandInterceptionContext<int> interceptionContext)
+        public InterceptionResult<int> NonQueryExecuting(DbCommand command, CommandEventData eventData, InterceptionResult<int> result)
         {
             LogCommand(command);
+            return result;
         }
 
-        public virtual void ReaderExecuting(
-            DbCommand command, DbCommandInterceptionContext<DbDataReader> interceptionContext)
-        {
-            // this will capture all SELECT queries if you care about them..
-            // however it also captures INSERT statements as well 
-            LogCommand(command);
-        }
-
-        public virtual void ScalarExecuting(
-         DbCommand command, DbCommandInterceptionContext<object> interceptionContext)
+        public InterceptionResult<DbDataReader> ReaderExecuting(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result)
         {
             LogCommand(command);
+            return result;
         }
 
+        public InterceptionResult<object> ScalarExecuting(DbCommand command, CommandEventData eventData, InterceptionResult<object> result)
+        {
+            LogCommand(command);
+            return result;
+        }
+
+        public ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result,
+            CancellationToken cancellationToken = new CancellationToken())
+        {
+            LogCommand(command);
+            return new (result);
+        }
+
+        public ValueTask<InterceptionResult<object>> ScalarExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<object> result,
+            CancellationToken cancellationToken = new CancellationToken())
+        {
+            LogCommand(command);
+            return new(result);
+        }
+
+        public ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<int> result,
+            CancellationToken cancellationToken = new CancellationToken())
+        {
+            LogCommand(command);
+            return new(result);
+        }
 
         private void LogCommand(DbCommand dbCommand)
         {
@@ -74,24 +94,6 @@ namespace PerformanceTest.EF
             }
 
             return "(" + param.Size + ")";
-        }
-
-
-        // To implement the IDbCommandInterceptor interface you need to also implement these methods like so
-
-        public void NonQueryExecuted(
-            DbCommand command, DbCommandInterceptionContext<int> interceptionContext)
-        {
-        }
-
-        public void ReaderExecuted(
-            DbCommand command, DbCommandInterceptionContext<DbDataReader> interceptionContext)
-        {
-        }
-
-        public void ScalarExecuted(
-            DbCommand command, DbCommandInterceptionContext<object> interceptionContext)
-        {
         }
     }
 }

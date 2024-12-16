@@ -1,4 +1,6 @@
-﻿namespace PerformanceTest.EF.Entities.Product
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace PerformanceTest.EF.Entities.Product
 {
     public class Product : Item
     {

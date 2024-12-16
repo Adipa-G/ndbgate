@@ -2,7 +2,7 @@
 
 namespace PerformanceTest.EF.Entities.Product
 {
-    public abstract class Item
+    public class Item
     {
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int ItemId { get; set; }
