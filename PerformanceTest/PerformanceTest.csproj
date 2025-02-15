@@ -27,6 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Data\placeholder">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Data\Test.mdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
