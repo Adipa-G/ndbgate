@@ -82,7 +82,7 @@ namespace DbGate.Exception
             {
                 var entity = new EntityWithAllWrong(123);
                 var property = entity.GetType().GetProperty("IdCol");
-                ReflectionUtils.GetValue(property, entity);
+                ReflectionUtils.GetValue(entity.GetType(), property.Name, entity);
                 Assert.Fail("could invoke getter method");
             }
             catch (MethodInvocationException)
@@ -102,7 +102,7 @@ namespace DbGate.Exception
             {
                 var entity = new EntityWithAllWrong(123);
                 var property = entity.GetType().GetProperty("IdCol");
-                ReflectionUtils.SetValue(property, entity, 0);
+                ReflectionUtils.SetValue(entity.GetType(), property.Name, entity, 0);
                 Assert.Fail("could invoke setter method");
             }
             catch (MethodInvocationException)

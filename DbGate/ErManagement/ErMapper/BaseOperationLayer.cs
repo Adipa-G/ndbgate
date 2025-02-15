@@ -100,7 +100,7 @@ namespace DbGate.ErManagement.ErMapper
                 if (entityInfo.FindRelationColumnInfo(fieldValue.Column.AttributeName) == null)
                 {
                     var setter = entityInfo.GetProperty(fieldValue.Column.AttributeName);
-                    ReflectionUtils.SetValue(setter, roEntity, fieldValue.Value);
+                    ReflectionUtils.SetValue(entityInfo.EntityType, setter.Name, roEntity, fieldValue.Value);
                 }
             }
         }
@@ -216,7 +216,7 @@ namespace DbGate.ErManagement.ErMapper
 	                else if (matchColumn != null)
 	                {		                
                         var getter = entityInfo.GetProperty(matchColumn.AttributeName);
-	                    fieldValue = ReflectionUtils.GetValue(getter, entity);
+	                    fieldValue = ReflectionUtils.GetValue(entityInfo.EntityType, getter.Name, entity);
 	                }	
                     else
                     {
@@ -325,7 +325,7 @@ namespace DbGate.ErManagement.ErMapper
             {
                 var entityInfo = CacheManager.GetEntityInfo(entity);
                 var property = entityInfo.GetProperty(relation.AttributeName);
-                var value = ReflectionUtils.GetValue(property, entity); ;
+                var value = ReflectionUtils.GetValue(entityInfo.EntityType, property.Name, entity); 
                
                 if (value == null)
                 {

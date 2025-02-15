@@ -145,17 +145,17 @@ Inserting/ Quering/ Updating/ Deleting 5000 `Transaction` entities using EF (6.2
 
 #### Results (entities per second)
 
-##### EF (6.2)			
-	Insertion :	457			
-	Querying :  1300			
-	Update : 778			
-	Delete	: 900			
+##### EF (9)			
+	Insertion :	8549			
+	Querying :  6038			
+	Update : 4360			
+	Delete	: 5777			
 
 #### NDbGate
-	Insertion :	2100
-	Querying :	1200
-	Update : 1100
-	Delete : 1100
+	Insertion :	4055
+	Querying :	2716
+	Update : 2219
+	Delete : 2219
 
 ### License
 GNU GPL V3

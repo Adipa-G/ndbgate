@@ -16,7 +16,7 @@ namespace DbGate.ErManagement.ErMapper.Utils
         {
             var entityInfo = CacheManager.GetEntityInfo(rootEntity);
             var property = entityInfo.GetProperty(relation.AttributeName);
-            var value = ReflectionUtils.GetValue(property, rootEntity);
+            var value = ReflectionUtils.GetValue(entityInfo.EntityType, property.Name, rootEntity);
 
             ICollection<IEntity> treeEntities = new List<IEntity>();
             if (value is ICollection)
@@ -147,7 +147,7 @@ namespace DbGate.ErManagement.ErMapper.Utils
                         else
                         {
                             var getter = entityInfo.GetProperty(subLevelColumn.AttributeName);
-                            var value = ReflectionUtils.GetValue(getter, entity);
+                            var value = ReflectionUtils.GetValue(entityInfo.EntityType, getter.Name, entity);
 
                             entityFieldValues.Add(new EntityFieldValue(value, subLevelColumn));
                         }
