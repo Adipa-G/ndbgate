@@ -228,7 +228,7 @@ namespace DbGate.ErManagement.ErMapper
                 {
                     columnValue = column.SequenceGenerator.GetNextSequenceValue(tx);
                     var setter = entityType.GetProperty(column.AttributeName);
-                    ReflectionUtils.SetValue(setter,entity,columnValue);
+                    ReflectionUtils.SetValue(entityType, setter.Name, entity,columnValue);
                 }
                 else
                 {
@@ -417,7 +417,7 @@ namespace DbGate.ErManagement.ErMapper
                     var setter = parentEntityInfo.GetProperty(subLevelMatchedColumn);
                     foreach (IReadOnlyEntity dbObject in childObjects)
                     {
-                        ReflectionUtils.SetValue(setter, dbObject, parentFieldValue.Value);
+                        ReflectionUtils.SetValue(entityInfo.EntityType, setter.Name, dbObject, parentFieldValue.Value);
                     }
                 }
                 entityInfo = entityInfo.SuperEntityInfo;
@@ -520,7 +520,7 @@ namespace DbGate.ErManagement.ErMapper
                     }
 
                     var getter = entityInfo.GetProperty(subLevelColumn.AttributeName);
-                    var value = ReflectionUtils.GetValue(getter,entity);
+                    var value = ReflectionUtils.GetValue(entityInfo.EntityType, getter.Name,entity);
 
                     var fieldValue = entityContext.ChangeTracker.GetFieldValue(subLevelColumn.AttributeName);
                     var isMatch = (fieldValue != null && fieldValue.Value == value)

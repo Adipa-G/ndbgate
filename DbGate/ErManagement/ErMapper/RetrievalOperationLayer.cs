@@ -183,7 +183,7 @@ namespace DbGate.ErManagement.ErMapper
             var entityContext = parentRoEntity.Context;
 
             var property = entityInfo.GetProperty(relation.AttributeName);
-            var value = ReflectionUtils.GetValue(property,parentRoEntity);
+            var value = ReflectionUtils.GetValue(entityInfo.EntityType, property.Name,parentRoEntity);
             
             if (!lazy && relation.FetchStrategy == FetchStrategy.Lazy)
             {
@@ -221,7 +221,7 @@ namespace DbGate.ErManagement.ErMapper
                 {
                     genCollection.Add(serverRoDbClass);
                 }
-                ReflectionUtils.SetValue(property,parentRoEntity,genCollection);
+                ReflectionUtils.SetValue(entityInfo.EntityType, property.Name,parentRoEntity,genCollection);
             }
             else if (value != null
                     && ReflectionUtils.IsImplementInterface(property.PropertyType, typeof(ICollection<>)))
@@ -240,7 +240,7 @@ namespace DbGate.ErManagement.ErMapper
                     var singleRoDbClass = childEnumarator.Current;
                     if (property.PropertyType.IsAssignableFrom(singleRoDbClass.GetType()))
                     {
-                        ReflectionUtils.SetValue(property,parentRoEntity,singleRoDbClass);
+                        ReflectionUtils.SetValue(entityType, property.Name,parentRoEntity,singleRoDbClass);
                     }
                     else
                     {
@@ -283,7 +283,8 @@ namespace DbGate.ErManagement.ErMapper
                 proxy = proxyGenerator.CreateClassProxy(proxyType, new object[] {},
                                                          new ChildLoadInterceptor(this, parentRoEntity, type, tx, relation));
             }
-            ReflectionUtils.SetValue(property,parentRoEntity,proxy);
+
+            ReflectionUtils.SetValue(type, property.Name, parentRoEntity, proxy);
         }
     }
 }

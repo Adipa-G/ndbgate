@@ -81,30 +81,32 @@ namespace DbGate.ErManagement.ErMapper.Utils
             return false;
         }
 
-        public static Object GetValue(PropertyInfo property, Object target)
+        public static Object GetValue(Type entityType, string propertyName, Object target)
         {
             try
             {
-                return property.GetValue(target);
+                var accessor = Reflectless.Reflectless.GetPropertyGetAccessor(entityType, propertyName);
+                return accessor(target);
             }
             catch (Exception ex)
             {
                 var message = String.Format("Exception while trying get property {0} value of entity {1}"
-                                               , property.Name, target.GetType().FullName);
+                                               , propertyName, target.GetType().FullName);
                 throw new MethodInvocationException(message, ex);
             }
         }
 
-        public static void SetValue(PropertyInfo property, Object target, Object value)
+        public static void SetValue(Type entityType, string propertyName, Object target, Object value)
         {
             try
             {
-                property.SetValue(target, value);
+                var accessor = Reflectless.Reflectless.GetPropertySetAccessor(entityType, propertyName);
+                accessor(target, value);
             }
             catch (Exception ex)
             {
                 var message = String.Format("Exception while trying to set property {0} of entity {1}"
-                                               , property.Name, target.GetType().FullName);
+                                               , propertyName, target.GetType().FullName);
                 throw new MethodInvocationException(message, ex);
             }
         }
@@ -120,20 +122,6 @@ namespace DbGate.ErManagement.ErMapper.Utils
                 var message = String.Format("Exception while trying to create an instance of type {0}"
                                                , type.FullName);
                 throw new EntityInstantiationException(message, ex);
-            }
-        }
-
-        public static object GetFieldValue(FieldInfo field,object target)
-        {
-            try
-            {
-                var value = field.GetValue(target);
-                return value;
-            }
-            catch (Exception ex)
-            {
-                var message = string.Format("Exception while trying to extract field value of {0} of entity {1}",field,target.GetType().FullName);
-                throw new FieldValueExtractionException(message,ex);
             }
         }
 
