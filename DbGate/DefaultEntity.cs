@@ -1,5 +1,5 @@
-﻿using System.Data;
-using DbGate.ErManagement.ErMapper;
+﻿using DbGate.ErManagement.ErMapper;
+using System.Data;
 
 namespace DbGate
 {
@@ -16,7 +16,7 @@ namespace DbGate
 
         public void Persist(ITransaction tx)
         {
-            tx.DbGate.Save(this,tx);
+            tx.DbGate.Save(this, tx);
         }
 
         #endregion

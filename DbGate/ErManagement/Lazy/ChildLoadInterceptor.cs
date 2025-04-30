@@ -1,11 +1,11 @@
-﻿using System;
-using System.Data;
-using System.Reflection;
-using Castle.DynamicProxy;
+﻿using Castle.DynamicProxy;
 using DbGate.Caches;
 using DbGate.Caches.Impl;
 using DbGate.ErManagement.ErMapper;
 using DbGate.Utility;
+using System;
+using System.Data;
+using System.Reflection;
 
 namespace DbGate.ErManagement.Lazy
 {
@@ -60,9 +60,9 @@ namespace DbGate.ErManagement.Lazy
 
                 var entityInfo = CacheManager.GetEntityInfo(parentRoEntity);
                 var property = entityInfo.GetProperty(relation.AttributeName);
-                var objectToInvoke = property.GetValue(parentRoEntity, new object[] {});
+                var objectToInvoke = property.GetValue(parentRoEntity, new object[] { });
 
-                invocation.ReturnValue = invocation.Method.Invoke(objectToInvoke, new object[] {});
+                invocation.ReturnValue = invocation.Method.Invoke(objectToInvoke, new object[] { });
             }
             else
             {

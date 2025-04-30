@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using DbGate.ErManagement.ErMapper.Utils;
+﻿using DbGate.ErManagement.ErMapper.Utils;
+using System.Collections.Generic;
 
 namespace DbGate.Context.Impl
 {
@@ -25,7 +25,7 @@ namespace DbGate.Context.Impl
             {
                 if (OperationUtils.IsTypeKeyEquals(keys, existingEntity))
                 {
-                    return  existingEntity.Entity;
+                    return existingEntity.Entity;
                 }
             }
             return null;

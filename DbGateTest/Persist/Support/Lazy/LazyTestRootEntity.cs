@@ -17,19 +17,19 @@ namespace DbGate.Persist.Support.Lazy
         public virtual string Name { get; set; }
 
         [ForeignKeyInfo("fk_root2one2manyent",
-            typeof (LazyTestOne2ManyEntity),
-            new[] {"idCol"},
-            new[] {"idCol"},
+            typeof(LazyTestOne2ManyEntity),
+            new[] { "idCol" },
+            new[] { "idCol" },
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade,
             FetchStrategy = FetchStrategy.Lazy)]
         public virtual ICollection<LazyTestOne2ManyEntity> One2ManyEntities { get; set; }
 
         [ForeignKeyInfo("fk_root2one2oneent",
-            typeof (LazyTestOne2OneEntity),
-            new[] {"idCol"},
-            new[] {"idCol"},
-            UpdateRule = ReferentialRuleType.Restrict, 
+            typeof(LazyTestOne2OneEntity),
+            new[] { "idCol" },
+            new[] { "idCol" },
+            UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade,
             FetchStrategy = FetchStrategy.Lazy)]
         public virtual LazyTestOne2OneEntity One2OneEntity { get; set; }

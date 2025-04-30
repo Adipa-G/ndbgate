@@ -1,8 +1,8 @@
-﻿using System;
+﻿using DbGate.Patch.Support.PatchTableDifferences;
+using log4net;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using DbGate.Patch.Support.PatchTableDifferences;
-using log4net;
 using Xunit;
 
 namespace DbGate.Patch
@@ -31,18 +31,18 @@ namespace DbGate.Patch
             {
                 var transaction = TransactionFactory.CreateTransaction();
                 ICollection<Type> types = new List<Type>();
-                types.Add(typeof (ThreeColumnEntity));
+                types.Add(typeof(ThreeColumnEntity));
                 TransactionFactory.DbGate.PatchDataBase(transaction, types, true);
                 transaction.Commit();
 
-                transaction = CreateTransaction(); 
+                transaction = CreateTransaction();
                 types = new List<Type>();
-                types.Add(typeof (FourColumnEntity));
+                types.Add(typeof(FourColumnEntity));
                 TransactionFactory.DbGate.PatchDataBase(transaction, types, false);
                 transaction.Commit();
 
                 var id = 35;
-                transaction = CreateTransaction(); 
+                transaction = CreateTransaction();
                 var columnEntity = CreateFourColumnEntity(id);
                 columnEntity.Persist(transaction);
                 columnEntity = LoadFourColumnEntityWithId(transaction, id);
@@ -50,7 +50,7 @@ namespace DbGate.Patch
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGatePatchTableDifferenceDbTests)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGatePatchTableDifferenceDbTests)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -60,23 +60,23 @@ namespace DbGate.Patch
         {
             try
             {
-                var transaction = TransactionFactory.CreateTransaction(); 
+                var transaction = TransactionFactory.CreateTransaction();
                 ICollection<Type> types = new List<Type>();
-                types.Add(typeof (FourColumnEntity));
+                types.Add(typeof(FourColumnEntity));
                 transaction.DbGate.PatchDataBase(transaction, types, true);
                 transaction.Commit();
 
-                transaction = CreateTransaction(); 
+                transaction = CreateTransaction();
                 types = new List<Type>();
-                types.Add(typeof (ThreeColumnEntity));
+                types.Add(typeof(ThreeColumnEntity));
                 transaction.DbGate.PatchDataBase(transaction, types, false);
                 transaction.Commit();
- 
+
                 //Sqllite does not support dropping columns, so this test does not work
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGatePatchTableDifferenceDbTests)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGatePatchTableDifferenceDbTests)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -88,14 +88,14 @@ namespace DbGate.Patch
             {
                 var longStr = new string('A', 220);
 
-                var transaction = TransactionFactory.CreateTransaction(); 
+                var transaction = TransactionFactory.CreateTransaction();
                 ICollection<Type> types = new List<Type>();
-                types.Add(typeof (ThreeColumnEntity));
+                types.Add(typeof(ThreeColumnEntity));
                 transaction.DbGate.PatchDataBase(transaction, types, true);
                 transaction.Commit();
- 
+
                 var id = 34;
-                transaction = CreateTransaction(); 
+                transaction = CreateTransaction();
                 var columnEntity = CreateThreeColumnEntity(id);
                 columnEntity.Name = longStr;
                 try
@@ -106,14 +106,14 @@ namespace DbGate.Patch
                 {
                 }
 
-                transaction = CreateTransaction(); 
+                transaction = CreateTransaction();
                 types = new List<Type>();
-                types.Add(typeof (ThreeColumnTypeDifferentEntity));
+                types.Add(typeof(ThreeColumnTypeDifferentEntity));
                 transaction.DbGate.PatchDataBase(transaction, types, false);
                 transaction.Commit();
- 
+
                 id = 35;
-                transaction = CreateTransaction();  
+                transaction = CreateTransaction();
                 columnEntity = CreateThreeColumnEntity(id);
                 columnEntity.Name = longStr;
                 columnEntity.Persist(transaction);
@@ -121,7 +121,7 @@ namespace DbGate.Patch
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGatePatchTableDifferenceDbTests)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGatePatchTableDifferenceDbTests)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }

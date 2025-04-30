@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using DbGate.Persist.Support.FeatureIntegration.Product;
+using System.Collections.Generic;
 
 namespace DbGate.Persist.Support.FeatureIntegration.Order
 {
@@ -27,27 +27,27 @@ namespace DbGate.Persist.Support.FeatureIntegration.Order
         public int ItemId { get; set; }
 
         [ForeignKeyInfo("item_tx2item",
-            typeof (Item),
-            new[] {"itemId"},
-            new[] {"itemId"},
+            typeof(Item),
+            new[] { "itemId" },
+            new[] { "itemId" },
             NonIdentifyingRelation = true,
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public Item Item { get; set; }
 
         [ForeignKeyInfo("item_tx2tx_rev",
-            typeof (Transaction),
-            new[] {"transactionId"},
-            new[] {"transactionId"},
+            typeof(Transaction),
+            new[] { "transactionId" },
+            new[] { "transactionId" },
             ReverseRelation = true,
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public Transaction Transaction { get; set; }
 
         [ForeignKeyInfo("item_tx2tx_chg",
-            typeof (ItemTransactionCharge),
-            new[] {"transactionId", "indexNo"},
-            new[] {"transactionId", "indexNo"},
+            typeof(ItemTransactionCharge),
+            new[] { "transactionId", "indexNo" },
+            new[] { "transactionId", "indexNo" },
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public ICollection<ItemTransactionCharge> ItemTransactionCharges { get; set; }

@@ -1,7 +1,7 @@
-using System;
 using DbGate.Caches;
 using DbGate.Caches.Impl;
 using DbGate.ErManagement.Query;
+using System;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.From
 {

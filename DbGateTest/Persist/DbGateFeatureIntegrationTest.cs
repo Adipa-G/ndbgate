@@ -1,9 +1,9 @@
-using System;
-using System.Data;
 using DbGate.Persist.Support.FeatureIntegration.Order;
 using DbGate.Persist.Support.FeatureIntegration.Product;
 using DbGate.Utility;
 using log4net;
+using System;
+using System.Data;
 using Xunit;
 
 namespace DbGate.Persist
@@ -23,10 +23,10 @@ namespace DbGate.Persist
             CleanupDb(DbName);
             FinalizeDb(DbName);
         }
- 
+
         private IDbConnection SetupTables()
         {
-            RegisterClassForDbPatching(typeof (ItemTransaction),DbName);
+            RegisterClassForDbPatching(typeof(ItemTransaction), DbName);
             RegisterClassForDbPatching(typeof(ItemTransactionCharge), DbName);
             RegisterClassForDbPatching(typeof(Transaction), DbName);
             RegisterClassForDbPatching(typeof(Product), DbName);
@@ -46,7 +46,7 @@ namespace DbGate.Persist
                 var serviceId = 235;
 
                 var connection = SetupTables();
-                
+
                 var product = CreateDefaultProduct(connection, productId);
                 var service = CreateDefaultService(connection, serviceId);
                 var transaction = CreateDefaultTransaction(connection, transId, product, service);
@@ -61,7 +61,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateFeatureIntegrationTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateFeatureIntegrationTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }

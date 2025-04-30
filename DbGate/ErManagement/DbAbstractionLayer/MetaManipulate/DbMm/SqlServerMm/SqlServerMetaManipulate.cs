@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare;
+﻿using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Mappings;
 using DbGate.Exceptions;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
 {
@@ -167,9 +167,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
                             foreignKey = new MetaForeignKey();
                             foreignKey.Name = foreignKeyName;
                             foreignKey.ToTable = reader["ReferenceTableName"].ToString();
-                            foreignKey.UpdateRule = (ReferentialRuleType) 
+                            foreignKey.UpdateRule = (ReferentialRuleType)
                                 int.Parse(reader["updateAction"].ToString());
-                            foreignKey.DeleteRule = (ReferentialRuleType) 
+                            foreignKey.DeleteRule = (ReferentialRuleType)
                                 int.Parse(reader["deleteAction"].ToString());
                         }
 

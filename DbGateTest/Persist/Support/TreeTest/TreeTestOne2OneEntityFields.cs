@@ -15,7 +15,7 @@ namespace DbGate.Persist.Support.TreeTest
                 dbColumns.Add(new DefaultColumn("IdCol", true, false, ColumnType.Integer));
                 dbColumns.Add(new DefaultColumn("Name", ColumnType.Varchar));
 
-                map.Add(typeof (TreeTestOne2OneEntityFields), dbColumns);
+                map.Add(typeof(TreeTestOne2OneEntityFields), dbColumns);
                 return map;
             }
         }
@@ -25,7 +25,7 @@ namespace DbGate.Persist.Support.TreeTest
             get
             {
                 var map = new Dictionary<Type, ITable>();
-                map.Add(typeof (TreeTestOne2OneEntityFields), new DefaultTable("tree_test_one2one"));
+                map.Add(typeof(TreeTestOne2OneEntityFields), new DefaultTable("tree_test_one2one"));
                 return map;
             }
         }

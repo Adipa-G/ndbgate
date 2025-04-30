@@ -2,7 +2,7 @@
 
 namespace DbGate.Persist.Support.InheritanceTest
 {
-    public class InheritanceTestSubEntityBExt : InheritanceTestSuperEntityExt , IInheritanceTestSubEntityB
+    public class InheritanceTestSubEntityBExt : InheritanceTestSuperEntityExt, IInheritanceTestSubEntityB
     {
         public string NameB { get; set; }
 
@@ -12,12 +12,12 @@ namespace DbGate.Persist.Support.InheritanceTest
 
         public override void Persist(ITransaction tx)
         {
-            tx.DbGate.Save(this,tx);
+            tx.DbGate.Save(this, tx);
         }
 
         public override void Retrieve(IDataReader rs, ITransaction tx)
         {
-            tx.DbGate.Load(this,rs,tx);
+            tx.DbGate.Load(this, rs, tx);
         }
     }
 }

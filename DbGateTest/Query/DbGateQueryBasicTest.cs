@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using DbGate.ErManagement.Query;
 using DbGate.ErManagement.Query.Expr;
 using DbGate.Query.Support.BasicTest;
 using log4net;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using Xunit;
 
 namespace DbGate.Query
@@ -41,7 +41,7 @@ namespace DbGate.Query
                       "\tid_col Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            CreateTableFromSql(sql,DbName);
+            CreateTableFromSql(sql, DbName);
 
             sql = "Create table query_basic_details (\n" +
                   "\tname Varchar(20) NOT NULL,\n" +
@@ -90,22 +90,22 @@ namespace DbGate.Query
                 {
                     if (listItem is QueryBasicEntity)
                     {
-                        found = found || ((QueryBasicEntity) listItem).IdCol == id;
+                        found = found || ((QueryBasicEntity)listItem).IdCol == id;
                     }
                     else if (listItem is object[])
                     {
-                        var items = (object[]) listItem;
+                        var items = (object[])listItem;
                         foreach (var item in items)
                         {
                             if (item is int)
                             {
-                                found = found || ((int) item) == id;
+                                found = found || ((int)item) == id;
                             }
                         }
                     }
                     else
                     {
-                        found = found || ((int) listItem) == id;
+                        found = found || ((int)listItem) == id;
                     }
                 }
                 if (!found)
@@ -119,9 +119,9 @@ namespace DbGate.Query
 
         private void CreateTestData(ITransaction transaction)
         {
-            basicEntityIds = new[] {35, 45, 55, 65};
-            basicEntityNames = new[] {"Org-NameA", "Org-NameA", "Org-NameA", "Org-NameB"};
-            hasOverrideChildren = new[] {true, false, false, true};
+            basicEntityIds = new[] { 35, 45, 55, 65 };
+            basicEntityNames = new[] { "Org-NameA", "Org-NameA", "Org-NameA", "Org-NameB" };
+            hasOverrideChildren = new[] { true, false, false, true };
 
             basicEntities = new List<QueryBasicEntity>();
             detailedEntities = new List<QueryBasicDetailsEntity>();
@@ -185,9 +185,9 @@ namespace DbGate.Query
                 Assert.True(results.Count == 4);
                 foreach (var result in results)
                 {
-                    var resultArray = (object[]) result;
-                    var id = (int) resultArray[0];
-                    var name = (string) resultArray[1];
+                    var resultArray = (object[])result;
+                    var id = (int)resultArray[0];
+                    var name = (string)resultArray[1];
 
                     var entity = GetById(id);
                     Assert.Equal(entity.Name, name);
@@ -197,7 +197,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -236,7 +236,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -264,7 +264,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -292,7 +292,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -320,7 +320,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -337,7 +337,7 @@ namespace DbGate.Query
 
                 transaction = CreateTransaction(con);
                 var selectionQuery = new SelectionQuery()
-                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity),"qb1"))
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity), "qb1"))
                     .Select(QuerySelection.EntityType<QueryBasicEntity>());
 
                 var results = selectionQuery.ToList(transaction);
@@ -388,7 +388,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -418,9 +418,9 @@ namespace DbGate.Query
                 Assert.True(results.Count == 4);
                 foreach (var result in results)
                 {
-                    var resultArray = (object[]) result;
-                    var entity = (QueryBasicEntity) resultArray[0];
-                    var description = (string) resultArray[1];
+                    var resultArray = (object[])result;
+                    var entity = (QueryBasicEntity)resultArray[0];
+                    var description = (string)resultArray[1];
 
                     var detailsEntity = GetDescriptionForName(entity.Name);
                     Assert.Equal(detailsEntity.Description, description);
@@ -430,7 +430,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -448,7 +448,7 @@ namespace DbGate.Query
                 transaction = CreateTransaction(con);
                 var query = new SelectionQuery()
                     .From(QueryFrom.EntityType<QueryBasicEntity>("qb1"))
-                    .Select(QuerySelection.Field(typeof (QueryBasicEntity), "Name", "name1"));
+                    .Select(QuerySelection.Field(typeof(QueryBasicEntity), "Name", "name1"));
 
                 var results = query.ToList(transaction);
                 Assert.True(results.Count == 4);
@@ -456,14 +456,14 @@ namespace DbGate.Query
                 foreach (var result in results)
                 {
                     var name = result.ToString();
-                    Assert.True(basicEntityNames[index++].Equals(name));
+                    Assert.Equal(basicEntityNames[index++], name);
                 }
                 transaction.Commit();
                 con.Close();
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -489,7 +489,7 @@ namespace DbGate.Query
                 foreach (var result in results)
                 {
                     var name = result.ToString();
-                    Assert.True(basicEntityNames[index++].Equals(name));
+                    Assert.Equal(basicEntityNames[index++], name);
                 }
                 transaction.Commit();
                 con.Close();
@@ -522,7 +522,7 @@ namespace DbGate.Query
                 foreach (var result in results)
                 {
                     var name = result.ToString();
-                    Assert.True(basicEntityNames[index++].Equals(name));
+                    Assert.Equal(basicEntityNames[index++], name);
                 }
                 transaction.Commit();
                 con.Close();
@@ -566,7 +566,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -598,7 +598,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -616,7 +616,7 @@ namespace DbGate.Query
                 transaction = CreateTransaction(con);
                 var query = new SelectionQuery()
                     .From(QueryFrom.EntityType<QueryBasicEntity>("qb1"))
-                    .Select(QuerySelection.CustFunction<QueryBasicEntity>("COUNT",f => f.IdCol, "id_count"));
+                    .Select(QuerySelection.CustFunction<QueryBasicEntity>("COUNT", f => f.IdCol, "id_count"));
 
                 var results = query.ToList(transaction);
                 Assert.True(results.Count == 1);
@@ -630,7 +630,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -647,7 +647,7 @@ namespace DbGate.Query
 
                 transaction = CreateTransaction(con);
                 var selectionQuery = new SelectionQuery()
-                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity),"qb1"))
+                    .From(QueryFrom.EntityType(typeof(QueryBasicEntity), "qb1"))
                     .Select(QuerySelection.EntityType<QueryBasicEntity>());
 
                 var results = selectionQuery.ToList(transaction);
@@ -657,7 +657,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -701,11 +701,11 @@ namespace DbGate.Query
 
                 transaction = CreateTransaction(con);
                 var fromQuery = new SelectionQuery()
-                    .From(QueryFrom.EntityType< QueryBasicEntity>());
+                    .From(QueryFrom.EntityType<QueryBasicEntity>());
 
                 var selectionQuery = new SelectionQuery()
                     .From(QueryFrom.Query(fromQuery, "qb1"))
-                    .Select(QuerySelection.EntityType< QueryBasicEntity>());
+                    .Select(QuerySelection.EntityType<QueryBasicEntity>());
 
                 var results = selectionQuery.ToList(transaction);
                 HasIds(results, basicEntityIds);
@@ -714,7 +714,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -735,11 +735,11 @@ namespace DbGate.Query
                     .Select(QuerySelection.RawSql("name as name1"));
 
                 var fromDetails = new SelectionQuery()
-                    .From(QueryFrom.EntityType< QueryBasicDetailsEntity>())
+                    .From(QueryFrom.EntityType<QueryBasicDetailsEntity>())
                     .Select(QuerySelection.RawSql("name as name1"));
 
                 var selectionQuery = new SelectionQuery()
-                    .From(QueryFrom.QueryUnion(true, new[] {fromBasic, fromDetails}))
+                    .From(QueryFrom.QueryUnion(true, new[] { fromBasic, fromDetails }))
                     .Select(QuerySelection.RawSql("name1"));
 
                 var results = selectionQuery.ToList(transaction);
@@ -750,12 +750,12 @@ namespace DbGate.Query
                     var name = result.ToString();
                     if (index < 4)
                     {
-                        Assert.True(basicEntityNames[index++].Equals(name));
+                        Assert.Equal(basicEntityNames[index++], name);
                     }
                     else
                     {
                         var detailsEntity = detailedEntities.ToArray()[index++ - 4];
-                        Assert.True(detailsEntity.Name.Equals(name));
+                        Assert.Equal(detailsEntity.Name, name);
                     }
                 }
                 transaction.Commit();
@@ -763,7 +763,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -792,7 +792,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -822,7 +822,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -852,7 +852,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -882,7 +882,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -912,7 +912,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -942,7 +942,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -972,7 +972,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1002,7 +1002,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1032,7 +1032,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1066,7 +1066,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1096,7 +1096,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1126,7 +1126,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1159,7 +1159,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1195,7 +1195,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1231,7 +1231,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1263,7 +1263,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1297,7 +1297,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1331,7 +1331,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1364,7 +1364,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1400,7 +1400,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1420,7 +1420,7 @@ namespace DbGate.Query
                     .From(QueryFrom.RawSql("query_basic qb1"))
                     .Join(QueryJoin.RawSql("inner join query_basic_details qbd1 on qb1.name = qbd1.name"))
                     .OrderBy(QueryOrderBy.RawSql("qb1.name"))
-                    .Select(QuerySelection.EntityType(typeof (QueryBasicEntity)));
+                    .Select(QuerySelection.EntityType(typeof(QueryBasicEntity)));
 
                 var results = selectionQuery.ToList(transaction);
                 HasIds(results, basicEntityIds);
@@ -1429,7 +1429,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1457,7 +1457,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1485,7 +1485,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1513,7 +1513,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1538,13 +1538,13 @@ namespace DbGate.Query
 
 
                 var results = selectionQuery.ToList(transaction);
-                Assert.Equal(4,results.Count);
+                Assert.Equal(4, results.Count);
                 transaction.Commit();
                 con.Close();
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1572,7 +1572,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1600,7 +1600,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1629,7 +1629,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1659,7 +1659,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1687,7 +1687,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -1716,11 +1716,12 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
 
+        [Fact]
         public void QueryBasic_OrderBy_WithExpressionDesc_ShouldSelectOrdered()
         {
             try
@@ -1744,7 +1745,7 @@ namespace DbGate.Query
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateQueryBasicTest)).Fatal(e.Message, e);
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }

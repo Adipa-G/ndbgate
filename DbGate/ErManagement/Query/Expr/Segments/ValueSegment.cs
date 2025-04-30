@@ -1,5 +1,5 @@
-using System;
 using DbGate.Exceptions;
+using System;
 
 namespace DbGate.ErManagement.Query.Expr.Segments
 {

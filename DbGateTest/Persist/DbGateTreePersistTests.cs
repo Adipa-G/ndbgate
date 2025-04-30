@@ -1,8 +1,8 @@
-﻿using System;
+﻿using DbGate.Persist.Support.TreeTest;
+using log4net;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using DbGate.Persist.Support.TreeTest;
-using log4net;
 using Xunit;
 
 namespace DbGate.Persist
@@ -33,17 +33,17 @@ namespace DbGate.Persist
 
         private void RegisterForExternal()
         {
-            var objType = typeof (TreeTestRootEntityExt);
+            var objType = typeof(TreeTestRootEntityExt);
             TransactionFactory.DbGate.RegisterEntity(objType,
                                                       TreeTestExtFactory.GetTableInfo(objType),
                                                       TreeTestExtFactory.GetFieldInfo(objType));
 
-            objType = typeof (TreeTestOne2ManyEntityExt);
+            objType = typeof(TreeTestOne2ManyEntityExt);
             TransactionFactory.DbGate.RegisterEntity(objType,
                                                       TreeTestExtFactory.GetTableInfo(objType),
                                                       TreeTestExtFactory.GetFieldInfo(objType));
 
-            objType = typeof (TreeTestOne2OneEntityExt);
+            objType = typeof(TreeTestOne2OneEntityExt);
             TransactionFactory.DbGate.RegisterEntity(objType,
                                                       TreeTestExtFactory.GetTableInfo(objType),
                                                       TreeTestExtFactory.GetFieldInfo(objType));
@@ -55,7 +55,7 @@ namespace DbGate.Persist
                       "\tid_col Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            CreateTableFromSql(sql,DbName);
+            CreateTableFromSql(sql, DbName);
 
             sql = "Create table tree_test_one2many (\n" +
                   "\tid_col Int NOT NULL,\n" +
@@ -69,7 +69,7 @@ namespace DbGate.Persist
                   "\tname Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col))";
             CreateTableFromSql(sql, DbName);
-            
+
             EndInit(DbName);
             return Connection;
         }
@@ -81,7 +81,7 @@ namespace DbGate.Persist
             {
                 var con = SetupTables();
                 var transaction = CreateTransaction(con);
-                
+
                 var id = 35;
                 var rootEntity = CreateFullObjectTree(id, TypeAttribute);
                 rootEntity.Persist(transaction);
@@ -97,7 +97,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateTreePersistTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(DbGateTreePersistTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -125,7 +125,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateTreePersistTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(DbGateTreePersistTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -137,7 +137,7 @@ namespace DbGate.Persist
             {
                 var con = SetupTables();
                 var transaction = CreateTransaction(con);
-               
+
                 RegisterForExternal();
 
                 var id = 35;
@@ -156,7 +156,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateTreePersistTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(DbGateTreePersistTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -258,7 +258,7 @@ namespace DbGate.Persist
             {
                 var con = SetupTables();
                 var transaction = CreateTransaction(con);
-               
+
                 var id = 35;
                 var rootEntity = CreateFullObjectTree(id, TypeAttribute);
                 rootEntity.Persist(transaction);
@@ -291,7 +291,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateTreePersistTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(DbGateTreePersistTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -336,7 +336,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateTreePersistTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(DbGateTreePersistTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -383,7 +383,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateTreePersistTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(DbGateTreePersistTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -422,7 +422,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateTreePersistTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(DbGateTreePersistTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -461,7 +461,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateTreePersistTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(DbGateTreePersistTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -502,7 +502,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateTreePersistTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(DbGateTreePersistTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -555,7 +555,7 @@ namespace DbGate.Persist
             entity = (type == TypeAttribute)
                          ? new TreeTestRootEntityAttributes()
                          : (type == TypeField)
-                               ? (ITreeTestRootEntity) new TreeTestRootEntityFields()
+                               ? (ITreeTestRootEntity)new TreeTestRootEntityFields()
                                : new TreeTestRootEntityExt();
             entity.IdCol = id;
             entity.Name = "root";
@@ -564,7 +564,7 @@ namespace DbGate.Persist
             one2OneEntity = (type == TypeAttribute)
                                 ? new TreeTestOne2OneEntityAttributes()
                                 : (type == TypeField)
-                                      ? (ITreeTestOne2OneEntity) new TreeTestOne2OneEntityFields()
+                                      ? (ITreeTestOne2OneEntity)new TreeTestOne2OneEntityFields()
                                       : new TreeTestOne2OneEntityExt();
             one2OneEntity.IdCol = id;
             one2OneEntity.Name = "one2one";
@@ -574,7 +574,7 @@ namespace DbGate.Persist
             one2ManyEntity = (type == TypeAttribute)
                                  ? new TreeTestOne2ManyEntityAttributes()
                                  : (type == TypeField)
-                                       ? (ITreeTestOne2ManyEntity) new TreeTestOne2ManyEntityFields()
+                                       ? (ITreeTestOne2ManyEntity)new TreeTestOne2ManyEntityFields()
                                        : new TreeTestOne2ManyEntityExt();
             one2ManyEntity.IdCol = id;
             one2ManyEntity.IndexNo = 0;

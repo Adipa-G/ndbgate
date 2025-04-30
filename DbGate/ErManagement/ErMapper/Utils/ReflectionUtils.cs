@@ -1,8 +1,8 @@
-﻿using System;
+﻿using DbGate.Exceptions.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
-using DbGate.Exceptions.Common;
 
 namespace DbGate.ErManagement.ErMapper.Utils
 {

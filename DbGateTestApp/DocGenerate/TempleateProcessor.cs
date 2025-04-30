@@ -16,7 +16,7 @@ namespace DbGateTestApp.DocGenerate
         {
             var templateText = File.ReadAllText(templatePath);
 
-            var pattern = string.Format(@"(<\s*{0}\s*>)([^<]*)(<\/\s*{0}\s*>)",WikiBlockTag);
+            var pattern = string.Format(@"(<\s*{0}\s*>)([^<]*)(<\/\s*{0}\s*>)", WikiBlockTag);
             var match = Regex.Match(templateText, pattern);
             while (match.Success)
             {

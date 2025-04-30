@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using DbGate;
+﻿using DbGate;
 using PerformanceTest.NDbGate.Entities.Order;
 using PerformanceTest.NDbGate.Entities.Product;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PerformanceTest.NDbGate
 {
@@ -11,7 +11,7 @@ namespace PerformanceTest.NDbGate
     {
         private readonly Random random = new Random();
 
-        public IList<IEntity> Generate(int seed,int txCount,int productsOrServicesPerTx)
+        public IList<IEntity> Generate(int seed, int txCount, int productsOrServicesPerTx)
         {
             var list = new List<IEntity>();
             var productIds = new List<int>();
@@ -110,7 +110,7 @@ namespace PerformanceTest.NDbGate
                     for (var i = 0; i < itemTransactions.Length; i++)
                     {
                         var itemTx = itemTransactions.ToArray()[i];
-                        itemTx.Item = itemTransactions[itemTransactions.Length -1 - i].Item;
+                        itemTx.Item = itemTransactions[itemTransactions.Length - 1 - i].Item;
 
                         foreach (var chg in itemTx.ItemTransactionCharges)
                         {
@@ -118,7 +118,7 @@ namespace PerformanceTest.NDbGate
                         }
                     }
                 }
-            }  
+            }
         }
     }
 }

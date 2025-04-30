@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures;
+using System.Collections.Generic;
 using System.Linq;
-using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
 {
@@ -84,13 +84,13 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
                 var requiredColumns = new List<IMetaItem>();
                 var comparedColumns = new List<MetaComparisonColumnGroup>();
 
-                existingColumns.AddRange(((MetaTable) tableGroup.ExistingItem).Columns.Cast<IMetaItem>());
-                requiredColumns.AddRange(((MetaTable) tableGroup.RequiredItem).Columns.Cast<IMetaItem>());
+                existingColumns.AddRange(((MetaTable)tableGroup.ExistingItem).Columns.Cast<IMetaItem>());
+                requiredColumns.AddRange(((MetaTable)tableGroup.RequiredItem).Columns.Cast<IMetaItem>());
 
                 var compared = Compare(metaManipulate, existingColumns, requiredColumns);
                 foreach (var columnComparison in compared)
                 {
-                    comparedColumns.Add((MetaComparisonColumnGroup) columnComparison);
+                    comparedColumns.Add((MetaComparisonColumnGroup)columnComparison);
                 }
                 tableGroup.Columns = comparedColumns;
             }
@@ -103,15 +103,15 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
 
                 if (tableGroup.ExistingItem != null)
                 {
-                    existingForeignKeys.AddRange((((MetaTable) tableGroup.ExistingItem).ForeignKeys.Cast<IMetaItem>()));
+                    existingForeignKeys.AddRange((((MetaTable)tableGroup.ExistingItem).ForeignKeys.Cast<IMetaItem>()));
                 }
-                requiredForeignKeys.AddRange(((MetaTable) tableGroup.RequiredItem).ForeignKeys.Cast<IMetaItem>());
+                requiredForeignKeys.AddRange(((MetaTable)tableGroup.RequiredItem).ForeignKeys.Cast<IMetaItem>());
 
                 var compared = Compare(metaManipulate, existingForeignKeys,
                                                                      requiredForeignKeys);
                 foreach (var columnComparison in compared)
                 {
-                    comparedForeignKeys.Add((MetaComparisonForeignKeyGroup) columnComparison);
+                    comparedForeignKeys.Add((MetaComparisonForeignKeyGroup)columnComparison);
                 }
                 tableGroup.ForeignKeys = comparedForeignKeys;
             }
@@ -123,21 +123,21 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
                 var comparedPrimaryKey = new List<MetaComparisonPrimaryKeyGroup>();
 
                 if (tableGroup.ExistingItem != null
-                    && ((MetaTable) tableGroup.ExistingItem).PrimaryKey != null)
+                    && ((MetaTable)tableGroup.ExistingItem).PrimaryKey != null)
                 {
-                    existingPrimaryKey.Add(((MetaTable) tableGroup.ExistingItem).PrimaryKey);
+                    existingPrimaryKey.Add(((MetaTable)tableGroup.ExistingItem).PrimaryKey);
                 }
                 if (tableGroup.RequiredItem != null
-                    && ((MetaTable) tableGroup.RequiredItem).PrimaryKey != null)
+                    && ((MetaTable)tableGroup.RequiredItem).PrimaryKey != null)
                 {
-                    requiredPrimaryKey.Add(((MetaTable) tableGroup.RequiredItem).PrimaryKey);
+                    requiredPrimaryKey.Add(((MetaTable)tableGroup.RequiredItem).PrimaryKey);
                 }
 
                 var compared = Compare(metaManipulate, existingPrimaryKey,
                                                                      requiredPrimaryKey);
                 foreach (var columnComparison in compared)
                 {
-                    comparedPrimaryKey.Add((MetaComparisonPrimaryKeyGroup) columnComparison);
+                    comparedPrimaryKey.Add((MetaComparisonPrimaryKeyGroup)columnComparison);
                 }
                 if (comparedPrimaryKey.Count > 0)
                 {

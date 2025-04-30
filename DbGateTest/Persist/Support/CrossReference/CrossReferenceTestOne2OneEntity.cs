@@ -10,9 +10,9 @@ namespace DbGate.Persist.Support.CrossReference
         public string Name { get; set; }
 
         [ForeignKeyInfo("fk_one2oneent2root",
-            typeof (CrossReferenceTestRootEntity),
-            new[] {"idCol"},
-            new[] {"idCol"},
+            typeof(CrossReferenceTestRootEntity),
+            new[] { "idCol" },
+            new[] { "idCol" },
             ReverseRelation = true,
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]

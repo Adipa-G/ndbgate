@@ -1,8 +1,8 @@
+using DbGate.Caches;
+using DbGate.ErManagement.DbAbstractionLayer;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using DbGate.Caches;
-using DbGate.ErManagement.DbAbstractionLayer;
 
 namespace DbGate.ErManagement.ErMapper
 {
@@ -11,25 +11,25 @@ namespace DbGate.ErManagement.ErMapper
         private readonly RetrievalOperationLayer retrievalOperationLayer;
         private readonly PersistOperationLayer persistOperationLayer;
 
-        public PersistRetrievalLayer(IDbLayer dbLayer,IDbGateStatistics statistics,IDbGateConfig config)
+        public PersistRetrievalLayer(IDbLayer dbLayer, IDbGateStatistics statistics, IDbGateConfig config)
         {
-            retrievalOperationLayer = new RetrievalOperationLayer(dbLayer,statistics,config);
-            persistOperationLayer = new PersistOperationLayer(dbLayer,statistics,config);
+            retrievalOperationLayer = new RetrievalOperationLayer(dbLayer, statistics, config);
+            persistOperationLayer = new PersistOperationLayer(dbLayer, statistics, config);
         }
 
-        public void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, ITransaction tx) 
+        public void Load(IReadOnlyEntity readOnlyEntity, IDataReader reader, ITransaction tx)
         {
             retrievalOperationLayer.Load(readOnlyEntity, reader, tx);
         }
 
         public void Save(IEntity entity, ITransaction tx)
         {
-            persistOperationLayer.Save(entity,tx);
+            persistOperationLayer.Save(entity, tx);
         }
 
         public ICollection<Object> Select(ISelectionQuery query, ITransaction tx)
         {
-            return retrievalOperationLayer.Select(query,tx);
+            return retrievalOperationLayer.Select(query, tx);
         }
 
         public void ClearCache()

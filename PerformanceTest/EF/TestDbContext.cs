@@ -43,9 +43,9 @@ namespace PerformanceTest.EF
         public DbSet<Service> Services { get; set; }
 
         public DbSet<Transaction> Transactions { get; set; }
-        
+
         public DbSet<ItemTransaction> ItemTransactions { get; set; }
-        
+
         public DbSet<ItemTransactionCharge> ItemTransactionCharges { get; set; }
     }
 }

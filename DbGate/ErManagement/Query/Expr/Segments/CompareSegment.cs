@@ -5,11 +5,11 @@ namespace DbGate.ErManagement.Query.Expr.Segments
     public class CompareSegment : BaseSegment
     {
         private readonly CompareSegmentMode mode;
-	  		
-	  	public CompareSegment(CompareSegmentMode mode)
-	  	{
-	  		this.mode = mode;
-	  	}
+
+        public CompareSegment(CompareSegmentMode mode)
+        {
+            this.mode = mode;
+        }
 
         public CompareSegmentMode Mode => mode;
 
@@ -18,8 +18,8 @@ namespace DbGate.ErManagement.Query.Expr.Segments
         public ISegment Left { get; set; }
 
         public ISegment Right { get; set; }
-	  	
-	  	public override ISegment Add(ISegment segment)
+
+        public override ISegment Add(ISegment segment)
         {
             switch (segment.SegmentType)
             {
@@ -37,7 +37,7 @@ namespace DbGate.ErManagement.Query.Expr.Segments
                     }
                     return this;
                 case SegmentType.Group:
-                    var groupFunctionSegment = (GroupFunctionSegment) segment;
+                    var groupFunctionSegment = (GroupFunctionSegment)segment;
                     if (groupFunctionSegment.SegmentToGroup == null)
                     {
                         if (Right != null && Right.SegmentType == SegmentType.Field)
@@ -53,7 +53,7 @@ namespace DbGate.ErManagement.Query.Expr.Segments
                     }
                     else
                     {
-                        if (Left == null 
+                        if (Left == null
                             && !(Mode == CompareSegmentMode.Exists || Mode == CompareSegmentMode.NotExists))
                         {
                             Left = segment;

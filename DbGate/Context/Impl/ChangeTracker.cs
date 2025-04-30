@@ -41,8 +41,8 @@ namespace DbGate.Context.Impl
                 tmpList.AddRange(childEntityRelationKeys);
                 tmpList.Add(list);
 
-                childEntityRelationKeys = new ReadOnlyCollection<ITypeFieldValueList>(tmpList);    
-            }  
+                childEntityRelationKeys = new ReadOnlyCollection<ITypeFieldValueList>(tmpList);
+            }
         }
 
         public void AddFields(ICollection<EntityFieldValue> fieldValues)

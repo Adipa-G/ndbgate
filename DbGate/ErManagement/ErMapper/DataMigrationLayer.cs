@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using DbGate.Caches;
 using DbGate.Caches.Impl;
 using DbGate.ErManagement.DbAbstractionLayer;
@@ -13,6 +9,10 @@ using DbGate.ErManagement.ErMapper.Utils;
 using DbGate.Exceptions.Migration;
 using DbGate.Utility;
 using log4net;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 
 namespace DbGate.ErManagement.ErMapper
 {
@@ -22,14 +22,14 @@ namespace DbGate.ErManagement.ErMapper
         private readonly IDbGateStatistics statistics;
         private readonly IDbGateConfig config;
 
-        public DataMigrationLayer(IDbLayer dbLayer,IDbGateStatistics statistics,IDbGateConfig config)
+        public DataMigrationLayer(IDbLayer dbLayer, IDbGateStatistics statistics, IDbGateConfig config)
         {
             this.dbLayer = dbLayer;
             this.statistics = statistics;
             this.config = config;
         }
 
-        public void PatchDataBase(ITransaction tx, ICollection<Type> entityTypes,bool dropAll)
+        public void PatchDataBase(ITransaction tx, ICollection<Type> entityTypes, bool dropAll)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace DbGate.ErManagement.ErMapper
                     CacheManager.Register(entityType);
                 }
 
-                var metaManipulate =  dbLayer.MetaManipulate(tx);
+                var metaManipulate = dbLayer.MetaManipulate(tx);
                 var existingItems = metaManipulate.GetMetaData(tx);
                 var requiredItems = CreateMetaItemsFromEntityTypes(entityTypes);
 
@@ -46,8 +46,8 @@ namespace DbGate.ErManagement.ErMapper
 
                 if (dropAll)
                 {
-                    var groupExisting = CompareUtility.Compare(metaManipulate,existingItems,new List<IMetaItem>());
-                    var groupRequired = CompareUtility.Compare(metaManipulate,new List<IMetaItem>(), requiredItems);
+                    var groupExisting = CompareUtility.Compare(metaManipulate, existingItems, new List<IMetaItem>());
+                    var groupRequired = CompareUtility.Compare(metaManipulate, new List<IMetaItem>(), requiredItems);
 
                     var queryHoldersExisting = new List<MetaQueryHolder>();
                     foreach (var comparisonGroup in groupExisting)
@@ -64,11 +64,11 @@ namespace DbGate.ErManagement.ErMapper
                     queryHoldersRequired.Sort();
 
                     queryHolders.AddRange(queryHoldersExisting);
-                    queryHolders.AddRange(queryHoldersRequired);    
+                    queryHolders.AddRange(queryHoldersRequired);
                 }
                 else
                 {
-                    var groups = CompareUtility.Compare(metaManipulate,existingItems,requiredItems);
+                    var groups = CompareUtility.Compare(metaManipulate, existingItems, requiredItems);
                     foreach (var comparisonGroup in groups)
                     {
                         queryHolders.AddRange(dbLayer.MetaManipulate(tx).CreateDbPathSql(comparisonGroup));
@@ -81,7 +81,7 @@ namespace DbGate.ErManagement.ErMapper
                     if (holder.QueryString == null)
                         continue;
 
-                    Logger.GetLogger( config.LoggerName).Debug(holder.QueryString);
+                    Logger.GetLogger(config.LoggerName).Debug(holder.QueryString);
 
                     var cmd = tx.CreateCommand();
                     cmd.CommandText = holder.QueryString;
@@ -93,8 +93,8 @@ namespace DbGate.ErManagement.ErMapper
             }
             catch (Exception e)
             {
-                Logger.GetLogger( config.LoggerName).Fatal(e.Message,e);
-                throw new MetaDataException(e.Message,e);
+                Logger.GetLogger(config.LoggerName).Fatal(e.Message, e);
+                throw new MetaDataException(e.Message, e);
             }
         }
 
@@ -152,14 +152,14 @@ namespace DbGate.ErManagement.ErMapper
                         filteredRelations.Add(reversed);
                     }
                 }
-                
-                retItems.Add(CreateTable(entityInfo.EntityType,dbColumns, filteredRelations));
+
+                retItems.Add(CreateTable(entityInfo.EntityType, dbColumns, filteredRelations));
                 entityInfo = entityInfo.SuperEntityInfo;
             }
             return retItems;
         }
 
-        private static IMetaItem CreateTable(Type type,IEnumerable<IColumn> dbColumns,IEnumerable<IRelation> dbRelations)
+        private static IMetaItem CreateTable(Type type, IEnumerable<IColumn> dbColumns, IEnumerable<IRelation> dbRelations)
         {
             var table = new MetaTable();
             var entityInfo = CacheManager.GetEntityInfo(type);
@@ -186,7 +186,7 @@ namespace DbGate.ErManagement.ErMapper
                 {
                     var fromCol = entityInfo.FindColumnByAttribute(mapping.FromField).ColumnName;
                     var toCol = relatedEntityInfo.FindColumnByAttribute(mapping.ToField).ColumnName;
-                    foreignKey.ColumnMappings.Add(new MetaForeignKeyColumnMapping(fromCol,toCol));
+                    foreignKey.ColumnMappings.Add(new MetaForeignKeyColumnMapping(fromCol, toCol));
                 }
                 foreignKey.DeleteRule = relation.DeleteRule;
                 foreignKey.UpdateRule = relation.UpdateRule;
@@ -210,4 +210,3 @@ namespace DbGate.ErManagement.ErMapper
         }
     }
 }
-

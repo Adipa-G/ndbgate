@@ -1,36 +1,36 @@
-﻿using System.Collections.Generic;
+﻿using DbGate.ErManagement.ErMapper;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
-using DbGate.ErManagement.ErMapper;
 
 namespace DbGate.ErManagement.Query
 {
-    public class SelectionQuery : Query , ISelectionQuery
+    public class SelectionQuery : Query, ISelectionQuery
     {
         public ICollection<object> ToList(ITransaction tx)
         {
             return tx.DbGate.Select(this, tx);
         }
-        
-     	public ISelectionQuery Distinct()
+
+        public ISelectionQuery Distinct()
         {
-			Structure.Distinct = true;
-			return this;
+            Structure.Distinct = true;
+            return this;
         }
 
-		public ISelectionQuery Fetch(long records)
+        public ISelectionQuery Fetch(long records)
         {
-			Structure.Fetch = records;
-			return this;
+            Structure.Fetch = records;
+            return this;
         }
 
-		public ISelectionQuery Skip(long records)
+        public ISelectionQuery Skip(long records)
         {
-			Structure.Skip = records;
-			return this;
+            Structure.Skip = records;
+            return this;
         }
 
-		public ISelectionQuery From(IQueryFrom queryFrom)
+        public ISelectionQuery From(IQueryFrom queryFrom)
         {
             return (ISelectionQuery)base.From(queryFrom);
         }

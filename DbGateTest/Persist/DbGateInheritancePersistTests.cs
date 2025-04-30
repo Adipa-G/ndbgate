@@ -1,7 +1,7 @@
-﻿using System;
-using System.Data;
-using DbGate.Persist.Support.InheritanceTest;
+﻿using DbGate.Persist.Support.InheritanceTest;
 using log4net;
+using System;
+using System.Data;
 using Xunit;
 
 namespace DbGate.Persist
@@ -29,15 +29,15 @@ namespace DbGate.Persist
             CleanupDb(DbName);
             FinalizeDb(DbName);
         }
-        
+
         private IDbConnection SetupTables()
         {
             var sql = "Create table inheritance_test_super (\n" +
                       "\tid_col Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            CreateTableFromSql(sql,DbName);
-            
+            CreateTableFromSql(sql, DbName);
+
             sql = "Create table inheritance_test_suba (\n" +
                   "\tid_col Int NOT NULL,\n" +
                   "\tname_a Varchar(20) NOT NULL,\n" +
@@ -75,22 +75,22 @@ namespace DbGate.Persist
             }
             catch (System.Exception ex)
             {
-                LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Fatal("Exception during test cleanup.", ex);
+                LogManager.GetLogger(typeof(DbGateInheritancePersistTests)).Fatal("Exception during test cleanup.", ex);
             }
         }
 
 
         private void RegisterForExternal()
         {
-            var objType = typeof (InheritanceTestSuperEntityExt);
+            var objType = typeof(InheritanceTestSuperEntityExt);
             TransactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableInfo(objType),
                                                       InheritanceTestExtFactory.GetFieldInfo(objType));
 
-            objType = typeof (InheritanceTestSubEntityAExt);
+            objType = typeof(InheritanceTestSubEntityAExt);
             TransactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableInfo(objType),
                                                       InheritanceTestExtFactory.GetFieldInfo(objType));
 
-            objType = typeof (InheritanceTestSubEntityBExt);
+            objType = typeof(InheritanceTestSubEntityBExt);
             TransactionFactory.DbGate.RegisterEntity(objType, InheritanceTestExtFactory.GetTableInfo(objType),
                                                       InheritanceTestExtFactory.GetFieldInfo(objType));
         }
@@ -100,9 +100,9 @@ namespace DbGate.Persist
         {
             try
             {
-                var types = new[] {TypeAttribute, TypeExternal, TypeField};
-                var idAs = new[] {35, 45, 55};
-                var idBs = new[] {36, 46, 56};
+                var types = new[] { TypeAttribute, TypeExternal, TypeField };
+                var idAs = new[] { 35, 45, 55 };
+                var idBs = new[] { 36, 46, 56 };
 
                 var connection = SetupTables();
 
@@ -115,15 +115,15 @@ namespace DbGate.Persist
                     switch (type)
                     {
                         case TypeAttribute:
-                            LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
+                            LogManager.GetLogger(typeof(DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Insert_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With attributes");
                             break;
                         case TypeExternal:
-                            LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
+                            LogManager.GetLogger(typeof(DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Insert_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With externals");
                             break;
                         case TypeField:
-                            LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
+                            LogManager.GetLogger(typeof(DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Insert_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With fields");
                             break;
                     }
@@ -159,7 +159,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(DbGateInheritancePersistTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -169,9 +169,9 @@ namespace DbGate.Persist
         {
             try
             {
-                var types = new[] {TypeAttribute, TypeExternal, TypeField};
-                var idAs = new[] {35, 45, 55};
-                var idBs = new[] {36, 46, 56};
+                var types = new[] { TypeAttribute, TypeExternal, TypeField };
+                var idAs = new[] { 35, 45, 55 };
+                var idBs = new[] { 36, 46, 56 };
 
                 var connection = SetupTables();
 
@@ -184,15 +184,15 @@ namespace DbGate.Persist
                     switch (type)
                     {
                         case TypeAttribute:
-                            LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
+                            LogManager.GetLogger(typeof(DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Update_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With attributes");
                             break;
                         case TypeExternal:
-                            LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
+                            LogManager.GetLogger(typeof(DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Update_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With externals");
                             break;
                         case TypeField:
-                            LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
+                            LogManager.GetLogger(typeof(DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Update_WithAllModesWithBothSubClasses_ShouldEqualWhenLoaded With fields");
                             break;
                     }
@@ -246,7 +246,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(DbGateInheritancePersistTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -256,9 +256,9 @@ namespace DbGate.Persist
         {
             try
             {
-                var types = new[] {TypeAttribute, TypeExternal, TypeField};
-                var idAs = new[] {35, 45, 55};
-                var idBs = new[] {36, 46, 56};
+                var types = new[] { TypeAttribute, TypeExternal, TypeField };
+                var idAs = new[] { 35, 45, 55 };
+                var idBs = new[] { 36, 46, 56 };
 
                 var connection = SetupTables();
 
@@ -271,15 +271,15 @@ namespace DbGate.Persist
                     switch (type)
                     {
                         case TypeAttribute:
-                            LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
+                            LogManager.GetLogger(typeof(DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Delete_WithAllModesWithBothSubClasses_ShouldDelete With attributes");
                             break;
                         case TypeExternal:
-                            LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
+                            LogManager.GetLogger(typeof(DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Delete_WithAllModesWithBothSubClasses_ShouldDelete With externals");
                             break;
                         case TypeField:
-                            LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Info(
+                            LogManager.GetLogger(typeof(DbGateInheritancePersistTests)).Info(
                                 "Inheritance_Delete_WithAllModesWithBothSubClasses_ShouldDelete With fields");
                             break;
                     }
@@ -340,7 +340,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof (DbGateInheritancePersistTests)).Fatal("Exception during test", e);
+                LogManager.GetLogger(typeof(DbGateInheritancePersistTests)).Fatal("Exception during test", e);
                 Assert.Fail(e.Message);
             }
         }
@@ -455,7 +455,7 @@ namespace DbGate.Persist
             entity = (type == TypeAttribute)
                          ? new InheritanceTestSubEntityAAttribute()
                          : (type == TypeField)
-                               ? (IInheritanceTestSubEntityA) new InheritanceTestSubEntityAFields()
+                               ? (IInheritanceTestSubEntityA)new InheritanceTestSubEntityAFields()
                                : new InheritanceTestSubEntityAExt();
             entity.IdCol = id;
             entity.Name = "typeA-name";
@@ -470,7 +470,7 @@ namespace DbGate.Persist
             entity = (type == TypeAttribute)
                          ? new InheritanceTestSubEntityBAttributes()
                          : (type == TypeField)
-                               ? (IInheritanceTestSubEntityB) new InheritanceTestSubEntityBFields()
+                               ? (IInheritanceTestSubEntityB)new InheritanceTestSubEntityBFields()
                                : new InheritanceTestSubEntityBExt();
             entity.IdCol = id;
             entity.Name = "typeB-name";
@@ -485,7 +485,7 @@ namespace DbGate.Persist
             entity = (type == TypeAttribute)
                          ? new InheritanceTestSubEntityAAttribute()
                          : (type == TypeField)
-                               ? (IInheritanceTestSubEntityA) new InheritanceTestSubEntityAFields()
+                               ? (IInheritanceTestSubEntityA)new InheritanceTestSubEntityAFields()
                                : new InheritanceTestSubEntityAExt();
             return entity;
         }
@@ -496,7 +496,7 @@ namespace DbGate.Persist
             entity = (type == TypeAttribute)
                          ? new InheritanceTestSubEntityBAttributes()
                          : (type == TypeField)
-                               ? (IInheritanceTestSubEntityB) new InheritanceTestSubEntityBFields()
+                               ? (IInheritanceTestSubEntityB)new InheritanceTestSubEntityBFields()
                                : new InheritanceTestSubEntityBExt();
             return entity;
         }
@@ -510,13 +510,13 @@ namespace DbGate.Persist
                 && entityB is IInheritanceTestSubEntityA)
             {
                 result &=
-                    ((IInheritanceTestSubEntityA) entityA).NameA.Equals(((IInheritanceTestSubEntityA) entityB).NameA);
+                    ((IInheritanceTestSubEntityA)entityA).NameA.Equals(((IInheritanceTestSubEntityA)entityB).NameA);
             }
             else if (entityA is IInheritanceTestSubEntityB
                      && entityB is IInheritanceTestSubEntityB)
             {
                 result &=
-                    ((IInheritanceTestSubEntityB) entityA).NameB.Equals(((IInheritanceTestSubEntityB) entityB).NameB);
+                    ((IInheritanceTestSubEntityB)entityA).NameB.Equals(((IInheritanceTestSubEntityB)entityB).NameB);
             }
             else
             {

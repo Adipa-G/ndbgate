@@ -1,8 +1,8 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using log4net;
 
 namespace DbGate.Utility
 {
@@ -30,24 +30,24 @@ namespace DbGate.Utility
                     {
                         if (value is ICollection)
                         {
-                            var enumerable = (ICollection) value;
+                            var enumerable = (ICollection)value;
                             foreach (var o in enumerable)
                             {
                                 if (o is IClientEntity)
                                 {
-                                    SetStatus((IClientEntity) o, status);
+                                    SetStatus((IClientEntity)o, status);
                                 }
                             }
                         }
                         else if (value is IClientEntity)
                         {
-                            SetStatus((IClientEntity) value, status);
+                            SetStatus((IClientEntity)value, status);
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    LogManager.GetLogger(typeof (StatusManager)).Fatal(
+                    LogManager.GetLogger(typeof(StatusManager)).Fatal(
                         "Exception occured while trying to update status", e);
                 }
             }
@@ -63,7 +63,7 @@ namespace DbGate.Utility
 
             if (obO is ICollection)
             {
-                var enumerable = (ICollection) obO;
+                var enumerable = (ICollection)obO;
                 foreach (var o in enumerable)
                 {
                     modified = IsModified(o);
@@ -80,7 +80,7 @@ namespace DbGate.Utility
 
             if ((obO is IClientEntity))
             {
-                var dbClass = (IClientEntity) obO;
+                var dbClass = (IClientEntity)obO;
 
                 modified = dbClass.Status == EntityStatus.Deleted
                            || dbClass.Status == EntityStatus.New
@@ -101,7 +101,7 @@ namespace DbGate.Utility
                         {
                             if (value is ICollection)
                             {
-                                var enumerable = (ICollection) value;
+                                var enumerable = (ICollection)value;
                                 foreach (var o in enumerable)
                                 {
                                     modified = IsModified(o);
@@ -123,7 +123,7 @@ namespace DbGate.Utility
                     }
                     catch (Exception e)
                     {
-                        LogManager.GetLogger(typeof (StatusManager)).Fatal(
+                        LogManager.GetLogger(typeof(StatusManager)).Fatal(
                             "Exception occured while trying to check if modified", e);
                     }
                 }
@@ -147,26 +147,26 @@ namespace DbGate.Utility
                     {
                         if (value is IList)
                         {
-                            var enumerable = (IList) value;
+                            var enumerable = (IList)value;
                             foreach (var o in enumerable)
                             {
                                 if (o is IClientEntity)
                                 {
-                                    childList.Add((IClientEntity) o);
+                                    childList.Add((IClientEntity)o);
                                 }
                             }
                             enumerable.Clear();
                         }
                         else if (value is IClientEntity)
                         {
-                            childList.Add((IClientEntity) value);
+                            childList.Add((IClientEntity)value);
                             propertyInfo.SetValue(clientEntity, null, null);
                         }
                     }
                 }
                 catch (Exception e)
                 {
-                    LogManager.GetLogger(typeof (StatusManager)).Fatal(
+                    LogManager.GetLogger(typeof(StatusManager)).Fatal(
                         "Exception occured while trying to retrieve child objects", e);
                 }
             }

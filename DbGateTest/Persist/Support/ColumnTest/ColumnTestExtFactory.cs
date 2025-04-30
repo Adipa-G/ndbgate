@@ -9,7 +9,7 @@ namespace DbGate.Persist.Support.ColumnTest
         {
             var dbColumns = new List<IField>();
 
-            if (type == typeof (ColumnTestEntityExts))
+            if (type == typeof(ColumnTestEntityExts))
             {
                 dbColumns.Add(new DefaultColumn("IdCol", "id_col", true, ColumnType.Integer, true,
                                                 new PrimaryKeyGenerator()));
@@ -41,7 +41,7 @@ namespace DbGate.Persist.Support.ColumnTest
         public static ITable GetTableInfo(Type type)
         {
             ITable table = null;
-            if (type == typeof (ColumnTestEntityExts))
+            if (type == typeof(ColumnTestEntityExts))
             {
                 table = new DefaultTable("column_test_entity");
             }

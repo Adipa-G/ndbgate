@@ -1,6 +1,6 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Data;
-using log4net;
 
 namespace DbGate.Utility
 {
@@ -19,7 +19,7 @@ namespace DbGate.Utility
                 }
                 catch (Exception e)
                 {
-                    LogManager.GetLogger(typeof (DbMgtUtility)).Fatal("Exception during closing connection", e);
+                    LogManager.GetLogger(typeof(DbMgtUtility)).Fatal("Exception during closing connection", e);
                 }
             }
         }
@@ -52,7 +52,7 @@ namespace DbGate.Utility
                 }
                 catch (Exception e)
                 {
-                    LogManager.GetLogger(typeof (DbMgtUtility)).Fatal("Exception during cancelling dbcpmmand", e);
+                    LogManager.GetLogger(typeof(DbMgtUtility)).Fatal("Exception during cancelling dbcpmmand", e);
                 }
             }
         }
@@ -67,7 +67,7 @@ namespace DbGate.Utility
                 }
                 catch (Exception e)
                 {
-                    LogManager.GetLogger(typeof (DbMgtUtility)).Fatal("Exception during closing data reader", e);
+                    LogManager.GetLogger(typeof(DbMgtUtility)).Fatal("Exception during closing data reader", e);
                 }
             }
         }

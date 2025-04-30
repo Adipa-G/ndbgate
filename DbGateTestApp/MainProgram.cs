@@ -1,5 +1,5 @@
-﻿using System.Threading;
-using DbGateTestApp.DocGenerate;
+﻿using DbGateTestApp.DocGenerate;
+using System.Threading;
 
 namespace DbGateTestApp
 {

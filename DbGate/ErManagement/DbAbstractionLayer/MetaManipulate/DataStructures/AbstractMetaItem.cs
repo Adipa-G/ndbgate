@@ -28,7 +28,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures
             if (this == o) return true;
             if (!(o is AbstractMetaItem)) return false;
 
-            var that = (AbstractMetaItem) o;
+            var that = (AbstractMetaItem)o;
 
             if (itemType != that.itemType) return false;
             if (!name.Equals(that.name, StringComparison.OrdinalIgnoreCase)) return false;

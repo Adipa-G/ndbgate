@@ -1,9 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Reflection;
-using System.Text;
 using Castle.DynamicProxy;
 using DbGate.Caches;
 using DbGate.Caches.Impl;
@@ -18,6 +12,12 @@ using DbGate.Exceptions.Common;
 using DbGate.Exceptions.Retrival;
 using DbGate.Utility;
 using log4net;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Reflection;
+using System.Text;
 
 namespace DbGate.ErManagement.ErMapper
 {
@@ -25,46 +25,46 @@ namespace DbGate.ErManagement.ErMapper
     {
         private ProxyGenerator proxyGenerator;
 
-        public RetrievalOperationLayer(IDbLayer dbLayer,IDbGateStatistics statistics, IDbGateConfig config)
-            : base(dbLayer,statistics, config)
+        public RetrievalOperationLayer(IDbLayer dbLayer, IDbGateStatistics statistics, IDbGateConfig config)
+            : base(dbLayer, statistics, config)
         {
             proxyGenerator = new ProxyGenerator();
         }
 
-		public ICollection<Object> Select (ISelectionQuery query, ITransaction tx)
-		{
-			IDataReader rs = null;
-			try 
-			{
-				var logSb = new StringBuilder ();
-				var showQuery = Config.ShowQueries;
-				var buildInfo = DbLayer.DataManipulate ().ProcessQuery (null,query.Structure);
-				var execInfo = buildInfo.ExecInfo;
-				
-				if (showQuery) 
-				{
-					logSb.Append (execInfo.Sql);
-					foreach (var param in execInfo.Params) 
-					{
-						logSb.Append (" ,").Append ("Param").Append (param.Index).Append ("=").Append (param.Value);
-					}
-					Logger.GetLogger(Config.LoggerName).Debug(logSb.ToString());
-				}
-		
-				rs = DbLayer.DataManipulate().CreateResultSet(tx, execInfo);
+        public ICollection<Object> Select(ISelectionQuery query, ITransaction tx)
+        {
+            IDataReader rs = null;
+            try
+            {
+                var logSb = new StringBuilder();
+                var showQuery = Config.ShowQueries;
+                var buildInfo = DbLayer.DataManipulate().ProcessQuery(null, query.Structure);
+                var execInfo = buildInfo.ExecInfo;
 
-                IList<Object> retList = new List<Object> ();
-				var selections = query.Structure.SelectList;
+                if (showQuery)
+                {
+                    logSb.Append(execInfo.Sql);
+                    foreach (var param in execInfo.Params)
+                    {
+                        logSb.Append(" ,").Append("Param").Append(param.Index).Append("=").Append(param.Value);
+                    }
+                    Logger.GetLogger(Config.LoggerName).Debug(logSb.ToString());
+                }
+
+                rs = DbLayer.DataManipulate().CreateResultSet(tx, execInfo);
+
+                IList<Object> retList = new List<Object>();
+                var selections = query.Structure.SelectList;
                 var selectionCount = selections.Count;
 
-				while (rs.Read()) 
-				{
-					var count = 0;
-				    
-				    object rowObject = selectionCount > 1 ? new object[selectionCount] : null;
-					foreach (var selection in selections) 
-					{
-						var loaded = ((IAbstractSelection)selection).Retrieve (rs,tx,buildInfo);
+                while (rs.Read())
+                {
+                    var count = 0;
+
+                    object rowObject = selectionCount > 1 ? new object[selectionCount] : null;
+                    foreach (var selection in selections)
+                    {
+                        var loaded = ((IAbstractSelection)selection).Retrieve(rs, tx, buildInfo);
                         if (selectionCount > 1)
                         {
                             ((object[])rowObject)[count++] = loaded;
@@ -73,22 +73,22 @@ namespace DbGate.ErManagement.ErMapper
                         {
                             rowObject = loaded;
                         }
-					}
+                    }
                     retList.Add(rowObject);
-				}
-		
-				return retList;
-			} 
-			catch (Exception e) 
-			{
-				Logger.GetLogger(Config.LoggerName).Error(e.Message, e);
-				throw new RetrievalException (e.Message, e);
-			} 
-			finally 
-			{
-				DbMgtUtility.Close (rs);
-			}
-		}
+                }
+
+                return retList;
+            }
+            catch (Exception e)
+            {
+                Logger.GetLogger(Config.LoggerName).Error(e.Message, e);
+                throw new RetrievalException(e.Message, e);
+            }
+            finally
+            {
+                DbMgtUtility.Close(rs);
+            }
+        }
 
         public void Load(IReadOnlyEntity roEntity, IDataReader reader, ITransaction tx)
         {
@@ -104,7 +104,7 @@ namespace DbGate.ErManagement.ErMapper
             }
             catch (Exception e)
             {
-                Logger.GetLogger( Config.LoggerName).Fatal(e.Message, e);
+                Logger.GetLogger(Config.LoggerName).Fatal(e.Message, e);
                 throw new RetrievalException(e.Message, e);
             }
         }
@@ -141,10 +141,10 @@ namespace DbGate.ErManagement.ErMapper
                             throw new NoMatchingRecordFoundForSuperClassException(message);
                         }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-                        var message = String.Format("SQL Exception while trying to read from table {0}",tableName);
-                        throw new ReadFromResultSetException(message,ex);
+                        var message = String.Format("SQL Exception while trying to read from table {0}", tableName);
+                        throw new ReadFromResultSetException(message, ex);
                     }
                     finally
                     {
@@ -172,19 +172,19 @@ namespace DbGate.ErManagement.ErMapper
             var dbRelations = entityInfo.Relations;
             foreach (var relation in dbRelations)
             {
-                LoadChildrenFromRelation(entity, type, tx, relation,false);
+                LoadChildrenFromRelation(entity, type, tx, relation, false);
             }
         }
 
         public void LoadChildrenFromRelation(IReadOnlyEntity parentRoEntity, Type entityType, ITransaction tx
-            , IRelation relation,bool lazy)
+            , IRelation relation, bool lazy)
         {
             var entityInfo = CacheManager.GetEntityInfo(entityType);
             var entityContext = parentRoEntity.Context;
 
             var property = entityInfo.GetProperty(relation.AttributeName);
-            var value = ReflectionUtils.GetValue(entityInfo.EntityType, property.Name,parentRoEntity);
-            
+            var value = ReflectionUtils.GetValue(entityInfo.EntityType, property.Name, parentRoEntity);
+
             if (!lazy && relation.FetchStrategy == FetchStrategy.Lazy)
             {
                 CreateProxy(parentRoEntity, entityType, tx, relation, value, property);
@@ -221,7 +221,7 @@ namespace DbGate.ErManagement.ErMapper
                 {
                     genCollection.Add(serverRoDbClass);
                 }
-                ReflectionUtils.SetValue(entityInfo.EntityType, property.Name,parentRoEntity,genCollection);
+                ReflectionUtils.SetValue(entityInfo.EntityType, property.Name, parentRoEntity, genCollection);
             }
             else if (value != null
                     && ReflectionUtils.IsImplementInterface(property.PropertyType, typeof(ICollection<>)))
@@ -240,12 +240,12 @@ namespace DbGate.ErManagement.ErMapper
                     var singleRoDbClass = childEnumarator.Current;
                     if (property.PropertyType.IsAssignableFrom(singleRoDbClass.GetType()))
                     {
-                        ReflectionUtils.SetValue(entityType, property.Name,parentRoEntity,singleRoDbClass);
+                        ReflectionUtils.SetValue(entityType, property.Name, parentRoEntity, singleRoDbClass);
                     }
                     else
                     {
                         var message = singleRoDbClass.GetType().FullName + " is not matching the getter " + property.Name;
-                        Logger.GetLogger( Config.LoggerName).Fatal(message);
+                        Logger.GetLogger(Config.LoggerName).Fatal(message);
                         throw new NoSetterFoundToSetChildObjectListException(message);
                     }
                 }
@@ -270,17 +270,17 @@ namespace DbGate.ErManagement.ErMapper
             }
 
             Object proxy = null;
-            if (ReflectionUtils.IsImplementInterface(property.PropertyType, typeof (ICollection<>)))
+            if (ReflectionUtils.IsImplementInterface(property.PropertyType, typeof(ICollection<>)))
             {
                 var generic = proxyType.GetGenericArguments()[0];
-                var genericType = typeof (ICollection<>).MakeGenericType(new Type[] {generic});
+                var genericType = typeof(ICollection<>).MakeGenericType(new Type[] { generic });
                 proxy = proxyGenerator.CreateInterfaceProxyWithTarget(genericType, value,
                                                                        new ChildLoadInterceptor(this, parentRoEntity, type, tx,
                                                                                                 relation));
             }
             else
             {
-                proxy = proxyGenerator.CreateClassProxy(proxyType, new object[] {},
+                proxy = proxyGenerator.CreateClassProxy(proxyType, new object[] { },
                                                          new ChildLoadInterceptor(this, parentRoEntity, type, tx, relation));
             }
 

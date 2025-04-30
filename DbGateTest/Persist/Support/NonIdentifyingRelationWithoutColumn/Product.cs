@@ -16,7 +16,7 @@ namespace DbGate.Persist.Support.NonIdentifyingRelationWithoutColumn
         [ForeignKeyInfo("product2currency",
             typeof(Currency),
             new[] { "productCurrencyId" },
-            new[] {"CurrencyId"},
+            new[] { "CurrencyId" },
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade,
             NonIdentifyingRelation = true,

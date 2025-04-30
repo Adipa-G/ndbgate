@@ -1,9 +1,9 @@
-﻿using System;
-using System.Data;
-using DbGate.ErManagement.Query;
+﻿using DbGate.ErManagement.Query;
 using DbGate.ErManagement.Query.Expr;
 using DbGate.ErManagement.Query.Expr.Segments;
 using DbGate.Exceptions;
+using System;
+using System.Data;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
 {
@@ -28,11 +28,11 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
             switch (rootSegment.SegmentType)
             {
                 case SegmentType.Group:
-                    return processor.GetGroupFunction((GroupFunctionSegment) rootSegment, true, buildInfo);
+                    return processor.GetGroupFunction((GroupFunctionSegment)rootSegment, true, buildInfo);
                 case SegmentType.Field:
-                    return processor.GetFieldName((FieldSegment) rootSegment, true, buildInfo);
+                    return processor.GetFieldName((FieldSegment)rootSegment, true, buildInfo);
                 case SegmentType.Query:
-                    var querySegment = (QuerySegment) rootSegment;
+                    var querySegment = (QuerySegment)rootSegment;
                     buildInfo = dbLayer.DataManipulate().ProcessQuery(buildInfo, querySegment.Query.Structure);
                     return "(" + buildInfo.ExecInfo.Sql + ") as " + querySegment.Alias;
             }
@@ -50,15 +50,15 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
                 switch (rootSegment.SegmentType)
                 {
                     case SegmentType.Group:
-                        fieldSegment = ((GroupFunctionSegment) rootSegment).SegmentToGroup;
-                        column = GetColumnName(fieldSegment,buildInfo);
+                        fieldSegment = ((GroupFunctionSegment)rootSegment).SegmentToGroup;
+                        column = GetColumnName(fieldSegment, buildInfo);
                         break;
                     case SegmentType.Field:
-                        fieldSegment = (FieldSegment) rootSegment;
-                        column = GetColumnName(fieldSegment,buildInfo);
+                        fieldSegment = (FieldSegment)rootSegment;
+                        column = GetColumnName(fieldSegment, buildInfo);
                         break;
                     case SegmentType.Query:
-                        var querySegment = (QuerySegment) rootSegment;
+                        var querySegment = (QuerySegment)rootSegment;
                         column = querySegment.Alias;
                         break;
                 }
@@ -75,10 +75,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
 
         #endregion
 
-        private string GetColumnName(FieldSegment fieldSegment,QueryBuildInfo buildInfo)
+        private string GetColumnName(FieldSegment fieldSegment, QueryBuildInfo buildInfo)
         {
             var alias = fieldSegment.Alias;
-            var column = !string.IsNullOrEmpty(alias) ? alias : processor.GetColumn(fieldSegment,buildInfo).ColumnName;
+            var column = !string.IsNullOrEmpty(alias) ? alias : processor.GetColumn(fieldSegment, buildInfo).ColumnName;
             return column;
         }
     }

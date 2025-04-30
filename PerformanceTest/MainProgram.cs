@@ -1,8 +1,8 @@
-﻿using System;
-using System.Data;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using PerformanceTest.EF;
 using PerformanceTest.NDbGate;
+using System;
+using System.Data;
 
 namespace PerformanceTest
 {
@@ -12,13 +12,13 @@ namespace PerformanceTest
 
         public static void Main(string[] args)
         {
-            var dbName = $"Test_{DateTime.UtcNow.Ticks}"; 
+            var dbName = $"Test_{DateTime.UtcNow.Ticks}";
             CreateDB(dbName);
 
             var connectionString = $"{connectionStringPrefix};database={dbName}";
 
-            new NDbGatePerformanceCounter(connectionString, 5000).Start(1);   
-            new EfPerformanceCounter(connectionString, 5000).Start(1);   
+            new NDbGatePerformanceCounter(connectionString, 5000).Start(1);
+            new EfPerformanceCounter(connectionString, 5000).Start(1);
         }
 
         private static void CreateDB(string dbName)

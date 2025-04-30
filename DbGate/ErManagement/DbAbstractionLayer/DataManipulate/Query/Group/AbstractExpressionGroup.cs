@@ -25,7 +25,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Group
             switch (rootSegment.SegmentType)
             {
                 case SegmentType.Field:
-                    return processor.GetFieldName((FieldSegment) rootSegment, false, buildInfo);
+                    return processor.GetFieldName((FieldSegment)rootSegment, false, buildInfo);
             }
             return null;
         }

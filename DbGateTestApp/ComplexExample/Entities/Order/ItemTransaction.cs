@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using DbGate;
 using DbGateTestApp.ComplexExample.Entities.Product;
 using DbGateTestApp.DocGenerate;
+using System.Collections.Generic;
 
 namespace DbGateTestApp.ComplexExample.Entities.Order
 {
@@ -29,28 +29,28 @@ namespace DbGateTestApp.ComplexExample.Entities.Order
         [ColumnInfo(ColumnType.Integer)]
         public int ItemId { get; set; }
 
-        [ForeignKeyInfo("item_tx2item", 
-            typeof (Item),
-            new[] {"itemId"},
-            new[] {"itemId"},
+        [ForeignKeyInfo("item_tx2item",
+            typeof(Item),
+            new[] { "itemId" },
+            new[] { "itemId" },
             NonIdentifyingRelation = true,
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public Item Item { get; set; }
 
         [ForeignKeyInfo("item_tx2tx",
-            typeof (Transaction),
-            new[] {"transactionId"},
-            new[] {"transactionId"},
+            typeof(Transaction),
+            new[] { "transactionId" },
+            new[] { "transactionId" },
             ReverseRelation = true,
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public Transaction Transaction { get; set; }
 
-        [ForeignKeyInfo("item_tx2tx_chg", 
-            typeof (ItemTransactionCharge),
-            new[] {"transactionId", "indexNo"},
-            new[] {"transactionId", "indexNo"},
+        [ForeignKeyInfo("item_tx2tx_chg",
+            typeof(ItemTransactionCharge),
+            new[] { "transactionId", "indexNo" },
+            new[] { "transactionId", "indexNo" },
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public ICollection<ItemTransactionCharge> ItemTransactionCharges { get; set; }

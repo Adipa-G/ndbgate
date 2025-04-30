@@ -1,6 +1,6 @@
+using DbGate;
 using System;
 using System.Collections.Generic;
-using DbGate;
 
 namespace PerformanceTest.NDbGate.Entities.Order
 {
@@ -19,9 +19,9 @@ namespace PerformanceTest.NDbGate.Entities.Order
         public string Name { get; set; }
 
         [ForeignKeyInfo("tx2item_tx",
-            typeof (ItemTransaction),
-            new[] {"transactionId"},
-            new[] {"transactionId"},
+            typeof(ItemTransaction),
+            new[] { "transactionId" },
+            new[] { "transactionId" },
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public ICollection<ItemTransaction> ItemTransactions { get; set; }

@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using DbGate.Context;
+﻿using DbGate.Context;
 using DbGate.Context.Impl;
+using System.Collections.Generic;
+using System.Data;
 
 namespace DbGate.Persist.Support.TreeTest
 {
@@ -14,7 +14,7 @@ namespace DbGate.Persist.Support.TreeTest
         public string Name { get; set; }
         public List<ITreeTestOne2ManyEntity> One2ManyEntities { get; set; }
         public ITreeTestOne2OneEntity One2OneEntity { get; set; }
-        
+
         public TreeTestRootEntityExt()
         {
             Status = EntityStatus.New;
@@ -23,12 +23,12 @@ namespace DbGate.Persist.Support.TreeTest
 
         public void Retrieve(IDataReader reader, ITransaction tx)
         {
-            tx.DbGate.Load(this,reader,tx);
+            tx.DbGate.Load(this, reader, tx);
         }
 
         public void Persist(ITransaction tx)
         {
-            tx.DbGate.Save(this,tx);   
+            tx.DbGate.Save(this, tx);
         }
 
         public IEntityContext Context => context;

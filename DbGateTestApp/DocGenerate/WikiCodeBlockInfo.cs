@@ -11,7 +11,7 @@ namespace DbGateTestApp.DocGenerate
         public string Id;
         public string Code;
 
-        public WikiCodeBlockInfo(string id,string code)
+        public WikiCodeBlockInfo(string id, string code)
         {
             Id = id;
             Code = code;

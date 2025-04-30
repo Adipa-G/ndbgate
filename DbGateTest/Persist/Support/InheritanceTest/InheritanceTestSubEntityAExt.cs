@@ -2,7 +2,7 @@
 
 namespace DbGate.Persist.Support.InheritanceTest
 {
-    public class InheritanceTestSubEntityAExt : InheritanceTestSuperEntityExt , IInheritanceTestSubEntityA
+    public class InheritanceTestSubEntityAExt : InheritanceTestSuperEntityExt, IInheritanceTestSubEntityA
     {
         public string NameA { get; set; }
 

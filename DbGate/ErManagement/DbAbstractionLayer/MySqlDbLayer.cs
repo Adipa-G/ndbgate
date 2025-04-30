@@ -1,5 +1,5 @@
-﻿using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.MySqlMm;
-using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate;
+﻿using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate;
+using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.MySqlMm;
 
 namespace DbGate.ErManagement.DbAbstractionLayer
 {

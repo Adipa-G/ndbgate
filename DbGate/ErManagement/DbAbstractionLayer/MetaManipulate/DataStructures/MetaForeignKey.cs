@@ -25,7 +25,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures
             if (o == null || GetType() != o.GetType()) return false;
             if (!base.Equals(o)) return false;
 
-            var that = (MetaForeignKey) o;
+            var that = (MetaForeignKey)o;
 
             var foundMatch = false;
             foreach (var thisMapping in ColumnMappings)

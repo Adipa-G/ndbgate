@@ -1,11 +1,11 @@
-﻿using System;
-using System.Text;
-using DbGate;
+﻿using DbGate;
 using DbGate.ErManagement.DbAbstractionLayer;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Mappings;
+using System;
+using System.Text;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.MySqlMm
 {
@@ -16,10 +16,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.MySqlMm
         }
 
         protected override void FillReferentialRuleMappings(ITransaction tx)
-	    {
-		    ReferentialRuleTypeMapItems.Add(new ReferentialRuleTypeMapItem(ReferentialRuleType.Cascade, "0"));
-		    ReferentialRuleTypeMapItems.Add(new ReferentialRuleTypeMapItem(ReferentialRuleType.Restrict, "3"));
-	    }
+        {
+            ReferentialRuleTypeMapItems.Add(new ReferentialRuleTypeMapItem(ReferentialRuleType.Cascade, "0"));
+            ReferentialRuleTypeMapItems.Add(new ReferentialRuleTypeMapItem(ReferentialRuleType.Restrict, "3"));
+        }
 
         protected override string CreateAlterColumnQuery(MetaComparisonTableGroup tableGroup, MetaComparisonColumnGroup columnGroup)
         {
@@ -66,40 +66,40 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.MySqlMm
             return sb.ToString();
         }
 
-	    protected override string CreateDropPrimaryKeyQuery(MetaComparisonTableGroup tableGroup
+        protected override string CreateDropPrimaryKeyQuery(MetaComparisonTableGroup tableGroup
             , MetaComparisonPrimaryKeyGroup primaryKeyGroup)
-	    {
-		    var requiredTable = (MetaTable)tableGroup.ExistingItem;
-		    var primaryKey = (MetaColumn)primaryKeyGroup.ExistingItem;
+        {
+            var requiredTable = (MetaTable)tableGroup.ExistingItem;
+            var primaryKey = (MetaColumn)primaryKeyGroup.ExistingItem;
 
-		    var sb = new StringBuilder();
-		    sb.Append("ALTER TABLE ");
-		    sb.Append(requiredTable.Name);
-		    sb.Append(" DROP PRIMARY KEY");
-		    return sb.ToString();
-	    }
+            var sb = new StringBuilder();
+            sb.Append("ALTER TABLE ");
+            sb.Append(requiredTable.Name);
+            sb.Append(" DROP PRIMARY KEY");
+            return sb.ToString();
+        }
 
         protected override string CreateDropForeignKeyQuery(MetaComparisonTableGroup tableGroup
-            ,MetaComparisonForeignKeyGroup foreignKeyGroup)
-	    {
-		    var requiredTable = (MetaTable)tableGroup.ExistingItem;
+            , MetaComparisonForeignKeyGroup foreignKeyGroup)
+        {
+            var requiredTable = (MetaTable)tableGroup.ExistingItem;
             var metaForeignKey = (MetaColumn)foreignKeyGroup.RequiredItem;
 
-		    var sb = new StringBuilder();
-		    sb.Append("ALTER TABLE ");
-		    sb.Append(requiredTable.Name);
-		    sb.Append(" DROP FOREIGN KEY ");
-		    sb.Append(metaForeignKey.Name);
-		    return sb.ToString();
-	    }
+            var sb = new StringBuilder();
+            sb.Append("ALTER TABLE ");
+            sb.Append(requiredTable.Name);
+            sb.Append(" DROP FOREIGN KEY ");
+            sb.Append(metaForeignKey.Name);
+            return sb.ToString();
+        }
 
         public override bool Equals(IMetaItem iMetaItemA, IMetaItem iMetaItemB)
         {
             if (iMetaItemA.ItemType == MetaItemType.PrimaryKey
                 && iMetaItemA.ItemType == iMetaItemB.ItemType)
             {
-                var primaryKeyA = (MetaPrimaryKey) iMetaItemA;
-                var primaryKeyB = (MetaPrimaryKey) iMetaItemB;
+                var primaryKeyA = (MetaPrimaryKey)iMetaItemA;
+                var primaryKeyB = (MetaPrimaryKey)iMetaItemB;
 
                 if (primaryKeyA.ColumnNames.Count != primaryKeyB.ColumnNames.Count)
                 {

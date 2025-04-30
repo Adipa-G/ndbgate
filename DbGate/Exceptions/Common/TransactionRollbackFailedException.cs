@@ -3,9 +3,9 @@ using System.Runtime.Serialization;
 
 namespace DbGate.Exceptions.Common
 {
-    public class TransactionRollbackFailedException  : DbGateException
+    public class TransactionRollbackFailedException : DbGateException
     {
-        public TransactionRollbackFailedException (string message, Exception innerException) : base(message, innerException)
+        public TransactionRollbackFailedException(string message, Exception innerException) : base(message, innerException)
         {
         }
     }

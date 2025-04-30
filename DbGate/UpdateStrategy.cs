@@ -10,6 +10,6 @@ namespace DbGate
     {
         Default = 0,
         AllColumns,
- 	    ChangedColumns,
+        ChangedColumns,
     }
 }

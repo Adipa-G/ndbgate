@@ -15,7 +15,7 @@ namespace DbGate.ErManagement.Query.Expr
             return BaseField(prop);
         }
 
-        
+
         public static GroupExpr Build()
         {
             return new GroupExpr();

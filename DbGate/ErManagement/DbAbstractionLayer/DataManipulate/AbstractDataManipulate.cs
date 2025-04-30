@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Text;
-using DbGate.Caches;
+﻿using DbGate.Caches;
 using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query;
 using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Condition;
 using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.From;
@@ -13,30 +9,34 @@ using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.OrderBy;
 using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection;
 using DbGate.ErManagement.ErMapper.Utils;
 using DbGate.ErManagement.Query;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Text;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 {
     public abstract class AbstractDataManipulate : IDataManipulate
     {
-    	private IDbLayer dbLayer;
-    	
+        private IDbLayer dbLayer;
+
         protected AbstractDataManipulate(IDbLayer dbLayer)
         {
-        	this.dbLayer = dbLayer;
-        	Initialize();
-		}
-	
-		protected void Initialize()
-		{
-			QuerySelection.Factory = new AbstractSelectionFactory();
-			QueryFrom.Factory = new AbstractFromFactory();
-			QueryCondition.Factory = new AbstractConditionFactory();
-			QueryGroup.Factory = new AbstractGroupFactory();
-			QueryGroupCondition.Factory = new AbstractGroupConditionFactory();
-			QueryJoin.Factory = new AbstractJoinFactory();
-			QueryOrderBy.Factory = new AbstractOrderByFactory();
-	 	}
+            this.dbLayer = dbLayer;
+            Initialize();
+        }
+
+        protected void Initialize()
+        {
+            QuerySelection.Factory = new AbstractSelectionFactory();
+            QueryFrom.Factory = new AbstractFromFactory();
+            QueryCondition.Factory = new AbstractConditionFactory();
+            QueryGroup.Factory = new AbstractGroupFactory();
+            QueryGroupCondition.Factory = new AbstractGroupConditionFactory();
+            QueryJoin.Factory = new AbstractJoinFactory();
+            QueryOrderBy.Factory = new AbstractOrderByFactory();
+        }
 
         protected virtual string FixUpQuery(string query)
         {
@@ -109,7 +109,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
                 }
                 sb.Append("?");
                 i++;
-            } 
+            }
             sb.Append(" )");
 
             return FixUpQuery(sb.ToString());
@@ -214,7 +214,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
                 {
                     sb.Append(" AND ");
                 }
-                sb.Append( entityInfo.FindColumnByAttribute(columnMapping.ToField).ColumnName);
+                sb.Append(entityInfo.FindColumnByAttribute(columnMapping.ToField).ColumnName);
                 sb.Append("= ?");
                 i++;
             }
@@ -264,17 +264,17 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 
         public void SetToPreparedStatement(IDbCommand cmd, object obj, int parameterIndex, IColumn column)
         {
-			SetToPreparedStatement(cmd,obj,parameterIndex,column.Nullable,column.ColumnType);
+            SetToPreparedStatement(cmd, obj, parameterIndex, column.Nullable, column.ColumnType);
         }
 
-		protected virtual void SetToPreparedStatement (IDbCommand cmd, object obj, int parameterIndex, bool nullable, ColumnType columnType)
-		{
-			var parameter = cmd.CreateParameter ();
-			parameter.Direction = ParameterDirection.Input;
-			parameter.Value = obj ?? DBNull.Value;
-            
-			cmd.Parameters.Add(parameter);
-		    parameter.DbType = ColumnTypeMapping.GetSqlType(columnType);
+        protected virtual void SetToPreparedStatement(IDbCommand cmd, object obj, int parameterIndex, bool nullable, ColumnType columnType)
+        {
+            var parameter = cmd.CreateParameter();
+            parameter.Direction = ParameterDirection.Input;
+            parameter.Value = obj ?? DBNull.Value;
+
+            cmd.Parameters.Add(parameter);
+            parameter.DbType = ColumnTypeMapping.GetSqlType(columnType);
         }
 
         public IDataReader CreateResultSet(ITransaction tx, QueryExecInfo execInfo)
@@ -289,7 +289,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 
             foreach (var param in sortedParams)
             {
-				SetToPreparedStatement(cmd,param.Value,param.Index + 1,param.Value == null,param.Type);
+                SetToPreparedStatement(cmd, param.Value, param.Index + 1, param.Value == null, param.Type);
             }
             return cmd.ExecuteReader();
         }
@@ -301,59 +301,59 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 
             var sb = new StringBuilder();
             ProcessFrom(sb, buildInfo, structure);
-			ProcessJoin(sb, buildInfo, structure);
+            ProcessJoin(sb, buildInfo, structure);
             ProcessWhere(sb, buildInfo, structure);
-		 	ProcessGroup(sb, buildInfo, structure);
-			ProcessGroupCondition(sb, buildInfo, structure);
-			ProcessOrderBy(sb, buildInfo, structure);
+            ProcessGroup(sb, buildInfo, structure);
+            ProcessGroupCondition(sb, buildInfo, structure);
+            ProcessOrderBy(sb, buildInfo, structure);
 
-			AddPagingClause(sb,buildInfo,structure);
+            AddPagingClause(sb, buildInfo, structure);
             ProcessSelection(sb, buildInfo, structure);
 
             buildInfo.ExecInfo.Sql = FixUpQuery(sb.ToString());
             return buildInfo;
         }
 
-		protected void AddPagingClause(StringBuilder sb,QueryBuildInfo buildInfo,QueryStructure structure)
-		{
-			var pageSize = structure.Fetch;
-			var currentOffset = structure.Skip;
+        protected void AddPagingClause(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
+        {
+            var pageSize = structure.Fetch;
+            var currentOffset = structure.Skip;
 
-			if (currentOffset > 0 && pageSize == 0)
-				pageSize = long.MaxValue;
+            if (currentOffset > 0 && pageSize == 0)
+                pageSize = long.MaxValue;
 
-		 	if (pageSize > 0)
-		 	{
-			 	sb.Append(" LIMIT ? ");
-			 	
-			 	var param = new QueryExecParam();
-			 	param.Index = buildInfo.ExecInfo.Params.Count;
-			 	param.Type = ColumnType.Long;
-			 	param.Value = pageSize;
-			 	buildInfo.ExecInfo.Params.Add(param);
-		 	}
-		 	
-		 	if (currentOffset > 0)
-		 	{
-			 	sb.Append(" OFFSET ? ");
-			 	
-				var param = new QueryExecParam();
-				param.Index = buildInfo.ExecInfo.Params.Count;
-			 	param.Type = ColumnType.Long;
-			 	param.Value = currentOffset;
-			 	buildInfo.ExecInfo.Params.Add(param);
-		 	}
-	 	}
+            if (pageSize > 0)
+            {
+                sb.Append(" LIMIT ? ");
 
-        private void ProcessSelection(StringBuilder querySb,QueryBuildInfo buildInfo, QueryStructure structure)
+                var param = new QueryExecParam();
+                param.Index = buildInfo.ExecInfo.Params.Count;
+                param.Type = ColumnType.Long;
+                param.Value = pageSize;
+                buildInfo.ExecInfo.Params.Add(param);
+            }
+
+            if (currentOffset > 0)
+            {
+                sb.Append(" OFFSET ? ");
+
+                var param = new QueryExecParam();
+                param.Index = buildInfo.ExecInfo.Params.Count;
+                param.Type = ColumnType.Long;
+                param.Value = currentOffset;
+                buildInfo.ExecInfo.Params.Add(param);
+            }
+        }
+
+        private void ProcessSelection(StringBuilder querySb, QueryBuildInfo buildInfo, QueryStructure structure)
         {
             var selectionSb = new StringBuilder();
             selectionSb.Append("SELECT ");
-            
-             if (structure.SelectList.Count == 0)
-                 selectionSb.Append(" * ");
 
-			if (structure.Distinct)
+            if (structure.SelectList.Count == 0)
+                selectionSb.Append(" * ");
+
+            if (structure.Distinct)
                 selectionSb.Append(" DISTINCT ");
 
             var selections = structure.SelectList;
@@ -371,11 +371,11 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
             querySb.Insert(0, selectionSb.ToString());
         }
 
-        protected string CreateSelectionSql(IQuerySelection selection,QueryBuildInfo buildInfo)
+        protected string CreateSelectionSql(IQuerySelection selection, QueryBuildInfo buildInfo)
         {
             if (selection != null)
             {
-                return ((IAbstractSelection) selection).CreateSql(dbLayer,buildInfo);
+                return ((IAbstractSelection)selection).CreateSql(dbLayer, buildInfo);
             }
             return "/*Incorrect Selection*/";
         }
@@ -392,157 +392,157 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
                 {
                     sb.Append(",");
                 }
-                sb.Append(CreateFromSql(from,buildInfo));
+                sb.Append(CreateFromSql(from, buildInfo));
                 initial = false;
             }
         }
 
-        protected string CreateFromSql(IQueryFrom from,QueryBuildInfo buildInfo)
+        protected string CreateFromSql(IQueryFrom from, QueryBuildInfo buildInfo)
         {
             if (from != null)
             {
-                return ((IAbstractFrom) from).CreateSql(dbLayer,buildInfo);
+                return ((IAbstractFrom)from).CreateSql(dbLayer, buildInfo);
             }
             return "/*Incorrect From*/";
         }
 
-		private void ProcessJoin(StringBuilder sb,QueryBuildInfo buildInfo, QueryStructure structure)
+        private void ProcessJoin(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
         {
-			var joinList = structure.JoinList;
-			if (joinList.Count == 0)
-				return;
+            var joinList = structure.JoinList;
+            if (joinList.Count == 0)
+                return;
 
-			foreach (var join in joinList) 
-			{
-				sb.Append(" ");
-				sb.Append(CreateJoinSql(join,buildInfo));
-			}
+            foreach (var join in joinList)
+            {
+                sb.Append(" ");
+                sb.Append(CreateJoinSql(join, buildInfo));
+            }
         }
 
-        protected string CreateJoinSql(IQueryJoin join,QueryBuildInfo buildInfo)
+        protected string CreateJoinSql(IQueryJoin join, QueryBuildInfo buildInfo)
         {
             if (join != null)
             {
-                return ((IAbstractJoin) join).CreateSql(dbLayer,buildInfo);
+                return ((IAbstractJoin)join).CreateSql(dbLayer, buildInfo);
             }
             return "/*Incorrect Join*/";
         }
 
-		private void ProcessWhere(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
-	 	{
-		 	var conditionList = structure.ConditionList;
-		 	if (conditionList.Count == 0)
-		 	return;
-		 	
-		 	sb.Append(" WHERE ");
-		 	
-		 	var initial = true;
-			foreach (var condition in conditionList)
-		 	{
-			 	if (!initial)
-			 	{
-			 		sb.Append(" AND ");
-			 	}
-			 	sb.Append(CreateWhereSql(condition,buildInfo));
-			 	initial = false;
-		 	}
-	 	}
-		 	
-	 	protected string CreateWhereSql(IQueryCondition condition,QueryBuildInfo buildInfo)
-	 	{
-			if (condition != null)
-		 	{
-		 		return ((IAbstractCondition) condition).CreateSql(dbLayer,buildInfo);
-		 	}
-		 	return "/*Incorrect Where*/";
-	 	}
-		 	
-	 	private void ProcessGroup(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
-	 	{
-		 	var groupList = structure.GroupList;
-		 	if (groupList.Count == 0)
-		 	return;
-		 	
-		 	sb.Append(" GROUP BY ");
-		 	
-		 	var initial = true;
-		 	foreach (var group in groupList)
-			 	{
-			 	if (!initial)
-			 	{
-			 		sb.Append(",");
-			 	}
-			 	sb.Append(CreateGroupSql(group,buildInfo));
-			 	initial = false;
-		 	}
-	 	}
-	 	
-	 	protected string CreateGroupSql(IQueryGroup group,QueryBuildInfo buildInfo)
-	 	{
-			if (group != null)
-		 	{
-		 		return ((IAbstractGroup) group).CreateSql(dbLayer,buildInfo);
-		 	}
-		 	return "/*Incorrect Group*/";
-	 	}
+        private void ProcessWhere(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
+        {
+            var conditionList = structure.ConditionList;
+            if (conditionList.Count == 0)
+                return;
 
-		private void ProcessGroupCondition(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
-	 	{
-		 	var groupConditionList = structure.GroupConditionList;
-		 	if (groupConditionList.Count == 0)
-		 	return;
-		 	
-		 	sb.Append(" HAVING ");
-		 	
-		 	var initial = true;
-			foreach (var groupCondition in groupConditionList)
-		 	{
-			 	if (!initial)
-			 	{
-			 		sb.Append(" AND ");
-			 	}
-			 	sb.Append(CreateGroupConditionSql(groupCondition,buildInfo));
-			 	initial = false;
-		 	}
-	 	}
+            sb.Append(" WHERE ");
+
+            var initial = true;
+            foreach (var condition in conditionList)
+            {
+                if (!initial)
+                {
+                    sb.Append(" AND ");
+                }
+                sb.Append(CreateWhereSql(condition, buildInfo));
+                initial = false;
+            }
+        }
+
+        protected string CreateWhereSql(IQueryCondition condition, QueryBuildInfo buildInfo)
+        {
+            if (condition != null)
+            {
+                return ((IAbstractCondition)condition).CreateSql(dbLayer, buildInfo);
+            }
+            return "/*Incorrect Where*/";
+        }
+
+        private void ProcessGroup(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
+        {
+            var groupList = structure.GroupList;
+            if (groupList.Count == 0)
+                return;
+
+            sb.Append(" GROUP BY ");
+
+            var initial = true;
+            foreach (var group in groupList)
+            {
+                if (!initial)
+                {
+                    sb.Append(",");
+                }
+                sb.Append(CreateGroupSql(group, buildInfo));
+                initial = false;
+            }
+        }
+
+        protected string CreateGroupSql(IQueryGroup group, QueryBuildInfo buildInfo)
+        {
+            if (group != null)
+            {
+                return ((IAbstractGroup)group).CreateSql(dbLayer, buildInfo);
+            }
+            return "/*Incorrect Group*/";
+        }
+
+        private void ProcessGroupCondition(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
+        {
+            var groupConditionList = structure.GroupConditionList;
+            if (groupConditionList.Count == 0)
+                return;
+
+            sb.Append(" HAVING ");
+
+            var initial = true;
+            foreach (var groupCondition in groupConditionList)
+            {
+                if (!initial)
+                {
+                    sb.Append(" AND ");
+                }
+                sb.Append(CreateGroupConditionSql(groupCondition, buildInfo));
+                initial = false;
+            }
+        }
 
         protected string CreateGroupConditionSql(IQueryGroupCondition groupCondition, QueryBuildInfo buildInfo)
-	 	{
-			if (groupCondition != null)
-		 	{
-		 		return ((IAbstractGroupCondition) groupCondition).CreateSql(dbLayer,buildInfo);
-		 	}
-		 	return "/*Incorrect Group condition*/";
-	 	}
+        {
+            if (groupCondition != null)
+            {
+                return ((IAbstractGroupCondition)groupCondition).CreateSql(dbLayer, buildInfo);
+            }
+            return "/*Incorrect Group condition*/";
+        }
 
-		private void ProcessOrderBy(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
-	 	{
-		 	var orderList = structure.OrderList;
-		 	if (orderList.Count == 0)
-		 	return;
-		 	
-		 	sb.Append(" ORDER BY ");
-		 	
-		 	var initial = true;
-			foreach (var orderBy in orderList)
-		 	{
-			 	if (!initial)
-			 	{
-			 		sb.Append(",");
-			 	}
-			 	sb.Append(CreateOrderBySql(orderBy,buildInfo));
-			 	initial = false;
-		 	}
-	 	}
-		 	
-	 	protected string CreateOrderBySql(IQueryOrderBy orderBy, QueryBuildInfo buildInfo)
-	 	{
-			if (orderBy != null)
-		 	{
-		 		return ((IAbstractOrderBy) orderBy).CreateSql(dbLayer,buildInfo);
-		 	}
-		 	return "/*Incorrect Order by*/";
-	 	}
+        private void ProcessOrderBy(StringBuilder sb, QueryBuildInfo buildInfo, QueryStructure structure)
+        {
+            var orderList = structure.OrderList;
+            if (orderList.Count == 0)
+                return;
+
+            sb.Append(" ORDER BY ");
+
+            var initial = true;
+            foreach (var orderBy in orderList)
+            {
+                if (!initial)
+                {
+                    sb.Append(",");
+                }
+                sb.Append(CreateOrderBySql(orderBy, buildInfo));
+                initial = false;
+            }
+        }
+
+        protected string CreateOrderBySql(IQueryOrderBy orderBy, QueryBuildInfo buildInfo)
+        {
+            if (orderBy != null)
+            {
+                return ((IAbstractOrderBy)orderBy).CreateSql(dbLayer, buildInfo);
+            }
+            return "/*Incorrect Order by*/";
+        }
         #endregion
     }
 }

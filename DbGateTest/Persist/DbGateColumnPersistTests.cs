@@ -1,14 +1,14 @@
-﻿using System;
-using System.Data;
-using DbGate.Patch;
+﻿using DbGate.Patch;
 using DbGate.Persist.Support.ColumnTest;
 using log4net;
+using System;
+using System.Data;
 using Xunit;
 
 namespace DbGate.Persist
 {
     [Collection("Sequential")]
-    public class DbGateColumnPersistTests :  AbstractDbGateTestBase, IDisposable
+    public class DbGateColumnPersistTests : AbstractDbGateTestBase, IDisposable
     {
         private const string DbName = "unit-testing-column-persist";
 
@@ -25,7 +25,7 @@ namespace DbGate.Persist
             CleanupDb(DbName);
             FinalizeDb(DbName);
         }
-        
+
         private IDbConnection SetupTables()
         {
             var sql = "Create table column_test_entity (\n" +
@@ -51,8 +51,8 @@ namespace DbGate.Persist
                       "\tguid_not_null Varchar(36) NOT NULL,\n" +
                       "\tguid_null Varchar(36),\n" +
                       " Primary Key (id_col))";
-            
-            CreateTableFromSql(sql,DbName);
+
+            CreateTableFromSql(sql, DbName);
             EndInit(DbName);
 
             return Connection;
@@ -75,11 +75,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(entity,loadedEntity);
+                AssertTwoEntitiesEquals(entity, loadedEntity);
             }
             catch (System.Exception e)
             {
@@ -109,11 +109,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(entity,loadedEntity);
+                AssertTwoEntitiesEquals(entity, loadedEntity);
             }
             catch (System.Exception e)
             {
@@ -132,18 +132,18 @@ namespace DbGate.Persist
 
                 var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityAttribute();
-                
+
                 CreateEntityWithNonNullValues(entity);
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAttribute();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(entity,loadedEntity);
+                AssertTwoEntitiesEquals(entity, loadedEntity);
             }
             catch (System.Exception e)
             {
@@ -162,7 +162,7 @@ namespace DbGate.Persist
 
                 var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityFields();
-                
+
                 CreateEntityWithNullValues(entity);
 
                 entity.Persist(transaction);
@@ -170,11 +170,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(entity,loadedEntity);
+                AssertTwoEntitiesEquals(entity, loadedEntity);
             }
             catch (System.Exception e)
             {
@@ -194,10 +194,10 @@ namespace DbGate.Persist
                 var type = typeof(ColumnTestEntityExts);
                 TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
- 
+
                 var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity entity = new ColumnTestEntityExts();
-                
+
                 CreateEntityWithNullValues(entity);
 
                 entity.Persist(transaction);
@@ -205,11 +205,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(entity,loadedEntity);
+                AssertTwoEntitiesEquals(entity, loadedEntity);
             }
             catch (System.Exception e)
             {
@@ -235,11 +235,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAttribute();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(entity,loadedEntity);
+                AssertTwoEntitiesEquals(entity, loadedEntity);
             }
             catch (System.Exception e)
             {
@@ -256,7 +256,7 @@ namespace DbGate.Persist
                 var connection = SetupTables();
                 var transaction = CreateTransaction(connection);
 
-                var id =(int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
                 CreateEntityWithNonNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -264,19 +264,19 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 UpdateEntityWithNonNullValues(loadedEntity);
-                loadedEntity.Status =EntityStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(transaction,reLoadedEntity,id);
+                LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
+                AssertTwoEntitiesEquals(loadedEntity, reLoadedEntity);
             }
             catch (System.Exception e)
             {
@@ -291,9 +291,9 @@ namespace DbGate.Persist
             try
             {
                 var connection = SetupTables();
-                 var transaction = CreateTransaction(connection);
+                var transaction = CreateTransaction(connection);
 
-                var type = typeof (ColumnTestEntityExts);
+                var type = typeof(ColumnTestEntityExts);
                 TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
                                                            ColumnTestExtFactory.GetFieldInfo(type));
 
@@ -305,19 +305,19 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 UpdateEntityWithNonNullValues(loadedEntity);
-                loadedEntity.Status =EntityStatus.Modified;
+                loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(transaction,reLoadedEntity,id);
+                LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
+                AssertTwoEntitiesEquals(loadedEntity, reLoadedEntity);
             }
             catch (System.Exception e)
             {
@@ -342,7 +342,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAttribute();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 UpdateEntityWithNonNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.Persist(transaction);
@@ -350,11 +350,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityAttribute();
-                LoadEntityWithId(transaction,reLoadedEntity,id);
+                LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
+                AssertTwoEntitiesEquals(loadedEntity, reLoadedEntity);
             }
             catch (System.Exception e)
             {
@@ -379,7 +379,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 UpdateEntityWithNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.Persist(transaction);
@@ -387,11 +387,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(transaction,reLoadedEntity,id);
+                LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
+                AssertTwoEntitiesEquals(loadedEntity, reLoadedEntity);
             }
             catch (System.Exception e)
             {
@@ -406,7 +406,7 @@ namespace DbGate.Persist
             try
             {
                 var connection = SetupTables();
-                 var transaction = CreateTransaction(connection);
+                var transaction = CreateTransaction(connection);
 
                 var type = typeof(ColumnTestEntityExts);
                 TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
@@ -420,7 +420,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 UpdateEntityWithNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.Persist(transaction);
@@ -428,11 +428,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(transaction,reLoadedEntity,id);
+                LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
+                AssertTwoEntitiesEquals(loadedEntity, reLoadedEntity);
             }
             catch (System.Exception e)
             {
@@ -447,7 +447,7 @@ namespace DbGate.Persist
             try
             {
                 var connection = SetupTables();
-                 var transaction = CreateTransaction(connection);
+                var transaction = CreateTransaction(connection);
 
                 var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityAttribute();
@@ -457,7 +457,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAttribute();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 UpdateEntityWithNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.Persist(transaction);
@@ -465,11 +465,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityAttribute();
-                LoadEntityWithId(transaction,reLoadedEntity,id);
+                LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
+                AssertTwoEntitiesEquals(loadedEntity, reLoadedEntity);
             }
             catch (System.Exception e)
             {
@@ -494,7 +494,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 UpdateEntityWithNonNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.Persist(transaction);
@@ -502,11 +502,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(transaction,reLoadedEntity,id);
+                LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
+                AssertTwoEntitiesEquals(loadedEntity, reLoadedEntity);
             }
             catch (System.Exception e)
             {
@@ -521,7 +521,7 @@ namespace DbGate.Persist
             try
             {
                 var connection = SetupTables();
-                 var transaction = CreateTransaction(connection);
+                var transaction = CreateTransaction(connection);
 
                 var type = typeof(ColumnTestEntityExts);
                 TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
@@ -535,7 +535,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 UpdateEntityWithNonNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.Persist(transaction);
@@ -543,11 +543,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(transaction,reLoadedEntity,id);
+                LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
+                AssertTwoEntitiesEquals(loadedEntity, reLoadedEntity);
             }
             catch (System.Exception e)
             {
@@ -562,7 +562,7 @@ namespace DbGate.Persist
             try
             {
                 var connection = SetupTables();
-                 var transaction = CreateTransaction(connection);
+                var transaction = CreateTransaction(connection);
 
                 var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityAttribute();
@@ -572,7 +572,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAttribute();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 UpdateEntityWithNonNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.Persist(transaction);
@@ -580,11 +580,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityAttribute();
-                LoadEntityWithId(transaction,reLoadedEntity,id);
+                LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
+                AssertTwoEntitiesEquals(loadedEntity, reLoadedEntity);
             }
             catch (System.Exception e)
             {
@@ -599,9 +599,9 @@ namespace DbGate.Persist
             try
             {
                 var connection = SetupTables();
-                 var transaction = CreateTransaction(connection);
+                var transaction = CreateTransaction(connection);
 
-                var id =(int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
+                var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
                 CreateEntityWithNullValues(newEntity);
                 newEntity.Persist(transaction);
@@ -609,7 +609,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 UpdateEntityWithNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.Persist(transaction);
@@ -617,11 +617,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(transaction,reLoadedEntity,id);
+                LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
+                AssertTwoEntitiesEquals(loadedEntity, reLoadedEntity);
             }
             catch (System.Exception e)
             {
@@ -636,7 +636,7 @@ namespace DbGate.Persist
             try
             {
                 var connection = SetupTables();
-                 var transaction = CreateTransaction(connection);
+                var transaction = CreateTransaction(connection);
 
                 var type = typeof(ColumnTestEntityExts);
                 TransactionFactory.DbGate.RegisterEntity(type, ColumnTestExtFactory.GetTableInfo(type),
@@ -650,7 +650,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 UpdateEntityWithNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.Persist(transaction);
@@ -658,11 +658,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(transaction,reLoadedEntity,id);
+                LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
+                AssertTwoEntitiesEquals(loadedEntity, reLoadedEntity);
             }
             catch (System.Exception e)
             {
@@ -687,7 +687,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAttribute();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 UpdateEntityWithNullValues(loadedEntity);
                 loadedEntity.Status = EntityStatus.Modified;
                 loadedEntity.Persist(transaction);
@@ -695,11 +695,11 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityAttribute();
-                LoadEntityWithId(transaction,reLoadedEntity,id);
+                LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                AssertTwoEntitiesEquals(loadedEntity,reLoadedEntity);
+                AssertTwoEntitiesEquals(loadedEntity, reLoadedEntity);
             }
             catch (System.Exception e)
             {
@@ -714,7 +714,7 @@ namespace DbGate.Persist
             try
             {
                 var connection = SetupTables();
-                 var transaction = CreateTransaction(connection);
+                var transaction = CreateTransaction(connection);
 
                 var id = (int)new PrimaryKeyGenerator().GetNextSequenceValue(transaction);
                 IColumnTestEntity newEntity = new ColumnTestEntityFields();
@@ -724,14 +724,14 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityFields();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityFields();
-                var  loaded = LoadEntityWithId(transaction,reLoadedEntity,id);
+                var loaded = LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
@@ -764,14 +764,14 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityExts();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityExts();
-                var loaded = LoadEntityWithId(transaction,reLoadedEntity,id);
+                var loaded = LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
@@ -800,14 +800,14 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity loadedEntity = new ColumnTestEntityAttribute();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 IColumnTestEntity reLoadedEntity = new ColumnTestEntityAttribute();
-                var  loaded = LoadEntityWithId(transaction,reLoadedEntity,id);
+                var loaded = LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
@@ -820,7 +820,7 @@ namespace DbGate.Persist
             }
         }
 
-        private bool LoadEntityWithId(ITransaction transaction, IColumnTestEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, IColumnTestEntity loadEntity, int id)
         {
             var loaded = false;
 
@@ -845,122 +845,122 @@ namespace DbGate.Persist
 
         private void CreateEntityWithNonNullValues(IColumnTestEntity entity)
         {
-            entity.BooleanNotNull=true;
-            entity.BooleanNull=true;
-            entity.CharNotNull='A';
-            entity.CharNull='B';
-            entity.DateNotNull= DateTime.Now;
-            entity.DateNull=DateTime.Now;
-            entity.DoubleNotNull=5D;
-            entity.DoubleNull=6D;
-            entity.FloatNotNull=20F;
-            entity.FloatNull=20F;
-            entity.IntNotNull=24;
-            entity.IntNull=23;
-            entity.LongNotNull=356L;
-            entity.LongNull=326L;
-            entity.TimestampNotNull=DateTime.Now;
-            entity.TimestampNull=DateTime.Now;
-            entity.VarcharNotNull="notNull";
-            entity.VarcharNull="null";
+            entity.BooleanNotNull = true;
+            entity.BooleanNull = true;
+            entity.CharNotNull = 'A';
+            entity.CharNull = 'B';
+            entity.DateNotNull = DateTime.Now;
+            entity.DateNull = DateTime.Now;
+            entity.DoubleNotNull = 5D;
+            entity.DoubleNull = 6D;
+            entity.FloatNotNull = 20F;
+            entity.FloatNull = 20F;
+            entity.IntNotNull = 24;
+            entity.IntNull = 23;
+            entity.LongNotNull = 356L;
+            entity.LongNull = 326L;
+            entity.TimestampNotNull = DateTime.Now;
+            entity.TimestampNull = DateTime.Now;
+            entity.VarcharNotNull = "notNull";
+            entity.VarcharNull = "null";
             entity.GuidNotNull = Guid.NewGuid();
             entity.GuidNull = Guid.NewGuid();
         }
 
         private void CreateEntityWithNullValues(IColumnTestEntity entity)
         {
-            entity.BooleanNotNull=true;
-            entity.BooleanNull=null;
-            entity.CharNotNull='A';
-            entity.CharNull=null;
-            entity.DateNotNull=DateTime.Now;
-            entity.DateNull=null;
-            entity.DoubleNotNull=5D;
-            entity.DoubleNull=null;
-            entity.FloatNotNull=20F;
-            entity.FloatNull=null;
-            entity.IntNotNull=24;
-            entity.IntNull=null;
-            entity.LongNotNull=356L;
-            entity.LongNull=null;
-            entity.TimestampNotNull=DateTime.Now;
-            entity.TimestampNull=null;
-            entity.VarcharNotNull="notNull";
-            entity.VarcharNull=null;
+            entity.BooleanNotNull = true;
+            entity.BooleanNull = null;
+            entity.CharNotNull = 'A';
+            entity.CharNull = null;
+            entity.DateNotNull = DateTime.Now;
+            entity.DateNull = null;
+            entity.DoubleNotNull = 5D;
+            entity.DoubleNull = null;
+            entity.FloatNotNull = 20F;
+            entity.FloatNull = null;
+            entity.IntNotNull = 24;
+            entity.IntNull = null;
+            entity.LongNotNull = 356L;
+            entity.LongNull = null;
+            entity.TimestampNotNull = DateTime.Now;
+            entity.TimestampNull = null;
+            entity.VarcharNotNull = "notNull";
+            entity.VarcharNull = null;
             entity.GuidNotNull = Guid.NewGuid();
             entity.GuidNull = null;
         }
 
         private void UpdateEntityWithNonNullValues(IColumnTestEntity entity)
         {
-            entity.BooleanNotNull=false;
-            entity.BooleanNull=false;
-            entity.CharNotNull='C';
-            entity.CharNull='D';
-            entity.DateNotNull=DateTime.Now;
-            entity.DateNull=DateTime.Now;
-            entity.DoubleNotNull=53D;
-            entity.DoubleNull=65D;
-            entity.FloatNotNull=20465F;
-            entity.FloatNull=32420F;
-            entity.IntNotNull=35424;
-            entity.IntNull=46723;
-            entity.LongNotNull=3565535L;
-            entity.LongNull=2245326L;
-            entity.TimestampNotNull=DateTime.Now;
+            entity.BooleanNotNull = false;
+            entity.BooleanNull = false;
+            entity.CharNotNull = 'C';
+            entity.CharNull = 'D';
+            entity.DateNotNull = DateTime.Now;
+            entity.DateNull = DateTime.Now;
+            entity.DoubleNotNull = 53D;
+            entity.DoubleNull = 65D;
+            entity.FloatNotNull = 20465F;
+            entity.FloatNull = 32420F;
+            entity.IntNotNull = 35424;
+            entity.IntNull = 46723;
+            entity.LongNotNull = 3565535L;
+            entity.LongNull = 2245326L;
+            entity.TimestampNotNull = DateTime.Now;
             entity.TimestampNull = DateTime.Now;
-            entity.VarcharNotNull="notNull string";
-            entity.VarcharNull="null string";
+            entity.VarcharNotNull = "notNull string";
+            entity.VarcharNull = "null string";
             entity.GuidNotNull = Guid.NewGuid();
             entity.GuidNull = Guid.NewGuid();
         }
 
         private void UpdateEntityWithNullValues(IColumnTestEntity entity)
         {
-            entity.BooleanNotNull=false;
-            entity.BooleanNull=null;
-            entity.CharNotNull='C';
-            entity.CharNull=null;
+            entity.BooleanNotNull = false;
+            entity.BooleanNull = null;
+            entity.CharNotNull = 'C';
+            entity.CharNull = null;
             entity.DateNotNull = DateTime.Now;
-            entity.DateNull=null;
-            entity.DoubleNotNull=53D;
-            entity.DoubleNull=null;
-            entity.FloatNotNull=20465F;
-            entity.FloatNull=null;
-            entity.IntNotNull=35424;
-            entity.IntNull=null;
-            entity.LongNotNull=3565535L;
-            entity.LongNull=null;
+            entity.DateNull = null;
+            entity.DoubleNotNull = 53D;
+            entity.DoubleNull = null;
+            entity.FloatNotNull = 20465F;
+            entity.FloatNull = null;
+            entity.IntNotNull = 35424;
+            entity.IntNull = null;
+            entity.LongNotNull = 3565535L;
+            entity.LongNull = null;
             entity.TimestampNotNull = DateTime.Now;
-            entity.TimestampNull=null;
-            entity.VarcharNotNull="notNull string";
-            entity.VarcharNull=null;
+            entity.TimestampNull = null;
+            entity.VarcharNotNull = "notNull string";
+            entity.VarcharNull = null;
             entity.GuidNotNull = Guid.NewGuid();
             entity.GuidNull = null;
         }
 
         private void AssertTwoEntitiesEquals(IColumnTestEntity entityA, IColumnTestEntity entityB)
         {
-            Assert.Equal(entityA.IdCol,entityB.IdCol);
+            Assert.Equal(entityA.IdCol, entityB.IdCol);
 
-            Assert.Equal(entityA.CharNotNull,entityB.CharNotNull);
-            Assert.Equal(entityA.CharNull,entityB.CharNull);
-            Assert.Equal(entityA.DateNotNull,entityB.DateNotNull);
-            Assert.Equal(entityA.DateNull,entityB.DateNull);
-            Assert.Equal(entityA.DoubleNotNull,entityB.DoubleNotNull);
-            Assert.Equal(entityA.DoubleNull,entityB.DoubleNull);
-            Assert.Equal(entityA.FloatNotNull,entityB.FloatNotNull);
-            Assert.Equal(entityA.FloatNull,entityB.FloatNull);
-            Assert.Equal(entityA.IntNotNull,entityB.IntNotNull);
-            Assert.Equal(entityA.IntNull,entityB.IntNull);
-            Assert.Equal(entityA.LongNotNull,entityB.LongNotNull);
-            Assert.Equal(entityA.LongNull,entityB.LongNull);
-            Assert.Equal(entityA.TimestampNotNull,entityB.TimestampNotNull);
-            Assert.Equal(entityA.TimestampNull,entityB.TimestampNull);
-            Assert.Equal(entityA.VarcharNotNull,entityB.VarcharNotNull);
-            Assert.Equal(entityA.VarcharNull,entityB.VarcharNull);
-            Assert.Equal(entityA.GuidNotNull,entityB.GuidNotNull);
-            Assert.Equal(entityA.GuidNull,entityB.GuidNull);
+            Assert.Equal(entityA.CharNotNull, entityB.CharNotNull);
+            Assert.Equal(entityA.CharNull, entityB.CharNull);
+            Assert.Equal(entityA.DateNotNull, entityB.DateNotNull);
+            Assert.Equal(entityA.DateNull, entityB.DateNull);
+            Assert.Equal(entityA.DoubleNotNull, entityB.DoubleNotNull);
+            Assert.Equal(entityA.DoubleNull, entityB.DoubleNull);
+            Assert.Equal(entityA.FloatNotNull, entityB.FloatNotNull);
+            Assert.Equal(entityA.FloatNull, entityB.FloatNull);
+            Assert.Equal(entityA.IntNotNull, entityB.IntNotNull);
+            Assert.Equal(entityA.IntNull, entityB.IntNull);
+            Assert.Equal(entityA.LongNotNull, entityB.LongNotNull);
+            Assert.Equal(entityA.LongNull, entityB.LongNull);
+            Assert.Equal(entityA.TimestampNotNull, entityB.TimestampNotNull);
+            Assert.Equal(entityA.TimestampNull, entityB.TimestampNull);
+            Assert.Equal(entityA.VarcharNotNull, entityB.VarcharNotNull);
+            Assert.Equal(entityA.VarcharNull, entityB.VarcharNull);
+            Assert.Equal(entityA.GuidNotNull, entityB.GuidNotNull);
+            Assert.Equal(entityA.GuidNull, entityB.GuidNull);
         }
     }
 }

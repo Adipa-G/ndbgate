@@ -31,7 +31,7 @@ namespace DbGate.Context.Impl
         public void CopyReferenceStoreFrom(IReadOnlyEntity entity)
         {
             if (entity.Context != null)
-	            referenceStore = entity.Context.ReferenceStore;
+                referenceStore = entity.Context.ReferenceStore;
         }
 
         public bool AlreadyInCurrentObjectGraph(ITypeFieldValueList keys)
@@ -43,20 +43,20 @@ namespace DbGate.Context.Impl
         public IReadOnlyEntity GetFromCurrentObjectGraph(ITypeFieldValueList keys)
         {
             InitReferenceStore();
-	        return referenceStore.GetFromCurrentObjectGraph(keys);
+            return referenceStore.GetFromCurrentObjectGraph(keys);
         }
 
         public void AddToCurrentObjectGraphIndex(IReadOnlyEntity refEntity)
         {
             InitReferenceStore();
-	        referenceStore.AddToCurrentObjectGraphIndex(refEntity);
+            referenceStore.AddToCurrentObjectGraphIndex(refEntity);
         }
 
         private void InitReferenceStore()
-	    {
-	        if (referenceStore == null)
-	            referenceStore = new ReferenceStore();
-	    }
+        {
+            if (referenceStore == null)
+                referenceStore = new ReferenceStore();
+        }
         #endregion
     }
 }

@@ -1,8 +1,8 @@
+using DbGate.Persist.Support.CrossReference;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using DbGate.Persist.Support.CrossReference;
-using log4net;
 using Xunit;
 
 namespace DbGate.Persist
@@ -30,7 +30,7 @@ namespace DbGate.Persist
                       "\tid_col Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            CreateTableFromSql(sql,DbName);
+            CreateTableFromSql(sql, DbName);
 
             sql = "Create table cross_reference_test_one2many (\n" +
                   "\tid_col Int NOT NULL,\n" +
@@ -55,7 +55,7 @@ namespace DbGate.Persist
             try
             {
                 var connection = SetupTables();
-                
+
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new CrossReferenceTestRootEntity();
@@ -65,7 +65,7 @@ namespace DbGate.Persist
                 one2OneEntity.IdCol = id;
                 one2OneEntity.Name = "Child-Entity";
                 one2OneEntity.RootEntity = entity;
-                entity.One2OneEntity =one2OneEntity;
+                entity.One2OneEntity = one2OneEntity;
                 entity.Persist(transaction);
                 transaction.Commit();
 
@@ -82,7 +82,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateCrossReferenceTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateCrossReferenceTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -101,7 +101,7 @@ namespace DbGate.Persist
                 entity.Name = "Org-Name";
                 var one2ManyEntity = new CrossReferenceTestOne2ManyEntity();
                 one2ManyEntity.IdCol = id;
-                one2ManyEntity.IndexNo =1;
+                one2ManyEntity.IndexNo = 1;
                 one2ManyEntity.Name = "Child-Entity";
                 one2ManyEntity.RootEntity = entity;
                 entity.One2ManyEntities.Add(one2ManyEntity);
@@ -111,7 +111,7 @@ namespace DbGate.Persist
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new CrossReferenceTestRootEntity();
                 LoadEntityWithId(transaction, loadedEntity, id);
-                
+
                 Assert.NotNull(loadedEntity);
                 Assert.True(loadedEntity.One2ManyEntities.Count == 1);
                 var childEnumerator = loadedEntity.One2ManyEntities.GetEnumerator();
@@ -130,7 +130,7 @@ namespace DbGate.Persist
             }
         }
 
-        private bool LoadEntityWithId(ITransaction transaction, CrossReferenceTestRootEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, CrossReferenceTestRootEntity loadEntity, int id)
         {
             var loaded = false;
 

@@ -14,7 +14,7 @@ namespace DbGate.Patch.Support.PatchEmpty
             get
             {
                 var map = new Dictionary<Type, ITable>();
-                map.Add(typeof (LeafEntity), new DefaultTable("leaf_entity"));
+                map.Add(typeof(LeafEntity), new DefaultTable("leaf_entity"));
                 return map;
             }
         }
@@ -36,7 +36,7 @@ namespace DbGate.Patch.Support.PatchEmpty
 
                 dbColumns.Add(new DefaultColumn("SomeText", ColumnType.Varchar));
 
-                map.Add(typeof (LeafEntity), dbColumns);
+                map.Add(typeof(LeafEntity), dbColumns);
                 return map;
             }
         }

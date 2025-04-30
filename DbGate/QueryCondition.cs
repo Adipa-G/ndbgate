@@ -6,18 +6,18 @@ namespace DbGate
 {
     public class QueryCondition
     {
-		private static AbstractConditionFactory factory;
+        private static AbstractConditionFactory factory;
 
-		public static AbstractConditionFactory Factory
-		{
-			set => factory = value;
+        public static AbstractConditionFactory Factory
+        {
+            set => factory = value;
         }
 
         public static IQueryCondition RawSql(string sql)
         {
-			var queryCondition = (AbstractSqlQueryCondition) factory.CreateCondition(QueryConditionExpressionType.RawSql);
-			queryCondition.Sql = sql;
-			return queryCondition;
+            var queryCondition = (AbstractSqlQueryCondition)factory.CreateCondition(QueryConditionExpressionType.RawSql);
+            queryCondition.Sql = sql;
+            return queryCondition;
         }
 
         public static IQueryCondition Expression(ConditionExpr expr)

@@ -1,6 +1,6 @@
+using DbGate.ErManagement.Query;
 using System.Collections.Generic;
 using System.Data;
-using DbGate.ErManagement.Query;
 
 namespace DbGate
 {

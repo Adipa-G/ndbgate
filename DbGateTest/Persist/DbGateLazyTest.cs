@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using Castle.DynamicProxy;
 using DbGate.Persist.Support.Lazy;
 using log4net;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using Xunit;
 
 namespace DbGate.Persist
@@ -26,14 +26,14 @@ namespace DbGate.Persist
             CleanupDb(DbName);
             FinalizeDb(DbName);
         }
-       
+
         private IDbConnection SetupTables()
         {
             var sql = "Create table lazy_test_root (\n" +
                       "\tid_col Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            CreateTableFromSql(sql,DbName);
+            CreateTableFromSql(sql, DbName);
 
             sql = "Create table lazy_test_one2many (\n" +
                       "\tid_col Int NOT NULL,\n" +
@@ -71,7 +71,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(con);
                 var entityReloaded = new LazyTestRootEntity();
-                LoadEntityWithId(transaction,entityReloaded,id);
+                LoadEntityWithId(transaction, entityReloaded, id);
                 transaction.Commit();
                 con.Close();
 
@@ -84,7 +84,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateLazyTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateLazyTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -96,67 +96,10 @@ namespace DbGate.Persist
             {
                 TransactionFactory.DbGate.Config.EnableStatistics = true;
                 TransactionFactory.DbGate.Statistics.Reset();
-                
-                var con = SetupTables();
-                var transaction = CreateTransaction(con);
-                
-                var id = 45;
-                var entity = new LazyTestRootEntity();
-                entity.IdCol = id;
-                entity.Name = "Org-Name";
-
-                var one2Many1 = new LazyTestOne2ManyEntity();
-                one2Many1.IndexNo = 1;
-                one2Many1.Name = "One2Many1";
-
-                var one2Many2 = new LazyTestOne2ManyEntity();
-                one2Many2.IndexNo = 2;
-                one2Many2.Name = "One2Many2";
-                entity.One2ManyEntities.Add(one2Many1);
-                entity.One2ManyEntities.Add(one2Many2);
-
-                var one2One = new LazyTestOne2OneEntity();
-                one2One.Name ="One2One";
-                entity.One2OneEntity =one2One;
-
-                entity.Persist(transaction);
-                transaction.Commit();
-                
-                transaction = CreateTransaction(con);
-                var entityReloaded = new LazyTestRootEntity();
-                LoadEntityWithId(transaction, entityReloaded, id);
-                
-                Assert.True(entityReloaded.One2ManyEntities.Count == 2);
-                var enumerator = entityReloaded.One2ManyEntities.GetEnumerator();
-                enumerator.MoveNext();
-                Assert.True(enumerator.Current.Name.Equals(one2Many1.Name));
-                enumerator.MoveNext();
-                Assert.True(enumerator.Current.Name.Equals(one2Many2.Name));
-                Assert.True(entityReloaded.One2OneEntity != null);
-                Assert.True(entityReloaded.One2OneEntity.Name.Equals(one2One.Name));
-                Assert.True(TransactionFactory.DbGate.Statistics.SelectQueryCount == 2);
-                
-                transaction.Commit();
-                con.Close();
-            }
-            catch (System.Exception e)
-            {
-                LogManager.GetLogger(typeof(DbGateLazyTest)).Fatal(e.Message, e);
-                Assert.Fail(e.Message);
-            }
-        }
-
-        [Fact]
-        public void Lazy_PersistAndLoad_WithLazyOnWithValuesInLazyFields_ShouldRetrieveLazyFieldsInAnotherConnection()
-        {
-            try
-            {
-                TransactionFactory.DbGate.Config.EnableStatistics = true;
-                TransactionFactory.DbGate.Statistics.Reset();
 
                 var con = SetupTables();
                 var transaction = CreateTransaction(con);
-                
+
                 var id = 45;
                 var entity = new LazyTestRootEntity();
                 entity.IdCol = id;
@@ -182,16 +125,73 @@ namespace DbGate.Persist
                 transaction = CreateTransaction(con);
                 var entityReloaded = new LazyTestRootEntity();
                 LoadEntityWithId(transaction, entityReloaded, id);
-                
 
                 Assert.True(entityReloaded.One2ManyEntities.Count == 2);
                 var enumerator = entityReloaded.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
-                Assert.True(enumerator.Current.Name.Equals(one2Many1.Name));
+                Assert.Equal(enumerator.Current.Name, one2Many1.Name);
                 enumerator.MoveNext();
-                Assert.True(enumerator.Current.Name.Equals(one2Many2.Name));
+                Assert.Equal(enumerator.Current.Name, one2Many2.Name);
                 Assert.True(entityReloaded.One2OneEntity != null);
-                Assert.True(entityReloaded.One2OneEntity.Name.Equals(one2One.Name));
+                Assert.Equal(entityReloaded.One2OneEntity.Name, one2One.Name);
+                Assert.True(TransactionFactory.DbGate.Statistics.SelectQueryCount == 2);
+
+                transaction.Commit();
+                con.Close();
+            }
+            catch (System.Exception e)
+            {
+                LogManager.GetLogger(typeof(DbGateLazyTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Fact]
+        public void Lazy_PersistAndLoad_WithLazyOnWithValuesInLazyFields_ShouldRetrieveLazyFieldsInAnotherConnection()
+        {
+            try
+            {
+                TransactionFactory.DbGate.Config.EnableStatistics = true;
+                TransactionFactory.DbGate.Statistics.Reset();
+
+                var con = SetupTables();
+                var transaction = CreateTransaction(con);
+
+                var id = 45;
+                var entity = new LazyTestRootEntity();
+                entity.IdCol = id;
+                entity.Name = "Org-Name";
+
+                var one2Many1 = new LazyTestOne2ManyEntity();
+                one2Many1.IndexNo = 1;
+                one2Many1.Name = "One2Many1";
+
+                var one2Many2 = new LazyTestOne2ManyEntity();
+                one2Many2.IndexNo = 2;
+                one2Many2.Name = "One2Many2";
+                entity.One2ManyEntities.Add(one2Many1);
+                entity.One2ManyEntities.Add(one2Many2);
+
+                var one2One = new LazyTestOne2OneEntity();
+                one2One.Name = "One2One";
+                entity.One2OneEntity = one2One;
+
+                entity.Persist(transaction);
+                transaction.Commit();
+
+                transaction = CreateTransaction(con);
+                var entityReloaded = new LazyTestRootEntity();
+                LoadEntityWithId(transaction, entityReloaded, id);
+
+
+                Assert.True(entityReloaded.One2ManyEntities.Count == 2);
+                var enumerator = entityReloaded.One2ManyEntities.GetEnumerator();
+                enumerator.MoveNext();
+                Assert.Equal(enumerator.Current.Name, one2Many1.Name);
+                enumerator.MoveNext();
+                Assert.Equal(enumerator.Current.Name, one2Many2.Name);
+                Assert.True(entityReloaded.One2OneEntity != null);
+                Assert.Equal(entityReloaded.One2OneEntity.Name, one2One.Name);
                 Assert.True(TransactionFactory.DbGate.Statistics.SelectQueryCount == 2);
 
                 transaction.Commit();
@@ -214,7 +214,7 @@ namespace DbGate.Persist
 
                 var con = SetupTables();
                 var transaction = CreateTransaction(con);
-                
+
                 var id = 45;
                 var entity = new LazyTestRootEntity();
                 entity.IdCol = id;
@@ -253,7 +253,7 @@ namespace DbGate.Persist
             }
         }
 
-        private bool LoadEntityWithId(ITransaction transaction, LazyTestRootEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, LazyTestRootEntity loadEntity, int id)
         {
             var loaded = false;
 

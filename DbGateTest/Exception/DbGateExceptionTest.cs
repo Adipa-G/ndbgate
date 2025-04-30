@@ -1,11 +1,11 @@
-using System;
-using System.Data;
-using System.Reflection;
 using DbGate.Caches.Impl;
 using DbGate.ErManagement.ErMapper;
 using DbGate.ErManagement.ErMapper.Utils;
 using DbGate.Exception.Support;
 using DbGate.Exceptions.Common;
+using System;
+using System.Data;
+using System.Reflection;
 using Xunit;
 
 namespace DbGate.Exception
@@ -27,7 +27,7 @@ namespace DbGate.Exception
         public void Dispose()
         {
             CleanupDb(DbName);
-            FinalizeDb(DbName); 
+            FinalizeDb(DbName);
         }
 
         private IDbConnection SetupTables()
@@ -36,7 +36,7 @@ namespace DbGate.Exception
                       "\tid_col Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            CreateTableFromSql(sql,DbName);
+            CreateTableFromSql(sql, DbName);
             EndInit(DbName);
 
             return Connection;
@@ -52,7 +52,7 @@ namespace DbGate.Exception
             }
             catch (EntityInstantiationException)
             {
-                Assert.True(true,"could not create instance without default constructor");
+                Assert.True(true, "could not create instance without default constructor");
             }
         }
 
@@ -67,11 +67,11 @@ namespace DbGate.Exception
             }
             catch (EntityRegistrationException)
             {
-                Assert.True(true,"could not register class without default constructor");
+                Assert.True(true, "could not register class without default constructor");
             }
             catch (System.Exception e)
             {
-                Assert.Fail("unexpected exception"  + e.Message);
+                Assert.Fail("unexpected exception" + e.Message);
             }
         }
 
@@ -87,11 +87,11 @@ namespace DbGate.Exception
             }
             catch (MethodInvocationException)
             {
-                Assert.True(true,"could not invoke getter method");
+                Assert.True(true, "could not invoke getter method");
             }
             catch (System.Exception e)
             {
-                Assert.Fail("unexpected exception"  + e.Message);
+                Assert.Fail("unexpected exception" + e.Message);
             }
         }
 
@@ -107,11 +107,11 @@ namespace DbGate.Exception
             }
             catch (MethodInvocationException)
             {
-                Assert.True(true,"could not invoke setter method");
+                Assert.True(true, "could not invoke setter method");
             }
             catch (System.Exception e)
             {
-                Assert.Fail("unexpected exception"  + e.Message);
+                Assert.Fail("unexpected exception" + e.Message);
             }
         }
 
@@ -126,11 +126,11 @@ namespace DbGate.Exception
             }
             catch (PropertyNotFoundException)
             {
-                Assert.True(true,"could not get method");
+                Assert.True(true, "could not get method");
             }
             catch (System.Exception e)
             {
-                Assert.Fail("unexpected exception"  + e.Message);
+                Assert.Fail("unexpected exception" + e.Message);
             }
         }
     }

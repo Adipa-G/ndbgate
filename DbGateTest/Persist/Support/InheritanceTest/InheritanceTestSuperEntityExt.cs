@@ -1,6 +1,6 @@
-﻿using System.Data;
-using DbGate.Context;
+﻿using DbGate.Context;
 using DbGate.Context.Impl;
+using System.Data;
 
 namespace DbGate.Persist.Support.InheritanceTest
 {

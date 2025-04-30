@@ -1,9 +1,9 @@
+using DbGate.ErManagement.Query;
+using DbGate.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text.RegularExpressions;
-using DbGate.ErManagement.Query;
-using DbGate.Exceptions;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
 {
@@ -40,7 +40,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
                     var column = columns[i].ToLowerInvariant();
                     if (column.Contains(" as "))
                     {
-                        column = column.Split(new[] {"as"}, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
+                        column = column.Split(new[] { "as" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
                     }
                     var ordinal = rs.GetOrdinal(column);
                     var obj = rs.GetValue(ordinal);

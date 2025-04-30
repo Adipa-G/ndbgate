@@ -1,5 +1,5 @@
-using System;
 using DbGate;
+using System;
 
 namespace PerformanceTest.NDbGate.Entities.Order
 {
@@ -29,18 +29,18 @@ namespace PerformanceTest.NDbGate.Entities.Order
         public string ChargeCode { get; set; }
 
         [ForeignKeyInfo("item_tx2tx_chg",
-            typeof (Transaction),
-            new[] {"transactionId"},
-            new[] {"transactionId"},
+            typeof(Transaction),
+            new[] { "transactionId" },
+            new[] { "transactionId" },
             ReverseRelation = true,
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public Transaction Transaction { get; set; }
 
         [ForeignKeyInfo("item_tx2tx_chg",
-            typeof (ItemTransaction),
-            new[] {"transactionId", "indexNo"},
-            new[] {"transactionId", "indexNo"},
+            typeof(ItemTransaction),
+            new[] { "transactionId", "indexNo" },
+            new[] { "transactionId", "indexNo" },
             ReverseRelation = true,
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]

@@ -1,7 +1,7 @@
-using System;
 using DbGate.ErManagement.Query;
 using DbGate.ErManagement.Query.Expr;
 using DbGate.ErManagement.Query.Expr.Segments;
+using System;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.OrderBy
 {
@@ -27,7 +27,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.OrderBy
             switch (rootSegment.SegmentType)
             {
                 case SegmentType.Field:
-                    var sql = processor.GetFieldName((FieldSegment) rootSegment, false, buildInfo);
+                    var sql = processor.GetFieldName((FieldSegment)rootSegment, false, buildInfo);
                     switch (OrderType)
                     {
                         case QueryOrderType.Ascend:

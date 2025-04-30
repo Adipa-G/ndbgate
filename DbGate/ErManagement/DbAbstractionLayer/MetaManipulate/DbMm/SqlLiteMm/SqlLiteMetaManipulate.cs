@@ -1,10 +1,10 @@
-﻿using System;
-using System.Data;
-using System.Text;
-using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare;
+﻿using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Mappings;
+using System;
+using System.Data;
+using System.Text;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlLiteMm
 {
@@ -38,7 +38,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlLiteMm
 
         protected override string CreateCreateTableQuery(MetaComparisonTableGroup tableGroup)
         {
-            var metaTable = (MetaTable) tableGroup.RequiredItem;
+            var metaTable = (MetaTable)tableGroup.RequiredItem;
 
             var sb = new StringBuilder();
             sb.Append("CREATE TABLE ");
@@ -77,7 +77,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlLiteMm
 
             if (tableGroup.PrimaryKey != null && tableGroup.PrimaryKey.RequiredItem != null)
             {
-                var primaryKey = (MetaPrimaryKey) tableGroup.PrimaryKey.RequiredItem;
+                var primaryKey = (MetaPrimaryKey)tableGroup.PrimaryKey.RequiredItem;
                 sb.Append(",");
                 sb.Append("PRIMARY KEY(");
 
@@ -96,7 +96,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlLiteMm
 
             foreach (var foreignKeyGroup in tableGroup.ForeignKeys)
             {
-                var requiredKey = (MetaForeignKey) foreignKeyGroup.RequiredItem;
+                var requiredKey = (MetaForeignKey)foreignKeyGroup.RequiredItem;
                 sb.Append(",");
                 sb.Append("FOREIGN KEY(");
 

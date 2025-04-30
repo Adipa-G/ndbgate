@@ -13,13 +13,13 @@ namespace DbGate.Persist.Support.SuperEntityRefInheritance
         [ColumnInfo((ColumnType.Integer), Key = true)]
         public virtual int IdCol { get; set; }
 
-        [ColumnInfo(ColumnType.Varchar,Size = 100)]
+        [ColumnInfo(ColumnType.Varchar, Size = 100)]
         public virtual string Name { get; set; }
 
         [ForeignKeyInfo("fk_root2one2manyent",
             typeof(SuperEntityRefOne2ManyEntity),
             new[] { "idCol" },
-            new[] {"idCol"},
+            new[] { "idCol" },
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade,
             FetchStrategy = FetchStrategy.Eager)]
@@ -28,7 +28,7 @@ namespace DbGate.Persist.Support.SuperEntityRefInheritance
         [ForeignKeyInfo("fk_root2one2oneent",
             typeof(SuperEntityRefOne2OneEntity),
             new[] { "idCol" },
-            new[] {"idCol"},
+            new[] { "idCol" },
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade,
             FetchStrategy = FetchStrategy.Eager)]

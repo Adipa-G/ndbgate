@@ -7,9 +7,9 @@
  * To change this template use Tools | Options | Coding | Edit Standard Headers.
  */
 
+using DbGate.ErManagement.Query;
 using System;
 using System.Text;
-using DbGate.ErManagement.Query;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.From
 {

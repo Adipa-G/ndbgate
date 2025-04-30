@@ -1,9 +1,9 @@
-using System;
-using System.Linq.Expressions;
 using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.OrderBy;
 using DbGate.ErManagement.ErMapper.Utils;
 using DbGate.ErManagement.Query;
 using DbGate.ErManagement.Query.Expr;
+using System;
+using System.Linq.Expressions;
 
 namespace DbGate
 {
@@ -18,7 +18,7 @@ namespace DbGate
 
         public static IQueryOrderBy RawSql(string sql)
         {
-            var queryOrderBy = (AbstractSqlQueryOrderBy) factory.CreateOrderBy(QueryOrderByExpressionType.RawSql);
+            var queryOrderBy = (AbstractSqlQueryOrderBy)factory.CreateOrderBy(QueryOrderByExpressionType.RawSql);
             queryOrderBy.Sql = sql;
             return queryOrderBy;
         }
@@ -31,7 +31,7 @@ namespace DbGate
         public static IQueryOrderBy Field<T>(Expression<Func<T, object>> prop, QueryOrderType orderType)
         {
             var fieldName = ReflectionUtils.GetPropertyNameFromExpression(prop);
-            return Field(typeof(T), fieldName,orderType);
+            return Field(typeof(T), fieldName, orderType);
         }
 
         public static IQueryOrderBy Field(Type type, string field)
@@ -42,7 +42,7 @@ namespace DbGate
         public static IQueryOrderBy Field(Type type, string field, QueryOrderType orderType)
         {
             var expressionOrderBy =
-                (AbstractExpressionOrderBy) factory.CreateOrderBy(QueryOrderByExpressionType.Expression);
+                (AbstractExpressionOrderBy)factory.CreateOrderBy(QueryOrderByExpressionType.Expression);
             expressionOrderBy.Expr = OrderByExpr.Build().Field(type, field);
             expressionOrderBy.OrderType = orderType;
             return expressionOrderBy;

@@ -14,7 +14,7 @@ namespace DbGate.ErManagement.Query.Expr
         {
             return BaseField(prop);
         }
-        
+
         public static OrderByExpr Build()
         {
             return new OrderByExpr();
