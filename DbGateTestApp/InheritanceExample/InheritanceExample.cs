@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using DbGate;
 using DbGate.Utility;
 using DbGateTestApp.DocGenerate;
 using DbGateTestApp.InheritanceExample.Entities;
+using System;
+using System.Collections.Generic;
+using System.Data;
 
 namespace DbGateTestApp.InheritanceExample
 {
@@ -23,7 +23,7 @@ namespace DbGateTestApp.InheritanceExample
             return entity;
         }
 
-        public void Patch(ITransaction tx) 
+        public void Patch(ITransaction tx)
         {
             ICollection<Type> entityTypes = new List<Type>();
             entityTypes.Add(typeof(BottomEntity));
@@ -91,5 +91,3 @@ namespace DbGateTestApp.InheritanceExample
         }
     }
 }
-
-

@@ -1,6 +1,6 @@
+using DbGate.ErManagement.Query;
 using System;
 using System.Data;
-using DbGate.ErManagement.Query;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Selection
 {

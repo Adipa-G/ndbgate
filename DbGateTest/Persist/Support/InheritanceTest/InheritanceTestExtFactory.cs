@@ -9,21 +9,21 @@ namespace DbGate.Persist.Support.InheritanceTest
         {
             ICollection<IField> fields = new List<IField>();
 
-            if (type == typeof (InheritanceTestSuperEntityExt))
+            if (type == typeof(InheritanceTestSuperEntityExt))
             {
                 var idCol = new DefaultColumn("IdCol", true, false, ColumnType.Integer);
                 idCol.SubClassCommonColumn = true;
                 fields.Add(idCol);
                 fields.Add(new DefaultColumn("Name", ColumnType.Varchar));
             }
-            else if (type == typeof (InheritanceTestSubEntityAExt))
+            else if (type == typeof(InheritanceTestSubEntityAExt))
             {
                 var idCol = new DefaultColumn("IdCol", true, false, ColumnType.Integer);
                 idCol.SubClassCommonColumn = true;
                 fields.Add(idCol);
                 fields.Add(new DefaultColumn("NameA", ColumnType.Varchar));
             }
-            else if (type == typeof (InheritanceTestSubEntityBExt))
+            else if (type == typeof(InheritanceTestSubEntityBExt))
             {
                 var idCol = new DefaultColumn("IdCol", true, false, ColumnType.Integer);
                 idCol.SubClassCommonColumn = true;
@@ -36,15 +36,15 @@ namespace DbGate.Persist.Support.InheritanceTest
         public static ITable GetTableInfo(Type type)
         {
             ITable table = null;
-            if (type == typeof (InheritanceTestSuperEntityExt))
+            if (type == typeof(InheritanceTestSuperEntityExt))
             {
                 table = new DefaultTable("inheritance_test_super");
             }
-            else if (type == typeof (InheritanceTestSubEntityAExt))
+            else if (type == typeof(InheritanceTestSubEntityAExt))
             {
                 table = new DefaultTable("inheritance_test_suba");
             }
-            else if (type == typeof (InheritanceTestSubEntityBExt))
+            else if (type == typeof(InheritanceTestSubEntityBExt))
             {
                 table = new DefaultTable("inheritance_test_subb");
             }

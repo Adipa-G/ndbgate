@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using DbGate;
 using DbGateTestApp.DocGenerate;
+using System.Collections.Generic;
 
 namespace DbGateTestApp.ComplexExample.Entities.Order
 {
@@ -20,9 +20,9 @@ namespace DbGateTestApp.ComplexExample.Entities.Order
         public string Name { get; set; }
 
         [ForeignKeyInfo("tx2item_tx",
-            typeof (ItemTransaction),
-            new[] {"transactionId"},
-            new[] {"transactionId"},
+            typeof(ItemTransaction),
+            new[] { "transactionId" },
+            new[] { "transactionId" },
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public ICollection<ItemTransaction> ItemTransactions { get; set; }

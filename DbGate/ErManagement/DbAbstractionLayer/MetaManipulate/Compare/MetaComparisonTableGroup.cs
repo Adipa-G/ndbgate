@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures;
+﻿using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures;
+using System.Collections.Generic;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
 {

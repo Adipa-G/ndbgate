@@ -1,14 +1,14 @@
-﻿using System;
+﻿using DbGate.Caches;
+using DbGate.Caches.Impl;
+using DbGate.ErManagement.ErMapper;
+using log4net;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using DbGate.Caches;
-using DbGate.Caches.Impl;
-using DbGate.ErManagement.ErMapper;
-using log4net;
 using Xunit;
 
 namespace DbGate
@@ -17,10 +17,10 @@ namespace DbGate
     {
         protected ITransactionFactory TransactionFactory;
         protected IDbConnection Connection;
-        
-        private readonly Dictionary<string,ICollection<string>> dbTableNameMap = new Dictionary<string, ICollection<string>>();
-        private readonly Dictionary<string,ICollection<Type>> dbEntityTypeMap = new Dictionary<string, ICollection<Type>>();
-        
+
+        private readonly Dictionary<string, ICollection<string>> dbTableNameMap = new Dictionary<string, ICollection<string>>();
+        private readonly Dictionary<string, ICollection<Type>> dbEntityTypeMap = new Dictionary<string, ICollection<Type>>();
+
         protected static Type TestClass = typeof(AbstractDbGateTestBase);
 
         protected void BeginInit(string dbName)
@@ -38,16 +38,16 @@ namespace DbGate
                             "Data Source=:memory:;Version=3;Mode=Memory;New=True;Pooling=True;Max Pool Size=1;foreign_keys = ON"),
                         DefaultTransactionFactory.DbSqllite);
                 }
-                
+
                 var transaction = TransactionFactory.CreateTransaction();
                 Assert.NotNull(transaction);
-                
+
                 Connection = transaction.Connection;
                 Assert.NotNull(Connection);
             }
             catch (System.Exception ex)
             {
-                LogManager.GetLogger(TestClass).Fatal(string.Format("Exception during database {0} startup.",dbName), ex);
+                LogManager.GetLogger(TestClass).Fatal(string.Format("Exception during database {0} startup.", dbName), ex);
             }
         }
 
@@ -60,7 +60,7 @@ namespace DbGate
             return new Transaction(TransactionFactory, Connection.BeginTransaction());
         }
 
-        protected void CreateTableFromSql(string sql,string dbName,IDbConnection con = null)
+        protected void CreateTableFromSql(string sql, string dbName, IDbConnection con = null)
         {
             try
             {
@@ -70,15 +70,15 @@ namespace DbGate
                 cmd.ExecuteNonQuery();
                 tx.Commit();
 
-                AddTableNameFromSql(sql,dbName);
+                AddTableNameFromSql(sql, dbName);
             }
             catch (System.Exception ex)
             {
-                LogManager.GetLogger(TestClass).Fatal(string.Format("Exception creating the table with sql {0} in database {1}.",sql,dbName),ex);
+                LogManager.GetLogger(TestClass).Fatal(string.Format("Exception creating the table with sql {0} in database {1}.", sql, dbName), ex);
             }
         }
 
-        protected void RegisterClassForDbPatching(Type entity,string dbName)
+        protected void RegisterClassForDbPatching(Type entity, string dbName)
         {
             ICollection<Type> entityTypes;
             if (dbEntityTypeMap.ContainsKey(dbName))
@@ -88,22 +88,22 @@ namespace DbGate
             else
             {
                 entityTypes = new List<Type>();
-                dbEntityTypeMap.Add(dbName,entityTypes);
+                dbEntityTypeMap.Add(dbName, entityTypes);
             }
             entityTypes.Add(entity);
         }
 
-        private void AddTableNameFromSql(string sql,string dbName)
+        private void AddTableNameFromSql(string sql, string dbName)
         {
-            var match = Regex.Match(sql,@"(create)([\\s]*)(table)([\\s]*)([^\\s]*)",RegexOptions.IgnoreCase);
+            var match = Regex.Match(sql, @"(create)([\\s]*)(table)([\\s]*)([^\\s]*)", RegexOptions.IgnoreCase);
             if (match.Success)
             {
                 var tableName = match.Groups[match.Groups.Count].Value;
-                AddTableName(tableName,dbName);
+                AddTableName(tableName, dbName);
             }
         }
 
-        protected void EndInit(string dbName,IDbConnection con = null)
+        protected void EndInit(string dbName, IDbConnection con = null)
         {
             try
             {
@@ -113,33 +113,33 @@ namespace DbGate
                     var typeList = dbEntityTypeMap[dbName];
                     if (typeList.Count > 0)
                     {
-                        tx.DbGate.PatchDataBase(tx,typeList,true);
+                        tx.DbGate.PatchDataBase(tx, typeList, true);
                         tx.Commit();
                     }
 
                     foreach (var aType in typeList)
                     {
-                        AddTableNameFromEntity(aType,dbName);
+                        AddTableNameFromEntity(aType, dbName);
                     }
                 }
             }
             catch (System.Exception ex)
             {
-                LogManager.GetLogger(TestClass).Fatal(string.Format("Exception patching the database {0}.",dbName),ex);
+                LogManager.GetLogger(TestClass).Fatal(string.Format("Exception patching the database {0}.", dbName), ex);
             }
         }
 
-        private void AddTableNameFromEntity(Type entityType,string dbName)
+        private void AddTableNameFromEntity(Type entityType, string dbName)
         {
             var entityInfo = CacheManager.GetEntityInfo(entityType);
             while (entityInfo != null)
             {
-                AddTableName(entityInfo.TableInfo.TableName,dbName);
+                AddTableName(entityInfo.TableInfo.TableName, dbName);
                 entityInfo = entityInfo.SuperEntityInfo;
             }
         }
 
-        private void AddTableName(string tableName,string dbName)
+        private void AddTableName(string tableName, string dbName)
         {
             ICollection<string> tableNames;
             if (dbTableNameMap.ContainsKey(dbName))
@@ -170,7 +170,7 @@ namespace DbGate
                         foreach (var tableName in tableNames)
                         {
                             var cmd = tx.CreateCommand();
-                            cmd.CommandText = string.Format("DELETE FROM {0}",tableName);
+                            cmd.CommandText = string.Format("DELETE FROM {0}", tableName);
                             cmd.ExecuteNonQuery();
                         }
                         tx.Commit();
@@ -179,13 +179,13 @@ namespace DbGate
             }
             catch (System.Exception ex)
             {
-                LogManager.GetLogger(TestClass).Fatal(string.Format("Exception cleaning the database {0}.",dbName),ex);
+                LogManager.GetLogger(TestClass).Fatal(string.Format("Exception cleaning the database {0}.", dbName), ex);
             }
         }
 
         protected void FinalizeDb(string dbName)
         {
-            LogManager.GetLogger(TestClass).Info(string.Format("Stopping in-memory database {0}.",dbName));
+            LogManager.GetLogger(TestClass).Info(string.Format("Stopping in-memory database {0}.", dbName));
 
             try
             {

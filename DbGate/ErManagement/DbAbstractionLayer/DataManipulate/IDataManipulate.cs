@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Data;
-using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query;
+﻿using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query;
 using DbGate.ErManagement.Query;
+using System.Collections.Generic;
+using System.Data;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 {

@@ -1,5 +1,5 @@
-﻿using System;
-using DbGate.Exceptions;
+﻿using DbGate.Exceptions;
+using System;
 
 namespace DbGate.ErManagement.Query.Expr.Segments
 {
@@ -11,7 +11,7 @@ namespace DbGate.ErManagement.Query.Expr.Segments
         private readonly string typeAlias;
 
         public FieldSegment(string field)
-            : this((Type) null, field)
+            : this((Type)null, field)
         {
             this.field = field;
         }

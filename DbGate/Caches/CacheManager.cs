@@ -1,6 +1,6 @@
+using DbGate.Caches.Impl;
 using System;
 using System.Collections.Generic;
-using DbGate.Caches.Impl;
 
 namespace DbGate.Caches
 {

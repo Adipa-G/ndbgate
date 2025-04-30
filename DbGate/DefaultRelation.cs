@@ -6,9 +6,9 @@ namespace DbGate
     {
         public DefaultRelation(string attributeName,
             string relationshipName,
-            Type sourceObjectType, 
+            Type sourceObjectType,
             Type relatedObjectType,
-            RelationColumnMapping[] tableColumnMappings) 
+            RelationColumnMapping[] tableColumnMappings)
             : base(attributeName,
                 relationshipName,
                 sourceObjectType,
@@ -20,24 +20,24 @@ namespace DbGate
         public DefaultRelation(string attributeName,
             string relationshipName,
             Type sourceObjectType,
-            Type relatedObjectType, 
+            Type relatedObjectType,
             RelationColumnMapping[] tableColumnMappings,
-            ReferentialRuleType updateRule, 
+            ReferentialRuleType updateRule,
             ReferentialRuleType deleteRule,
             bool reverseRelationship,
             bool nonIdentifyingRelation,
             FetchStrategy fetchStrategy,
-            bool nullable) 
-            : base(attributeName, 
+            bool nullable)
+            : base(attributeName,
                   relationshipName,
-                  sourceObjectType, 
+                  sourceObjectType,
                   relatedObjectType,
-                  tableColumnMappings, 
-                  updateRule, 
+                  tableColumnMappings,
+                  updateRule,
                   deleteRule,
                   reverseRelationship,
                   nonIdentifyingRelation,
-                  fetchStrategy, 
+                  fetchStrategy,
                   nullable)
         {
         }

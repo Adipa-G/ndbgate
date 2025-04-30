@@ -2,6 +2,6 @@ namespace DbGate.ErManagement.Query
 {
     public interface IQueryCondition
     {
-		QueryConditionExpressionType ConditionExpressionType { get; }
+        QueryConditionExpressionType ConditionExpressionType { get; }
     }
 }

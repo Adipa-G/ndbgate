@@ -27,7 +27,7 @@ namespace DbGate.ErManagement.Query.Expr
 
         public ConditionExpr Field<T>(Expression<Func<T, object>> prop, string typeAlias)
         {
-            return BaseField(prop, typeAlias,null);
+            return BaseField(prop, typeAlias, null);
         }
 
         public ConditionExpr Value(ColumnType type, object value)
@@ -37,7 +37,7 @@ namespace DbGate.ErManagement.Query.Expr
 
         public ConditionExpr Value(object value)
         {
-            return Values( value);
+            return Values(value);
         }
 
         public ConditionExpr Values(ColumnType type, params object[] value)

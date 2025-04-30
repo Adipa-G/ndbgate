@@ -19,7 +19,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures
             if (this == o) return true;
             if (o == null || GetType() != o.GetType()) return false;
 
-            var that = (MetaForeignKeyColumnMapping) o;
+            var that = (MetaForeignKeyColumnMapping)o;
 
             if (FromColumn != null && !FromColumn.Equals(that.FromColumn, StringComparison.OrdinalIgnoreCase))
             {

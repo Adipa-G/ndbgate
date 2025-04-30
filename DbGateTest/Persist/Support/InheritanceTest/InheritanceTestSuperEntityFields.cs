@@ -10,7 +10,7 @@ namespace DbGate.Persist.Support.InheritanceTest
             get
             {
                 var map = new Dictionary<Type, ITable>();
-                map.Add(typeof (InheritanceTestSuperEntityFields), new DefaultTable("inheritance_test_super"));
+                map.Add(typeof(InheritanceTestSuperEntityFields), new DefaultTable("inheritance_test_super"));
                 return map;
             }
         }
@@ -27,7 +27,7 @@ namespace DbGate.Persist.Support.InheritanceTest
                 dbColumns.Add(idCol);
                 dbColumns.Add(new DefaultColumn("Name", ColumnType.Varchar));
 
-                map.Add(typeof (InheritanceTestSuperEntityFields), dbColumns);
+                map.Add(typeof(InheritanceTestSuperEntityFields), dbColumns);
                 return map;
             }
         }

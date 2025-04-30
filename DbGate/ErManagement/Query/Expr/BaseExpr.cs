@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq.Expressions;
-using DbGate.ErManagement.ErMapper.Utils;
+﻿using DbGate.ErManagement.ErMapper.Utils;
 using DbGate.ErManagement.Query.Expr.Segments;
+using System;
+using System.Linq.Expressions;
 
 namespace DbGate.ErManagement.Query.Expr
 {
@@ -15,27 +15,27 @@ namespace DbGate.ErManagement.Query.Expr
             return AddSegment(segment);
         }
 
-        protected T BaseField(string field,string alias)
+        protected T BaseField(string field, string alias)
         {
-            var segment = new FieldSegment(field,alias);
+            var segment = new FieldSegment(field, alias);
             return AddSegment(segment);
         }
 
         protected T BaseField(Type entityType, string field)
         {
-            var segment = new FieldSegment(entityType,field);
+            var segment = new FieldSegment(entityType, field);
             return AddSegment(segment);
         }
 
         protected T BaseField(Type entityType, string field, string alias)
         {
-            var segment = new FieldSegment(entityType,field,alias);
+            var segment = new FieldSegment(entityType, field, alias);
             return AddSegment(segment);
         }
 
         protected T BaseField(Type entityType, string typeAlias, string field, string alias)
         {
-            var segment = new FieldSegment(entityType,typeAlias,field,alias);
+            var segment = new FieldSegment(entityType, typeAlias, field, alias);
             return AddSegment(segment);
         }
 
@@ -59,13 +59,13 @@ namespace DbGate.ErManagement.Query.Expr
         {
             var entityType = typeof(TU);
             var fieldName = ReflectionUtils.GetPropertyNameFromExpression(prop);
-            var segment = new FieldSegment(entityType,typeAlias, fieldName, alias);
+            var segment = new FieldSegment(entityType, typeAlias, fieldName, alias);
             return AddSegment(segment);
         }
 
         protected T BaseValues(ColumnType type, params object[] values)
         {
-            var segment = new ValueSegment(type,values);
+            var segment = new ValueSegment(type, values);
             return AddSegment(segment);
         }
 
@@ -77,12 +77,12 @@ namespace DbGate.ErManagement.Query.Expr
 
         protected T BaseQuery(ISelectionQuery query)
         {
-            return BaseQuery(query,null);
+            return BaseQuery(query, null);
         }
 
         protected T BaseQuery(ISelectionQuery query, string alias)
         {
-            var segment = new QuerySegment(query,alias);
+            var segment = new QuerySegment(query, alias);
             return AddSegment(segment);
         }
 

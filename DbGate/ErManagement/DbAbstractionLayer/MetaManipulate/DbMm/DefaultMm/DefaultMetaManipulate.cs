@@ -1,12 +1,12 @@
-﻿using System;
+﻿using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare;
+using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures;
+using DbGate.Exceptions;
+using log4net;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Text;
-using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare;
-using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures;
-using DbGate.Exceptions;
-using log4net;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
 {
@@ -21,7 +21,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
             var metaItems = new List<MetaTable>();
             try
             {
-                var dbConnection = (DbConnection) tx.Connection;
+                var dbConnection = (DbConnection)tx.Connection;
                 var dbTableTable = dbConnection.GetSchema("Tables");
                 if (dbTableTable == null)
                 {
@@ -48,8 +48,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
         {
             try
             {
-                var dbConnection = (DbConnection) tx.Connection;
-                var columnTable = dbConnection.GetSchema("Columns", new[] {null, null, table.Name, null});
+                var dbConnection = (DbConnection)tx.Connection;
+                var columnTable = dbConnection.GetSchema("Columns", new[] { null, null, table.Name, null });
                 if (columnTable == null)
                 {
                     Logger.GetLogger(Config.LoggerName).Fatal(
@@ -61,9 +61,9 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
                     var column = new MetaColumn();
                     table.Columns.Add(column);
                     column.Name = columnRow["COLUMN_NAME"].ToString();
-                    column.Size = (int) columnRow["CHARACTER_MAXIMUM_LENGTH"];
+                    column.Size = (int)columnRow["CHARACTER_MAXIMUM_LENGTH"];
                     column.ColumnType = MapColumnTypeNameToType(columnRow["DATA_TYPE"].ToString());
-                    column.Null = (bool) columnRow["IS_NULLABLE"];
+                    column.Null = (bool)columnRow["IS_NULLABLE"];
                 }
             }
             catch (Exception e)
@@ -80,8 +80,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
             var keyColMap = new Dictionary<int, string>();
             try
             {
-                var dbConnection = (DbConnection) tx.Connection;
-                var pkTable = dbConnection.GetSchema("Primary_Keys", new[] {null, null, table.Name, null});
+                var dbConnection = (DbConnection)tx.Connection;
+                var pkTable = dbConnection.GetSchema("Primary_Keys", new[] { null, null, table.Name, null });
                 if (pkTable == null)
                 {
                     Logger.GetLogger(Config.LoggerName).Fatal(
@@ -96,7 +96,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
                         table.PrimaryKey = primaryKey;
                         primaryKey.Name = pkRow["PK_NAME"].ToString();
                     }
-                    keyColMap.Add((int) pkRow["ORDINAL"], pkRow["COLUMN_NAME"].ToString());
+                    keyColMap.Add((int)pkRow["ORDINAL"], pkRow["COLUMN_NAME"].ToString());
                 }
                 if (table.PrimaryKey != null)
                 {
@@ -125,8 +125,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
 
             try
             {
-                var dbConnection = (DbConnection) tx.Connection;
-                var fkTable = dbConnection.GetSchema("Foreign_Keys", new[] {null, null, table.Name, null});
+                var dbConnection = (DbConnection)tx.Connection;
+                var fkTable = dbConnection.GetSchema("Foreign_Keys", new[] { null, null, table.Name, null });
                 if (fkTable == null)
                 {
                     Logger.GetLogger(Config.LoggerName).Fatal(
@@ -143,8 +143,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
                         foreignKeyMap.Add(fkName, foreignKey);
                         foreignKey.Name = fkName;
                         foreignKey.ToTable = fkRow["FK_TABLE_NAME"].ToString();
-                        foreignKey.UpdateRule = (ReferentialRuleType) fkRow["UPDATE_RULE"];
-                        foreignKey.DeleteRule = (ReferentialRuleType) fkRow["DELETE_RULE"];
+                        foreignKey.UpdateRule = (ReferentialRuleType)fkRow["UPDATE_RULE"];
+                        foreignKey.DeleteRule = (ReferentialRuleType)fkRow["DELETE_RULE"];
 
                         fromTableColMap.Add(fkName, new Dictionary<int, string>());
                         toTableColMap.Add(fkName, new Dictionary<int, string>());
@@ -190,7 +190,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
 
         protected override string CreateCreateTableQuery(MetaComparisonTableGroup tableGroup)
         {
-            var metaTable = (MetaTable) tableGroup.RequiredItem;
+            var metaTable = (MetaTable)tableGroup.RequiredItem;
 
             var sb = new StringBuilder();
             sb.Append("CREATE TABLE ");
@@ -233,7 +233,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
 
         protected override string CreateDropTableQuery(MetaComparisonTableGroup tableGroup)
         {
-            var metaTable = (MetaTable) tableGroup.ExistingItem;
+            var metaTable = (MetaTable)tableGroup.ExistingItem;
 
             var sb = new StringBuilder();
             sb.Append("DROP TABLE ");
@@ -249,8 +249,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
         protected override string CreateCreateColumnQuery(MetaComparisonTableGroup tableGroup,
                                                           MetaComparisonColumnGroup columnGroup)
         {
-            var metaTable = (MetaTable) tableGroup.RequiredItem;
-            var metaColumn = (MetaColumn) columnGroup.RequiredItem;
+            var metaTable = (MetaTable)tableGroup.RequiredItem;
+            var metaColumn = (MetaColumn)columnGroup.RequiredItem;
 
             var sb = new StringBuilder();
             sb.Append("ALTER TABLE ");
@@ -295,8 +295,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
         protected override string CreateDropColumnQuery(MetaComparisonTableGroup tableGroup,
                                                         MetaComparisonColumnGroup columnGroup)
         {
-            var metaTable = (MetaTable) tableGroup.RequiredItem;
-            var metaColumn = (MetaColumn) columnGroup.RequiredItem;
+            var metaTable = (MetaTable)tableGroup.RequiredItem;
+            var metaColumn = (MetaColumn)columnGroup.RequiredItem;
 
             var sb = new StringBuilder();
             sb.Append("ALTER TABLE ");
@@ -311,8 +311,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
         protected override string CreateAlterColumnQuery(MetaComparisonTableGroup tableGroup,
                                                          MetaComparisonColumnGroup columnGroup)
         {
-            var metaTable = (MetaTable) tableGroup.RequiredItem;
-            var metaColumn = (MetaColumn) columnGroup.RequiredItem;
+            var metaTable = (MetaTable)tableGroup.RequiredItem;
+            var metaColumn = (MetaColumn)columnGroup.RequiredItem;
 
             var sb = new StringBuilder();
             sb.Append("ALTER TABLE ");
@@ -358,8 +358,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
         protected override string CreateCreatePrimaryKeyQuery(MetaComparisonTableGroup tableGroup,
                                                               MetaComparisonPrimaryKeyGroup primaryKeyGroup)
         {
-            var requiredTable = (MetaTable) tableGroup.RequiredItem;
-            var primaryKey = (MetaPrimaryKey) primaryKeyGroup.RequiredItem;
+            var requiredTable = (MetaTable)tableGroup.RequiredItem;
+            var primaryKey = (MetaPrimaryKey)primaryKeyGroup.RequiredItem;
 
             var sb = new StringBuilder();
             sb.Append("ALTER TABLE ");
@@ -390,8 +390,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
         protected override string CreateDropPrimaryKeyQuery(MetaComparisonTableGroup tableGroup,
                                                             MetaComparisonPrimaryKeyGroup primaryKeyGroup)
         {
-            var requiredTable = (MetaTable) tableGroup.ExistingItem;
-            var primaryKey = (MetaPrimaryKey) primaryKeyGroup.ExistingItem;
+            var requiredTable = (MetaTable)tableGroup.ExistingItem;
+            var primaryKey = (MetaPrimaryKey)primaryKeyGroup.ExistingItem;
 
             var sb = new StringBuilder();
             sb.Append("ALTER TABLE ");
@@ -404,8 +404,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
         protected override string CreateCreateForeginKeyQuery(MetaComparisonTableGroup tableGroup,
                                                               MetaComparisonForeignKeyGroup foreignKeyGroup)
         {
-            var requiredTable = (MetaTable) tableGroup.RequiredItem;
-            var metaForeignKey = (MetaForeignKey) foreignKeyGroup.RequiredItem;
+            var requiredTable = (MetaTable)tableGroup.RequiredItem;
+            var metaForeignKey = (MetaForeignKey)foreignKeyGroup.RequiredItem;
 
             var sb = new StringBuilder();
             sb.Append("ALTER TABLE ");
@@ -458,8 +458,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.DefaultMm
         protected override string CreateDropForeignKeyQuery(MetaComparisonTableGroup tableGroup,
                                                             MetaComparisonForeignKeyGroup foreignKeyGroup)
         {
-            var requiredTable = (MetaTable) tableGroup.RequiredItem;
-            var metaForeignKey = (MetaForeignKey) foreignKeyGroup.RequiredItem;
+            var requiredTable = (MetaTable)tableGroup.RequiredItem;
+            var metaForeignKey = (MetaForeignKey)foreignKeyGroup.RequiredItem;
 
             var sb = new StringBuilder();
             sb.Append("ALTER TABLE ");

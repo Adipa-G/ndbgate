@@ -1,6 +1,6 @@
-﻿using System;
+﻿using PerformanceTest.EF.Entities.Product;
+using System;
 using System.Collections.Generic;
-using PerformanceTest.EF.Entities.Product;
 
 namespace PerformanceTest.EF.Entities.Order
 {

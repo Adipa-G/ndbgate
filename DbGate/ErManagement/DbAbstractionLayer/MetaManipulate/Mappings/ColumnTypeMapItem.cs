@@ -39,8 +39,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Mappings
                     ColumnType = ColumnType.Varchar;
                     DefaultNonNullValue = "''";
                     break;
-//                case DbType.Binary:
-//                    break;
+                //                case DbType.Binary:
+                //                    break;
                 case DbType.Boolean:
                     ColumnType = ColumnType.Boolean;
                     DefaultNonNullValue = "true";
@@ -65,8 +65,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Mappings
                     ColumnType = ColumnType.Date;
                     DefaultNonNullValue = "1981/10/12";
                     break;
-//                case DbType.DateTimeOffset:
-//                    break;
+                //                case DbType.DateTimeOffset:
+                //                    break;
                 case DbType.Decimal:
                     ColumnType = ColumnType.Float;
                     DefaultNonNullValue = "0";
@@ -91,8 +91,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Mappings
                     ColumnType = ColumnType.Long;
                     DefaultNonNullValue = "0";
                     break;
-//                case DbType.Object:
-//                    break;
+                //                case DbType.Object:
+                //                    break;
                 case DbType.SByte:
                     ColumnType = ColumnType.Integer;
                     DefaultNonNullValue = "0";
@@ -129,8 +129,8 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Mappings
                     ColumnType = ColumnType.Float;
                     DefaultNonNullValue = "0";
                     break;
-//                case DbType.Xml:
-//                    break;
+                    //                case DbType.Xml:
+                    //                    break;
             }
         }
     }

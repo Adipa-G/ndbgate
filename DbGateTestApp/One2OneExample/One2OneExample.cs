@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using DbGate;
 using DbGate.Utility;
 using DbGateTestApp.DocGenerate;
 using DbGateTestApp.One2OneExample.Entities;
+using System;
+using System.Collections.Generic;
+using System.Data;
 
 namespace DbGateTestApp.One2OneExample
 {
@@ -35,7 +35,7 @@ namespace DbGateTestApp.One2OneExample
             return entity;
         }
 
-        public void Patch(ITransaction tx) 
+        public void Patch(ITransaction tx)
         {
             ICollection<Type> entityTypes = new List<Type>();
             entityTypes.Add(typeof(One2OneParentEntity));
@@ -49,7 +49,7 @@ namespace DbGateTestApp.One2OneExample
             entity.Persist(tx);
         }
 
-        public One2OneParentEntity Retrieve(ITransaction tx,int id)
+        public One2OneParentEntity Retrieve(ITransaction tx, int id)
         {
             var cmd = tx.CreateCommand();
             cmd.CommandText = "select * from parent_entity where id = ?";
@@ -120,4 +120,3 @@ namespace DbGateTestApp.One2OneExample
         }
     }
 }
-

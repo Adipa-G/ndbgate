@@ -13,12 +13,12 @@ namespace DbGate.ErManagement.DbAbstractionLayer
 
         protected override IDataManipulate CreateDataManipulate()
         {
-			return new DefaultDataManipulate(this);
+            return new DefaultDataManipulate(this);
         }
 
         protected override IMetaManipulate CreateMetaManipulate()
         {
-			return new DefaultMetaManipulate(this, Config);
+            return new DefaultMetaManipulate(this, Config);
         }
     }
 }

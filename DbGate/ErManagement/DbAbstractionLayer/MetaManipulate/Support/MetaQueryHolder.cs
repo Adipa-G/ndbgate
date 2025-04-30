@@ -30,7 +30,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Support
 
         #region IComparable<MetaQueryHolder> Members
 
-        
+
         public int CompareTo(MetaQueryHolder metaQueryHolder)
         {
             if (metaQueryHolder == null)

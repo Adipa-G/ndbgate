@@ -1,6 +1,6 @@
-﻿using System.Data;
-using DbGate.ErManagement.DbAbstractionLayer.DataManipulate;
+﻿using DbGate.ErManagement.DbAbstractionLayer.DataManipulate;
 using DbGate.ErManagement.DbAbstractionLayer.MetaManipulate;
+using System.Data;
 
 namespace DbGate.ErManagement.DbAbstractionLayer
 {

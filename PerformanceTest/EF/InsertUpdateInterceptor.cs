@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+using System;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace PerformanceTest.EF
 {
@@ -32,7 +32,7 @@ namespace PerformanceTest.EF
             CancellationToken cancellationToken = new CancellationToken())
         {
             LogCommand(command);
-            return new (result);
+            return new(result);
         }
 
         public ValueTask<InterceptionResult<object>> ScalarExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<object> result,

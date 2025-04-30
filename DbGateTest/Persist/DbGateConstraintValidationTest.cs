@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using DbGate.Exceptions;
 using DbGate.Persist.Support.Constraint;
 using log4net;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using Xunit;
 
 namespace DbGate.Persist
@@ -26,7 +26,7 @@ namespace DbGate.Persist
             CleanupDb(DbName);
             FinalizeDb(DbName);
         }
-        
+
         private IDbConnection SetupTables()
         {
             var sql = "Create table constraint_test_root (\n" +
@@ -46,9 +46,9 @@ namespace DbGate.Persist
                   "\tid_col Int NOT NULL,\n" +
                   "\tname Varchar(20) NOT NULL,\n" +
                   " Primary Key (id_col))";
-            CreateTableFromSql(sql,DbName);
+            CreateTableFromSql(sql, DbName);
             EndInit(DbName);
-            
+
             return Connection;
         }
 
@@ -76,7 +76,7 @@ namespace DbGate.Persist
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new ConstraintTestReverseRootEntity();
                 LoadEntityWithId(transaction, loadedEntity, id);
-                loadedEntity.One2OneEntity.Status =EntityStatus.Deleted;
+                loadedEntity.One2OneEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
@@ -91,7 +91,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -112,7 +112,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 var one2ManyEntity = new ConstraintTestOne2ManyEntity();
-                one2ManyEntity.IdCol= id;
+                one2ManyEntity.IdCol = id;
                 one2ManyEntity.IndexNo = 1;
                 one2ManyEntity.Name = "Child-Org-Name";
                 one2ManyEntity.Persist(transaction);
@@ -139,7 +139,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -151,7 +151,7 @@ namespace DbGate.Persist
             {
                 var connection = SetupTables();
                 var transaction = CreateTransaction(connection);
-                
+
                 var id = 45;
                 var entity = new ConstraintTestReverseRootEntity();
                 entity.IdCol = id;
@@ -168,14 +168,14 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new ConstraintTestReverseRootEntity();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                var hasOneToOne = ExistsOne2OneChild(transaction,id);
-                var hasRoot = ExistsRoot(transaction,id);
+                var hasOneToOne = ExistsOne2OneChild(transaction, id);
+                var hasRoot = ExistsRoot(transaction, id);
                 transaction.Commit();
                 connection.Close();
 
@@ -184,7 +184,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -214,14 +214,14 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new ConstraintTestReverseRootEntity();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                var hasOneToMany = ExistsOne2ManyChild(transaction,id);
-                var hasRoot = ExistsRoot(transaction,id);
+                var hasOneToMany = ExistsOne2ManyChild(transaction, id);
+                var hasRoot = ExistsRoot(transaction, id);
                 transaction.Commit();
                 connection.Close();
 
@@ -230,7 +230,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -243,7 +243,7 @@ namespace DbGate.Persist
             var transaction = CreateTransaction(connection);
             var id = 45;
             var entity = new ConstraintTestDeleteRestrictRootEntity();
-            entity.IdCol =id;
+            entity.IdCol = id;
             entity.Name = "Org-Name";
             entity.Persist(transaction);
             transaction.Commit();
@@ -257,13 +257,13 @@ namespace DbGate.Persist
 
             transaction = CreateTransaction(connection);
             var loadedEntity = new ConstraintTestDeleteRestrictRootEntity();
-            LoadEntityWithId(transaction,loadedEntity,id);
+            LoadEntityWithId(transaction, loadedEntity, id);
             loadedEntity.Status = EntityStatus.Deleted;
             Assert.Throws<PersistException>(() => loadedEntity.Persist(transaction));
             transaction.Commit();
             connection.Close();
         }
-    
+
         [Fact]
         public void ConstraintValidation_DeleteRootWithOneToManyChild_WithRestrictConstraint_ShouldThrowException()
         {
@@ -286,13 +286,13 @@ namespace DbGate.Persist
 
             transaction = CreateTransaction(connection);
             var loadedEntity = new ConstraintTestDeleteRestrictRootEntity();
-            LoadEntityWithId(transaction,loadedEntity,id);
+            LoadEntityWithId(transaction, loadedEntity, id);
             loadedEntity.Status = EntityStatus.Deleted;
             Assert.Throws<PersistException>(() => loadedEntity.Persist(transaction));
             transaction.Commit();
             connection.Close();
         }
-    
+
         [Fact]
         public void ConstraintValidation_DeleteOneToManyChild_WithCascadeConstraint_ShouldDeleteChild()
         {
@@ -303,22 +303,22 @@ namespace DbGate.Persist
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new ConstraintTestDeleteCascadeRootEntity();
-                entity.IdCol =id;
-                entity.Name ="Org-Name";
+                entity.IdCol = id;
+                entity.Name = "Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 var one2ManyEntity = new ConstraintTestOne2ManyEntity();
-                one2ManyEntity.IdCol =id;
-                one2ManyEntity.IndexNo=1;
-                one2ManyEntity.Name ="Child-Org-Name";
+                one2ManyEntity.IdCol = id;
+                one2ManyEntity.IndexNo = 1;
+                one2ManyEntity.Name = "Child-Org-Name";
                 one2ManyEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new ConstraintTestDeleteCascadeRootEntity();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 var childEnumarator = loadedEntity.One2ManyEntities.GetEnumerator();
                 childEnumarator.MoveNext();
                 var loadedOne2ManyEntity = childEnumarator.Current;
@@ -327,8 +327,8 @@ namespace DbGate.Persist
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                var hasOneToMany = ExistsOne2ManyChild(transaction,id);
-                var hasRoot = ExistsRoot(transaction,id);
+                var hasOneToMany = ExistsOne2ManyChild(transaction, id);
+                var hasRoot = ExistsRoot(transaction, id);
                 transaction.Commit();
                 connection.Close();
 
@@ -337,11 +337,11 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
-    
+
         [Fact]
         public void ConstraintValidation_DeleteOneToOneChild_WithCascadeConstraint_ShouldDeleteChild()
         {
@@ -352,28 +352,28 @@ namespace DbGate.Persist
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new ConstraintTestDeleteCascadeRootEntity();
-                entity.IdCol =id;
-                entity.Name ="Org-Name";
+                entity.IdCol = id;
+                entity.Name = "Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 var one2ManyEntity = new ConstraintTestOne2OneEntity();
-                one2ManyEntity.IdCol =id;
-                one2ManyEntity.Name ="Child-Org-Name";
+                one2ManyEntity.IdCol = id;
+                one2ManyEntity.Name = "Child-Org-Name";
                 one2ManyEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new ConstraintTestDeleteCascadeRootEntity();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.One2OneEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                var hasOneToOne = ExistsOne2ManyChild(transaction,id);
-                var hasRoot = ExistsRoot(transaction,id);
+                var hasOneToOne = ExistsOne2ManyChild(transaction, id);
+                var hasRoot = ExistsRoot(transaction, id);
                 transaction.Commit();
                 connection.Close();
 
@@ -382,7 +382,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -397,29 +397,29 @@ namespace DbGate.Persist
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new ConstraintTestDeleteCascadeRootEntity();
-                entity.IdCol =id;
-                entity.Name ="Org-Name";
+                entity.IdCol = id;
+                entity.Name = "Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 var one2ManyEntity = new ConstraintTestOne2ManyEntity();
-                one2ManyEntity.IdCol =id;
-                one2ManyEntity.IndexNo=1;
-                one2ManyEntity.Name ="Child-Org-Name";
+                one2ManyEntity.IdCol = id;
+                one2ManyEntity.IndexNo = 1;
+                one2ManyEntity.Name = "Child-Org-Name";
                 one2ManyEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new ConstraintTestDeleteCascadeRootEntity();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.Status = EntityStatus.Deleted;
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
-                var hasOneToMany = ExistsOne2ManyChild(transaction,id);
-                var hasRoot = ExistsRoot(transaction,id);
+                var hasOneToMany = ExistsOne2ManyChild(transaction, id);
+                var hasRoot = ExistsRoot(transaction, id);
                 transaction.Commit();
                 connection.Close();
 
@@ -428,7 +428,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -443,15 +443,15 @@ namespace DbGate.Persist
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new ConstraintTestDeleteCascadeRootEntity();
-                entity.IdCol =id;
-                entity.Name ="Org-Name";
+                entity.IdCol = id;
+                entity.Name = "Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 var one2ManyEntity = new ConstraintTestOne2OneEntity();
-                one2ManyEntity.IdCol =id;
-                one2ManyEntity.Name ="Child-Org-Name";
+                one2ManyEntity.IdCol = id;
+                one2ManyEntity.Name = "Child-Org-Name";
                 one2ManyEntity.Persist(transaction);
                 transaction.Commit();
 
@@ -473,12 +473,12 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateConstraintValidationTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
 
-        private bool LoadEntityWithId(ITransaction transaction, ConstraintTestDeleteCascadeRootEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, ConstraintTestDeleteCascadeRootEntity loadEntity, int id)
         {
             var loaded = false;
 
@@ -501,7 +501,7 @@ namespace DbGate.Persist
             return loaded;
         }
 
-        private bool LoadEntityWithId(ITransaction transaction, ConstraintTestDeleteRestrictRootEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, ConstraintTestDeleteRestrictRootEntity loadEntity, int id)
         {
             var loaded = false;
 
@@ -524,7 +524,7 @@ namespace DbGate.Persist
             return loaded;
         }
 
-        private bool LoadEntityWithId(ITransaction transaction, ConstraintTestReverseRootEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, ConstraintTestReverseRootEntity loadEntity, int id)
         {
             var loaded = false;
 
@@ -547,7 +547,7 @@ namespace DbGate.Persist
             return loaded;
         }
 
-        private bool ExistsRoot(ITransaction transaction,int id)
+        private bool ExistsRoot(ITransaction transaction, int id)
         {
             var exists = false;
 
@@ -567,7 +567,7 @@ namespace DbGate.Persist
             return exists;
         }
 
-        private bool ExistsOne2OneChild(ITransaction transaction,int id)
+        private bool ExistsOne2OneChild(ITransaction transaction, int id)
         {
             var exists = false;
 
@@ -587,7 +587,7 @@ namespace DbGate.Persist
             return exists;
         }
 
-        private bool ExistsOne2ManyChild(ITransaction transaction,int id)
+        private bool ExistsOne2ManyChild(ITransaction transaction, int id)
         {
             var exists = false;
 

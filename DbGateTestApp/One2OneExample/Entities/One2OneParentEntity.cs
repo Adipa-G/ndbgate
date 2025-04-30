@@ -14,15 +14,15 @@ namespace DbGateTestApp.One2OneExample.Entities
         public string Name { get; set; }
 
         [ForeignKeyInfo("parent2childA",
-            typeof (One2OneChildEntityA),
-            new[] {"id"},
-            new[] {"parentId"},
+            typeof(One2OneChildEntityA),
+            new[] { "id" },
+            new[] { "parentId" },
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         [ForeignKeyInfo("parent2childB",
-            typeof (One2OneChildEntityB),
-            new[] {"id"},
-            new[] {"parentId"},
+            typeof(One2OneChildEntityB),
+            new[] { "id" },
+            new[] { "parentId" },
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public One2OneChildEntity ChildEntity { get; set; }

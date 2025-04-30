@@ -1,15 +1,15 @@
-﻿using System;
+﻿using log4net;
+using log4net.Core;
+using Microsoft.EntityFrameworkCore;
+using PerformanceTest.EF.Entities.Order;
+using PerformanceTest.EF.Entities.Product;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using log4net;
-using log4net.Core;
-using Microsoft.EntityFrameworkCore;
-using PerformanceTest.EF.Entities.Order;
-using PerformanceTest.EF.Entities.Product;
 
 namespace PerformanceTest.EF
 {
@@ -86,7 +86,7 @@ namespace PerformanceTest.EF
             {
                 var item = items[i];
                 var itemType = item.GetType();
-               
+
                 if (item is Product)
                 {
                     ctx.Products.Add((Product)item);
@@ -161,7 +161,7 @@ namespace PerformanceTest.EF
                         .Single(t => t.TransactionId == tx.TransactionId);
                     newList.Add(loaded);
                 }
-                else 
+                else
                 if (itemType == typeof(Service))
                 {
                     var svc = (Service)item;

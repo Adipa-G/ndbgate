@@ -21,7 +21,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.DbDm.SqliteDm
                 var success = Guid.TryParse(result, out guidResult);
 
                 return (result == null || !success) ?
-                    (column.Nullable ? null : (object) Guid.Empty) :
+                    (column.Nullable ? null : (object)Guid.Empty) :
                     guidResult;
             }
             return base.ReadFromResultSet(reader, column);

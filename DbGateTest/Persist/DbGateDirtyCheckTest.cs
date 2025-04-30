@@ -1,11 +1,11 @@
+using DbGate.Context;
+using DbGate.Persist.Support.DirtyCheck;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Reflection;
-using DbGate.Context;
-using DbGate.Persist.Support.DirtyCheck;
-using log4net;
 using Xunit;
 
 namespace DbGate.Persist
@@ -25,16 +25,16 @@ namespace DbGate.Persist
         public void Dispose()
         {
             CleanupDb(DbName);
-            FinalizeDb(DbName);   
+            FinalizeDb(DbName);
         }
-        
+
         private IDbConnection SetupTables()
         {
             var sql = "Create table dirty_check_test_root (\n" +
                       "\tid_col Int NOT NULL,\n" +
                       "\tname Varchar(20) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            CreateTableFromSql(sql,DbName);
+            CreateTableFromSql(sql, DbName);
 
             sql = "Create table dirty_check_test_one2many (\n" +
                       "\tid_col Int NOT NULL,\n" +
@@ -60,7 +60,7 @@ namespace DbGate.Persist
             {
                 TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
                 var connection = SetupTables();
-                
+
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new DirtyCheckTestRootEntity();
@@ -89,7 +89,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -116,11 +116,11 @@ namespace DbGate.Persist
                 transaction.Commit();
 
                 var changeTracker = loadedEntity.Context.ChangeTracker;
-                changeTracker.GetType().GetField("fields",BindingFlags.Instance|BindingFlags.NonPublic)
-                    .SetValue(changeTracker,new ReadOnlyCollection<EntityFieldValue>(new List<EntityFieldValue>()));
-                changeTracker.GetType().GetField("childEntityRelationKeys",BindingFlags.Instance|BindingFlags.NonPublic)
-                    .SetValue(changeTracker,new ReadOnlyCollection<ITypeFieldValueList>(new List<ITypeFieldValueList>()));
-                
+                changeTracker.GetType().GetField("fields", BindingFlags.Instance | BindingFlags.NonPublic)
+                    .SetValue(changeTracker, new ReadOnlyCollection<EntityFieldValue>(new List<EntityFieldValue>()));
+                changeTracker.GetType().GetField("childEntityRelationKeys", BindingFlags.Instance | BindingFlags.NonPublic)
+                    .SetValue(changeTracker, new ReadOnlyCollection<ITypeFieldValueList>(new List<ITypeFieldValueList>()));
+
                 transaction = CreateTransaction(connection);
                 loadedEntity.Name = "Changed-Name";
                 loadedEntity.Persist(transaction);
@@ -148,7 +148,7 @@ namespace DbGate.Persist
             {
                 TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
                 var connection = SetupTables();
-                
+
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new DirtyCheckTestRootEntity();
@@ -159,7 +159,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new DirtyCheckTestRootEntity();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
@@ -169,7 +169,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 var reloadedEntity = new DirtyCheckTestRootEntity();
-                LoadEntityWithId(transaction,reloadedEntity,id);
+                LoadEntityWithId(transaction, reloadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
@@ -177,7 +177,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -189,20 +189,20 @@ namespace DbGate.Persist
             {
                 TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
                 var connection = SetupTables();
-                
+
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.One2OneEntity =new DirtyCheckTestOne2OneEntity();
+                entity.One2OneEntity = new DirtyCheckTestOne2OneEntity();
                 entity.One2OneEntity.Name = "Child-Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new DirtyCheckTestRootEntity();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.One2OneEntity = null;
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
@@ -216,7 +216,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -228,20 +228,20 @@ namespace DbGate.Persist
             {
                 TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
                 var connection = SetupTables();
-                
+
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.One2OneEntity =new DirtyCheckTestOne2OneEntity();
+                entity.One2OneEntity = new DirtyCheckTestOne2OneEntity();
                 entity.One2OneEntity.Name = "Child-Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new DirtyCheckTestRootEntity();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.One2OneEntity = null;
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
@@ -255,7 +255,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -267,35 +267,35 @@ namespace DbGate.Persist
             {
                 TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
                 var connection = SetupTables();
-                
+
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.One2OneEntity =new DirtyCheckTestOne2OneEntity();
+                entity.One2OneEntity = new DirtyCheckTestOne2OneEntity();
                 entity.One2OneEntity.Name = "Child-Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new DirtyCheckTestRootEntity();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.One2OneEntity.Name = "Child-Upd-Name";
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 var reLoadedEntity = new DirtyCheckTestRootEntity();
-                LoadEntityWithId(transaction,reLoadedEntity,id);
+                LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                Assert.Equal(loadedEntity.One2OneEntity.Name,reLoadedEntity.One2OneEntity.Name);
+                Assert.Equal(loadedEntity.One2OneEntity.Name, reLoadedEntity.One2OneEntity.Name);
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -307,35 +307,35 @@ namespace DbGate.Persist
             {
                 TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
                 var connection = SetupTables();
-                
+
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new DirtyCheckTestRootEntity();
                 entity.IdCol = id;
                 entity.Name = "Org-Name";
-                entity.One2OneEntity =new DirtyCheckTestOne2OneEntity();
+                entity.One2OneEntity = new DirtyCheckTestOne2OneEntity();
                 entity.One2OneEntity.Name = "Child-Org-Name";
                 entity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new DirtyCheckTestRootEntity();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.One2OneEntity.Name = "Child-Upd-Name";
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
 
                 transaction = CreateTransaction(connection);
                 var reLoadedEntity = new DirtyCheckTestRootEntity();
-                LoadEntityWithId(transaction,reLoadedEntity,id);
+                LoadEntityWithId(transaction, reLoadedEntity, id);
                 transaction.Commit();
                 connection.Close();
 
-                Assert.Equal(entity.One2OneEntity.Name,reLoadedEntity.One2OneEntity.Name);
+                Assert.Equal(entity.One2OneEntity.Name, reLoadedEntity.One2OneEntity.Name);
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -347,7 +347,7 @@ namespace DbGate.Persist
             {
                 TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
                 var connection = SetupTables();
-                
+
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new DirtyCheckTestRootEntity();
@@ -364,7 +364,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new DirtyCheckTestRootEntity();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.One2ManyEntities.Clear();
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
@@ -378,7 +378,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -390,7 +390,7 @@ namespace DbGate.Persist
             {
                 TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
                 var connection = SetupTables();
-                
+
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new DirtyCheckTestRootEntity();
@@ -407,7 +407,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new DirtyCheckTestRootEntity();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 loadedEntity.One2ManyEntities.Clear();
                 loadedEntity.Persist(transaction);
                 transaction.Commit();
@@ -421,7 +421,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -433,7 +433,7 @@ namespace DbGate.Persist
             {
                 TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Automatic;
                 var connection = SetupTables();
-                
+
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new DirtyCheckTestRootEntity();
@@ -450,7 +450,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new DirtyCheckTestRootEntity();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 var enumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
                 var loadedChild = enumerator.Current;
@@ -460,7 +460,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 var reloadedEntity = new DirtyCheckTestRootEntity();
-                LoadEntityWithId(transaction,reloadedEntity,id);
+                LoadEntityWithId(transaction, reloadedEntity, id);
                 enumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
                 var reLoadedChild = enumerator.Current;
@@ -471,7 +471,7 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
@@ -483,7 +483,7 @@ namespace DbGate.Persist
             {
                 TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
                 var connection = SetupTables();
-                
+
                 var transaction = CreateTransaction(connection);
                 var id = 45;
                 var entity = new DirtyCheckTestRootEntity();
@@ -500,7 +500,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 var loadedEntity = new DirtyCheckTestRootEntity();
-                LoadEntityWithId(transaction,loadedEntity,id);
+                LoadEntityWithId(transaction, loadedEntity, id);
                 var enumerator = loadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
                 var loadedChild = enumerator.Current;
@@ -510,7 +510,7 @@ namespace DbGate.Persist
 
                 transaction = CreateTransaction(connection);
                 var reloadedEntity = new DirtyCheckTestRootEntity();
-                LoadEntityWithId(transaction,reloadedEntity,id);
+                LoadEntityWithId(transaction, reloadedEntity, id);
                 enumerator = reloadedEntity.One2ManyEntities.GetEnumerator();
                 enumerator.MoveNext();
                 var reLoadedChild = enumerator.Current;
@@ -521,12 +521,12 @@ namespace DbGate.Persist
             }
             catch (System.Exception e)
             {
-                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message,e);
+                LogManager.GetLogger(typeof(DbGateDirtyCheckTest)).Fatal(e.Message, e);
                 Assert.Fail(e.Message);
             }
         }
 
-        private bool LoadEntityWithId(ITransaction transaction, DirtyCheckTestRootEntity loadEntity,int id)
+        private bool LoadEntityWithId(ITransaction transaction, DirtyCheckTestRootEntity loadEntity, int id)
         {
             var loaded = false;
 
@@ -549,7 +549,7 @@ namespace DbGate.Persist
             return loaded;
         }
 
-        private bool ExistsOne2OneChild(ITransaction transaction,int id)
+        private bool ExistsOne2OneChild(ITransaction transaction, int id)
         {
             var exists = false;
 
@@ -569,7 +569,7 @@ namespace DbGate.Persist
             return exists;
         }
 
-        private bool ExistsOne2ManyChild(ITransaction transaction,int id)
+        private bool ExistsOne2ManyChild(ITransaction transaction, int id)
         {
             var exists = false;
 

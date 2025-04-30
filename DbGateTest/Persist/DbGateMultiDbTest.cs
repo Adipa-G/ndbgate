@@ -1,6 +1,6 @@
+using DbGate.Persist.Support.MultiDb;
 using System;
 using System.Data;
-using DbGate.Persist.Support.MultiDb;
 using Xunit;
 
 namespace DbGate.Persist
@@ -20,9 +20,9 @@ namespace DbGate.Persist
             BeginInit(Db1Name);
             TransactionFactoryDb1 = TransactionFactory;
             ConnectionDb1 = Connection;
-            
+
             BeginInit(Db2Name);
-            
+
             TransactionFactoryDb1.DbGate.ClearCache();
             TransactionFactoryDb1.DbGate.Config.UpdateStrategy = UpdateStrategy.AllColumns;
 
@@ -41,19 +41,19 @@ namespace DbGate.Persist
 
             FinalizeDb(Db2Name);
         }
-       
+
         private void SetupTables()
         {
             var sql = "Create table multi_db_test_root (\n" +
                       "\tid_col Int NOT NULL,\n" +
                       "\tname Varchar(100) NOT NULL,\n" +
                       " Primary Key (id_col))";
-            
-            CreateTableFromSql(sql,Db1Name,ConnectionDb1);
-            CreateTableFromSql(sql,Db2Name,Connection);
 
-            EndInit(Db1Name,ConnectionDb1);
-            EndInit(Db2Name,Connection);
+            CreateTableFromSql(sql, Db1Name, ConnectionDb1);
+            CreateTableFromSql(sql, Db2Name, Connection);
+
+            EndInit(Db1Name, ConnectionDb1);
+            EndInit(Db2Name, Connection);
         }
 
         [Fact]
@@ -68,10 +68,10 @@ namespace DbGate.Persist
                 var db1Entity = new MultiDbEntity();
                 db1Entity.IdCol = id;
                 db1Entity.Name = Db1Name;
-                
+
                 db1Entity.Persist(txDb1);
                 txDb1.Commit();
- 
+
                 var txDb2 = CreateTransaction(Connection);
                 var db2Entity = new MultiDbEntity();
                 db2Entity.IdCol = id;
@@ -81,14 +81,14 @@ namespace DbGate.Persist
 
                 txDb1 = CreateTransaction(ConnectionDb1);
                 var db1LoadedEntity = new MultiDbEntity();
-                LoadWithId(txDb1,db1LoadedEntity,id);
-                Assert.Equal(Db1Name,db1LoadedEntity.Name);
+                LoadWithId(txDb1, db1LoadedEntity, id);
+                Assert.Equal(Db1Name, db1LoadedEntity.Name);
                 txDb1.Commit();
 
                 txDb2 = CreateTransaction(Connection);
                 var db2LoadedEntity = new MultiDbEntity();
-                LoadWithId(txDb2,db2LoadedEntity,id);
-                Assert.Equal(Db2Name,db2LoadedEntity.Name);
+                LoadWithId(txDb2, db2LoadedEntity, id);
+                Assert.Equal(Db2Name, db2LoadedEntity.Name);
             }
             catch (System.Exception e)
             {
@@ -96,7 +96,7 @@ namespace DbGate.Persist
             }
         }
 
-        private bool LoadWithId(ITransaction tx, MultiDbEntity loadEntity,int id)
+        private bool LoadWithId(ITransaction tx, MultiDbEntity loadEntity, int id)
         {
             var loaded = false;
 

@@ -1,5 +1,5 @@
-﻿using System;
-using DbGate.Exceptions;
+﻿using DbGate.Exceptions;
+using System;
 
 namespace DbGate.ErManagement.Query.Expr.Segments
 {
@@ -33,7 +33,7 @@ namespace DbGate.ErManagement.Query.Expr.Segments
             switch (segment.SegmentType)
             {
                 case SegmentType.Field:
-                    SegmentToGroup = (FieldSegment) segment;
+                    SegmentToGroup = (FieldSegment)segment;
                     return this;
                 case SegmentType.Value:
                 case SegmentType.Query:

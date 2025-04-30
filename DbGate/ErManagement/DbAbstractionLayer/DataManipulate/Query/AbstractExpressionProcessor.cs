@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using DbGate.Caches;
 using DbGate.Caches.Impl;
 using DbGate.ErManagement.Query.Expr.Segments;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
 {
@@ -28,7 +28,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
             {
                 foreach (var column in columns)
                 {
-                    if (column.AttributeName.Equals(field,StringComparison.InvariantCultureIgnoreCase))
+                    if (column.AttributeName.Equals(field, StringComparison.InvariantCultureIgnoreCase))
                     {
                         return column;
                     }
@@ -46,7 +46,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
                 tableAlias = fieldSegment.TypeAlias;
             }
             tableAlias = (tableAlias == null) ? "" : tableAlias + ".";
-            var column = GetColumn(fieldSegment,buildInfo);
+            var column = GetColumn(fieldSegment, buildInfo);
 
             if (column != null)
             {
@@ -71,12 +71,12 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
             }
             else
             {
-                var values =  buildInfo.Aliases.Values;
+                var values = buildInfo.Aliases.Values;
                 foreach (var value in values)
                 {
                     if (value is Type)
                     {
-                        var targetType = (Type) value;
+                        var targetType = (Type)value;
                         var columns = FindColumnsForType(targetType);
                         var column = FindColumn(segment.Field, columns);
                         if (column != null)
@@ -127,22 +127,22 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
             switch (segment.SegmentType)
             {
                 case SegmentType.Field:
-                    ProcessField(sb, (FieldSegment) segment, buildInfo);
+                    ProcessField(sb, (FieldSegment)segment, buildInfo);
                     break;
                 case SegmentType.Group:
-                    ProcessGroup(sb, (GroupFunctionSegment) segment, buildInfo);
+                    ProcessGroup(sb, (GroupFunctionSegment)segment, buildInfo);
                     break;
                 case SegmentType.Value:
-                    ProcessValue(sb, (ValueSegment) segment, buildInfo);
+                    ProcessValue(sb, (ValueSegment)segment, buildInfo);
                     break;
                 case SegmentType.Compare:
-                    ProcessCompare(sb, (CompareSegment) segment, buildInfo, dbLayer);
+                    ProcessCompare(sb, (CompareSegment)segment, buildInfo, dbLayer);
                     break;
                 case SegmentType.Merge:
-                    ProcessMerge(sb, (MergeSegment) segment, buildInfo, dbLayer);
+                    ProcessMerge(sb, (MergeSegment)segment, buildInfo, dbLayer);
                     break;
                 case SegmentType.Query:
-                    ProcessQuery(sb, (QuerySegment) segment, buildInfo, dbLayer);
+                    ProcessQuery(sb, (QuerySegment)segment, buildInfo, dbLayer);
                     break;
             }
             return sb.ToString();
@@ -238,7 +238,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
         private void ProcessBetween(StringBuilder sb, CompareSegment segment, QueryBuildInfo buildInfo, IDbLayer dbLayer)
         {
             sb.Append(" BETWEEN ? AND ? ");
-            var valueSegment = (ValueSegment) segment.Right;
+            var valueSegment = (ValueSegment)segment.Right;
             var values = valueSegment.Values;
             for (int i = 0, valuesLength = 2; i < valuesLength; i++)
             {
@@ -254,7 +254,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
         private void ProcessInValues(StringBuilder sb, CompareSegment segment, QueryBuildInfo buildInfo)
         {
             sb.Append(" IN (");
-            var valueSegment = (ValueSegment) segment.Right;
+            var valueSegment = (ValueSegment)segment.Right;
             var values = valueSegment.Values;
             for (int i = 0, valuesLength = values.Length; i < valuesLength; i++)
             {
@@ -278,7 +278,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query
                                         IDbLayer dbLayer)
         {
             sb.Append(" IN ");
-            var querySegment = (QuerySegment) segment.Right;
+            var querySegment = (QuerySegment)segment.Right;
             ProcessQuery(sb, querySegment, buildInfo, dbLayer);
         }
 

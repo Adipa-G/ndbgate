@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using DbGate.Caches;
 using DbGate.ErManagement.DbAbstractionLayer;
 using DbGate.Exceptions.Common;
 using log4net;
+using System;
+using System.Collections.Generic;
+using System.Data;
 
 namespace DbGate.ErManagement.ErMapper
 {

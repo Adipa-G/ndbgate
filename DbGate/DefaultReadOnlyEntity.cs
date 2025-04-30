@@ -1,7 +1,7 @@
-﻿using System.Data;
-using DbGate.Context;
+﻿using DbGate.Context;
 using DbGate.Context.Impl;
 using DbGate.ErManagement.ErMapper;
+using System.Data;
 
 namespace DbGate
 {
@@ -16,7 +16,7 @@ namespace DbGate
 
         public void Retrieve(IDataReader reader, ITransaction tx)
         {
-            tx.DbGate.Load(this,reader,tx);
+            tx.DbGate.Load(this, reader, tx);
         }
 
         public IEntityContext Context => context;

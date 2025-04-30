@@ -1,4 +1,11 @@
-﻿using System;
+﻿using DbGate;
+using DbGate.ErManagement.Query;
+using DbGate.ErManagement.Query.Expr;
+using log4net;
+using log4net.Core;
+using PerformanceTest.NDbGate.Entities.Order;
+using PerformanceTest.NDbGate.Entities.Product;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -6,13 +13,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using DbGate;
-using DbGate.ErManagement.Query;
-using DbGate.ErManagement.Query.Expr;
-using log4net;
-using log4net.Core;
-using PerformanceTest.NDbGate.Entities.Order;
-using PerformanceTest.NDbGate.Entities.Product;
 
 namespace PerformanceTest.NDbGate
 {
@@ -21,7 +21,7 @@ namespace PerformanceTest.NDbGate
         private readonly int perThread;
         private readonly DefaultTransactionFactory transactionFactory;
 
-        public NDbGatePerformanceCounter(string connectionString,int perThread)
+        public NDbGatePerformanceCounter(string connectionString, int perThread)
         {
             this.perThread = perThread;
 
@@ -93,7 +93,7 @@ namespace PerformanceTest.NDbGate
         private void InsertTest(IList<IEntity> items)
         {
             var sw = new Stopwatch();
-            
+
             sw.Start();
             var tx = transactionFactory.CreateTransaction();
             for (var i = 0; i < items.Count; i++)
@@ -185,7 +185,7 @@ namespace PerformanceTest.NDbGate
                         .ToList(tx).FirstOrDefault();
                     newList.Add((IEntity)loaded);
                 }
-               
+
                 if (i % 100 == 0)
                 {
                     tx.Close();
@@ -209,11 +209,11 @@ namespace PerformanceTest.NDbGate
 
             sw.Start();
             var tx = transactionFactory.CreateTransaction();
-            for (var i = items.Count - 1; i >= 0 ; i--)
+            for (var i = items.Count - 1; i >= 0; i--)
             {
                 items[i].Status = EntityStatus.Deleted;
                 items[i].Persist(tx);
-                if (i % 100== 0 || (i > 0 && items[i].GetType() != items[i -1].GetType()))
+                if (i % 100 == 0 || (i > 0 && items[i].GetType() != items[i - 1].GetType()))
                 {
                     tx.Commit();
                     tx.Close();

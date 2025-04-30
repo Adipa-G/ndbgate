@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using DbGate.Exceptions;
+﻿using DbGate.Exceptions;
 using DbGate.Patch.Support.PatchEmpty;
 using log4net;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using Xunit;
 
 namespace DbGate.Patch
@@ -19,7 +19,7 @@ namespace DbGate.Patch
             BeginInit(DbName);
             TransactionFactory.DbGate.Config.DirtyCheckStrategy = DirtyCheckStrategy.Manual;
             TransactionFactory.DbGate.Config.VerifyOnWriteStrategy = VerifyOnWriteStrategy.DoNotVerify;
-            
+
             ICollection<Type> types = new List<Type>();
             types.Add(typeof(LeafEntitySubA));
             types.Add(typeof(LeafEntitySubB));
@@ -49,7 +49,7 @@ namespace DbGate.Patch
                 entity.LeafEntities.Add(CreateLeafEntityB(id, 2));
                 entity.Persist(transaction);
                 transaction.Commit();
- 
+
                 transaction = CreateTransaction();
                 var loadedEntity = LoadRootEntityWithId(transaction, id);
                 transaction.Commit();

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using PerformanceTest.EF.Entities.Order;
+using PerformanceTest.EF.Entities.Product;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using PerformanceTest.EF.Entities.Order;
-using PerformanceTest.EF.Entities.Product;
 
 namespace PerformanceTest.EF
 {
@@ -10,7 +10,7 @@ namespace PerformanceTest.EF
     {
         private readonly Random random = new Random();
 
-        public IList<object> Generate(int seed,int txCount,int productsOrServicesPerTx)
+        public IList<object> Generate(int seed, int txCount, int productsOrServicesPerTx)
         {
             var list = new List<object>();
             var productIds = new List<int>();
@@ -118,7 +118,7 @@ namespace PerformanceTest.EF
                 for (var i = 0; i < itemTransactions.Length; i++)
                 {
                     var itemTx = itemTransactions.ToArray()[i];
-                    itemTx.Item = itemTransactions[itemTransactions.Length -1 - i].Item;
+                    itemTx.Item = itemTransactions[itemTransactions.Length - 1 - i].Item;
 
                     foreach (var chg in itemTx.ItemTransactionCharges)
                     {
@@ -129,4 +129,3 @@ namespace PerformanceTest.EF
         }
     }
 }
-

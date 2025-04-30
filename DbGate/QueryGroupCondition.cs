@@ -16,7 +16,7 @@ namespace DbGate
         public static IQueryGroupCondition RawSql(string sql)
         {
             var queryGroupCondition =
-                (AbstractSqlQueryGroupCondition) factory.CreateGroupCondition(QueryGroupConditionExpressionType.RawSql);
+                (AbstractSqlQueryGroupCondition)factory.CreateGroupCondition(QueryGroupConditionExpressionType.RawSql);
             queryGroupCondition.Sql = sql;
             return queryGroupCondition;
         }

@@ -17,8 +17,8 @@ namespace DbGate
             DirtyCheckStrategy = dirtyCheckStrategy;
         }
 
-        protected AbstractTable(string tableName) : this(tableName,UpdateStrategy.Default
-            ,VerifyOnWriteStrategy.Default,DirtyCheckStrategy.Default)
+        protected AbstractTable(string tableName) : this(tableName, UpdateStrategy.Default
+            , VerifyOnWriteStrategy.Default, DirtyCheckStrategy.Default)
         {
             TableName = tableName;
         }

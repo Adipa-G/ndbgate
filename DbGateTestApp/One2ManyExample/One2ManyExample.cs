@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using DbGate;
 using DbGate.Utility;
 using DbGateTestApp.DocGenerate;
 using DbGateTestApp.One2ManyExample.Entities;
+using System;
+using System.Collections.Generic;
+using System.Data;
 
 namespace DbGateTestApp.One2ManyExample
 {
@@ -32,13 +32,13 @@ namespace DbGateTestApp.One2ManyExample
             return entity;
         }
 
-        public void Patch(ITransaction tx) 
+        public void Patch(ITransaction tx)
         {
             ICollection<Type> entityTypes = new List<Type>();
             entityTypes.Add(typeof(One2ManyParentEntity));
             entityTypes.Add(typeof(One2ManyChildEntityA));
             entityTypes.Add(typeof(One2ManyChildEntityB));
-            tx.DbGate.PatchDataBase(tx,entityTypes,false);
+            tx.DbGate.PatchDataBase(tx, entityTypes, false);
         }
 
         public void Persist(ITransaction tx, One2ManyParentEntity entity)
@@ -108,5 +108,3 @@ namespace DbGateTestApp.One2ManyExample
         }
     }
 }
-
-

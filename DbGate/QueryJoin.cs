@@ -1,7 +1,7 @@
-﻿using System;
-using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Join;
+﻿using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Join;
 using DbGate.ErManagement.Query;
 using DbGate.ErManagement.Query.Expr;
+using System;
 
 namespace DbGate
 {
@@ -16,12 +16,12 @@ namespace DbGate
 
         public static IQueryJoin RawSql(string sql)
         {
-            var queryJoin = (AbstractSqlQueryJoin) factory.CreateJoin(QueryJoinExpressionType.RawSql);
+            var queryJoin = (AbstractSqlQueryJoin)factory.CreateJoin(QueryJoinExpressionType.RawSql);
             queryJoin.Sql = sql;
             return queryJoin;
         }
 
-        public static IQueryJoin EntityType<T,TU>()
+        public static IQueryJoin EntityType<T, TU>()
         {
             return EntityType(typeof(T), typeof(TU), null, null, null);
         }
@@ -36,7 +36,7 @@ namespace DbGate
             return EntityType(typeof(T), typeof(TU), null, null, alias);
         }
 
-        public static IQueryJoin EntityType<T, TU>( String alias, QueryJoinType joinType)
+        public static IQueryJoin EntityType<T, TU>(String alias, QueryJoinType joinType)
         {
             return EntityType(typeof(T), typeof(TU), null, joinType, alias);
         }
@@ -88,7 +88,7 @@ namespace DbGate
 
         public static IQueryJoin EntityType(Type from, Type to, JoinExpr expr, QueryJoinType? joinType, string alias)
         {
-            var typeJoin = (AbstractTypeJoin) factory.CreateJoin(QueryJoinExpressionType.Type);
+            var typeJoin = (AbstractTypeJoin)factory.CreateJoin(QueryJoinExpressionType.Type);
             typeJoin.TypeFrom = from;
             typeJoin.TypeTo = to;
             if (expr != null)

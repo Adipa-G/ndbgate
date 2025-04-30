@@ -1,10 +1,10 @@
-﻿using System;
-using System.Data;
-using System.Linq;
-using DbGate.ErManagement.Query;
+﻿using DbGate.ErManagement.Query;
 using DbGate.ErManagement.Query.Expr;
 using DbGate.Persist.Support.NonIdentifyingRelationWithoutColumn;
 using log4net;
+using System;
+using System.Data;
+using System.Linq;
 using Xunit;
 
 namespace DbGate.Persist
@@ -104,16 +104,16 @@ namespace DbGate.Persist
                 tx.Commit();
 
                 tx = CreateTransaction(connection);
-                var loaded = LoadProductWithId(tx,productId);
+                var loaded = LoadProductWithId(tx, productId);
                 loaded.Currency = currencyB;
                 loaded.Persist(tx);
                 tx.Commit();
 
                 tx = CreateTransaction(connection);
-                loaded = LoadProductWithId(tx,productId);
+                loaded = LoadProductWithId(tx, productId);
                 Assert.NotNull(loaded);
                 Assert.NotNull(loaded.Currency);
-                Assert.Equal(loaded.Currency.CurrencyId,currencyB.CurrencyId);
+                Assert.Equal(loaded.Currency.CurrencyId, currencyB.CurrencyId);
                 Assert.Equal(loaded.Currency.Code, currencyB.Code);
             }
             catch (System.Exception e)
@@ -167,9 +167,9 @@ namespace DbGate.Persist
         private Product LoadProductWithId(ITransaction transaction, int id)
         {
             var query = new SelectionQuery()
-                .From(QueryFrom.EntityType(typeof (Product)))
+                .From(QueryFrom.EntityType(typeof(Product)))
                 .Where(QueryCondition.Expression(ConditionExpr.Build().Field(typeof(Product), "ProductId").Eq().Value(id)))
-                .Select(QuerySelection.EntityType(typeof (Product))).ToList(transaction);
+                .Select(QuerySelection.EntityType(typeof(Product))).ToList(transaction);
 
             return query.First() as Product;
         }

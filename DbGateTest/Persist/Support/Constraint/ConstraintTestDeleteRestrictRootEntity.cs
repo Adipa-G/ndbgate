@@ -17,17 +17,17 @@ namespace DbGate.Persist.Support.Constraint
         public string Name { get; set; }
 
         [ForeignKeyInfo("fk_root2one2manyent",
-            typeof (ConstraintTestOne2ManyEntity),
-            new[] {"idCol"},
-            new[] {"idCol"},
+            typeof(ConstraintTestOne2ManyEntity),
+            new[] { "idCol" },
+            new[] { "idCol" },
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Restrict)]
         public ICollection<ConstraintTestOne2ManyEntity> One2ManyEntities { get; set; }
 
         [ForeignKeyInfo("fk_root2one2oneent",
-            typeof (ConstraintTestOne2OneEntity),
-            new[] {"idCol"},
-            new[] {"idCol"},
+            typeof(ConstraintTestOne2OneEntity),
+            new[] { "idCol" },
+            new[] { "idCol" },
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Restrict)]
         public ConstraintTestOne2OneEntity One2OneEntity { get; set; }

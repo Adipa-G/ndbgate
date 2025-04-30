@@ -23,7 +23,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures
             if (o == null || GetType() != o.GetType()) return false;
             if (!base.Equals(o)) return false;
 
-            var that = (MetaTable) o;
+            var that = (MetaTable)o;
 
             if (PrimaryKey == null && that.PrimaryKey != null) return false;
             if (PrimaryKey != null && that.PrimaryKey == null) return false;

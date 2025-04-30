@@ -1,9 +1,9 @@
-﻿using System;
-using System.Data;
-using System.Data.SqlClient;
-using DbGate.ErManagement.ErMapper;
+﻿using DbGate.ErManagement.ErMapper;
 using DbGate.Exceptions.Common;
 using log4net;
+using System;
+using System.Data;
+using System.Data.SqlClient;
 
 //for windows
 //for linux
@@ -47,7 +47,7 @@ namespace DbGate
             {
                 throw new TransactionCreationFailedException("Failed to create a transaction ", ex);
             }
-            return new Transaction(this,tx);
+            return new Transaction(this, tx);
         }
 
         public IDbGate DbGate => dbGate;
@@ -55,7 +55,7 @@ namespace DbGate
         #region IDisposable Members
         public void Dispose()
         {
-            LogManager.GetLogger(typeof (DefaultTransactionFactory)).Info("finalize pool");
+            LogManager.GetLogger(typeof(DefaultTransactionFactory)).Info("finalize pool");
         }
         #endregion
     }

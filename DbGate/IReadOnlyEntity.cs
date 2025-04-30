@@ -1,5 +1,5 @@
-﻿using System.Data;
-using DbGate.Context;
+﻿using DbGate.Context;
+using System.Data;
 
 namespace DbGate
 {

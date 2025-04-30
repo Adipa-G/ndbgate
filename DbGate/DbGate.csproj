@@ -40,4 +40,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\Adipa\CodePlayground\github-repo\ndbgate\DbGate\.editorconfig" />
+  </ItemGroup>
+
 </Project>

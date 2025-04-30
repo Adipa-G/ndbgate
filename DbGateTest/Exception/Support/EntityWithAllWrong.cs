@@ -12,11 +12,11 @@ namespace DbGate.Exception.Support
             get => throw new System.Exception("cant' get");
             set => throw new System.Exception("cant' set");
         }
- 		
- 		public EntityWithAllWrong(int id)
- 		{
- 		    
- 		}
+
+        public EntityWithAllWrong(int id)
+        {
+
+        }
 
         public override Dictionary<Type, ICollection<IField>> FieldInfo => null;
 

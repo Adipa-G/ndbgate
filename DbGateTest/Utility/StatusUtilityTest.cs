@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using DbGate.Utility.Support;
+﻿using DbGate.Utility.Support;
+using System.Collections.Generic;
 using Xunit;
 
 namespace DbGate.Utility

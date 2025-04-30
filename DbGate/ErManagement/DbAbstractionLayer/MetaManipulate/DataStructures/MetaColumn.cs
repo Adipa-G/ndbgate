@@ -19,7 +19,7 @@
             if (o == null || GetType() != o.GetType()) return false;
             if (!base.Equals(o)) return false;
 
-            var that = (MetaColumn) o;
+            var that = (MetaColumn)o;
 
             if (Null != that.Null) return false;
             if (ColumnType != that.ColumnType) return false;

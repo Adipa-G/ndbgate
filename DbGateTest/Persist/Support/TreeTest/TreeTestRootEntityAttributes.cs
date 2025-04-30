@@ -14,17 +14,17 @@ namespace DbGate.Persist.Support.TreeTest
         public string Name { get; set; }
 
         [ForeignKeyInfo("fk_root2one2manyent",
-            typeof (TreeTestOne2ManyEntityAttributes),
-            new[] {"idcol"},
-            new[] {"idcol"},
+            typeof(TreeTestOne2ManyEntityAttributes),
+            new[] { "idcol" },
+            new[] { "idcol" },
             DeleteRule = ReferentialRuleType.Cascade,
             UpdateRule = ReferentialRuleType.Restrict)]
         public List<ITreeTestOne2ManyEntity> One2ManyEntities { get; set; }
 
         [ForeignKeyInfo("fk_root2one2oneent",
-            typeof (TreeTestOne2OneEntityAttributes),
-            new[] {"idcol"},
-            new[] {"idcol"},
+            typeof(TreeTestOne2OneEntityAttributes),
+            new[] { "idcol" },
+            new[] { "idcol" },
             DeleteRule = ReferentialRuleType.Cascade,
             UpdateRule = ReferentialRuleType.Restrict)]
         public ITreeTestOne2OneEntity One2OneEntity { get; set; }

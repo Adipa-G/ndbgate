@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.From;
 using DbGate.ErManagement.Query;
 using DbGate.ErManagement.Query.Expr;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.Join
 {

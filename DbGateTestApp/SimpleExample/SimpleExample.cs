@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using DbGate;
 using DbGate.ErManagement.Query;
 using DbGate.Utility;
 using DbGateTestApp.DocGenerate;
 using DbGateTestApp.SimpleExample.Entities;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace DbGateTestApp.SimpleExample
@@ -23,14 +23,14 @@ namespace DbGateTestApp.SimpleExample
             return entity;
         }
 
-        public void Patch(ITransaction tx) 
+        public void Patch(ITransaction tx)
         {
             ICollection<Type> entityTypes = new List<Type>();
             entityTypes.Add(typeof(SimpleEntity));
             tx.DbGate.PatchDataBase(tx, entityTypes, false);
         }
 
-        public void Persist(ITransaction tx,SimpleEntity entity)
+        public void Persist(ITransaction tx, SimpleEntity entity)
         {
             entity.Persist(tx);
         }

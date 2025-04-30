@@ -1,9 +1,9 @@
-﻿using System.Data;
+﻿using log4net;
+using log4net.Core;
+using System.Data;
 using System.Data.SQLite;
 using System.IO;
 using System.Reflection;
-using log4net;
-using log4net.Core;
 using Xunit;
 
 namespace DbGate.Utility
@@ -50,7 +50,7 @@ namespace DbGate.Utility
             }
             catch (System.Exception ex)
             {
-                LogManager.GetLogger(typeof (DbUtilsTests)).Fatal("Exception during test", ex);
+                LogManager.GetLogger(typeof(DbUtilsTests)).Fatal("Exception during test", ex);
                 Assert.Fail(ex.Message);
             }
         }

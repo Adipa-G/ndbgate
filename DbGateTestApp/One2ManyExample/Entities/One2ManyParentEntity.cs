@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using DbGate;
 using DbGateTestApp.DocGenerate;
+using System.Collections.Generic;
 
 namespace DbGateTestApp.One2ManyExample.Entities
 {
@@ -20,15 +20,15 @@ namespace DbGateTestApp.One2ManyExample.Entities
         public string Name { get; set; }
 
         [ForeignKeyInfo("parent2childA",
-            typeof (One2ManyChildEntityA),
-            new[] {"id"},
-            new[] {"parentId"},
+            typeof(One2ManyChildEntityA),
+            new[] { "id" },
+            new[] { "parentId" },
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         [ForeignKeyInfo("parent2childB",
-            typeof (One2ManyChildEntityB),
-            new[] {"id"},
-            new[] {"parentId"}, 
+            typeof(One2ManyChildEntityB),
+            new[] { "id" },
+            new[] { "parentId" },
             UpdateRule = ReferentialRuleType.Restrict,
             DeleteRule = ReferentialRuleType.Cascade)]
         public ICollection<One2ManyChildEntity> ChildEntities { get; set; }

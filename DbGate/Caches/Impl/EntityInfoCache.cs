@@ -1,12 +1,12 @@
-﻿using System;
+﻿using DbGate.ErManagement.ErMapper.Utils;
+using DbGate.Exceptions;
+using DbGate.Exceptions.Common;
+using log4net;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using DbGate.ErManagement.ErMapper.Utils;
-using DbGate.Exceptions;
-using DbGate.Exceptions.Common;
-using log4net;
 
 namespace DbGate.Caches.Impl
 {
@@ -47,7 +47,7 @@ namespace DbGate.Caches.Impl
             }
             return Cache[entityType];
         }
-        
+
         public IList<IRelation> GetReversedRelationships(Type entityType)
         {
             var typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(entityType,
@@ -110,7 +110,7 @@ namespace DbGate.Caches.Impl
 
             EntityInfo subEntity = null;
             var typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(subType,
-                                                                                     new[] {typeof (IReadOnlyEntity)});
+                                                                                     new[] { typeof(IReadOnlyEntity) });
             foreach (var regType in typeList)
             {
                 if (subEntity != null && Cache.ContainsKey(regType))
@@ -151,12 +151,12 @@ namespace DbGate.Caches.Impl
                 {
                     if (attribute is TableInfo)
                     {
-                        var tableInfo = (TableInfo) attribute;
-                        var annotatedTableInfo = (TableInfo) attribute;
+                        var tableInfo = (TableInfo)attribute;
+                        var annotatedTableInfo = (TableInfo)attribute;
                         table = new DefaultTable(annotatedTableInfo.TableName
-                            ,annotatedTableInfo.UpdateStrategy
-                            ,annotatedTableInfo.VerifyOnWriteStrategy
-                            ,annotatedTableInfo.DirtyCheckStrategy);
+                            , annotatedTableInfo.UpdateStrategy
+                            , annotatedTableInfo.VerifyOnWriteStrategy
+                            , annotatedTableInfo.DirtyCheckStrategy);
                     }
                 }
             }
@@ -181,11 +181,11 @@ namespace DbGate.Caches.Impl
 
         private static ITable GetTableInfoIfManagedClass(Type regType, Type subType)
         {
-            if (ReflectionUtils.IsImplementInterface(regType, typeof (IManagedEntity)))
+            if (ReflectionUtils.IsImplementInterface(regType, typeof(IManagedEntity)))
             {
                 try
                 {
-                    var managedDbClass = (IManagedEntity) Activator.CreateInstance(subType);
+                    var managedDbClass = (IManagedEntity)Activator.CreateInstance(subType);
                     return managedDbClass.TableInfo.ContainsKey(regType) ? managedDbClass.TableInfo[regType] : null;
                 }
                 catch (Exception e)
@@ -211,26 +211,26 @@ namespace DbGate.Caches.Impl
             }
 
             foreach (var field in fields)
-	        {
-	            if (field is IRelation)
-	            {
-	                var relation = (IRelation) field;
-	
-	                if (relation.FetchStrategy == FetchStrategy.Default)
-	                    relation.FetchStrategy = config.FetchStrategy;
-	            }
-	        }
+            {
+                if (field is IRelation)
+                {
+                    var relation = (IRelation)field;
+
+                    if (relation.FetchStrategy == FetchStrategy.Default)
+                        relation.FetchStrategy = config.FetchStrategy;
+                }
+            }
 
             return fields;
         }
 
         private static List<IField> GetFieldsIfManagedClass(Type regType, Type subType)
         {
-            if (ReflectionUtils.IsImplementInterface(regType, typeof (IManagedEntity)))
+            if (ReflectionUtils.IsImplementInterface(regType, typeof(IManagedEntity)))
             {
                 try
                 {
-                    var managedDbClass = (IManagedEntity) Activator.CreateInstance(subType);
+                    var managedDbClass = (IManagedEntity)Activator.CreateInstance(subType);
                     return GetFieldsForManagedClass(managedDbClass, regType);
                 }
                 catch (Exception e)
@@ -247,7 +247,7 @@ namespace DbGate.Caches.Impl
             var fields = new List<IField>();
 
             var typeList = ReflectionUtils.GetSuperTypesWithInterfacesImplemented(type,
-                                                                                     new[] {typeof (IReadOnlyEntity)});
+                                                                                     new[] { typeof(IReadOnlyEntity) });
             foreach (var targetType in typeList)
             {
                 var targetTypeFields = entity.FieldInfo.ContainsKey(targetType)
@@ -290,7 +290,7 @@ namespace DbGate.Caches.Impl
                 {
                     if (attribute is ColumnInfo)
                     {
-                        var dbColumnInfo = (ColumnInfo) attribute;
+                        var dbColumnInfo = (ColumnInfo)attribute;
                         if (superClass && !dbColumnInfo.SubClassCommonColumn)
                         {
                             continue;
@@ -306,7 +306,7 @@ namespace DbGate.Caches.Impl
                         }
                         if (attribute is ForeignKeyInfo)
                         {
-                            var foreignKeyInfo = (ForeignKeyInfo) attribute;
+                            var foreignKeyInfo = (ForeignKeyInfo)attribute;
 
                             var relation = CreateForeignKeyMapping(entityType,
                                 propertyInfo,
@@ -338,7 +338,7 @@ namespace DbGate.Caches.Impl
                 try
                 {
                     column.SequenceGenerator =
-                        (ISequenceGenerator) Activator.CreateInstance(columnInfo.SequenceGeneratorType);
+                        (ISequenceGenerator)Activator.CreateInstance(columnInfo.SequenceGeneratorType);
                 }
                 catch (Exception e)
                 {
@@ -377,7 +377,7 @@ namespace DbGate.Caches.Impl
 
             if (fromFieldMappings.Length != toFieldMappings.Length)
             {
-                LogManager.GetLogger(typeof (EntityInfoCache)).Fatal(
+                LogManager.GetLogger(typeof(EntityInfoCache)).Fatal(
                     "incorrect relation definition, no of from columns should ne equal to no of to columns");
                 throw new IncorrectFieldDefinitionException(
                     "incorrect relation definition, no of from columns should ne equal to no of to columns");

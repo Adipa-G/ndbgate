@@ -12,7 +12,7 @@ namespace DbGate.Patch.Support.PatchEmpty
             get
             {
                 var map = base.TableInfo;
-                map.Add(typeof (LeafEntitySubA), new DefaultTable("leaf_entity_a"));
+                map.Add(typeof(LeafEntitySubA), new DefaultTable("leaf_entity_a"));
                 return map;
             }
         }
@@ -26,7 +26,7 @@ namespace DbGate.Patch.Support.PatchEmpty
 
                 dbColumns.Add(new DefaultColumn("SomeTextA", ColumnType.Varchar));
 
-                map.Add(typeof (LeafEntitySubA), dbColumns);
+                map.Add(typeof(LeafEntitySubA), dbColumns);
                 return map;
             }
         }

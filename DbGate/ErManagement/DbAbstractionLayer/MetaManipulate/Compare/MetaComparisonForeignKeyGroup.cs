@@ -24,7 +24,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
         public override bool ShouldAlterInDb()
         {
             return ExistingItem != null && RequiredItem != null
- 				        && !ExistingItem.Equals(RequiredItem);
+                         && !ExistingItem.Equals(RequiredItem);
         }
     }
 }

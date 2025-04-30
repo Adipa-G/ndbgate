@@ -10,7 +10,7 @@ namespace DbGate.Persist.Support.ColumnTest
             get
             {
                 var map = new Dictionary<Type, ITable>();
-                map.Add(typeof (ColumnTestEntityFields), new DefaultTable("column_test_entity"));
+                map.Add(typeof(ColumnTestEntityFields), new DefaultTable("column_test_entity"));
                 return map;
             }
         }
@@ -45,7 +45,7 @@ namespace DbGate.Persist.Support.ColumnTest
                 dbColumns.Add(new DefaultColumn("GuidNotNull", ColumnType.Guid));
                 dbColumns.Add(new DefaultColumn("GuidNull", ColumnType.Guid, true));
 
-                map.Add(typeof (ColumnTestEntityFields), dbColumns);
+                map.Add(typeof(ColumnTestEntityFields), dbColumns);
                 return map;
             }
         }

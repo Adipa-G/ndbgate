@@ -35,10 +35,10 @@ namespace DbGate.ErManagement.Query.Expr.Segments
                 case SegmentType.Compare:
                     var result = Active != null ? Active.Add(segment) : segment;
                     if (result.SegmentType == SegmentType.Compare
-                        && ((CompareSegment) result).Right != null)
+                        && ((CompareSegment)result).Right != null)
                     {
                         AddSub(result);
-                        ((CompareSegment) result).Parent = this;
+                        ((CompareSegment)result).Parent = this;
                         Active = null;
                     }
                     else
@@ -47,7 +47,7 @@ namespace DbGate.ErManagement.Query.Expr.Segments
                     }
                     return this;
                 case SegmentType.Merge:
-                    var mergeSegment = (MergeSegment) segment;
+                    var mergeSegment = (MergeSegment)segment;
                     mergeSegment.AddSub(this);
                     Parent = mergeSegment;
                     return mergeSegment;

@@ -9,7 +9,7 @@ namespace DbGate
     public interface ITable
     {
         string TableName { get; set; }
-        
+
         UpdateStrategy UpdateStrategy { get; set; }
 
         VerifyOnWriteStrategy VerifyOnWriteStrategy { get; set; }

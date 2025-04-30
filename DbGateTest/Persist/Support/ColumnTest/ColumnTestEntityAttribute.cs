@@ -7,7 +7,7 @@ namespace DbGate.Persist.Support.ColumnTest
     {
         #region IColumnTestEntity Members
 
-        [ColumnInfo((ColumnType.Integer), Key = true, ReadFromSequence = true,SequenceGeneratorType = typeof(PrimaryKeyGenerator))]
+        [ColumnInfo((ColumnType.Integer), Key = true, ReadFromSequence = true, SequenceGeneratorType = typeof(PrimaryKeyGenerator))]
         public int IdCol { get; set; }
 
         [ColumnInfo(ColumnType.Long)]

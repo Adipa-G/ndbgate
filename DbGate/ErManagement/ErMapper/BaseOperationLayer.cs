@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Reflection;
-using System.Text;
-using Castle.DynamicProxy;
+﻿using Castle.DynamicProxy;
 using DbGate.Caches;
 using DbGate.Caches.Impl;
 using DbGate.Context;
@@ -13,7 +8,12 @@ using DbGate.ErManagement.ErMapper.Utils;
 using DbGate.Exceptions.Common;
 using DbGate.Utility;
 using log4net;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace DbGate.ErManagement.ErMapper
 {
@@ -23,7 +23,7 @@ namespace DbGate.ErManagement.ErMapper
         protected IDbGateStatistics Statistics;
         protected IDbGateConfig Config;
 
-        protected BaseOperationLayer(IDbLayer dbLayer,IDbGateStatistics statistics, IDbGateConfig config)
+        protected BaseOperationLayer(IDbLayer dbLayer, IDbGateStatistics statistics, IDbGateConfig config)
         {
             DbLayer = dbLayer;
             Statistics = statistics;
@@ -44,10 +44,10 @@ namespace DbGate.ErManagement.ErMapper
             }
             catch (Exception ex)
             {
-                var message = String.Format("SQL Exception while trying create command for sql {0}",query);
-                throw new CommandCreationException(message,ex);
+                var message = String.Format("SQL Exception while trying create command for sql {0}", query);
+                throw new CommandCreationException(message, ex);
             }
-            
+
             var keys = entityInfo.GetKeys();
 
             var logSb = new StringBuilder();
@@ -129,7 +129,7 @@ namespace DbGate.ErManagement.ErMapper
                     {
                         continue;
                     }
-                    if (IsProxyObject(parentEntity,typeRelation))
+                    if (IsProxyObject(parentEntity, typeRelation))
                     {
                         continue;
                     }
@@ -162,7 +162,7 @@ namespace DbGate.ErManagement.ErMapper
                 , ITransaction tx, IRelation relation)
         {
             var retrievedEntities = new List<IReadOnlyEntity>();
-	        var childTypesToProcess = GetChildTypesToProcess(relation);
+            var childTypesToProcess = GetChildTypesToProcess(relation);
 
             var index = 0;
             foreach (var childType in childTypesToProcess)
@@ -208,20 +208,20 @@ namespace DbGate.ErManagement.ErMapper
                     var matchColumn = entityInfo.FindColumnByAttribute(field);
                     var entityRelationColumnInfo =
                         entityInfo.FindRelationColumnInfo(matchColumn != null ? matchColumn.AttributeName : "");
-	                if (entityRelationColumnInfo != null)
-	                {
-	                    var entityFieldValue =  entity.Context.ChangeTracker.GetFieldValue(matchColumn.AttributeName);
-	                    fieldValue = entityFieldValue.Value;
-	                }
-	                else if (matchColumn != null)
-	                {		                
+                    if (entityRelationColumnInfo != null)
+                    {
+                        var entityFieldValue = entity.Context.ChangeTracker.GetFieldValue(matchColumn.AttributeName);
+                        fieldValue = entityFieldValue.Value;
+                    }
+                    else if (matchColumn != null)
+                    {
                         var getter = entityInfo.GetProperty(matchColumn.AttributeName);
-	                    fieldValue = ReflectionUtils.GetValue(entityInfo.EntityType, getter.Name, entity);
-	                }	
+                        fieldValue = ReflectionUtils.GetValue(entityInfo.EntityType, getter.Name, entity);
+                    }
                     else
                     {
                         var message = String.Format("The field {0} does not have a matching field in the object {1}"
-                            , field,entity.GetType().FullName);
+                            , field, entity.GetType().FullName);
                         throw new NoMatchingColumnFoundException(message);
                     }
 
@@ -307,13 +307,13 @@ namespace DbGate.ErManagement.ErMapper
             }
             catch (Exception ex)
             {
-                var message = String.Format("SQL Exception while trying to read type {0} from result set",childType.FullName);
-                throw new ReadFromResultSetException(message,ex);
+                var message = String.Format("SQL Exception while trying to read type {0} from result set", childType.FullName);
+                throw new ReadFromResultSetException(message, ex);
             }
             finally
             {
                 DbMgtUtility.Close(reader);
-                DbMgtUtility.Close(cmd);     
+                DbMgtUtility.Close(cmd);
             }
 
             return data;
@@ -325,8 +325,8 @@ namespace DbGate.ErManagement.ErMapper
             {
                 var entityInfo = CacheManager.GetEntityInfo(entity);
                 var property = entityInfo.GetProperty(relation.AttributeName);
-                var value = ReflectionUtils.GetValue(entityInfo.EntityType, property.Name, entity); 
-               
+                var value = ReflectionUtils.GetValue(entityInfo.EntityType, property.Name, entity);
+
                 if (value == null)
                 {
                     return false;

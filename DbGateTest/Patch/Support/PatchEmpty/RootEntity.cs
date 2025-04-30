@@ -33,9 +33,9 @@ namespace DbGate.Patch.Support.PatchEmpty
         public Guid? GuidNull { get; set; }
 
         [ForeignKeyInfo("fk_root2leaf",
-            typeof (LeafEntity),
-            new[] {"idcol"}, 
-            new[] {"idcol"})]
+            typeof(LeafEntity),
+            new[] { "idcol" },
+            new[] { "idcol" })]
         public ICollection<LeafEntity> LeafEntities { get; set; }
 
         public override Dictionary<Type, ITable> TableInfo
@@ -43,7 +43,7 @@ namespace DbGate.Patch.Support.PatchEmpty
             get
             {
                 var map = new Dictionary<Type, ITable>();
-                map.Add(typeof (RootEntity), new DefaultTable("root_entity"));
+                map.Add(typeof(RootEntity), new DefaultTable("root_entity"));
                 return map;
             }
         }
@@ -77,7 +77,7 @@ namespace DbGate.Patch.Support.PatchEmpty
                 dbColumns.Add(new DefaultColumn("GuidNotNull", ColumnType.Guid));
                 dbColumns.Add(new DefaultColumn("GuidNull", ColumnType.Guid, true));
 
-                map.Add(typeof (RootEntity), dbColumns);
+                map.Add(typeof(RootEntity), dbColumns);
                 return map;
             }
         }

@@ -95,7 +95,7 @@ namespace DbGate.ErManagement.ErMapper
         {
             if (typeCountMap.ContainsKey(type))
             {
-                return (int) typeCountMap[type];
+                return (int)typeCountMap[type];
             }
             return 0;
         }
@@ -104,8 +104,8 @@ namespace DbGate.ErManagement.ErMapper
         {
             if (typeCountMap.ContainsKey(type))
             {
-                var currentCount = (int) typeCountMap[type];
-                currentCount ++;
+                var currentCount = (int)typeCountMap[type];
+                currentCount++;
                 typeCountMap.Remove(type);
                 typeCountMap.Add(type, currentCount);
             }

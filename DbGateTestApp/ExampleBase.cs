@@ -1,12 +1,12 @@
+using DbGate;
+using DbGateTestApp.DocGenerate;
+using log4net;
+using log4net.Core;
 using System;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
 using System.Reflection;
-using DbGate;
-using DbGateTestApp.DocGenerate;
-using log4net;
-using log4net.Core;
 
 namespace DbGateTestApp
 {
@@ -39,7 +39,7 @@ namespace DbGateTestApp
             }
         }
 
-        
+
         public static void CloseDb()
         {
             try

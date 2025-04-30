@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Data;
 using DbGate;
 using DbGate.Utility;
 using DbGateTestApp.ComplexExample.Entities.Order;
 using DbGateTestApp.ComplexExample.Entities.Product;
 using DbGateTestApp.DocGenerate;
+using System;
+using System.Collections.Generic;
+using System.Data;
 
 namespace DbGateTestApp.ComplexExample
 {
@@ -67,11 +67,11 @@ namespace DbGateTestApp.ComplexExample
         public void Patch(ITransaction tx)
         {
             ICollection<Type> entityTypes = new List<Type>();
-            entityTypes.Add(typeof (Product));
-            entityTypes.Add(typeof (Service));
-            entityTypes.Add(typeof (Transaction));
-            entityTypes.Add(typeof (ItemTransaction));
-            entityTypes.Add(typeof (ItemTransactionCharge));
+            entityTypes.Add(typeof(Product));
+            entityTypes.Add(typeof(Service));
+            entityTypes.Add(typeof(Transaction));
+            entityTypes.Add(typeof(ItemTransaction));
+            entityTypes.Add(typeof(ItemTransactionCharge));
 
             tx.DbGate.PatchDataBase(tx, entityTypes, false);
         }

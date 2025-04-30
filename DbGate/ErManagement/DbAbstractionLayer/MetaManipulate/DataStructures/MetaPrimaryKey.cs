@@ -19,13 +19,13 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DataStructures
             if (o == null || GetType() != o.GetType()) return false;
             if (this == o) return true;
             if (!(o is AbstractMetaItem)) return false;
- 		
- 			var that = (MetaPrimaryKey) o;
+
+            var that = (MetaPrimaryKey)o;
 
             if (ItemType != that.ItemType) return false;
- 			 if (!"PRIMARY".Equals(Name,StringComparison.InvariantCultureIgnoreCase)
-                    && !"PRIMARY".Equals(that.Name,StringComparison.InvariantCultureIgnoreCase)
-                    && !Name.Equals(that.Name, StringComparison.InvariantCultureIgnoreCase)) return false;
+            if (!"PRIMARY".Equals(Name, StringComparison.InvariantCultureIgnoreCase)
+                  && !"PRIMARY".Equals(that.Name, StringComparison.InvariantCultureIgnoreCase)
+                  && !Name.Equals(that.Name, StringComparison.InvariantCultureIgnoreCase)) return false;
 
             var foundMatch = false;
             foreach (var thisColumn in ColumnNames)

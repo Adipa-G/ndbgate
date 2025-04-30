@@ -1,15 +1,15 @@
-﻿using System;
+﻿using DbGate.Exceptions.Common;
+using System;
 using System.Collections.Generic;
 using System.Data;
-using DbGate.Exceptions.Common;
 
 namespace DbGate
 {
     public class ColumnTypeMapping
     {
-        private static readonly Dictionary<Type,ColumnType> NetType2ColumnType = new Dictionary<Type, ColumnType>();
-        private static readonly Dictionary<ColumnType,Type> ColumnType2NetType = new Dictionary<ColumnType, Type>();
-        private static readonly Dictionary<ColumnType,DbType> ColumnType2DbType = new Dictionary<ColumnType, DbType>();
+        private static readonly Dictionary<Type, ColumnType> NetType2ColumnType = new Dictionary<Type, ColumnType>();
+        private static readonly Dictionary<ColumnType, Type> ColumnType2NetType = new Dictionary<ColumnType, Type>();
+        private static readonly Dictionary<ColumnType, DbType> ColumnType2DbType = new Dictionary<ColumnType, DbType>();
         private static bool initialized = false;
 
         private static void Init()
@@ -22,18 +22,18 @@ namespace DbGate
                         return;
 
                     AddNetTypeAndColumnTypeRelation(typeof(Guid), ColumnType.Guid);
-                    AddNetTypeAndColumnTypeRelation(typeof(long),ColumnType.Long);                       
-                    AddNetTypeAndColumnTypeRelation(typeof(bool),ColumnType.Boolean);                       
-                    AddNetTypeAndColumnTypeRelation(typeof(char),ColumnType.Char);                       
-                    AddNetTypeAndColumnTypeRelation(typeof(int),ColumnType.Integer);                       
-                    AddNetTypeAndColumnTypeRelation(typeof(DateTime),ColumnType.Date);                       
-                    AddNetTypeAndColumnTypeRelation(typeof(double),ColumnType.Double);                       
-                    AddNetTypeAndColumnTypeRelation(typeof(float),ColumnType.Float);                       
-                    AddNetTypeAndColumnTypeRelation(typeof(DateTime),ColumnType.Timestamp);                       
-                    AddNetTypeAndColumnTypeRelation(typeof(string),ColumnType.Varchar);                       
-                    AddNetTypeAndColumnTypeRelation(typeof(String),ColumnType.Varchar);                       
-                    AddNetTypeAndColumnTypeRelation(typeof(int),ColumnType.Version);
-                    
+                    AddNetTypeAndColumnTypeRelation(typeof(long), ColumnType.Long);
+                    AddNetTypeAndColumnTypeRelation(typeof(bool), ColumnType.Boolean);
+                    AddNetTypeAndColumnTypeRelation(typeof(char), ColumnType.Char);
+                    AddNetTypeAndColumnTypeRelation(typeof(int), ColumnType.Integer);
+                    AddNetTypeAndColumnTypeRelation(typeof(DateTime), ColumnType.Date);
+                    AddNetTypeAndColumnTypeRelation(typeof(double), ColumnType.Double);
+                    AddNetTypeAndColumnTypeRelation(typeof(float), ColumnType.Float);
+                    AddNetTypeAndColumnTypeRelation(typeof(DateTime), ColumnType.Timestamp);
+                    AddNetTypeAndColumnTypeRelation(typeof(string), ColumnType.Varchar);
+                    AddNetTypeAndColumnTypeRelation(typeof(String), ColumnType.Varchar);
+                    AddNetTypeAndColumnTypeRelation(typeof(int), ColumnType.Version);
+
                     AddDbTypeAndColumnTypeRelation(DbType.Guid, ColumnType.Guid);
                     AddDbTypeAndColumnTypeRelation(DbType.Int32, ColumnType.Integer);
                     AddDbTypeAndColumnTypeRelation(DbType.Int64, ColumnType.Long);
@@ -50,15 +50,15 @@ namespace DbGate
             }
         }
 
-        private static void AddNetTypeAndColumnTypeRelation(Type type,ColumnType columnType)
+        private static void AddNetTypeAndColumnTypeRelation(Type type, ColumnType columnType)
         {
             if (!NetType2ColumnType.ContainsKey(type))
-                NetType2ColumnType.Add(type,columnType);
+                NetType2ColumnType.Add(type, columnType);
             if (!ColumnType2NetType.ContainsKey(columnType))
-                ColumnType2NetType.Add(columnType,type);
+                ColumnType2NetType.Add(columnType, type);
         }
 
-        private static void AddDbTypeAndColumnTypeRelation(DbType dbType,ColumnType columnType)
+        private static void AddDbTypeAndColumnTypeRelation(DbType dbType, ColumnType columnType)
         {
             if (!ColumnType2DbType.ContainsKey(columnType))
                 ColumnType2DbType.Add(columnType, dbType);

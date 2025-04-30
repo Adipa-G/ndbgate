@@ -1,6 +1,6 @@
-﻿using System.Data;
-using DbGate.Context;
+﻿using DbGate.Context;
 using DbGate.Context.Impl;
+using System.Data;
 
 namespace DbGate.Persist.Support.TreeTest
 {
@@ -12,7 +12,7 @@ namespace DbGate.Persist.Support.TreeTest
         public int IdCol { get; set; }
         public int IndexNo { get; set; }
         public string Name { get; set; }
-        
+
         public TreeTestOne2ManyEntityExt()
         {
             Status = EntityStatus.New;
@@ -22,7 +22,7 @@ namespace DbGate.Persist.Support.TreeTest
         public void Retrieve(IDataReader reader, ITransaction tx)
         {
             tx.DbGate.Load(this, reader, tx);
- 
+
         }
 
         public void Persist(ITransaction tx)

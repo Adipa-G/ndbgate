@@ -1,6 +1,6 @@
-using System;
 using DbGate.ErManagement.DbAbstractionLayer.DataManipulate.Query.From;
 using DbGate.ErManagement.Query;
+using System;
 
 namespace DbGate
 {
@@ -15,21 +15,21 @@ namespace DbGate
 
         public static IQueryFrom RawSql(string sql)
         {
-            var queryFrom = (AbstractSqlQueryFrom) factory.CreateFrom(QueryFromExpressionType.RawSql);
+            var queryFrom = (AbstractSqlQueryFrom)factory.CreateFrom(QueryFromExpressionType.RawSql);
             queryFrom.Sql = sql;
             return queryFrom;
         }
 
         public static IQueryFrom EntityType(Type entityType)
         {
-            var typeFrom = (AbstractTypeFrom) factory.CreateFrom(QueryFromExpressionType.EntityType);
+            var typeFrom = (AbstractTypeFrom)factory.CreateFrom(QueryFromExpressionType.EntityType);
             typeFrom.EntityType = entityType;
             return typeFrom;
         }
 
         public static IQueryFrom EntityType(Type entityType, String alias)
         {
-            var typeFrom = (AbstractTypeFrom) factory.CreateFrom(QueryFromExpressionType.EntityType);
+            var typeFrom = (AbstractTypeFrom)factory.CreateFrom(QueryFromExpressionType.EntityType);
             typeFrom.EntityType = entityType;
             if (!string.IsNullOrEmpty(alias))
             {
@@ -63,7 +63,7 @@ namespace DbGate
 
         public static IQueryFrom Query(ISelectionQuery query, String alias)
         {
-            var queryFromSub = (AbstractSubQueryFrom) factory.CreateFrom(QueryFromExpressionType.Query);
+            var queryFromSub = (AbstractSubQueryFrom)factory.CreateFrom(QueryFromExpressionType.Query);
             queryFromSub.Query = query;
             ;
             if (!string.IsNullOrEmpty(alias))
@@ -75,7 +75,7 @@ namespace DbGate
 
         public static IQueryFrom QueryUnion(bool all, ISelectionQuery[] queries)
         {
-            var queryFrom = (AbstractUnionFrom) factory.CreateFrom(QueryFromExpressionType.QueryUnion);
+            var queryFrom = (AbstractUnionFrom)factory.CreateFrom(QueryFromExpressionType.QueryUnion);
             queryFrom.Queries = queries;
             queryFrom.All = all;
             return queryFrom;
