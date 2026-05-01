@@ -17,17 +17,17 @@
 	<PackageReference Include="Microsoft.NET.Test.Sdk" />
 	<PackageReference Include="xunit" />
 	<PackageReference Include="xunit.runner.visualstudio">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="coverlet.collector">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  <PrivateAssets>all</PrivateAssets>
+	</PackageReference>
+	<PackageReference Include="coverlet.collector">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
 	<PackageReference Include="Castle.Core" />
-    <PackageReference Include="log4net" />
-    <PackageReference Include="System.Data.SqlClient" />
-    <PackageReference Include="System.Data.SQLite.Core" />
+	<PackageReference Include="log4net" />
+	<PackageReference Include="Microsoft.Data.SqlClient" />
+	<PackageReference Include="System.Data.SQLite.Core" />
   </ItemGroup>
 
   <ItemGroup>

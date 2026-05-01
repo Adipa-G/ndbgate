@@ -7,7 +7,7 @@ using PerformanceTest.NDbGate.Entities.Order;
 using PerformanceTest.NDbGate.Entities.Product;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;

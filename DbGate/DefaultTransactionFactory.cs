@@ -3,7 +3,7 @@ using DbGate.Exceptions.Common;
 using log4net;
 using System;
 using System.Data;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 
 //for windows
 //for linux

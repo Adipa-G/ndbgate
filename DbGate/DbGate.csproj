@@ -22,7 +22,7 @@
     <PackageReference Include="log4net" />
     <PackageReference Include="Microsoft.CSharp" />
     <PackageReference Include="Reflectless" />
-    <PackageReference Include="System.Data.SqlClient" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
   </ItemGroup>
 
   <ItemGroup>
