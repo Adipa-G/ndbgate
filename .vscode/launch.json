@@ -36,6 +36,21 @@
         "cwd": "${workspaceFolder}/DbGateTestApp",
         "console": "internalConsole",
         "stopAtEntry": false
+    },
+    {
+        "name": "Run Unit Tests",
+        "type": "coreclr",
+        "request": "launch",
+        "preLaunchTask": "build-tests",
+        "program": "dotnet",
+        "args": [
+            "test",
+            "${workspaceFolder}/DbGateTest/DbGateTest.csproj",
+            "--logger", "console;verbosity=normal"
+        ],
+        "cwd": "${workspaceFolder}",
+        "console": "internalConsole",
+        "stopAtEntry": false
     }
     ]
 }
