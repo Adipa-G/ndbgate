@@ -160,8 +160,8 @@ namespace DbGate.ErManagement.ErMapper
         {
             var entityInfo = CacheManager.GetEntityInfo(type);
             var entityContext = entity.Context;
-            var valueTypeList = ReadValues(type, reader);
-            SetValues(entity, valueTypeList);
+            var valueTypeList = ReadValues(entityInfo, reader);
+            SetValues(entity, valueTypeList, entityInfo);
             entity.Context.AddToCurrentObjectGraphIndex(entity);
 
             if (entityContext != null)

@@ -9,9 +9,11 @@ using DbGate.Exceptions.Common;
 using DbGate.Utility;
 using log4net;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
@@ -19,6 +21,9 @@ namespace DbGate.ErManagement.ErMapper
 {
     public abstract class BaseOperationLayer
     {
+        private static readonly ConcurrentDictionary<Type, Func<IReadOnlyEntity>> EntityFactoryCache =
+            new ConcurrentDictionary<Type, Func<IReadOnlyEntity>>();
+
         protected IDbLayer DbLayer;
         protected IDbGateStatistics Statistics;
         protected IDbGateConfig Config;
@@ -50,12 +55,8 @@ namespace DbGate.ErManagement.ErMapper
 
             var keys = entityInfo.GetKeys();
 
-            var logSb = new StringBuilder();
             var showQuery = Config.ShowQueries;
-            if (showQuery)
-            {
-                logSb.Append(query);
-            }
+            StringBuilder logSb = showQuery ? new StringBuilder(query) : null;
             var i = 0;
             foreach (var key in keys)
             {
@@ -80,8 +81,12 @@ namespace DbGate.ErManagement.ErMapper
         protected ITypeFieldValueList ReadValues(Type type, IDataReader reader)
         {
             var entityInfo = CacheManager.GetEntityInfo(type);
+            return ReadValues(entityInfo, reader);
+        }
 
-            ITypeFieldValueList valueTypeList = new EntityTypeFieldValueList(type);
+        protected ITypeFieldValueList ReadValues(EntityInfo entityInfo, IDataReader reader)
+        {
+            ITypeFieldValueList valueTypeList = new EntityTypeFieldValueList(entityInfo.EntityType);
             var dbColumns = entityInfo.Columns;
             foreach (var dbColumn in dbColumns)
             {
@@ -94,7 +99,11 @@ namespace DbGate.ErManagement.ErMapper
         protected static void SetValues(IReadOnlyEntity roEntity, ITypeFieldValueList values)
         {
             var entityInfo = CacheManager.GetEntityInfo(roEntity);
+            SetValues(roEntity, values, entityInfo);
+        }
 
+        protected static void SetValues(IReadOnlyEntity roEntity, ITypeFieldValueList values, EntityInfo entityInfo)
+        {
             foreach (var fieldValue in values.FieldValues)
             {
                 if (entityInfo.FindRelationColumnInfo(fieldValue.Column.AttributeName) == null)
@@ -163,6 +172,8 @@ namespace DbGate.ErManagement.ErMapper
         {
             var retrievedEntities = new List<IReadOnlyEntity>();
             var childTypesToProcess = GetChildTypesToProcess(relation);
+            var entityInfo = CacheManager.GetEntityInfo(entityType);
+            var showQuery = Config.ShowQueries;
 
             var index = 0;
             foreach (var childType in childTypesToProcess)
@@ -172,8 +183,6 @@ namespace DbGate.ErManagement.ErMapper
                 effectiveRelation.RelatedObjectType = childType;
                 effectiveRelation.RelationShipName = relation.RelationShipName + "_" + index;
 
-                var entityInfo = CacheManager.GetEntityInfo(entityType);
-                var logSb = new StringBuilder();
                 var query = entityInfo.GetRelationObjectLoad(DbLayer, effectiveRelation);
 
                 IList<string> fields = new List<string>();
@@ -194,11 +203,7 @@ namespace DbGate.ErManagement.ErMapper
                     throw new CommandCreationException(message, ex);
                 }
 
-                var showQuery = Config.ShowQueries;
-                if (showQuery)
-                {
-                    logSb.Append(query);
-                }
+                StringBuilder logSb = showQuery ? new StringBuilder(query) : null;
 
                 for (var i = 0; i < fields.Count; i++)
                 {
@@ -297,7 +302,13 @@ namespace DbGate.ErManagement.ErMapper
                         continue;
                     }
 
-                    var rodbClass = (IReadOnlyEntity)Activator.CreateInstance(childType);
+                    var factory = EntityFactoryCache.GetOrAdd(childType, t =>
+                    {
+                        var ctor = t.GetConstructor(Type.EmptyTypes);
+                        var newExpr = Expression.New(ctor);
+                        return Expression.Lambda<Func<IReadOnlyEntity>>(newExpr).Compile();
+                    });
+                    var rodbClass = factory();
                     rodbClass.Context.CopyReferenceStoreFrom(entity);
                     rodbClass.Retrieve(reader, tx);
                     data.Add(rodbClass);

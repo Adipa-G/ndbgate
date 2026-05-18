@@ -1,0 +1,41 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+    {
+        "name": "C#: PerformanceTest Debug",
+        "type": "coreclr",
+        "request": "launch",
+        "preLaunchTask": "build",
+        "program": "${workspaceFolder}/PerformanceTest/bin/Debug/net8.0/PerformanceTest.dll",
+        "args": [],
+        "cwd": "${workspaceFolder}/PerformanceTest",
+        "console": "internalConsole",
+        "stopAtEntry": false
+    },
+    {
+        "name": "C#: PerformanceTest Release",
+        "type": "coreclr",
+        "request": "launch",
+        "preLaunchTask": "build-release",
+        "program": "${workspaceFolder}/PerformanceTest/bin/Release/net8.0/PerformanceTest.dll",
+        "args": [],
+        "cwd": "${workspaceFolder}/PerformanceTest",
+        "console": "internalConsole",
+        "stopAtEntry": false
+    },
+    {
+        "name": "C#: DbGateTestApp Debug",
+        "type": "coreclr",
+        "request": "launch",
+        "preLaunchTask": "build",
+        "program": "${workspaceFolder}/DbGateTestApp/bin/Debug/net8.0/DbGateTestApp.dll",
+        "args": [],
+        "cwd": "${workspaceFolder}/DbGateTestApp",
+        "console": "internalConsole",
+        "stopAtEntry": false
+    }
+    ]
+}
