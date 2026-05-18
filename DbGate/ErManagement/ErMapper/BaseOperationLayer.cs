@@ -1,4 +1,4 @@
-﻿using Castle.DynamicProxy;
+using Castle.DynamicProxy;
 using DbGate.Caches;
 using DbGate.Caches.Impl;
 using DbGate.Context;
@@ -175,6 +175,34 @@ namespace DbGate.ErManagement.ErMapper
             var entityInfo = CacheManager.GetEntityInfo(entityType);
             var showQuery = Config.ShowQueries;
 
+            // Pre-extract parent field values once � same mapping fields are used for all child types
+            var mappingFields = new List<(IColumn column, object value)>();
+            foreach (var mapping in relation.TableColumnMappings)
+            {
+                var field = mapping.FromField;
+                var matchColumn = entityInfo.FindColumnByAttribute(field);
+                object fieldValue;
+                var entityRelationColumnInfo =
+                    entityInfo.FindRelationColumnInfo(matchColumn != null ? matchColumn.AttributeName : "");
+                if (entityRelationColumnInfo != null)
+                {
+                    var entityFieldValue = entity.Context.ChangeTracker.GetFieldValue(matchColumn.AttributeName);
+                    fieldValue = entityFieldValue.Value;
+                }
+                else if (matchColumn != null)
+                {
+                    var getter = entityInfo.GetProperty(matchColumn.AttributeName);
+                    fieldValue = ReflectionUtils.GetValue(entityInfo.EntityType, getter.Name, entity);
+                }
+                else
+                {
+                    var message = String.Format("The field {0} does not have a matching field in the object {1}"
+                        , field, entity.GetType().FullName);
+                    throw new NoMatchingColumnFoundException(message);
+                }
+                mappingFields.Add((matchColumn, fieldValue));
+            }
+
             var index = 0;
             foreach (var childType in childTypesToProcess)
             {
@@ -184,12 +212,6 @@ namespace DbGate.ErManagement.ErMapper
                 effectiveRelation.RelationShipName = relation.RelationShipName + "_" + index;
 
                 var query = entityInfo.GetRelationObjectLoad(DbLayer, effectiveRelation);
-
-                IList<string> fields = new List<string>();
-                foreach (var mapping in effectiveRelation.TableColumnMappings)
-                {
-                    fields.Add(mapping.FromField);
-                }
 
                 IDbCommand cmd = null;
                 try
@@ -205,31 +227,9 @@ namespace DbGate.ErManagement.ErMapper
 
                 StringBuilder logSb = showQuery ? new StringBuilder(query) : null;
 
-                for (var i = 0; i < fields.Count; i++)
+                for (var i = 0; i < mappingFields.Count; i++)
                 {
-                    var field = fields[i];
-                    object fieldValue = null;
-
-                    var matchColumn = entityInfo.FindColumnByAttribute(field);
-                    var entityRelationColumnInfo =
-                        entityInfo.FindRelationColumnInfo(matchColumn != null ? matchColumn.AttributeName : "");
-                    if (entityRelationColumnInfo != null)
-                    {
-                        var entityFieldValue = entity.Context.ChangeTracker.GetFieldValue(matchColumn.AttributeName);
-                        fieldValue = entityFieldValue.Value;
-                    }
-                    else if (matchColumn != null)
-                    {
-                        var getter = entityInfo.GetProperty(matchColumn.AttributeName);
-                        fieldValue = ReflectionUtils.GetValue(entityInfo.EntityType, getter.Name, entity);
-                    }
-                    else
-                    {
-                        var message = String.Format("The field {0} does not have a matching field in the object {1}"
-                            , field, entity.GetType().FullName);
-                        throw new NoMatchingColumnFoundException(message);
-                    }
-
+                    var (matchColumn, fieldValue) = mappingFields[i];
                     if (showQuery)
                     {
                         logSb.Append(" ,").Append(matchColumn.ColumnName).Append("=").Append(fieldValue);
@@ -277,7 +277,7 @@ namespace DbGate.ErManagement.ErMapper
             , Type childType)
         {
             var entityInfo = CacheManager.GetEntityInfo(childType);
-            ICollection<IColumn> childKeys = null;
+            var childKeys = entityInfo.GetKeys();
             ICollection<IReadOnlyEntity> data = new List<IReadOnlyEntity>();
 
             IDataReader reader = null;
@@ -286,10 +286,6 @@ namespace DbGate.ErManagement.ErMapper
                 reader = cmd.ExecuteReader();
                 while (reader.Read())
                 {
-                    if (childKeys == null)
-                    {
-                        childKeys = entityInfo.GetKeys();
-                    }
                     ITypeFieldValueList childTypeKeyList = new EntityTypeFieldValueList(childType);
                     foreach (var childKey in childKeys)
                     {

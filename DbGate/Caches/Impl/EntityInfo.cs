@@ -22,6 +22,8 @@ namespace DbGate.Caches.Impl
 
 
         private bool relationColumnsPopulated;
+        private Dictionary<string, EntityRelationColumnInfo> relationColumnInfoByAttribute;
+        private Dictionary<string, IColumn> columnByAttributeName;
 
         public EntityInfo(Type entityType)
         {
@@ -59,14 +61,18 @@ namespace DbGate.Caches.Impl
 
         public EntityRelationColumnInfo FindRelationColumnInfo(string attributeName)
         {
-            return
-                relationColumnInfoList.FirstOrDefault(
-                    l => attributeName.Equals(l.Column.AttributeName, StringComparison.InvariantCultureIgnoreCase));
+            if (relationColumnInfoByAttribute == null)
+                PopulateRelationColumns();
+            relationColumnInfoByAttribute.TryGetValue(attributeName, out var result);
+            return result;
         }
 
         public IColumn FindColumnByAttribute(string attributeName)
         {
-            return columns.First(c => attributeName.Equals(c.AttributeName, StringComparison.InvariantCultureIgnoreCase));
+            if (columnByAttributeName == null)
+                PopulateRelationColumns();
+            columnByAttributeName.TryGetValue(attributeName, out var column);
+            return column;
         }
 
         public ICollection<IRelation> Relations => relations.AsReadOnly();
@@ -120,6 +126,14 @@ namespace DbGate.Caches.Impl
             }
 
             relationColumnsPopulated = true;
+
+            relationColumnInfoByAttribute = new Dictionary<string, EntityRelationColumnInfo>(StringComparer.InvariantCultureIgnoreCase);
+            foreach (var r in relationColumnInfoList)
+                relationColumnInfoByAttribute[r.Column.AttributeName] = r;
+
+            columnByAttributeName = new Dictionary<string, IColumn>(StringComparer.InvariantCultureIgnoreCase);
+            foreach (var c in columns)
+                columnByAttributeName[c.AttributeName] = c;
         }
 
         private bool HasManualRelationColumnsDefined(IRelation relation)

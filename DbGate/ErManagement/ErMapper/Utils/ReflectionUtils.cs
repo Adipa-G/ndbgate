@@ -1,5 +1,6 @@
 ﻿using DbGate.Exceptions.Common;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -8,6 +9,8 @@ namespace DbGate.ErManagement.ErMapper.Utils
 {
     public class ReflectionUtils
     {
+        private static readonly ConcurrentDictionary<(Type, Type), bool> IsSubClassOfCache =
+            new ConcurrentDictionary<(Type, Type), bool>();
         public static bool IsImplementInterface(Type type, Type interfaceType)
         {
             if (type == interfaceType
@@ -66,6 +69,11 @@ namespace DbGate.ErManagement.ErMapper.Utils
 
         public static bool IsSubClassOf(Type type, Type superType)
         {
+            return IsSubClassOfCache.GetOrAdd((type, superType), key => IsSubClassOfCore(key.Item1, key.Item2));
+        }
+
+        private static bool IsSubClassOfCore(Type type, Type superType)
+        {
             if (type == superType)
             {
                 return true;
@@ -73,7 +81,7 @@ namespace DbGate.ErManagement.ErMapper.Utils
 
             if (type.BaseType != null)
             {
-                if (IsSubClassOf(type.BaseType, superType))
+                if (IsSubClassOfCore(type.BaseType, superType))
                 {
                     return true;
                 }

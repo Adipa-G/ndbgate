@@ -106,6 +106,7 @@ namespace DbGate.ErManagement.ErMapper.Utils
         private static ICollection<EntityFieldValue> ExtractValues(IEntity entity, bool key, Type typeToLoad)
         {
             ICollection<EntityFieldValue> entityFieldValues = new List<EntityFieldValue>();
+            var addedAttributeNames = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
             var parentEntityInfo = CacheManager.GetEntityInfo(entity);
             var entityInfo = parentEntityInfo;
 
@@ -121,7 +122,7 @@ namespace DbGate.ErManagement.ErMapper.Utils
                 {
                     if (!key || (subLevelColumn.Key && key))
                     {
-                        if (AlreadyHasTheColumnAdded(entityFieldValues, subLevelColumn))
+                        if (!addedAttributeNames.Add(subLevelColumn.AttributeName))
                         {
                             continue;
                         }
@@ -156,18 +157,6 @@ namespace DbGate.ErManagement.ErMapper.Utils
                 entityInfo = entityInfo.SuperEntityInfo;
             }
             return entityFieldValues;
-        }
-
-        private static bool AlreadyHasTheColumnAdded(ICollection<EntityFieldValue> entityFieldValues, IColumn column)
-        {
-            foreach (var fieldValue in entityFieldValues)
-            {
-                if (fieldValue.Column.AttributeName.Equals(column.AttributeName))
-                {
-                    return true;
-                }
-            }
-            return false;
         }
 
         public static ICollection<ITypeFieldValueList> FindDeletedChildren(IEnumerable<ITypeFieldValueList> startListRelation
