@@ -24,6 +24,9 @@ namespace DbGate.ErManagement.ErMapper
         private static readonly ConcurrentDictionary<Type, Func<IReadOnlyEntity>> EntityFactoryCache =
             new ConcurrentDictionary<Type, Func<IReadOnlyEntity>>();
 
+        private static readonly ConcurrentDictionary<Type, int[]> ColumnOrdinalsCache =
+            new ConcurrentDictionary<Type, int[]>();
+
         protected IDbLayer DbLayer;
         protected IDbGateStatistics Statistics;
         protected IDbGateConfig Config;
@@ -86,11 +89,21 @@ namespace DbGate.ErManagement.ErMapper
 
         protected ITypeFieldValueList ReadValues(EntityInfo entityInfo, IDataReader reader)
         {
-            ITypeFieldValueList valueTypeList = new EntityTypeFieldValueList(entityInfo.EntityType);
             var dbColumns = entityInfo.Columns;
+            var ordinals = ColumnOrdinalsCache.GetOrAdd(entityInfo.EntityType, _ =>
+            {
+                var ords = new int[dbColumns.Count];
+                var i = 0;
+                foreach (var col in dbColumns)
+                    ords[i++] = reader.GetOrdinal(col.ColumnName);
+                return ords;
+            });
+
+            ITypeFieldValueList valueTypeList = new EntityTypeFieldValueList(entityInfo.EntityType);
+            var j = 0;
             foreach (var dbColumn in dbColumns)
             {
-                var value = DbLayer.DataManipulate().ReadFromResultSet(reader, dbColumn);
+                var value = DbLayer.DataManipulate().ReadFromResultSet(reader, dbColumn, ordinals[j++]);
                 valueTypeList.FieldValues.Add(new EntityFieldValue(value, dbColumn));
             }
             return valueTypeList;
@@ -252,7 +265,7 @@ namespace DbGate.ErManagement.ErMapper
             return retrievedEntities;
         }
 
-        private ICollection<Type> GetChildTypesToProcess(IRelation relation)
+        protected ICollection<Type> GetChildTypesToProcess(IRelation relation)
         {
             ICollection<Type> childTypesToProcess = new List<Type>();
             var childType = relation.RelatedObjectType;
@@ -273,7 +286,7 @@ namespace DbGate.ErManagement.ErMapper
             return childTypesToProcess.OrderBy(t => t.FullName).ToList();
         }
 
-        private ICollection<IReadOnlyEntity> ExecuteAndReadFromPreparedStatement(IReadOnlyEntity entity, ITransaction tx, IDbCommand cmd
+        protected ICollection<IReadOnlyEntity> ExecuteAndReadFromPreparedStatement(IReadOnlyEntity entity, ITransaction tx, IDbCommand cmd
             , Type childType)
         {
             var entityInfo = CacheManager.GetEntityInfo(childType);

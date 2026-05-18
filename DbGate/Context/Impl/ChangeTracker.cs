@@ -1,18 +1,17 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace DbGate.Context.Impl
 {
     public class ChangeTracker : IChangeTracker
     {
-        private ReadOnlyCollection<ITypeFieldValueList> childEntityRelationKeys;
-        private ReadOnlyCollection<EntityFieldValue> fields;
+        private readonly List<ITypeFieldValueList> childEntityRelationKeys;
+        private readonly Dictionary<string, EntityFieldValue> fieldsByAttribute;
 
         public ChangeTracker()
         {
-            fields = new ReadOnlyCollection<EntityFieldValue>(new List<EntityFieldValue>());
-            childEntityRelationKeys = new ReadOnlyCollection<ITypeFieldValueList>(new List<ITypeFieldValueList>());
+            fieldsByAttribute = new Dictionary<string, EntityFieldValue>();
+            childEntityRelationKeys = new List<ITypeFieldValueList>();
         }
 
         #region IChangeTracker Members
@@ -21,54 +20,40 @@ namespace DbGate.Context.Impl
 
         public EntityFieldValue GetFieldValue(string attributeName)
         {
-            foreach (var fieldValue in fields)
-            {
-                if (fieldValue.Column.AttributeName.Equals(attributeName))
-                {
-                    return fieldValue;
-                }
-            }
-            return null;
+            fieldsByAttribute.TryGetValue(attributeName, out var fieldValue);
+            return fieldValue;
         }
 
-        public bool Valid => fields.Count > 0 || childEntityRelationKeys.Count > 0;
+        public bool Valid => fieldsByAttribute.Count > 0 || childEntityRelationKeys.Count > 0;
 
         public void AddChildEntityKey(ITypeFieldValueList list)
         {
-            lock (this)
+            lock (childEntityRelationKeys)
             {
-                var tmpList = new List<ITypeFieldValueList>();
-                tmpList.AddRange(childEntityRelationKeys);
-                tmpList.Add(list);
-
-                childEntityRelationKeys = new ReadOnlyCollection<ITypeFieldValueList>(tmpList);
+                childEntityRelationKeys.Add(list);
             }
         }
 
         public void AddFields(ICollection<EntityFieldValue> fieldValues)
         {
-            lock (this)
+            lock (fieldsByAttribute)
             {
-                var toAdd = new List<EntityFieldValue>();
-
-                var tmpList = new List<EntityFieldValue>();
-                tmpList.AddRange(fields);
-
                 foreach (var newFieldValue in fieldValues)
                 {
-                    var value = tmpList.FirstOrDefault(l => l.Column.AttributeName.Equals(newFieldValue.Column.AttributeName));
-                    if (value != null)
-                    {
-                        value.Value = newFieldValue.Value;
-                    }
-                    else
-                    {
-                        toAdd.Add(newFieldValue);
-                    }
+                    fieldsByAttribute[newFieldValue.Column.AttributeName] = newFieldValue;
                 }
-                tmpList.AddRange(toAdd);
+            }
+        }
 
-                fields = new ReadOnlyCollection<EntityFieldValue>(tmpList);
+        public void Clear()
+        {
+            lock (fieldsByAttribute)
+            {
+                fieldsByAttribute.Clear();
+            }
+            lock (childEntityRelationKeys)
+            {
+                childEntityRelationKeys.Clear();
             }
         }
 

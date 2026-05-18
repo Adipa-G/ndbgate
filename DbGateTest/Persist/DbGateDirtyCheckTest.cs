@@ -116,10 +116,7 @@ namespace DbGate.Persist
                 transaction.Commit();
 
                 var changeTracker = loadedEntity.Context.ChangeTracker;
-                changeTracker.GetType().GetField("fields", BindingFlags.Instance | BindingFlags.NonPublic)
-                    .SetValue(changeTracker, new ReadOnlyCollection<EntityFieldValue>(new List<EntityFieldValue>()));
-                changeTracker.GetType().GetField("childEntityRelationKeys", BindingFlags.Instance | BindingFlags.NonPublic)
-                    .SetValue(changeTracker, new ReadOnlyCollection<ITypeFieldValueList>(new List<ITypeFieldValueList>()));
+                changeTracker.Clear();
 
                 transaction = CreateTransaction(connection);
                 loadedEntity.Name = "Changed-Name";

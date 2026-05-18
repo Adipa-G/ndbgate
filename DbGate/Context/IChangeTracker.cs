@@ -13,5 +13,7 @@ namespace DbGate.Context
         void AddChildEntityKey(ITypeFieldValueList list);
 
         void AddFields(ICollection<EntityFieldValue> fieldValues);
+
+        void Clear();
     }
 }

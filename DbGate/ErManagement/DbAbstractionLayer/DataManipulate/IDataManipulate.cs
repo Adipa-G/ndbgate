@@ -17,7 +17,11 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
 
         string CreateRelatedObjectsLoadQuery(IRelation relation);
 
+        string CreateBatchRelationLoadQuery(IRelation relation, int batchSize);
+
         object ReadFromResultSet(IDataReader reader, IColumn column);
+
+        object ReadFromResultSet(IDataReader reader, IColumn column, int ordinal);
 
         void SetToPreparedStatement(IDbCommand cmd, object obj, int parameterIndex, IColumn column);
 

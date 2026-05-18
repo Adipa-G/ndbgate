@@ -222,9 +222,35 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
             return FixUpQuery(sb.ToString());
         }
 
+        public string CreateBatchRelationLoadQuery(IRelation relation, int batchSize)
+        {
+            var entityInfo = CacheManager.GetEntityInfo(relation.RelatedObjectType);
+            var mapping = relation.TableColumnMappings.First();
+            var toColumn = entityInfo.FindColumnByAttribute(mapping.ToField);
+
+            var sb = new StringBuilder();
+            sb.Append("SELECT * FROM ");
+            sb.Append(entityInfo.TableInfo.TableName);
+            sb.Append(" WHERE ");
+            sb.Append(toColumn.ColumnName);
+            sb.Append(" IN (");
+            for (var i = 0; i < batchSize; i++)
+            {
+                if (i > 0) sb.Append(",");
+                sb.Append("?");
+            }
+            sb.Append(")");
+            return FixUpQuery(sb.ToString());
+        }
+
         public virtual object ReadFromResultSet(IDataReader reader, IColumn column)
         {
             var ordinal = reader.GetOrdinal(column.ColumnName);
+            return ReadFromResultSet(reader, column, ordinal);
+        }
+
+        public virtual object ReadFromResultSet(IDataReader reader, IColumn column, int ordinal)
+        {
             if (column.Nullable)
             {
                 var obj = reader.GetValue(ordinal);

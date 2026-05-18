@@ -16,6 +16,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -23,6 +24,9 @@ namespace DbGate.ErManagement.ErMapper
 {
     public class RetrievalOperationLayer : BaseOperationLayer
     {
+        [ThreadStatic]
+        private static bool _batchSelectMode;
+
         private ProxyGenerator proxyGenerator;
 
         public RetrievalOperationLayer(IDbLayer dbLayer, IDbGateStatistics statistics, IDbGateConfig config)
@@ -56,25 +60,64 @@ namespace DbGate.ErManagement.ErMapper
                 IList<Object> retList = new List<Object>();
                 var selections = query.Structure.SelectList;
                 var selectionCount = selections.Count;
+                var batchMode = selectionCount == 1;
 
-                while (rs.Read())
+                _batchSelectMode = batchMode;
+                try
                 {
-                    var count = 0;
-
-                    object rowObject = selectionCount > 1 ? new object[selectionCount] : null;
-                    foreach (var selection in selections)
+                    while (rs.Read())
                     {
-                        var loaded = ((IAbstractSelection)selection).Retrieve(rs, tx, buildInfo);
-                        if (selectionCount > 1)
+                        var count = 0;
+
+                        object rowObject = selectionCount > 1 ? new object[selectionCount] : null;
+                        foreach (var selection in selections)
                         {
-                            ((object[])rowObject)[count++] = loaded;
+                            var loaded = ((IAbstractSelection)selection).Retrieve(rs, tx, buildInfo);
+                            if (selectionCount > 1)
+                            {
+                                ((object[])rowObject)[count++] = loaded;
+                            }
+                            else
+                            {
+                                rowObject = loaded;
+                            }
                         }
-                        else
+                        retList.Add(rowObject);
+                    }
+                }
+                finally
+                {
+                    _batchSelectMode = false;
+                }
+
+                // Post-select batch child loading for single-type entity results
+                if (batchMode && retList.Count > 0)
+                {
+                    var entityResults = retList.OfType<IReadOnlyEntity>().ToList();
+                    if (entityResults.Count > 0)
+                    {
+                        var typeGroups = entityResults.GroupBy(e => e.GetType());
+                        foreach (var group in typeGroups)
                         {
-                            rowObject = loaded;
+                            var typedEntities = group.ToList();
+                            var typeEntityInfo = CacheManager.GetEntityInfo(group.Key);
+                            while (typeEntityInfo != null)
+                            {
+                                foreach (var relation in typeEntityInfo.Relations)
+                                {
+                                    if (!relation.ReverseRelationship && relation.FetchStrategy != FetchStrategy.Lazy)
+                                    {
+                                        if (relation.TableColumnMappings.Count == 1)
+                                            BatchLoadRelationChildren(typedEntities, typeEntityInfo.EntityType, tx, relation);
+                                        else
+                                            foreach (var entity in typedEntities)
+                                                LoadChildrenFromRelation(entity, typeEntityInfo.EntityType, tx, relation, false);
+                                    }
+                                }
+                                typeEntityInfo = typeEntityInfo.SuperEntityInfo;
+                            }
                         }
                     }
-                    retList.Add(rowObject);
                 }
 
                 return retList;
@@ -191,6 +234,11 @@ namespace DbGate.ErManagement.ErMapper
                 return;
             }
 
+            if (_batchSelectMode && !lazy && !relation.ReverseRelationship)
+            {
+                return; // deferred — will be batch-loaded in Select post-processing
+            }
+
             var children = ReadRelationChildrenFromDb(parentRoEntity, entityType, tx, relation);
             if (entityContext != null
                     && !relation.ReverseRelationship)
@@ -245,6 +293,154 @@ namespace DbGate.ErManagement.ErMapper
                     else
                     {
                         var message = singleRoDbClass.GetType().FullName + " is not matching the getter " + property.Name;
+                        Logger.GetLogger(Config.LoggerName).Fatal(message);
+                        throw new NoSetterFoundToSetChildObjectListException(message);
+                    }
+                }
+            }
+        }
+
+        private void BatchLoadRelationChildren(IList<IReadOnlyEntity> parentEntities, Type entityType,
+            ITransaction tx, IRelation relation)
+        {
+            var entityInfo = CacheManager.GetEntityInfo(entityType);
+            var mapping = relation.TableColumnMappings.First();
+            var fromColumn = entityInfo.FindColumnByAttribute(mapping.FromField);
+            if (fromColumn == null) return;
+
+            // Build FK-value → parent-index map
+            var parentValueIndexMap = new Dictionary<object, List<int>>();
+            for (var i = 0; i < parentEntities.Count; i++)
+            {
+                var parent = parentEntities[i];
+                var entityRelationColumnInfo = entityInfo.FindRelationColumnInfo(fromColumn.AttributeName);
+                object fieldValue;
+                if (entityRelationColumnInfo != null)
+                {
+                    var efv = parent.Context.ChangeTracker.GetFieldValue(fromColumn.AttributeName);
+                    fieldValue = efv?.Value;
+                }
+                else
+                {
+                    var getter = entityInfo.GetProperty(fromColumn.AttributeName);
+                    fieldValue = ReflectionUtils.GetValue(entityInfo.EntityType, getter.Name, parent);
+                }
+                if (fieldValue == null) continue;
+                if (!parentValueIndexMap.TryGetValue(fieldValue, out var indices))
+                    parentValueIndexMap[fieldValue] = indices = new List<int>();
+                indices.Add(i);
+            }
+
+            if (parentValueIndexMap.Count == 0) return;
+
+            var childTypesToProcess = GetChildTypesToProcess(relation);
+            var index = 0;
+            foreach (var childType in childTypesToProcess)
+            {
+                index++;
+                var effectiveRelation = relation.Clone();
+                effectiveRelation.RelatedObjectType = childType;
+                effectiveRelation.RelationShipName = relation.RelationShipName + "_batch_" + index;
+
+                var uniqueValues = parentValueIndexMap.Keys.ToList();
+                var batchSql = DbLayer.DataManipulate().CreateBatchRelationLoadQuery(effectiveRelation, uniqueValues.Count);
+
+                IDbCommand cmd = null;
+                try
+                {
+                    cmd = tx.CreateCommand();
+                    cmd.CommandText = batchSql;
+                }
+                catch (Exception ex)
+                {
+                    var message = String.Format("SQL Exception while trying create command for sql {0}", batchSql);
+                    throw new CommandCreationException(message, ex);
+                }
+
+                if (Config.ShowQueries)
+                    Logger.GetLogger(Config.LoggerName).Debug(batchSql + " [batch size=" + uniqueValues.Count + "]");
+                if (Config.EnableStatistics)
+                    Statistics.RegisterSelect(childType);
+
+                for (var i = 0; i < uniqueValues.Count; i++)
+                    DbLayer.DataManipulate().SetToPreparedStatement(cmd, uniqueValues[i], i + 1, fromColumn);
+
+                var allChildren = ExecuteAndReadFromPreparedStatement(parentEntities[0], tx, cmd, childType);
+
+                // Get child's FK attribute getter for distribution
+                var childEntityInfo = CacheManager.GetEntityInfo(childType);
+                var toColumn = childEntityInfo.FindColumnByAttribute(mapping.ToField);
+                if (toColumn == null) continue;
+                var toGetter = childEntityInfo.GetProperty(toColumn.AttributeName);
+
+                // Distribute children to parent buckets
+                var childrenByIndex = new List<IReadOnlyEntity>[parentEntities.Count];
+                for (var i = 0; i < parentEntities.Count; i++)
+                    childrenByIndex[i] = new List<IReadOnlyEntity>();
+
+                foreach (var child in allChildren)
+                {
+                    var childFkValue = ReflectionUtils.GetValue(childEntityInfo.EntityType, toGetter.Name, child);
+                    if (childFkValue == null) continue;
+                    if (parentValueIndexMap.TryGetValue(childFkValue, out var parentIndices))
+                        foreach (var idx in parentIndices)
+                            childrenByIndex[idx].Add(child);
+                }
+
+                for (var i = 0; i < parentEntities.Count; i++)
+                    SetChildrenOnParent(parentEntities[i], entityType, relation, childrenByIndex[i]);
+            }
+        }
+
+        private void SetChildrenOnParent(IReadOnlyEntity parentRoEntity, Type entityType,
+            IRelation relation, ICollection<IReadOnlyEntity> children)
+        {
+            var entityInfo = CacheManager.GetEntityInfo(entityType);
+            var entityContext = parentRoEntity.Context;
+
+            if (entityContext != null && !relation.ReverseRelationship)
+            {
+                foreach (var childEntity in children)
+                {
+                    var valueTypeList = OperationUtils.ExtractRelationKeyValues(childEntity, relation);
+                    if (valueTypeList != null)
+                        entityContext.ChangeTracker.AddChildEntityKey(valueTypeList);
+                }
+            }
+
+            var property = entityInfo.GetProperty(relation.AttributeName);
+            var value = ReflectionUtils.GetValue(entityInfo.EntityType, property.Name, parentRoEntity);
+
+            if ((value == null || ProxyUtil.IsProxyType(value.GetType()))
+                    && ReflectionUtils.IsImplementInterface(property.PropertyType, typeof(ICollection<>)))
+            {
+                var propertyType = property.PropertyType;
+                if (propertyType.IsInterface)
+                {
+                    var generic = propertyType.GetGenericArguments()[0];
+                    propertyType = typeof(List<>).MakeGenericType(new Type[] { generic });
+                }
+                value = Activator.CreateInstance(propertyType);
+                var genCollection = (IList)value;
+                foreach (var child in children) genCollection.Add(child);
+                ReflectionUtils.SetValue(entityInfo.EntityType, property.Name, parentRoEntity, value);
+            }
+            else if (value != null && ReflectionUtils.IsImplementInterface(property.PropertyType, typeof(ICollection<>)))
+            {
+                var genCollection = (IList)value;
+                foreach (var child in children) genCollection.Add(child);
+            }
+            else
+            {
+                var enumerator = children.GetEnumerator();
+                if (enumerator.MoveNext())
+                {
+                    var singleChild = enumerator.Current;
+                    if (property.PropertyType.IsAssignableFrom(singleChild.GetType()))
+                        ReflectionUtils.SetValue(entityType, property.Name, parentRoEntity, singleChild);
+                    else
+                    {
+                        var message = singleChild.GetType().FullName + " is not matching the getter " + property.Name;
                         Logger.GetLogger(Config.LoggerName).Fatal(message);
                         throw new NoSetterFoundToSetChildObjectListException(message);
                     }

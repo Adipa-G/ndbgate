@@ -9,13 +9,13 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.DbDm.SqliteDm
         {
         }
 
-        public override object ReadFromResultSet(IDataReader reader, IColumn column)
+        public override object ReadFromResultSet(IDataReader reader, IColumn column, int ordinal)
         {
             if (column.ColumnType == ColumnType.Guid)
             {
                 var columnCopy = column.Clone();
                 columnCopy.ColumnType = ColumnType.Varchar;
-                var result = (string)base.ReadFromResultSet(reader, columnCopy);
+                var result = (string)base.ReadFromResultSet(reader, columnCopy, ordinal);
 
                 var guidResult = Guid.Empty;
                 var success = Guid.TryParse(result, out guidResult);
@@ -24,7 +24,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate.DbDm.SqliteDm
                     (column.Nullable ? null : (object)Guid.Empty) :
                     guidResult;
             }
-            return base.ReadFromResultSet(reader, column);
+            return base.ReadFromResultSet(reader, column, ordinal);
         }
 
         protected override void SetToPreparedStatement(IDbCommand cmd, object obj, int parameterIndex, bool nullable, ColumnType columnType)

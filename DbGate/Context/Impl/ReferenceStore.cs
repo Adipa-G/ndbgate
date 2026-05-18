@@ -1,43 +1,53 @@
 ﻿using DbGate.ErManagement.ErMapper.Utils;
 using System.Collections.Generic;
+using System.Text;
 
 namespace DbGate.Context.Impl
 {
     public class ReferenceStore : IReferenceStore
     {
-        private readonly ICollection<IEntityFieldValueList> entityFieldValueList;
+        private readonly Dictionary<string, IReadOnlyEntity> entityIndex;
 
         public ReferenceStore()
         {
-            entityFieldValueList = new List<IEntityFieldValueList>();
+            entityIndex = new Dictionary<string, IReadOnlyEntity>();
         }
 
         #region IErSession Members
 
         public bool AlreadyInCurrentObjectGraph(ITypeFieldValueList keys)
         {
-            return GetFromCurrentObjectGraph(keys) != null;
+            return entityIndex.ContainsKey(BuildKey(keys));
         }
 
         public IReadOnlyEntity GetFromCurrentObjectGraph(ITypeFieldValueList keys)
         {
-            foreach (var existingEntity in entityFieldValueList)
-            {
-                if (OperationUtils.IsTypeKeyEquals(keys, existingEntity))
-                {
-                    return existingEntity.Entity;
-                }
-            }
-            return null;
+            entityIndex.TryGetValue(BuildKey(keys), out var entity);
+            return entity;
         }
 
         public void AddToCurrentObjectGraphIndex(IReadOnlyEntity refEntity)
         {
             var refKeyList = OperationUtils.ExtractEntityKeyValues(refEntity);
-            if (!AlreadyInCurrentObjectGraph(refKeyList))
+            var key = BuildKey(refKeyList);
+            if (!entityIndex.ContainsKey(key))
             {
-                entityFieldValueList.Add(refKeyList);
+                entityIndex[key] = refEntity;
             }
+        }
+
+        private static string BuildKey(ITypeFieldValueList keys)
+        {
+            var sb = new StringBuilder();
+            sb.Append(keys.Type.FullName);
+            foreach (var fv in keys.FieldValues)
+            {
+                sb.Append(':');
+                sb.Append(fv.Column.AttributeName);
+                sb.Append('=');
+                sb.Append(fv.Value);
+            }
+            return sb.ToString();
         }
         #endregion
     }
