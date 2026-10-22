@@ -1,9 +1,11 @@
+using DbGate.ErManagement.Query;
 using DbGate.Persist.Support.FeatureIntegration.Order;
 using DbGate.Persist.Support.FeatureIntegration.Product;
 using DbGate.Utility;
 using log4net;
 using System;
 using System.Data;
+using System.Linq;
 using Xunit;
 
 namespace DbGate.Persist
@@ -109,6 +111,40 @@ namespace DbGate.Persist
                 Assert.True(foundItem, "Item transaction not found");
             }
             Assert.Equal(loadedTransaction.Name, transaction.Name);
+        }
+
+        [Fact]
+        public void FeatureIntegration_SelectAndRetrieve_WithComplexStructure_ShouldBeSameAsPersisted()
+        {
+            try
+            {
+                var transId = 36;
+                var productId = 136;
+                var serviceId = 236;
+
+                var connection = SetupTables();
+
+                var product = CreateDefaultProduct(connection, productId);
+                var service = CreateDefaultService(connection, serviceId);
+                var expected = CreateDefaultTransaction(connection, transId, product, service);
+
+                var tx = CreateTransaction(connection);
+                var selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.EntityType<Transaction>("t1"))
+                    .Select(QuerySelection.EntityType<Transaction>());
+                var results = selectionQuery.ToList(tx);
+                tx.Commit();
+                DbMgtUtility.Close(connection);
+
+                Assert.Single(results);
+                var loadedTransaction = (Transaction)results.First();
+                VerifyEquals(expected, loadedTransaction);
+            }
+            catch (System.Exception e)
+            {
+                LogManager.GetLogger(typeof(DbGateFeatureIntegrationTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
         }
 
         private bool LoadWithId(ITransaction transaction, Transaction loadEntity, int id)

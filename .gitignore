@@ -4,3 +4,4 @@ DbGateTestApp/wikigen/*.*
 DbGateTestApp/logs/*
 /.vs/**
 **/TestResults/**
+**/BenchmarkDotNet.Artifacts/results/**

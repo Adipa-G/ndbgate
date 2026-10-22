@@ -24,6 +24,7 @@ namespace DbGate.Caches.Impl
         private bool relationColumnsPopulated;
         private Dictionary<string, EntityRelationColumnInfo> relationColumnInfoByAttribute;
         private Dictionary<string, IColumn> columnByAttributeName;
+        private IReadOnlyCollection<IColumn> cachedKeys;
 
         public EntityInfo(Type entityType)
         {
@@ -79,17 +80,17 @@ namespace DbGate.Caches.Impl
 
         public IDictionary<string, string> Queries => new ReadOnlyDictionary<string, string>(queries);
 
-        public ICollection<IColumn> GetKeys()
+        public IReadOnlyCollection<IColumn> GetKeys()
         {
+            if (cachedKeys != null) return cachedKeys;
             var keys = new List<IColumn>();
             foreach (var column in Columns)
             {
                 if (column.Key)
-                {
                     keys.Add(column);
-                }
             }
-            return keys;
+            cachedKeys = keys.AsReadOnly();
+            return cachedKeys;
         }
 
         public void SetFields(ICollection<IField> fields)
@@ -278,9 +279,8 @@ namespace DbGate.Caches.Impl
 
         private string GetQuery(string id)
         {
-            if (Queries.ContainsKey(id))
-                return Queries[id];
-            return null;
+            queries.TryGetValue(id, out var query);
+            return query;
         }
 
         private void SetQuery(String id, String query)

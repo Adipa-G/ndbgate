@@ -243,6 +243,30 @@ namespace DbGate.ErManagement.DbAbstractionLayer.DataManipulate
             return FixUpQuery(sb.ToString());
         }
 
+        public string CreateMultiKeyBatchRelationLoadQuery(IRelation relation, int batchSize)
+        {
+            var entityInfo = CacheManager.GetEntityInfo(relation.RelatedObjectType);
+            var mappings = relation.TableColumnMappings.ToList();
+
+            var sb = new StringBuilder();
+            sb.Append("SELECT * FROM ");
+            sb.Append(entityInfo.TableInfo.TableName);
+            sb.Append(" WHERE ");
+            for (var i = 0; i < batchSize; i++)
+            {
+                if (i > 0) sb.Append(" OR ");
+                sb.Append("(");
+                for (var j = 0; j < mappings.Count; j++)
+                {
+                    if (j > 0) sb.Append(" AND ");
+                    sb.Append(entityInfo.FindColumnByAttribute(mappings[j].ToField).ColumnName);
+                    sb.Append(" = ?");
+                }
+                sb.Append(")");
+            }
+            return FixUpQuery(sb.ToString());
+        }
+
         public virtual object ReadFromResultSet(IDataReader reader, IColumn column)
         {
             var ordinal = reader.GetOrdinal(column.ColumnName);

@@ -62,6 +62,15 @@ namespace DbGate.ErManagement.ErMapper
                 var selectionCount = selections.Count;
                 var batchMode = selectionCount == 1;
 
+                if (Config.EnableStatistics)
+                {
+                    foreach (var selection in selections)
+                    {
+                        if (selection is AbstractTypeSelection typeSelection)
+                            Statistics.RegisterSelect(typeSelection.EntityType);
+                    }
+                }
+
                 _batchSelectMode = batchMode;
                 try
                 {
@@ -107,11 +116,7 @@ namespace DbGate.ErManagement.ErMapper
                                 {
                                     if (!relation.ReverseRelationship && relation.FetchStrategy != FetchStrategy.Lazy)
                                     {
-                                        if (relation.TableColumnMappings.Count == 1)
-                                            BatchLoadRelationChildren(typedEntities, typeEntityInfo.EntityType, tx, relation);
-                                        else
-                                            foreach (var entity in typedEntities)
-                                                LoadChildrenFromRelation(entity, typeEntityInfo.EntityType, tx, relation, false);
+                                        BatchLoadRelationChildren(typedEntities, typeEntityInfo.EntityType, tx, relation);
                                     }
                                 }
                                 typeEntityInfo = typeEntityInfo.SuperEntityInfo;
@@ -143,7 +148,8 @@ namespace DbGate.ErManagement.ErMapper
             try
             {
                 LoadFromDb(roEntity, reader, tx);
-                roEntity.Context.DestroyReferenceStore();
+                if (!_batchSelectMode)
+                    roEntity.Context.DestroyReferenceStore();
             }
             catch (Exception e)
             {
@@ -304,46 +310,67 @@ namespace DbGate.ErManagement.ErMapper
             ITransaction tx, IRelation relation)
         {
             var entityInfo = CacheManager.GetEntityInfo(entityType);
-            var mapping = relation.TableColumnMappings.First();
-            var fromColumn = entityInfo.FindColumnByAttribute(mapping.FromField);
-            if (fromColumn == null) return;
+            var mappings = relation.TableColumnMappings.ToList();
+            var isMultiKey = mappings.Count > 1;
 
-            // Build FK-value → parent-index map
-            var parentValueIndexMap = new Dictionary<object, List<int>>();
+            var fromColumns = mappings.Select(m => entityInfo.FindColumnByAttribute(m.FromField)).ToList();
+            if (fromColumns.Any(c => c == null)) return;
+
+            // Ensure all parent entities are registered in the shared object graph so that
+            // reverse-relation lookups during child loading find them as the same instance.
+            foreach (var parent in parentEntities)
+                parentEntities[0].Context.AddToCurrentObjectGraphIndex(parent);
+
+            // Build composite FK-value → parent-index map
+            var parentValueIndexMap = new Dictionary<string, List<int>>();
+            var parentKeyValues = new Dictionary<string, List<object>>();
             for (var i = 0; i < parentEntities.Count; i++)
             {
                 var parent = parentEntities[i];
-                var entityRelationColumnInfo = entityInfo.FindRelationColumnInfo(fromColumn.AttributeName);
-                object fieldValue;
-                if (entityRelationColumnInfo != null)
+                var keyParts = new List<object>(fromColumns.Count);
+                var hasNull = false;
+                foreach (var fromColumn in fromColumns)
                 {
-                    var efv = parent.Context.ChangeTracker.GetFieldValue(fromColumn.AttributeName);
-                    fieldValue = efv?.Value;
+                    var relColInfo = entityInfo.FindRelationColumnInfo(fromColumn.AttributeName);
+                    object fieldValue;
+                    if (relColInfo != null)
+                    {
+                        var efv = parent.Context.ChangeTracker.GetFieldValue(fromColumn.AttributeName);
+                        fieldValue = efv?.Value;
+                    }
+                    else
+                    {
+                        var getter = entityInfo.GetProperty(fromColumn.AttributeName);
+                        fieldValue = ReflectionUtils.GetValue(entityInfo.EntityType, getter.Name, parent);
+                    }
+                    if (fieldValue == null) { hasNull = true; break; }
+                    keyParts.Add(fieldValue);
                 }
-                else
+                if (hasNull) continue;
+                var compositeKey = string.Join("\x00", keyParts);
+                if (!parentValueIndexMap.TryGetValue(compositeKey, out var indices))
                 {
-                    var getter = entityInfo.GetProperty(fromColumn.AttributeName);
-                    fieldValue = ReflectionUtils.GetValue(entityInfo.EntityType, getter.Name, parent);
+                    parentValueIndexMap[compositeKey] = indices = new List<int>();
+                    parentKeyValues[compositeKey] = keyParts;
                 }
-                if (fieldValue == null) continue;
-                if (!parentValueIndexMap.TryGetValue(fieldValue, out var indices))
-                    parentValueIndexMap[fieldValue] = indices = new List<int>();
                 indices.Add(i);
             }
 
             if (parentValueIndexMap.Count == 0) return;
 
             var childTypesToProcess = GetChildTypesToProcess(relation);
-            var index = 0;
+            var typeIndex = 0;
             foreach (var childType in childTypesToProcess)
             {
-                index++;
+                typeIndex++;
                 var effectiveRelation = relation.Clone();
                 effectiveRelation.RelatedObjectType = childType;
-                effectiveRelation.RelationShipName = relation.RelationShipName + "_batch_" + index;
+                effectiveRelation.RelationShipName = relation.RelationShipName + "_batch_" + typeIndex;
 
-                var uniqueValues = parentValueIndexMap.Keys.ToList();
-                var batchSql = DbLayer.DataManipulate().CreateBatchRelationLoadQuery(effectiveRelation, uniqueValues.Count);
+                var uniqueKeys = parentValueIndexMap.Keys.ToList();
+                var batchSql = isMultiKey
+                    ? DbLayer.DataManipulate().CreateMultiKeyBatchRelationLoadQuery(effectiveRelation, uniqueKeys.Count)
+                    : DbLayer.DataManipulate().CreateBatchRelationLoadQuery(effectiveRelation, uniqueKeys.Count);
 
                 IDbCommand cmd = null;
                 try
@@ -358,20 +385,32 @@ namespace DbGate.ErManagement.ErMapper
                 }
 
                 if (Config.ShowQueries)
-                    Logger.GetLogger(Config.LoggerName).Debug(batchSql + " [batch size=" + uniqueValues.Count + "]");
+                    Logger.GetLogger(Config.LoggerName).Debug(batchSql + " [batch size=" + uniqueKeys.Count + "]");
                 if (Config.EnableStatistics)
                     Statistics.RegisterSelect(childType);
 
-                for (var i = 0; i < uniqueValues.Count; i++)
-                    DbLayer.DataManipulate().SetToPreparedStatement(cmd, uniqueValues[i], i + 1, fromColumn);
-
-                var allChildren = ExecuteAndReadFromPreparedStatement(parentEntities[0], tx, cmd, childType);
-
-                // Get child's FK attribute getter for distribution
                 var childEntityInfo = CacheManager.GetEntityInfo(childType);
-                var toColumn = childEntityInfo.FindColumnByAttribute(mapping.ToField);
-                if (toColumn == null) continue;
-                var toGetter = childEntityInfo.GetProperty(toColumn.AttributeName);
+                var toColumns = mappings.Select(m => childEntityInfo.FindColumnByAttribute(m.ToField)).ToList();
+                var paramIndex = 1;
+                foreach (var key in uniqueKeys)
+                {
+                    var keyParts = parentKeyValues[key];
+                    for (var j = 0; j < toColumns.Count; j++)
+                        DbLayer.DataManipulate().SetToPreparedStatement(cmd, keyParts[j], paramIndex++, toColumns[j]);
+                }
+
+                // Defer grandchild loading while executing this batch
+                var prevBatchMode = _batchSelectMode;
+                _batchSelectMode = true;
+                ICollection<IReadOnlyEntity> allChildren;
+                try
+                {
+                    allChildren = ExecuteAndReadFromPreparedStatement(parentEntities[0], tx, cmd, childType);
+                }
+                finally
+                {
+                    _batchSelectMode = prevBatchMode;
+                }
 
                 // Distribute children to parent buckets
                 var childrenByIndex = new List<IReadOnlyEntity>[parentEntities.Count];
@@ -380,15 +419,40 @@ namespace DbGate.ErManagement.ErMapper
 
                 foreach (var child in allChildren)
                 {
-                    var childFkValue = ReflectionUtils.GetValue(childEntityInfo.EntityType, toGetter.Name, child);
-                    if (childFkValue == null) continue;
-                    if (parentValueIndexMap.TryGetValue(childFkValue, out var parentIndices))
+                    var childKeyParts = new List<object>(toColumns.Count);
+                    var hasNull = false;
+                    foreach (var toCol in toColumns)
+                    {
+                        var getter = childEntityInfo.GetProperty(toCol.AttributeName);
+                        var val = ReflectionUtils.GetValue(childEntityInfo.EntityType, getter.Name, child);
+                        if (val == null) { hasNull = true; break; }
+                        childKeyParts.Add(val);
+                    }
+                    if (hasNull) continue;
+                    var childKey = string.Join("\x00", childKeyParts);
+                    if (parentValueIndexMap.TryGetValue(childKey, out var parentIndices))
                         foreach (var idx in parentIndices)
                             childrenByIndex[idx].Add(child);
                 }
 
                 for (var i = 0; i < parentEntities.Count; i++)
                     SetChildrenOnParent(parentEntities[i], entityType, relation, childrenByIndex[i]);
+
+                // Recursively batch-load children's children
+                if (allChildren.Count > 0)
+                {
+                    var childEntityList = (IList<IReadOnlyEntity>)allChildren;
+                    var childEntityInfoIter = CacheManager.GetEntityInfo(childType);
+                    while (childEntityInfoIter != null)
+                    {
+                        foreach (var childRelation in childEntityInfoIter.Relations)
+                        {
+                            if (!childRelation.ReverseRelationship && childRelation.FetchStrategy != FetchStrategy.Lazy)
+                                BatchLoadRelationChildren(childEntityList, childEntityInfoIter.EntityType, tx, childRelation);
+                        }
+                        childEntityInfoIter = childEntityInfoIter.SuperEntityInfo;
+                    }
+                }
             }
         }
 

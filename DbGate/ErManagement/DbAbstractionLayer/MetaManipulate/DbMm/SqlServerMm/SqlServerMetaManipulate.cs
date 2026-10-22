@@ -171,6 +171,7 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
                                 int.Parse(reader["updateAction"].ToString());
                             foreignKey.DeleteRule = (ReferentialRuleType)
                                 int.Parse(reader["deleteAction"].ToString());
+                            table.ForeignKeys.Add(foreignKey);
                         }
 
                         foreignKey.ColumnMappings.Add(new MetaForeignKeyColumnMapping(
@@ -462,14 +463,15 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.DbMm.SqlServerMm
         protected override string CreateDropForeignKeyQuery(MetaComparisonTableGroup tableGroup,
                                                             MetaComparisonForeignKeyGroup foreignKeyGroup)
         {
-            var requiredTable = (MetaTable)tableGroup.RequiredItem;
-            var metaForeignKey = (MetaForeignKey)foreignKeyGroup.RequiredItem;
+            var table = (MetaTable)(tableGroup.ExistingItem ?? tableGroup.RequiredItem);
+            var metaForeignKey = (MetaForeignKey)(foreignKeyGroup.ExistingItem ?? foreignKeyGroup.RequiredItem);
 
             var sb = new StringBuilder();
             sb.Append("ALTER TABLE [");
-            sb.Append(requiredTable.Name);
-            sb.Append("] DROP CONSTRAINT ");
-            sb.Append(metaForeignKey.ToTable);
+            sb.Append(table.Name);
+            sb.Append("] DROP CONSTRAINT [");
+            sb.Append(metaForeignKey.Name);
+            sb.Append("]");
             return sb.ToString();
         }
     }

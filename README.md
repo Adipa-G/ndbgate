@@ -2,7 +2,7 @@
 NDbGate is a high performance ORM. The framework provides granular level control over persistence/retrieval.
 
 ### Features
-* .Net Standard 2.0
+* .Net Standard 2.1 (tested on .NET 10)
 * Core relationships (One to One, One to Many, Inheritance)
 * Change tracking
 * Data verification on persisting
@@ -141,21 +141,35 @@ More examples can be found in the wiki. Also there is a sample project using the
 	
 #### Test
 
-Inserting/ Quering/ Updating/ Deleting 5000 `Transaction` entities using EF (6.2) and NDbGate. Test project is in the Repo.
+Inserting/ Querying/ Updating/ Deleting 100, 1000 and 5000 `Transaction` entities using EF Core (10) and NDbGate against SQL Server LocalDB, measured with BenchmarkDotNet (0.15.8, 1 warmup + 5 iterations). Test project is in the Repo (`PerformanceTest`).
 
-#### Results (entities per second)
+Environment: .NET 10.0.13, Windows 11, AMD Ryzen AI 9 HX 370.
 
-##### EF (9)			
-	Insertion :	8549			
-	Querying :  6038			
-	Update : 4360			
-	Delete	: 5777			
+#### Results (mean time)
 
-#### NDbGate
-	Insertion :	4055
-	Querying :	2716
-	Update : 2219
-	Delete : 2219
+| Operation | Entities | EF Core 10 | NDbGate    |
+|-----------|---------:|-----------:|-----------:|
+| Insert    | 100      |    79.4 ms |   132.7 ms |
+| Insert    | 1000     |   658.1 ms | 1,137.8 ms |
+| Insert    | 5000     | 1,903.9 ms | 4,871.6 ms |
+| Query     | 100      |   188.7 ms |   228.8 ms |
+| Query     | 1000     | 1,112.9 ms | 1,590.4 ms |
+| Query     | 5000     | 6,058.2 ms | 6,751.3 ms |
+| Update    | 100      |   285.0 ms |   232.6 ms |
+| Update    | 1000     | 1,819.4 ms | 1,559.4 ms |
+| Update    | 5000     | 8,397.3 ms | 8,957.2 ms |
+| Delete    | 100      |   279.7 ms |   153.1 ms |
+| Delete    | 1000     | 1,408.4 ms | 2,126.6 ms |
+| Delete    | 5000     | 4,764.3 ms | 8,766.1 ms |
+
+#### Results (entities per second, 5000 entities)
+
+| Operation | EF Core 10 | NDbGate |
+|-----------|-----------:|--------:|
+| Insert    | 2626       | 1026    |
+| Query     | 825        | 741     |
+| Update    | 595        | 558     |
+| Delete    | 1049       | 570     |
 
 ### License
 GNU GPL V3

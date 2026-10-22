@@ -1749,5 +1749,81 @@ namespace DbGate.Query
                 Assert.Fail(e.Message);
             }
         }
+
+        [Fact]
+        public void QueryBasic_Select_WithEntityType_RelationChildrenShouldBeLoaded()
+        {
+            try
+            {
+                var con = SetupTables();
+                var transaction = CreateTransaction(con);
+                CreateTestData(transaction);
+                transaction.Commit();
+
+                transaction = CreateTransaction(con);
+                var selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.EntityType<QueryBasicEntity>("qb1"))
+                    .Select(QuerySelection.EntityType<QueryBasicEntity>());
+
+                var results = selectionQuery.ToList(transaction);
+                transaction.Commit();
+                con.Close();
+
+                Assert.Equal(4, results.Count);
+                foreach (var result in results)
+                {
+                    var loaded = (QueryBasicEntity)result;
+                    var original = GetById(loaded.IdCol);
+                    Assert.NotNull(original);
+                    if (original.JoinEntity != null)
+                    {
+                        Assert.NotNull(loaded.JoinEntity);
+                        Assert.Equal(original.JoinEntity.OverrideDescription, loaded.JoinEntity.OverrideDescription);
+                    }
+                    else
+                    {
+                        Assert.Null(loaded.JoinEntity);
+                    }
+                }
+            }
+            catch (System.Exception e)
+            {
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
+
+        [Fact]
+        public void QueryBasic_Select_WithMultiColumnFkRelation_ShouldUseSingleBatchQueryForChildren()
+        {
+            try
+            {
+                TransactionFactory.DbGate.Config.EnableStatistics = true;
+                TransactionFactory.DbGate.Statistics.Reset();
+
+                var con = SetupTables();
+                var transaction = CreateTransaction(con);
+                CreateTestData(transaction);  // 4 entities, 2 with a join-entity (multi-column FK)
+                transaction.Commit();
+
+                transaction = CreateTransaction(con);
+                var selectionQuery = new SelectionQuery()
+                    .From(QueryFrom.EntityType<QueryBasicEntity>("qb1"))
+                    .Select(QuerySelection.EntityType<QueryBasicEntity>());
+
+                selectionQuery.ToList(transaction);
+                transaction.Commit();
+                con.Close();
+
+                // 1 query for the root entities + 1 batch query for the join entity
+                // (instead of 1 root + 4 individual child queries without batching)
+                Assert.Equal(2, TransactionFactory.DbGate.Statistics.SelectQueryCount);
+            }
+            catch (System.Exception e)
+            {
+                LogManager.GetLogger(typeof(DbGateQueryBasicTest)).Fatal(e.Message, e);
+                Assert.Fail(e.Message);
+            }
+        }
     }
 }

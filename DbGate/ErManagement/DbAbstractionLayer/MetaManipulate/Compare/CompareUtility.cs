@@ -75,6 +75,17 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Compare
         {
             if (tableGroup.ShouldDeleteFromDb())
             {
+                // Populate FK groups from existing FKs so DROP CONSTRAINT queries are
+                // generated before DROP TABLE, satisfying referential integrity constraints.
+                if (tableGroup.ExistingItem != null)
+                {
+                    var comparedForeignKeys = new List<MetaComparisonForeignKeyGroup>();
+                    foreach (var fk in ((MetaTable)tableGroup.ExistingItem).ForeignKeys)
+                    {
+                        comparedForeignKeys.Add(new MetaComparisonForeignKeyGroup(fk, null));
+                    }
+                    tableGroup.ForeignKeys = comparedForeignKeys;
+                }
                 return;
             }
             //columns

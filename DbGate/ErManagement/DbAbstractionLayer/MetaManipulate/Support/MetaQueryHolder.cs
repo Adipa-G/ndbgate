@@ -37,6 +37,10 @@ namespace DbGate.ErManagement.DbAbstractionLayer.MetaManipulate.Support
                 return 1;
             if (ItemType != metaQueryHolder.ItemType)
             {
+                // When dropping, reverse the type order: drop FK constraints (4) before
+                // primary keys (3) before tables (1) to satisfy referential integrity.
+                if (QueryType == OperationTypeDelete && metaQueryHolder.QueryType == OperationTypeDelete)
+                    return metaQueryHolder.ItemType.CompareTo(ItemType);
                 return ItemType.CompareTo(metaQueryHolder.ItemType);
             }
             else

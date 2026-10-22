@@ -49,7 +49,7 @@ namespace DbGateTestApp
             var assemblyLocation = Assembly.GetExecutingAssembly().Location;
             var assemblyDirectory = Path.GetDirectoryName(assemblyLocation);
 
-            // Navigate up from bin\Debug\net8.0 (or Release) to project root
+            // Navigate up from bin\Debug\net10.0 (or Release) to project root
             var projectDirectory = Directory.GetParent(assemblyDirectory)?.Parent?.Parent?.FullName;
 
             if (string.IsNullOrEmpty(projectDirectory) || !Directory.Exists(projectDirectory))
